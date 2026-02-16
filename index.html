@@ -4,12 +4,11 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
 <meta name="theme-color" content="#ffffff" />
-<title>Store Master v30 - Auto Scan</title>
+<title>Store Master v31 - Filtres & Images</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 <script src="https://unpkg.com/@zxing/library@latest"></script>
 
 <style>
-  /* --- DESIGN SYSTEM --- */
   :root {
     --primary: #0055AA; --accent: #E2001A; --success: #10b981; --warning: #f59e0b;
     --bg: #F4F6F9; --surface: #ffffff; --text: #1e293b; --radius: 16px;
@@ -17,36 +16,41 @@
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: system-ui, -apple-system, sans-serif; }
   body { margin: 0; background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
-  /* HEADER */
   header {
     background: var(--surface); padding: 15px 20px; padding-top: max(15px, env(safe-area-inset-top));
     display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 0 rgba(0,0,0,0.05); z-index: 50;
   }
   .brand { font-size: 18px; font-weight: 800; color: var(--primary); letter-spacing: -0.5px; }
 
-  /* TABS */
+  /* TABS NAVIGATION */
   .tabs { display: flex; background: #e2e8f0; padding: 4px; border-radius: 12px; margin-bottom: 15px; }
   .tab { flex: 1; text-align: center; padding: 12px; font-weight: 700; font-size: 13px; color: #64748b; border-radius: 10px; cursor: pointer; transition: 0.2s; }
   .tab.active { background: white; color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
 
-  /* MAIN */
+  /* BARRE DE FILTRES (NOUVEAU) */
+  .filter-bar { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; margin-bottom: 10px; }
+  .filter-btn { 
+    flex: 1; border: 1px solid #cbd5e1; background: white; padding: 8px 12px; 
+    border-radius: 20px; font-size: 12px; font-weight: bold; color: #64748b; white-space: nowrap; cursor: pointer;
+  }
+  .filter-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+  .filter-btn.active.red { background: var(--accent); border-color: var(--accent); }
+  .filter-btn.active.orange { background: var(--warning); border-color: var(--warning); }
+  .filter-btn.active.green { background: var(--success); border-color: var(--success); }
+
+  /* MAIN CONTENT */
   main { flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 100px; }
   .card { background: var(--surface); border-radius: var(--radius); padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); margin-bottom: 15px; }
   
-  /* SCANNER VIDEO ZONE */
-  #scanner-container { 
-    width: 100%; height: 250px; background: black; border-radius: 12px; margin-bottom: 15px; 
-    overflow: hidden; position: relative; display: none; 
-  }
+  /* SCANNER */
+  #scanner-container { width: 100%; height: 250px; background: black; border-radius: 12px; margin-bottom: 15px; overflow: hidden; position: relative; display: none; }
   video { width: 100%; height: 100%; object-fit: cover; }
-  .scan-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; border: 2px solid var(--accent); opacity: 0.5; pointer-events: none; }
   .scan-btn { width: 100%; padding: 20px; background: var(--primary); color: white; font-weight: bold; font-size: 18px; border-radius: 12px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 15px; }
-  .scan-btn.active { background: var(--accent); }
-
+  
   /* INPUTS */
   .input-group { margin-bottom: 12px; }
   .input-group label { display: block; font-size: 11px; font-weight: 700; color: #64748b; margin-bottom: 4px; text-transform: uppercase; }
-  input, select { width: 100%; padding: 14px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 16px; background: #fff; outline: none; }
+  input { width: 100%; padding: 14px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 16px; background: #fff; outline: none; }
   input:focus { border-color: var(--primary); background: #f8fafc; }
   
   /* LISTE DLC */
@@ -54,11 +58,10 @@
   .dlc-red { border-left-color: var(--accent); background: #FEF2F2; }
   .dlc-orange { border-left-color: var(--warning); background: #FFF7ED; }
   .dlc-green { border-left-color: var(--success); }
-  .dlc-img { width: 45px; height: 45px; border-radius: 8px; object-fit: cover; background: #eee; margin-right: 12px; }
+  .dlc-img { width: 50px; height: 50px; border-radius: 8px; object-fit: contain; background: white; border: 1px solid #eee; margin-right: 12px; }
   .dlc-info { flex: 1; }
-  .dlc-qty { background: #e2e8f0; padding: 2px 6px; border-radius: 4px; font-size: 12px; font-weight: bold; margin-left: 5px; }
   
-  /* NAV & UTILS */
+  /* NAV */
   nav { position: fixed; bottom: 0; width: 100%; background: white; height: 70px; display: flex; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); z-index: 100; }
   .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #94a3b8; font-size: 10px; cursor: pointer; }
   .nav-btn.active { color: var(--primary); } .nav-btn i { font-size: 24px; margin-bottom: 4px; }
@@ -71,7 +74,7 @@
 <body>
 
   <div id="login-overlay" class="overlay">
-    <h1 style="color: white; margin-bottom: 20px;">Store Master v30</h1>
+    <h1 style="color: white; margin-bottom: 20px;">Store Master v31</h1>
     <input type="password" id="login-pass" placeholder="Code (2008)" style="text-align: center; margin-bottom: 20px; max-width: 200px;">
     <button class="btn" style="background: white; color: var(--primary); max-width: 200px;" onclick="window.app.login()">Connexion</button>
   </div>
@@ -84,45 +87,42 @@
   <main>
     <div id="view-home">
       <div class="card" onclick="window.app.nav('frais')" style="text-align:center; cursor:pointer; padding:30px;">
-        <i class="fas fa-barcode" style="font-size:40px; color:var(--primary); margin-bottom:10px;"></i>
-        <h3 style="margin:0;">SCANNER DLC</h3>
-        <p style="color:#64748b; font-size:13px;">Auto-Scan Caméra</p>
+        <i class="fas fa-barcode" style="font-size:50px; color:var(--primary); margin-bottom:15px;"></i>
+        <h3 style="margin:0;">GESTION DLC</h3>
+        <p style="color:#64748b; font-size:13px;">Scanner / Liste / Retraits</p>
       </div>
       <div class="card" onclick="window.app.exportCSV()" style="text-align:center; cursor:pointer;">
         <i class="fas fa-file-csv" style="font-size:30px; color:#64748b; margin-bottom:10px;"></i>
-        <h4 style="margin:0;">Rapport</h4>
+        <h4 style="margin:0;">Export CSV</h4>
       </div>
     </div>
 
     <div id="view-frais" class="hidden">
       <div class="tabs">
         <div id="tab-scan" class="tab active" onclick="window.app.switchTab('scan')">SCANNER</div>
-        <div id="tab-list" class="tab" onclick="window.app.switchTab('list')">LISTE</div>
+        <div id="tab-list" class="tab" onclick="window.app.switchTab('list')">VOIR LISTE</div>
       </div>
 
       <div id="content-scan">
-        <div id="scanner-container">
-            <video id="video"></video>
-            <div class="scan-overlay"></div>
-        </div>
+        <div id="scanner-container"><video id="video"></video></div>
 
         <button id="btn-scan-toggle" class="scan-btn" onclick="window.app.toggleScanner()">
             <i class="fas fa-camera"></i> LANCER SCAN
         </button>
 
         <div class="card">
-          <div class="input-group">
-            <label>EAN (Code Barre)</label>
-            <input type="number" id="frais-ean" placeholder="Scanner ou taper..." oninput="if(this.value.length>=8) window.app.scanApi(this.value)">
+          <div id="frais-img-box" style="display:none; justify-content:center; margin-bottom:15px;">
+            <img id="frais-img" style="height:120px; border-radius:12px; object-fit:contain; border:1px solid #eee;">
           </div>
-          
-          <div id="frais-img-box" style="display:none; text-align:center; margin-bottom:10px;">
-            <img id="frais-img" style="height:100px; border-radius:10px; object-fit:contain; border:1px solid #eee;">
+
+          <div class="input-group">
+            <label>EAN</label>
+            <input type="number" id="frais-ean" placeholder="Code Barre..." oninput="if(this.value.length>=8) window.app.scanApi(this.value)">
           </div>
 
           <div class="input-group">
             <label>Nom du Produit</label>
-            <input type="text" id="frais-name" placeholder="Remplissage auto...">
+            <input type="text" id="frais-name" placeholder="Automatique...">
           </div>
 
           <div style="display: flex; gap: 10px;">
@@ -141,11 +141,13 @@
       </div>
 
       <div id="content-list" class="hidden">
-        <div style="text-align:center; font-size:12px; margin-bottom:10px; color:#666;">
-          <span style="color:var(--accent)">● J-0/Périmé</span> &nbsp; 
-          <span style="color:var(--warning)">● J+1</span> &nbsp; 
-          <span style="color:var(--success)">● OK</span>
+        <div class="filter-bar">
+          <button class="filter-btn active" id="filter-all" onclick="window.app.filterList('all')">TOUT</button>
+          <button class="filter-btn red" id="filter-red" onclick="window.app.filterList('red')">🔴 J-0</button>
+          <button class="filter-btn orange" id="filter-orange" onclick="window.app.filterList('orange')">🟠 J+1</button>
+          <button class="filter-btn green" id="filter-green" onclick="window.app.filterList('green')">🟢 J+2</button>
         </div>
+
         <div id="list-frais-container"></div>
       </div>
     </div>
@@ -166,21 +168,22 @@
   const firebaseConfig = { apiKey: "AIzaSyA0ffa4Nfa7kGLyaEcAocU9YzIhzmx3SkA", authDomain: "araujo-exploitation.firebaseapp.com", databaseURL: "https://araujo-exploitation-default-rtdb.europe-west1.firebasedatabase.app", projectId: "araujo-exploitation", storageBucket: "araujo-exploitation.firebasestorage.app", messagingSenderId: "292878114487", appId: "1:292878114487:web:2a450227310e970ce1b732" };
   
   const db = getFirestore(initializeApp(firebaseConfig));
-  const docRef = doc(db, "store_master", "v30");
+  const docRef = doc(db, "store_master", "v31");
   const codeReader = new ZXing.BrowserMultiFormatReader();
 
   window.app = {
     data: { frais: [] },
     scanning: false,
-    
+    currentFilter: 'all',
+    currentImgUrl: "", // Stocke l'URL de l'image récupérée
+
     init: function() {
       onSnapshot(docRef, (s) => {
         if(s.exists()) { this.data = {...this.data, ...s.data()}; this.renderList(); }
       });
     },
-
     save: async function() { await setDoc(docRef, this.data, {merge:true}); this.renderList(); },
-
+    
     login: function() {
       if(document.getElementById('login-pass').value === "2008") {
         document.getElementById('login-overlay').classList.add('hidden');
@@ -191,7 +194,7 @@
     nav: function(v) {
       document.querySelectorAll('[id^="view-"]').forEach(e => e.classList.add('hidden'));
       document.getElementById('view-'+v).classList.remove('hidden');
-      if(this.scanning) this.stopScanner(); // Stop caméra si on change de page
+      if(this.scanning) this.stopScanner();
     },
 
     switchTab: function(t) {
@@ -203,32 +206,22 @@
       if(t === 'list') this.stopScanner();
     },
 
-    // SCANNER CAMERA LOGIC
     toggleScanner: function() {
-        if(this.scanning) {
-            this.stopScanner();
-        } else {
-            this.startScanner();
-        }
+        if(this.scanning) this.stopScanner();
+        else this.startScanner();
     },
 
     startScanner: function() {
         this.scanning = true;
         document.getElementById('scanner-container').style.display = "block";
-        document.getElementById('btn-scan-toggle').innerHTML = "<i class='fas fa-stop'></i> STOP SCAN";
-        document.getElementById('btn-scan-toggle').classList.add('active');
-        
+        document.getElementById('btn-scan-toggle').innerHTML = "STOP SCAN";
         codeReader.decodeFromVideoDevice(null, 'video', (result, err) => {
             if (result) {
-                // CODE TROUVÉ !
                 document.getElementById('beep').play();
                 if(navigator.vibrate) navigator.vibrate(200);
-                
-                // Remplir champs
                 document.getElementById('frais-ean').value = result.text;
-                this.scanApi(result.text); // Chercher infos
-                
-                this.stopScanner(); // Fermer caméra après scan réussi
+                this.scanApi(result.text);
+                this.stopScanner();
             }
         });
     },
@@ -238,20 +231,20 @@
         codeReader.reset();
         document.getElementById('scanner-container').style.display = "none";
         document.getElementById('btn-scan-toggle').innerHTML = "<i class='fas fa-camera'></i> LANCER SCAN";
-        document.getElementById('btn-scan-toggle').classList.remove('active');
     },
 
-    // OPEN FOOD FACTS API
     scanApi: async function(ean) {
       try {
         let r = await fetch(`https://world.openfoodfacts.org/api/v0/product/${ean}.json`);
         let d = await r.json();
         if(d.status === 1) {
           document.getElementById('frais-name').value = d.product.product_name_fr || d.product.product_name;
-          let img = d.product.image_small_url;
-          if(img) {
-             document.getElementById('frais-img').src = img;
-             document.getElementById('frais-img-box').style.display = 'block';
+          // Sauvegarde l'image dans la variable globale
+          this.currentImgUrl = d.product.image_url || d.product.image_small_url || "";
+          
+          if(this.currentImgUrl) {
+             document.getElementById('frais-img').src = this.currentImgUrl;
+             document.getElementById('frais-img-box').style.display = 'flex';
           }
         }
       } catch(e){}
@@ -262,13 +255,12 @@
       let name = document.getElementById('frais-name').value;
       let date = document.getElementById('frais-date').value;
       let qty = document.getElementById('frais-qty').value;
-      let img = document.getElementById('frais-img').src;
       
-      if(!name || !date) return alert("Nom et Date requis !");
+      if(!name || !date) return alert("Date requise !");
       
       this.data.frais.push({
         id: Date.now(), ean, name, date, qty,
-        img: img.includes('http') ? img : null
+        img: this.currentImgUrl // Utilise l'image de l'API
       });
       this.save();
       
@@ -277,7 +269,8 @@
       document.getElementById('frais-ean').value = "";
       document.getElementById('frais-qty').value = "1";
       document.getElementById('frais-img-box').style.display = 'none';
-      alert("Produit ajouté !");
+      this.currentImgUrl = ""; // Reset image
+      alert("Ajouté !");
     },
 
     delItem: function(id) {
@@ -287,36 +280,62 @@
       }
     },
 
+    filterList: function(filterType) {
+        this.currentFilter = filterType;
+        // Update boutons
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('filter-'+filterType).classList.add('active');
+        this.renderList();
+    },
+
     renderList: function() {
       let today = new Date().toISOString().split('T')[0];
-      
-      let html = this.data.frais.sort((a,b) => a.date.localeCompare(b.date)).map(i => {
+      const cont = document.getElementById('list-frais-container');
+      cont.innerHTML = "";
+
+      let list = this.data.frais.sort((a,b) => a.date.localeCompare(b.date));
+
+      list.forEach(i => {
         let diff = (new Date(i.date) - new Date(today)) / (86400000);
         let cls = 'dlc-green';
         let txt = i.date;
+        let show = false;
 
-        if (diff < 1) { cls = 'dlc-red'; txt = "AUJOURD'HUI"; } 
-        else if (diff < 2) { cls = 'dlc-orange'; txt = "DEMAIN"; }
+        // Logique Couleur et Filtre
+        if (diff < 1) { 
+            cls = 'dlc-red'; txt = "J-0 (Aujourd'hui)"; 
+            if(this.currentFilter === 'all' || this.currentFilter === 'red') show = true;
+        } 
+        else if (diff < 2) { 
+            cls = 'dlc-orange'; txt = "J+1 (Demain)"; 
+            if(this.currentFilter === 'all' || this.currentFilter === 'orange') show = true;
+        } 
+        else { 
+            cls = 'dlc-green'; 
+            if(this.currentFilter === 'all' || this.currentFilter === 'green') show = true;
+        }
 
-        return `
-          <div class="dlc-item ${cls}">
-            <img src="${i.img || 'https://via.placeholder.com/50'}" class="dlc-img">
-            <div class="dlc-info">
-              <div style="font-weight:bold;">${i.name}</div>
-              <div style="font-size:13px; color:#555;">${txt} (${new Date(i.date).toLocaleDateString()}) <span class="dlc-qty">x${i.qty}</span></div>
-            </div>
-            <button onclick="window.app.delItem(${i.id})" style="background:none; border:none; color:#ccc; padding:10px;"><i class="fas fa-trash"></i></button>
-          </div>
-        `;
-      }).join('');
-      
-      document.getElementById('list-frais-container').innerHTML = html || "<div style='text-align:center; padding:20px; color:#aaa'>Liste vide</div>";
+        if(show) {
+            cont.innerHTML += `
+              <div class="dlc-item ${cls}">
+                <img src="${i.img || 'https://via.placeholder.com/50?text=No+Img'}" class="dlc-img">
+                <div class="dlc-info">
+                  <div style="font-weight:bold;">${i.name}</div>
+                  <div style="font-size:12px; color:#555;">${txt} • <span style="font-weight:bold">x${i.qty}</span></div>
+                </div>
+                <button onclick="window.app.delItem(${i.id})" style="background:none; border:none; color:#999; padding:10px;"><i class="fas fa-trash"></i></button>
+              </div>
+            `;
+        }
+      });
+
+      if(cont.innerHTML === "") cont.innerHTML = "<div style='text-align:center; padding:20px; color:#aaa'>Aucun produit dans cette catégorie</div>";
     },
 
     exportCSV: function() {
       let csv = "Date;Nom;DLC;Quantite\n";
       this.data.frais.forEach(i => csv += `${new Date().toLocaleDateString()};${i.name};${i.date};${i.qty}\n`);
-      let a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv'})); a.download = 'DLC_Stock.csv'; a.click();
+      let a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv'})); a.download = 'Stock_DLC.csv'; a.click();
     }
   };
 </script>
