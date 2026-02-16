@@ -4,35 +4,36 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
 <meta name="theme-color" content="#ffffff" />
-<title>Araujo Exploitation v36</title>
+<title>Araujo Exploitation v37</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 <script src="https://unpkg.com/@zxing/library@latest"></script>
 
 <style>
   :root {
     --primary: #003896; --accent: #E2001A; --success: #10b981; --warning: #f59e0b;
-    --bg: #F4F6F9; --surface: #ffffff; --text: #1e293b; --radius: 12px; --gray: #64748b;
-    --header-bg: #2c3e50; /* Couleur sombre des entêtes de famille style Wek */
+    --bg: #ffffff; /* FOND BLANC DEMANDÉ */
+    --surface: #ffffff; --text: #1e293b; --radius: 12px; --gray: #64748b;
+    --header-bg: #2c3e50;
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: system-ui, -apple-system, sans-serif; }
   body { margin: 0; background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
   /* HEADER */
   header {
-    background: var(--surface); padding: 10px 20px; padding-top: max(10px, env(safe-area-inset-top));
-    display: flex; align-items: center; gap: 15px; box-shadow: 0 1px 0 rgba(0,0,0,0.05); z-index: 50;
+    background: var(--surface); padding: 10px 20px; padding-top: max(15px, env(safe-area-inset-top));
+    display: flex; justify-content: center; align-items: center; z-index: 50;
   }
-  .logo-img { height: 45px; width: auto; object-fit: contain; }
-  .brand { font-size: 16px; font-weight: 900; color: var(--primary); letter-spacing: -0.5px; text-transform: uppercase; line-height: 1.2; }
+  /* LOGO GROSSI */
+  .logo-img { height: 70px; width: auto; object-fit: contain; }
 
   /* TABS */
-  .tabs { display: flex; background: #e2e8f0; padding: 4px; border-radius: 12px; margin-bottom: 15px; }
+  .tabs { display: flex; background: #f1f5f9; padding: 4px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #e2e8f0; }
   .tab { flex: 1; text-align: center; padding: 10px; font-weight: 700; font-size: 11px; color: #64748b; border-radius: 9px; cursor: pointer; transition: 0.2s; white-space: nowrap; }
   .tab.active { background: white; color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
 
   /* FILTRES */
   .filter-bar { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; margin-bottom: 10px; }
-  .filter-btn { flex: 1; border: 1px solid #cbd5e1; background: white; padding: 8px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; color: #64748b; white-space: nowrap; cursor: pointer; }
+  .filter-btn { flex: 1; border: 1px solid #e2e8f0; background: #f8fafc; padding: 8px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; color: #64748b; white-space: nowrap; cursor: pointer; }
   .filter-btn.active.red { background: var(--accent); color: white; border-color: var(--accent); }
   .filter-btn.active.orange { background: var(--warning); color: white; border-color: var(--warning); }
   .filter-btn.active.green { background: var(--success); color: white; border-color: var(--success); }
@@ -40,38 +41,57 @@
 
   /* MAIN */
   main { flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 100px; }
-  .card { background: var(--surface); border-radius: var(--radius); padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); margin-bottom: 15px; }
+  .card { background: #f8fafc; border-radius: var(--radius); padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); margin-bottom: 15px; border: 1px solid #e2e8f0; }
 
   /* SCANNER */
   #scanner-container { width: 100%; height: 250px; background: black; border-radius: 12px; margin-bottom: 15px; overflow: hidden; display: none; }
   video { width: 100%; height: 100%; object-fit: cover; }
   .scan-btn { width: 100%; padding: 20px; background: var(--primary); color: white; font-weight: bold; font-size: 18px; border-radius: 12px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 15px; }
 
-  /* --- STYLE WEK (NOUVEAU) --- */
+  /* --- STYLE LISTE & SWIPE --- */
   
-  /* Entête de Famille */
   .group-header {
     background: var(--header-bg); color: white;
     padding: 10px 15px; border-radius: 8px 8px 0 0;
     margin-top: 15px; display: flex; justify-content: space-between; align-items: center;
     font-size: 13px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;
   }
-  .group-count {
-    background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 10px; font-size: 11px;
+
+  /* CONTENEUR SWIPE */
+  .swipe-wrapper {
+    position: relative;
+    background: var(--accent); /* Fond rouge quand on glisse */
+    overflow: hidden;
+    border-bottom: 1px solid #eee;
+  }
+  .swipe-wrapper:last-child { border-radius: 0 0 8px 8px; border-bottom: none; }
+
+  /* ICONE POUBELLE DERRIERE */
+  .swipe-action-bg {
+    position: absolute; top: 0; bottom: 0; left: 0; width: 100px;
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 24px; z-index: 1;
   }
 
-  /* Item de la liste */
+  /* CONTENU DE L'ITEM (Ce qui bouge) */
   .wek-item {
-    background: white; border-bottom: 1px solid #eee;
+    position: relative; z-index: 2;
+    background: white; 
     padding: 12px 15px; display: flex; align-items: center; justify-content: space-between;
+    transition: transform 0.2s ease-out;
+    will-change: transform;
   }
-  .wek-item:last-child { border-radius: 0 0 8px 8px; border-bottom: none; }
+  
+  .wek-img { 
+    width: 45px; height: 45px; border-radius: 8px; object-fit: cover; 
+    background: #f1f5f9; border: 1px solid #e2e8f0; margin-right: 12px; 
+    display: flex; align-items: center; justify-content: center; color: #cbd5e1;
+  }
   
   .wek-info { flex: 1; padding-right: 10px; }
   .wek-name { font-weight: bold; font-size: 14px; color: var(--text); margin-bottom: 4px; }
-  .wek-qty { font-size: 12px; color: #666; background: #f1f5f9; padding: 2px 6px; border-radius: 4px; }
+  .wek-qty { font-size: 11px; color: #666; background: #f1f5f9; padding: 2px 6px; border-radius: 4px; border: 1px solid #e2e8f0; }
   
-  /* Badge Date Carré (Style Wek) */
   .date-badge {
     width: 45px; height: 45px; border-radius: 8px;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -81,17 +101,11 @@
   .date-day { font-size: 16px; line-height: 1; }
   .date-month { font-size: 10px; text-transform: uppercase; margin-top: 2px; }
 
-  /* Couleurs Badge */
   .badge-red { background: var(--accent); }
   .badge-orange { background: var(--warning); }
   .badge-green { background: var(--success); }
   .badge-gray { background: var(--gray); }
 
-  /* Bouton Poubelle discret */
-  .btn-trash {
-    background: none; border: none; color: #cbd5e1; margin-right: 10px; font-size: 16px; cursor: pointer;
-  }
-  
   /* INPUTS */
   .input-group label { display: block; font-size: 11px; font-weight: 700; color: #64748b; margin-bottom: 4px; text-transform: uppercase; }
   input, select { width: 100%; padding: 14px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 16px; background: #fff; outline: none; }
@@ -109,24 +123,22 @@
 <body>
 
   <div id="login-overlay" class="overlay">
-    <img src="https://raw.githubusercontent.com/araujoexploitation/Magasin/main/LOGO.png" style="height:100px; margin-bottom:20px; border-radius:10px; background:white; padding:5px;">
-    <h1 style="color: white; margin-bottom: 10px; font-size:20px;">ARAUJO EXPLOITATION</h1>
-    <p style="color:white; margin-bottom:30px; opacity:0.8">v36.0</p>
+    <img src="https://raw.githubusercontent.com/araujoexploitation/Magasin/main/LOGO.png" style="height:100px; margin-bottom:20px; border-radius:10px; background:white; padding:10px;">
+    <h1 style="color: white; margin-bottom: 10px; font-size:20px;">EXPLOITATION</h1>
     <input type="password" id="login-pass" placeholder="Code (2008)" style="text-align: center; margin-bottom: 20px; max-width: 200px;">
     <button class="btn" style="background: white; color: var(--primary); max-width: 200px;" onclick="window.app.login()">Connexion</button>
   </div>
 
   <header>
     <img src="https://raw.githubusercontent.com/araujoexploitation/Magasin/main/LOGO.png" class="logo-img">
-    <div class="brand">ARAUJO<br>EXPLOITATION</div>
   </header>
 
   <main>
     <div id="view-home">
-      <div class="card" onclick="window.app.nav('frais')" style="text-align:center; cursor:pointer; padding:40px;">
+      <div class="card" onclick="window.app.nav('frais')" style="text-align:center; cursor:pointer; padding:40px; border: 2px solid var(--primary); background:white;">
         <i class="fas fa-barcode" style="font-size:60px; color:var(--primary); margin-bottom:20px;"></i>
         <h2 style="margin:0; color:var(--primary)">GESTION DLC</h2>
-        <p style="color:#64748b; font-size:14px; margin-top:5px;">Accéder au module</p>
+        <p style="color:#64748b; font-size:14px; margin-top:5px;">Scanner & Liste</p>
       </div>
     </div>
 
@@ -143,7 +155,7 @@
             <i class="fas fa-camera"></i> LANCER SCAN
         </button>
 
-        <div class="card">
+        <div class="card" style="background:white;">
           <div id="frais-img-box" style="display:none; justify-content:center; margin-bottom:15px;">
             <img id="frais-img" style="height:120px; border-radius:12px; object-fit:contain; border:1px solid #eee;">
           </div>
@@ -205,7 +217,7 @@
 
   const firebaseConfig = { apiKey: "AIzaSyA0ffa4Nfa7kGLyaEcAocU9YzIhzmx3SkA", authDomain: "araujo-exploitation.firebaseapp.com", databaseURL: "https://araujo-exploitation-default-rtdb.europe-west1.firebasedatabase.app", projectId: "araujo-exploitation", storageBucket: "araujo-exploitation.firebasestorage.app", messagingSenderId: "292878114487", appId: "1:292878114487:web:2a450227310e970ce1b732" };
   const db = getFirestore(initializeApp(firebaseConfig));
-  const docRef = doc(db, "store_master", "v36");
+  const docRef = doc(db, "store_master", "v37");
   const codeReader = new ZXing.BrowserMultiFormatReader();
 
   window.app = {
@@ -289,7 +301,11 @@
           document.getElementById('frais-name').value = d.product.product_name_fr || d.product.product_name;
           let fam = this.detectFamily(d.product);
           document.getElementById('frais-famille').value = fam;
-          this.currentImgUrl = d.product.image_url || d.product.image_small_url || "";
+          
+          // Récupère l'image avec fallback
+          let img = d.product.image_front_small_url || d.product.image_small_url || d.product.image_url || "";
+          this.currentImgUrl = img;
+          
           if(this.currentImgUrl) {
              document.getElementById('frais-img').src = this.currentImgUrl;
              document.getElementById('frais-img-box').style.display = 'flex';
@@ -313,8 +329,8 @@
     },
 
     moveToHistory: function(id) {
-      let code = prompt("Code Manager requis pour supprimer :");
-      if(code !== "2008") return alert("Accès refusé");
+      // Pour le swipe, on ne demande pas le code pour aller vite (fluidité)
+      // On demandera le code seulement pour vider tout l'historique
       let item = this.data.frais.find(x => x.id === id);
       if(item) {
           this.data.history.push({...item, deletedAt: new Date().toISOString()});
@@ -342,12 +358,46 @@
         return d.toLocaleDateString('fr-FR');
     },
 
-    // HELPER POUR DATE BADGE
     getDateBadgeParts: function(dateStr) {
         let d = new Date(dateStr);
         let day = d.getDate();
-        let month = d.toLocaleString('fr-FR', { month: 'short' }).replace('.',''); // JAN, FEV...
+        let month = d.toLocaleString('fr-FR', { month: 'short' }).replace('.','');
         return { day, month };
+    },
+
+    // SWIPE LOGIC INITIALIZATION
+    initSwipe: function() {
+        document.querySelectorAll('.wek-item').forEach(item => {
+            let startX, currentX;
+            let id = item.dataset.id;
+            
+            item.addEventListener('touchstart', (e) => {
+                startX = e.touches[0].clientX;
+                item.style.transition = 'none';
+            });
+            
+            item.addEventListener('touchmove', (e) => {
+                currentX = e.touches[0].clientX;
+                let diff = currentX - startX;
+                // On autorise seulement le glissement vers la droite
+                if(diff > 0) {
+                    item.style.transform = `translateX(${diff}px)`;
+                    // Prevent scroll if swiping horizontally
+                    if(diff > 10) e.preventDefault();
+                }
+            });
+            
+            item.addEventListener('touchend', (e) => {
+                let diff = currentX - startX;
+                item.style.transition = 'transform 0.3s ease';
+                if(diff > 150) { // Seuil de validation
+                    item.style.transform = `translateX(100%)`;
+                    setTimeout(() => window.app.moveToHistory(Number(id)), 300);
+                } else {
+                    item.style.transform = 'translateX(0)';
+                }
+            });
+        });
     },
 
     renderList: function() {
@@ -355,10 +405,8 @@
       const cont = document.getElementById('list-frais-container');
       cont.innerHTML = "";
 
-      // GROUP BY FAMILY
       let grouped = {};
       this.data.frais.sort((a,b) => a.date.localeCompare(b.date)).forEach(i => {
-         // Filter Logic
          let diff = (new Date(i.date) - new Date(today)) / (86400000);
          let show = false;
          if (diff < 1 && ['all','red'].includes(this.currentFilter)) show = true;
@@ -371,7 +419,6 @@
          }
       });
 
-      // RENDER GROUPS
       Object.keys(grouped).sort().forEach(fam => {
           let items = grouped[fam];
           cont.innerHTML += `
@@ -386,36 +433,49 @@
              else if(i.diff < 2) badgeColor = 'badge-orange';
              
              let {day, month} = this.getDateBadgeParts(i.date);
+             
+             // GESTION IMAGE AVEC FALLBACK ICONE
+             let imgHtml = i.img 
+                ? `<img src="${i.img}" class="wek-img" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                   <div class="wek-img" style="display:none"><i class="fas fa-utensils"></i></div>`
+                : `<div class="wek-img"><i class="fas fa-utensils"></i></div>`;
 
              cont.innerHTML += `
-               <div class="wek-item">
-                  <button class="btn-trash" onclick="window.app.moveToHistory(${i.id})"><i class="fas fa-trash"></i></button>
-                  <div class="wek-info">
-                      <div class="wek-name">${i.name}</div>
-                      <span class="wek-qty">x${i.qty}</span>
-                  </div>
-                  <div class="date-badge ${badgeColor}">
-                      <span class="date-day">${day}</span>
-                      <span class="date-month">${month}</span>
-                  </div>
+               <div class="swipe-wrapper">
+                   <div class="swipe-action-bg"><i class="fas fa-trash"></i></div>
+                   <div class="wek-item" data-id="${i.id}">
+                      ${imgHtml}
+                      <div class="wek-info">
+                          <div class="wek-name">${i.name}</div>
+                          <span class="wek-qty">x${i.qty}</span>
+                      </div>
+                      <div class="date-badge ${badgeColor}">
+                          <span class="date-day">${day}</span>
+                          <span class="date-month">${month}</span>
+                      </div>
+                   </div>
                </div>
              `;
           });
       });
 
-      if(cont.innerHTML === "") cont.innerHTML = "<div style='text-align:center; padding:20px; color:#aaa'>Vide</div>";
+      if(cont.innerHTML === "") cont.innerHTML = "<div style='text-align:center; padding:20px; color:#aaa'>Aucun produit</div>";
+      
+      // Activer le swipe après le rendu
+      this.initSwipe();
     },
 
     renderHistory: function() {
         const cont = document.getElementById('list-hist-container');
         cont.innerHTML = this.data.history.slice().reverse().map(i => `
-            <div class="wek-item" style="opacity:0.7">
+            <div class="wek-item" style="opacity:0.7; background:#f8fafc; border-bottom:1px solid #eee;">
                 <div class="wek-info">
+                   <span style="font-size:10px; font-weight:bold; color:#003896">${i.fam}</span><br>
                    <div class="wek-name">${i.name}</div>
                    <small>Retiré le ${this.formatDateFR(i.deletedAt)}</small>
                 </div>
                 <div class="date-badge badge-gray">
-                    <span class="date-day" style="font-size:12px;">x${i.qty}</span>
+                    <span class="date-day" style="font-size:14px;">x${i.qty}</span>
                 </div>
             </div>
         `).join('');
