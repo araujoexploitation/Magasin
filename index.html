@@ -1,492 +1,76 @@
-<!doctype html>
-<html lang="fr">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-<title>Carrefour Store Master v25.0</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-<script src="https://unpkg.com/@zxing/library@latest"></script>
-
-<style>
-  :root {
-    --bg:#f8fafc; --white:#ffffff; 
-    --blue:#003896; --red:#ef4444; --orange:#f97316; --green:#10b981; 
-    --radius:12px; --shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-  }
-  * { box-sizing:border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
-  body { margin:0; background:#e2e8f0; display: flex; justify-content: center; height: 100vh; overflow: hidden; }
-  
-  #app { width: 100%; max-width: 600px; background: var(--bg); height: 100%; position: relative; display: flex; flex-direction: column; }
-  
-  /* HEADER */
-  header { padding:15px; background:var(--white); border-bottom:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center; z-index:10; }
-  .logo { font-weight:900; color:var(--blue); font-size:18px; letter-spacing:-0.5px; }
-  .status-badge { font-size:10px; padding:4px 8px; border-radius:10px; background:#e0f2fe; color:var(--blue); font-weight:bold; }
-  .offline { background:#fee2e2; color:var(--red); }
-
-  /* SCROLLABLE CONTENT */
-  .content { flex:1; overflow-y: auto; padding: 15px; padding-bottom: 80px; }
-
-  /* CARDS & MODULES */
-  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .card { background:var(--white); border-radius:var(--radius); padding:15px; box-shadow:var(--shadow); margin-bottom:12px; position:relative; }
-  .module-btn { background:var(--white); border-radius:var(--radius); padding:20px; text-align:center; box-shadow:var(--shadow); cursor:pointer; transition:0.1s; border-bottom:4px solid transparent; }
-  .module-btn:active { transform:scale(0.98); }
-  .module-btn i { font-size:30px; margin-bottom:8px; display:block; }
-  
-  /* COULEURS MODULES */
-  .mod-frais { border-color:var(--blue); color:var(--blue); }
-  .mod-pvp { border-color:var(--orange); color:var(--orange); }
-  .mod-rec { border-color:var(--green); color:var(--green); }
-  .mod-clean { border-color:#8b5cf6; color:#8b5cf6; }
-
-  /* INPUTS & BUTTONS */
-  input, select, textarea { width:100%; padding:12px; margin:5px 0 15px; border:1px solid #cbd5e1; border-radius:8px; font-size:16px; background:#fff; }
-  .btn { width:100%; padding:14px; border:none; border-radius:8px; font-weight:bold; color:white; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; margin-top:5px; }
-  .btn-blue { background:var(--blue); }
-  .btn-red { background:var(--red); }
-  .btn-green { background:var(--green); }
-  .btn-outline { background:transparent; border:2px solid var(--blue); color:var(--blue); }
-
-  /* LIST ITEMS */
-  .item-row { display:flex; gap:10px; align-items:center; border-bottom:1px solid #f1f5f9; padding:10px 0; }
-  .item-img { width:50px; height:50px; border-radius:6px; background:#eee; object-fit:cover; flex-shrink:0; }
-  .item-info { flex:1; }
-  .tag { font-size:10px; padding:2px 6px; border-radius:4px; font-weight:bold; text-transform:uppercase; }
-  .tag-red { background:#fee2e2; color:var(--red); }
-  .tag-orange { background:#ffedd5; color:var(--orange); }
-  .tag-green { background:#dcfce7; color:var(--green); }
-
-  /* MODALS */
-  .overlay { position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:50; display:flex; align-items:center; justify-content:center; }
-  .modal { background:white; width:90%; max-width:400px; max-height:80vh; border-radius:var(--radius); padding:20px; overflow-y:auto; }
-
-  /* NAVBAR */
-  nav { position:absolute; bottom:0; width:100%; background:var(--white); border-top:1px solid #e2e8f0; display:flex; height:60px; z-index:20; }
-  .nav-item { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#64748b; font-size:10px; cursor:pointer; }
-  .nav-item.active { color:var(--blue); font-weight:bold; }
-  .nav-item i { font-size:20px; margin-bottom:2px; }
-
-  .hidden { display:none !important; }
-</style>
-</head>
-<body>
-
-<div id="app">
-  <div id="login-overlay" class="overlay" style="background:var(--blue); z-index:100;">
-    <div style="text-align:center; color:white;">
-      <h1>STORE MASTER</h1>
-      <p>Identification Requise</p>
-      <input type="text" id="login-user" placeholder="Votre Prénom" style="text-align:center;">
-      <input type="password" id="login-pass" placeholder="Code Magasin (2008)" style="text-align:center;">
-      <button class="btn btn-green" onclick="app.login()">ENTRER</button>
-    </div>
-  </div>
-
-  <header>
-    <div class="logo">CARREFOUR <span style="font-weight:300">EXPLOITATION</span></div>
-    <div id="cloud-status" class="status-badge">CONNEXION...</div>
-  </header>
-
-  <div id="main-content" class="content">
-    
-    <div id="view-home">
-      <div class="card" style="background:#fff7ed; border-left:4px solid var(--orange);">
-        <h3 style="margin:0; color:var(--orange)">⚠️ À FAIRE AUJOURD'HUI</h3>
-        <div id="kpi-list" style="margin-top:10px;">Chargement...</div>
-      </div>
-      
-      <div class="grid">
-        <div class="module-btn mod-frais" onclick="app.nav('frais')"><i class="fas fa-barcode"></i>FRAIS / DLC</div>
-        <div class="module-btn mod-pvp" onclick="app.nav('pvp')"><i class="fas fa-bread-slice"></i>PVP / SALADE</div>
-        <div class="module-btn mod-rec" onclick="app.nav('reception')"><i class="fas fa-truck"></i>RÉCEPTION</div>
-        <div class="module-btn mod-clean" onclick="app.nav('clean')"><i class="fas fa-pump-soap"></i>NETTOYAGE</div>
-      </div>
-      
-      <div class="card">
-        <h4>Outils Rapides</h4>
-        <button class="btn btn-outline" onclick="app.exportCSV()"><i class="fas fa-file-csv"></i> Exporter Rapport Inspection</button>
-      </div>
-    </div>
-
-    <div id="view-frais" class="hidden">
-      <div class="card">
-        <h3><i class="fas fa-barcode"></i> Saisie DLC</h3>
-        <div style="display:flex; gap:10px;">
-          <input type="number" id="frais-ean" placeholder="Scan EAN..." oninput="if(this.value.length>=8) app.scanApi(this.value)">
-          <div id="frais-img-box" style="width:50px; height:50px; background:#eee; border-radius:5px; overflow:hidden;"><img id="frais-img" style="width:100%; height:100%; object-fit:cover; display:none;"></div>
-        </div>
-        <input type="text" id="frais-name" placeholder="Produit">
-        <input type="date" id="frais-date">
-        <button class="btn btn-blue" onclick="app.addFrais()">VALIDER</button>
-      </div>
-      <div id="list-frais"></div>
-    </div>
-
-    <div id="view-pvp" class="hidden">
-      <div class="card">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-          <h3><i class="fas fa-clock"></i> Production</h3>
-          <button class="status-badge" onclick="document.getElementById('modal-pvp-lib').classList.remove('hidden')">+ BIBLIOTHÈQUE</button>
-        </div>
-        <p style="font-size:12px; color:#666;">Cliquez sur un produit pour lancer un lot.</p>
-        <div id="list-pvp-lib" class="grid" style="grid-template-columns: repeat(3, 1fr);"></div>
-      </div>
-      <div class="card">
-        <h4>Lots en cours</h4>
-        <div id="list-pvp-batches"></div>
-      </div>
-    </div>
-
-    <div id="view-reception" class="hidden">
-      <div class="card">
-        <h3><i class="fas fa-thermometer-half"></i> Contrôle Réception</h3>
-        <select id="rec-type" onchange="app.checkTempRules()">
-          <option value="Frais">Frais (0°C à 4°C)</option>
-          <option value="Surgelé">Surgelé (-18°C)</option>
-          <option value="Sec">Sec (Ambiant)</option>
-        </select>
-        <input type="text" id="rec-fournisseur" placeholder="Fournisseur / Transporteur">
-        <input type="number" id="rec-temp" placeholder="Température °C" step="0.1" oninput="app.checkTempRules()">
-        <div id="rec-status" style="font-weight:bold; margin-bottom:10px;"></div>
-        <button class="btn btn-green" onclick="app.addReception()">ENREGISTRER</button>
-      </div>
-      <div id="list-reception"></div>
-    </div>
-
-    <div id="view-clean" class="hidden">
-      <div class="card">
-        <h3><i class="fas fa-broom"></i> Plan du Jour</h3>
-        <div id="list-clean"></div>
-      </div>
-    </div>
-
-  </div>
-
-  <nav>
-    <div class="nav-item active" onclick="app.nav('home')"><i class="fas fa-home"></i>Dashboard</div>
-    <div class="nav-item" onclick="app.nav('frais')"><i class="fas fa-barcode"></i>Frais</div>
-    <div class="nav-item" onclick="app.nav('pvp')"><i class="fas fa-clock"></i>PVP</div>
-    <div class="nav-item" onclick="app.nav('reception')"><i class="fas fa-truck"></i>Recept.</div>
-  </nav>
-
-  <div id="modal-pvp-lib" class="overlay hidden">
-    <div class="modal">
-      <h3>Nouveau Produit PVP/Salade</h3>
-      <input type="text" id="lib-name" placeholder="Nom (ex: Baguette, Bac Tomates)">
-      <select id="lib-type"><option value="PVP">Boulangerie</option><option value="SALADE">Salade Bar</option></select>
-      <label>Durée de vie (Heures)</label>
-      <input type="number" id="lib-hours" value="24">
-      <label>Photo (Optionnel)</label>
-      <input type="file" id="lib-file" accept="image/*">
-      <div style="display:flex; gap:10px;">
-        <button class="btn btn-blue" onclick="app.addLibPvp()">CRÉER</button>
-        <button class="btn btn-red" onclick="document.getElementById('modal-pvp-lib').classList.add('hidden')">ANNULER</button>
-      </div>
-    </div>
-  </div>
-
-</div>
-
 <script type="module">
+  // 1. On importe les outils depuis Internet (CDN)
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+  // 2. Ta configuration spécifique (Celle que tu m'as donnée)
   const firebaseConfig = {
     apiKey: "AIzaSyA0ffa4Nfa7kGLyaEcAocU9YzIhzmx3SkA",
     authDomain: "araujo-exploitation.firebaseapp.com",
+    databaseURL: "https://araujo-exploitation-default-rtdb.europe-west1.firebasedatabase.app",
     projectId: "araujo-exploitation",
     storageBucket: "araujo-exploitation.firebasestorage.app",
     messagingSenderId: "292878114487",
     appId: "1:292878114487:web:2a450227310e970ce1b732"
   };
 
+  // 3. Initialisation de la connexion
   const firebaseApp = initializeApp(firebaseConfig);
   const dbFirestore = getFirestore(firebaseApp);
-  const docRef = doc(dbFirestore, "store_master", "v25");
+  
+  // On pointe vers le document de sauvegarde (v26 pour la dernière version)
+  const docRef = doc(dbFirestore, "store_master", "v26");
 
-  // --- APP LOGIC ---
+  // --- LOGIQUE DE L'APPLICATION (Ne change pas) ---
   window.app = {
-    data: {
-      frais: [], pvpLib: [], pvpBatches: [], reception: [], cleaning_log: {},
-      cleaningDef: [
-        {id:1, name:"Sol Cuisine", freq:"daily"},
-        {id:2, name:"Tapis Caisse", freq:"daily"},
-        {id:3, name:"Vitres Entrée", freq:"weekly", day:1} // 1 = Lundi
-      ],
-      config: { adminCode: "2008" }
-    },
-    user: null,
-
-    // INIT
+    data: { history: [], frais: [] }, // Structure de base
+    
+    // Initialisation et Synchronisation
     init: function() {
-      // Sync Firestore
-      onSnapshot(docRef, (doc) => {
-        if(doc.exists()) {
-          this.data = { ...this.data, ...doc.data() }; // Merge local defaults with cloud data
-          document.getElementById('cloud-status').innerText = "CLOUD OK";
-          document.getElementById('cloud-status').style.background = "#dcfce7";
-          document.getElementById('cloud-status').style.color = "#16a34a";
-          this.renderAll();
+      // Écoute en temps réel les changements dans la base de données
+      onSnapshot(docRef, (docSnap) => {
+        if (docSnap.exists()) {
+          // Si des données existent, on les charge
+          this.data = { ...this.data, ...docSnap.data() };
+          
+          // Indicateur visuel que la connexion est OK
+          const statusEl = document.getElementById('user-display');
+          if(statusEl) statusEl.style.color = "#16a34a"; // Vert
+          
+          // On rafraîchit l'affichage
+          if(typeof updateConformite === 'function') updateConformite();
+          if(typeof renderInspect === 'function') renderInspect();
+          if(typeof renderFrais === 'function') renderFrais();
+          
         } else {
-          // First time init
+          // Si c'est la première fois, on crée la base
           this.save();
         }
-      }, (err) => {
-        document.getElementById('cloud-status').innerText = "OFFLINE";
-        document.getElementById('cloud-status').classList.add('offline');
+      }, (error) => {
+        console.error("Erreur connexion:", error);
+        alert("Attention : Mode Hors Ligne ou Erreur de connexion Firebase");
       });
     },
 
+    // Sauvegarde vers le Cloud
     save: async function() {
-      try { await setDoc(docRef, this.data, { merge: true }); } 
-      catch(e) { console.error("Save error", e); }
-    },
-
-    login: function() {
-      let u = document.getElementById('login-user').value;
-      let p = document.getElementById('login-pass').value;
-      if(u && p === this.data.config.adminCode) {
-        this.user = u;
-        document.getElementById('login-overlay').classList.add('hidden');
-        this.init();
-      } else { alert("Code Incorrect"); }
-    },
-
-    nav: function(view) {
-      document.querySelectorAll('[id^="view-"]').forEach(el => el.classList.add('hidden'));
-      document.getElementById('view-'+view).classList.remove('hidden');
-      // KPI Update on home
-      if(view === 'home') this.renderKPI();
-    },
-
-    // --- MODULE FRAIS ---
-    scanApi: async function(ean) {
-      try {
-        let res = await fetch(`https://world.openfoodfacts.org/api/v0/product/${ean}.json`);
-        let json = await res.json();
-        if(json.status === 1) {
-          if(navigator.vibrate) navigator.vibrate(200);
-          document.getElementById('frais-name').value = json.product.product_name_fr || json.product.product_name;
-          let img = json.product.image_small_url;
-          if(img) {
-            document.getElementById('frais-img').src = img;
-            document.getElementById('frais-img').style.display = "block";
-          }
-        }
-      } catch(e) {}
-    },
-
-    addFrais: function() {
-      let ean = document.getElementById('frais-ean').value;
-      let name = document.getElementById('frais-name').value;
-      let date = document.getElementById('frais-date').value;
-      let img = document.getElementById('frais-img').src;
-      
-      if(!name || !date) return alert("Nom et Date requis");
-
-      this.data.frais.push({
-        id: Date.now(), ean, name, date, img: img.includes('http') ? img : null,
-        user: this.user, created: new Date().toISOString()
-      });
-      this.save();
-      
-      // Reset
-      document.getElementById('frais-name').value = "";
-      document.getElementById('frais-ean').value = "";
-      document.getElementById('frais-img').style.display = "none";
-      this.renderAll();
-    },
-
-    // --- MODULE PVP / SALADE ---
-    addLibPvp: async function() {
-      let name = document.getElementById('lib-name').value;
-      let hours = parseInt(document.getElementById('lib-hours').value);
-      let file = document.getElementById('lib-file').files[0];
-      
-      if(!name) return;
-
-      let imgBase64 = null;
-      if(file) imgBase64 = await this.compressImg(file);
-
-      this.data.pvpLib.push({ id: Date.now(), name, hours, img: imgBase64 });
-      this.save();
-      document.getElementById('modal-pvp-lib').classList.add('hidden');
-    },
-
-    createBatch: function(libId) {
-      let lib = this.data.pvpLib.find(x => x.id === libId);
-      let now = new Date();
-      let end = new Date(now.getTime() + lib.hours * 60 * 60 * 1000);
-      
-      this.data.pvpBatches.push({
-        id: Date.now(), libId, name: lib.name, 
-        start: now.toISOString(), end: end.toISOString(),
-        user: this.user
-      });
-      this.save();
-      alert(`Lot lancé : ${lib.name} (Fin : ${end.toLocaleTimeString()})`);
-    },
-
-    // --- MODULE RECEPTION ---
-    checkTempRules: function() {
-      let type = document.getElementById('rec-type').value;
-      let val = parseFloat(document.getElementById('rec-temp').value);
-      let statusEl = document.getElementById('rec-status');
-      
-      if(isNaN(val)) { statusEl.innerText=""; return; }
-
-      let isOk = false;
-      if(type === 'Frais' && val >= 0 && val <= 4) isOk = true;
-      if(type === 'Surgelé' && val <= -18) isOk = true;
-      if(type === 'Sec') isOk = true;
-
-      statusEl.innerText = isOk ? "CONFORME ✅" : "NON CONFORME ❌";
-      statusEl.style.color = isOk ? "var(--green)" : "var(--red)";
-      return isOk;
-    },
-
-    addReception: function() {
-      let type = document.getElementById('rec-type').value;
-      let four = document.getElementById('rec-fournisseur').value;
-      let temp = document.getElementById('rec-temp').value;
-      let conform = this.checkTempRules();
-      
-      this.data.reception.push({
-        id: Date.now(), type, four, temp, conform,
-        date: new Date().toISOString(), user: this.user
-      });
-      this.save();
-      document.getElementById('rec-fournisseur').value = "";
-      document.getElementById('rec-temp').value = "";
-      this.renderAll();
-    },
-
-    // --- MODULE CLEANING ---
-    toggleClean: function(taskId) {
-      let today = new Date().toISOString().split('T')[0];
-      let key = `${today}_${taskId}`;
-      if(this.data.cleaning_log[key]) delete this.data.cleaning_log[key];
-      else this.data.cleaning_log[key] = { user: this.user, time: new Date().toISOString() };
-      this.save();
-    },
-
-    // --- UTILS ---
-    compressImg: function(file) {
-      return new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = (e) => {
-          const img = new Image();
-          img.src = e.target.result;
-          img.onload = () => {
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            const maxWidth = 300; // Forte compression pour Firestore
-            const scale = maxWidth / img.width;
-            canvas.width = maxWidth;
-            canvas.height = img.height * scale;
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            resolve(canvas.toDataURL('image/jpeg', 0.6));
-          };
-        };
-      });
-    },
-
-    renderAll: function() {
-      // 1. Render Frais
-      let today = new Date().toISOString().split('T')[0];
-      let fraisHtml = this.data.frais.sort((a,b) => a.date.localeCompare(b.date)).map(i => {
-        let diff = (new Date(i.date) - new Date(today)) / (1000*3600*24);
-        let tag = diff < 0 ? 'tag-red' : (diff <= 2 ? 'tag-orange' : 'tag-green');
-        let txt = diff < 0 ? 'PÉRIMÉ' : (diff === 0 ? 'AUJOURD\'HUI' : i.date);
-        return `
-          <div class="item-row">
-            <img src="${i.img || 'https://placehold.co/50'}" class="item-img">
-            <div class="item-info">
-              <b>${i.name}</b><br>
-              <span class="tag ${tag}">${txt}</span>
-            </div>
-            <button class="btn-red" style="width:auto; padding:5px 10px;" onclick="app.delItem('frais', ${i.id})"><i class="fas fa-trash"></i></button>
-          </div>`;
-      }).join('');
-      document.getElementById('list-frais').innerHTML = fraisHtml;
-
-      // 2. Render PVP Lib & Batches
-      document.getElementById('list-pvp-lib').innerHTML = this.data.pvpLib.map(i => `
-        <div onclick="app.createBatch(${i.id})" style="text-align:center; cursor:pointer;">
-          <img src="${i.img || 'https://placehold.co/50'}" style="width:50px; height:50px; border-radius:50%; object-fit:cover;">
-          <div style="font-size:12px; font-weight:bold;">${i.name}</div>
-        </div>
-      `).join('');
-      
-      let now = new Date();
-      document.getElementById('list-pvp-batches').innerHTML = this.data.pvpBatches.filter(b => new Date(b.end) > now).map(b => {
-        let end = new Date(b.end);
-        let left = Math.round((end - now) / (1000*60*60));
-        return `<div class="item-row"><div><b>${b.name}</b><br>Fin: ${end.toLocaleTimeString()} (${left}h rest.)</div></div>`;
-      }).join('');
-
-      // 3. Render Cleaning (Daily Filter)
-      let dayIdx = new Date().getDay(); // 0=Dim, 1=Lun
-      document.getElementById('list-clean').innerHTML = this.data.cleaningDef.filter(t => {
-        return t.freq === 'daily' || t.day === dayIdx;
-      }).map(t => {
-        let key = `${today}_${t.id}`;
-        let done = this.data.cleaning_log[key];
-        return `
-          <div class="item-row" style="background:${done ? '#dcfce7' : 'white'}; padding:10px; border-radius:8px;">
-            <div class="item-info"><b>${t.name}</b><br><small>${done ? 'Fait par '+done.user : 'À faire'}</small></div>
-            <button class="btn-${done?'green':'outline'}" style="width:auto;" onclick="app.toggleClean(${t.id})">${done?'OK':'GO'}</button>
-          </div>
-        `;
-      }).join('');
-
-      // 4. Render Reception
-      document.getElementById('list-reception').innerHTML = this.data.reception.slice(-10).reverse().map(r => `
-        <div class="item-row">
-          <div class="item-info">
-            <b>${r.four}</b> (${r.type})<br>
-            Temp: ${r.temp}°C
-          </div>
-          <div class="tag ${r.conform?'tag-green':'tag-red'}">${r.conform?'OK':'NON'}</div>
-        </div>
-      `).join('');
-    },
-    
-    delItem: function(coll, id) {
-      if(confirm("Supprimer ?")) {
-        this.data[coll] = this.data[coll].filter(x => x.id !== id);
-        this.save();
+      try { 
+        await setDoc(docRef, this.data, { merge: true }); 
+      } catch(e) { 
+        console.error("Erreur sauvegarde", e); 
       }
-    },
-
-    renderKPI: function() {
-      let today = new Date().toISOString().split('T')[0];
-      let alertCount = this.data.frais.filter(i => i.date <= today).length;
-      let cleanCount = Object.keys(this.data.cleaning_log).filter(k => k.startsWith(today)).length;
-      
-      document.getElementById('kpi-list').innerHTML = `
-        <div>DLC à retirer : <b>${alertCount}</b></div>
-        <div>Nettoyage fait : <b>${cleanCount}</b></div>
-      `;
-    },
-
-    exportCSV: function() {
-      let csv = "Type;Date;Nom;Val;User\n";
-      // Merge all history logs
-      this.data.frais.forEach(i => csv += `DLC;${i.date};${i.name};${i.ean};${i.user}\n`);
-      this.data.reception.forEach(i => csv += `RECEP;${i.date};${i.four};${i.temp};${i.user}\n`);
-      
-      let blob = new Blob([csv], { type: 'text/csv' });
-      let url = URL.createObjectURL(blob);
-      let a = document.createElement('a'); a.href = url; a.download = "Rapport_StoreMaster.csv";
-      a.click();
     }
   };
+  
+  // Rendre les fonctions accessibles globalement pour les boutons HTML
+  window.login = login;
+  window.go = go;
+  window.openModule = openModule;
+  window.apiScan = apiScan;
+  window.addItem = addItem;
+  window.renderInspect = renderInspect;
+  window.downloadCSV = downloadCSV;
 
-  // Start
-  // app.init(); // Called after login
+  // Si l'utilisateur est déjà connecté localement, on lance la sync
+  // (La fonction login() dans le script principal appellera app.init())
 </script>
-</body>
-</html>
