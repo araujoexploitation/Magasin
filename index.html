@@ -194,3 +194,178 @@
 
     init: function() {
       onSnapshot(docRef, (s) => {
+        if(s.exists()) { 
+            this.data = {...this.data, ...s.data()};
+            if(!this.data.history) this.data.history = []; 
+            this.renderList(); 
+            this.renderHistory();
+        }
+      });
+    },
+    save: async function() { await setDoc(docRef, this.data, {merge:true}); this.renderList(); this.renderHistory(); },
+    
+    login: function() {
+      if(document.getElementById('login-pass').value === "2008") {
+        document.getElementById('login-overlay').classList.add('hidden');
+        this.init();
+      } else alert("Code erreur");
+    },
+
+    nav: function(v) {
+      document.querySelectorAll('[id^="view-"]').forEach(e => e.classList.add('hidden'));
+      document.getElementById('view-'+v).classList.remove('hidden');
+      if(this.scanning) this.stopScanner();
+    },
+
+    switchTab: function(t) {
+      document.querySelectorAll('.tab').forEach(e => e.classList.remove('active'));
+      document.getElementById('tab-'+t).classList.add('active');
+      ['content-scan','content-list','content-hist'].forEach(id => document.getElementById(id).classList.add('hidden'));
+      document.getElementById('content-'+t).classList.remove('hidden');
+      if(t !== 'scan') this.stopScanner();
+    },
+
+    toggleScanner: function() { if(this.scanning) this.stopScanner(); else this.startScanner(); },
+    startScanner: function() {
+        this.scanning = true;
+        document.getElementById('scanner-container').style.display = "block";
+        document.getElementById('btn-scan-toggle').innerHTML = "STOP SCAN";
+        codeReader.decodeFromVideoDevice(null, 'video', (result) => {
+            if (result) {
+                document.getElementById('beep').play();
+                if(navigator.vibrate) navigator.vibrate(200);
+                document.getElementById('frais-ean').value = result.text;
+                this.scanApi(result.text);
+                this.stopScanner();
+            }
+        });
+    },
+    stopScanner: function() {
+        this.scanning = false; codeReader.reset();
+        document.getElementById('scanner-container').style.display = "none";
+        document.getElementById('btn-scan-toggle').innerHTML = "<i class='fas fa-camera'></i> LANCER SCAN";
+    },
+
+    detectFamily: function(prod) {
+        let cats = (prod.categories || "") + " " + (prod.pnns_groups_2 || "") + " " + (prod.product_name || "");
+        cats = cats.toUpperCase();
+        if(cats.includes("YAOURT") || cats.includes("LAIT") || cats.includes("CRÈME") || cats.includes("DESSERT") || cats.includes("FROMAGE BLANC")) return "ULTRA FRAIS";
+        if(cats.includes("JAMBON") || cats.includes("SAUCIS") || cats.includes("LARD") || cats.includes("PÂTÉ") || cats.includes("RILLETTE")) return "CHARCUTERIE";
+        if(cats.includes("POULET") || cats.includes("DINDE") || cats.includes("CANARD") || cats.includes("VOLAILLE")) return "VOLAILLE";
+        if(cats.includes("STEAK") || cats.includes("BOEUF") || cats.includes("PORC") || cats.includes("VIANDE")) return "BOUCHERIE";
+        if(cats.includes("PIZZA") || cats.includes("QUICHE") || cats.includes("SANDWICH") || cats.includes("SALADE")) return "TRAITEUR";
+        if(cats.includes("FROMAGE") || cats.includes("CAMEMBERT") || cats.includes("COMTÉ") || cats.includes("EMMENTAL")) return "FROMAGE";
+        return "DIVERS"; 
+    },
+
+    scanApi: async function(ean) {
+      try {
+        let r = await fetch(`https://world.openfoodfacts.org/api/v0/product/${ean}.json`);
+        let d = await r.json();
+        if(d.status === 1) {
+          document.getElementById('frais-name').value = d.product.product_name_fr || d.product.product_name;
+          let fam = this.detectFamily(d.product);
+          document.getElementById('frais-famille').value = fam;
+          this.currentImgUrl = d.product.image_url || d.product.image_small_url || "";
+          if(this.currentImgUrl) {
+             document.getElementById('frais-img').src = this.currentImgUrl;
+             document.getElementById('frais-img-box').style.display = 'flex';
+          }
+        }
+      } catch(e){}
+    },
+
+    addFrais: function() {
+      let ean = document.getElementById('frais-ean').value;
+      let name = document.getElementById('frais-name').value;
+      let date = document.getElementById('frais-date').value;
+      let qty = document.getElementById('frais-qty').value;
+      let fam = document.getElementById('frais-famille').value;
+      if(!name || !date) return alert("Date requise !");
+      this.data.frais.push({ id: Date.now(), ean, name, date, qty, fam, img: this.currentImgUrl });
+      this.save();
+      document.getElementById('frais-name').value = ""; document.getElementById('frais-ean').value = "";
+      document.getElementById('frais-qty').value = "1"; document.getElementById('frais-img-box').style.display = 'none';
+      this.currentImgUrl = ""; alert("Ajouté !");
+    },
+
+    moveToHistory: function(id) {
+      let code = prompt("Code Manager requis pour supprimer :");
+      if(code !== "2008") return alert("Accès refusé");
+      let item = this.data.frais.find(x => x.id === id);
+      if(item) {
+          this.data.history.push({...item, deletedAt: new Date().toISOString()});
+          this.data.frais = this.data.frais.filter(x => x.id !== id);
+          this.save();
+      }
+    },
+
+    clearHistory: function() {
+        let code = prompt("Code Manager requis pour vider l'historique :");
+        if(code !== "2008") return alert("Accès refusé");
+        if(confirm("Vider définitivement ?")) { this.data.history = []; this.save(); }
+    },
+
+    filterList: function(type) {
+        this.currentFilter = type;
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('filter-'+type).classList.add('active');
+        this.renderList();
+    },
+
+    formatDateFR: function(dateStr) {
+        if(!dateStr) return "";
+        let d = new Date(dateStr);
+        return d.toLocaleDateString('fr-FR');
+    },
+
+    renderList: function() {
+      let today = new Date().toISOString().split('T')[0];
+      const cont = document.getElementById('list-frais-container');
+      cont.innerHTML = "";
+      this.data.frais.sort((a,b) => a.date.localeCompare(b.date)).forEach(i => {
+        let diff = (new Date(i.date) - new Date(today)) / (86400000);
+        let cls = 'dlc-green'; let txt = this.formatDateFR(i.date); let show = false;
+        
+        if (diff < 1) { cls = 'dlc-red'; txt = "J-0"; if(['all','red'].includes(this.currentFilter)) show = true; } 
+        else if (diff < 2) { cls = 'dlc-orange'; txt = "J+1"; if(['all','orange'].includes(this.currentFilter)) show = true; } 
+        else { cls = 'dlc-green'; if(['all','green'].includes(this.currentFilter)) show = true; }
+
+        if(show) {
+            cont.innerHTML += `
+              <div class="dlc-item ${cls}">
+                <img src="${i.img || 'https://via.placeholder.com/50?text=IMG'}" class="dlc-img">
+                <div class="dlc-info">
+                  <span class="family-tag">${i.fam || 'DIVERS'}</span>
+                  <div style="font-weight:bold;">${i.name}</div>
+                  <div style="font-size:12px; color:#555;">${txt} • <b>x${i.qty}</b></div>
+                </div>
+                <button onclick="window.app.moveToHistory(${i.id})" style="background:none; border:none; color:#999; padding:15px;"><i class="fas fa-trash"></i></button>
+              </div>`;
+        }
+      });
+      if(cont.innerHTML === "") cont.innerHTML = "<div style='text-align:center; padding:20px; color:#aaa'>Vide</div>";
+    },
+
+    renderHistory: function() {
+        const cont = document.getElementById('list-hist-container');
+        cont.innerHTML = this.data.history.slice().reverse().map(i => `
+            <div class="dlc-item dlc-gray">
+                <div class="dlc-info">
+                   <span class="family-tag">${i.fam || 'DIVERS'}</span><br>
+                   <b>${i.name}</b> <br> <small>Retiré le ${this.formatDateFR(i.deletedAt)}</small>
+                </div>
+                <span style="font-weight:bold;">x${i.qty}</span>
+            </div>
+        `).join('');
+    },
+
+    exportHistory: function() {
+      let csv = "Date Retrait;Famille;Nom;DLC;Quantite\n";
+      this.data.history.forEach(i => csv += `${this.formatDateFR(i.deletedAt)};${i.fam || 'DIVERS'};${i.name};${this.formatDateFR(i.date)};${i.qty}\n`);
+      let a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv'})); a.download = 'Casse_Magasin.csv'; a.click();
+    }
+  };
+</script>
+</body>
+</html>
