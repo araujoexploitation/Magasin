@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
 <meta name="theme-color" content="#003896" />
-<title>Araujo Exploitation v41</title>
+<title>Araujo Exploitation PRO</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 <script src="https://unpkg.com/@zxing/library@latest"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
@@ -13,10 +13,36 @@
   :root {
     --primary: #003896; --accent: #E2001A; --success: #10b981; --warning: #f59e0b;
     --bg: #f3f4f6; --surface: #ffffff; --text: #1e293b; --radius: 16px; --gray: #64748b;
-    --header-bg: #2c3e50;
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: system-ui, -apple-system, sans-serif; }
   body { margin: 0; background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+  /* --- LOGIN SCREEN --- */
+  .overlay { 
+    position: fixed; inset: 0; z-index: 999; 
+    display: flex; flex-direction: column; align-items: center; justify-content: center; 
+    background-color: var(--primary);
+    background-image: url('https://raw.githubusercontent.com/araujoexploitation/Magasin/main/LOGO.png');
+    background-size: 80%; /* Logo prend beaucoup de place */
+    background-position: center 30%;
+    background-repeat: no-repeat;
+  }
+  
+  .login-box {
+    position: absolute; bottom: 10%; width: 80%;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 20px; border-radius: 20px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    text-align: center;
+  }
+  
+  #login-pass {
+    width: 100%; padding: 15px; font-size: 24px; letter-spacing: 5px; text-align: center;
+    border: none; border-bottom: 2px solid var(--primary); background: transparent;
+    outline: none; margin-bottom: 20px; color: var(--primary); font-weight: bold;
+  }
+  #login-pass::placeholder { font-size: 14px; letter-spacing: 0; color: #999; }
 
   /* HEADER */
   header {
@@ -25,116 +51,91 @@
     box-shadow: 0 2px 10px rgba(0,0,0,0.05); height: 70px;
   }
   .logo-img { height: 50px; width: auto; object-fit: contain; }
+  .user-badge { position: absolute; right: 15px; font-size: 10px; background: #e0f2fe; color: var(--primary); padding: 4px 8px; border-radius: 10px; font-weight: bold; }
 
   /* TABS */
   .tabs { display: flex; background: #e2e8f0; padding: 4px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #cbd5e1; }
   .tab { flex: 1; text-align: center; padding: 12px; font-weight: 700; font-size: 12px; color: #64748b; border-radius: 9px; cursor: pointer; transition: 0.2s; white-space: nowrap; }
   .tab.active { background: white; color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
 
-  /* FILTRES */
-  .filter-bar { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; margin-bottom: 10px; }
-  .filter-btn { flex: 1; border: 1px solid #e2e8f0; background: white; padding: 8px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; color: #64748b; white-space: nowrap; cursor: pointer; }
-  .filter-btn.active.red { background: var(--accent); color: white; border-color: var(--accent); }
-  .filter-btn.active.orange { background: var(--warning); color: white; border-color: var(--warning); }
-  .filter-btn.active.green { background: var(--success); color: white; border-color: var(--success); }
-  .filter-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
-
   /* MAIN */
   main { flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 100px; }
-  
-  /* CARTE ACCUEIL */
-  .card-home {
-    background: linear-gradient(135deg, #003896 0%, #002366 100%);
-    border-radius: 20px; padding: 40px 20px; 
-    text-align: center; cursor: pointer;
-    box-shadow: 0 10px 25px rgba(0, 56, 150, 0.3);
-    color: white; transform: translateY(0); transition: transform 0.2s;
-  }
-  .card-home:active { transform: translateY(3px); }
   .card { background: var(--surface); border-radius: var(--radius); padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); margin-bottom: 15px; }
 
   /* SCANNER */
   #scanner-container { width: 100%; height: 250px; background: black; border-radius: 12px; margin-bottom: 15px; overflow: hidden; display: none; }
   video { width: 100%; height: 100%; object-fit: cover; }
-  .scan-btn { width: 100%; padding: 20px; background: var(--primary); color: white; font-weight: bold; font-size: 18px; border-radius: 12px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 15px; }
 
-  /* LISTE AMÉLIORÉE */
-  .group-header {
-    background: #334155; color: white;
-    padding: 8px 15px; border-radius: 8px 8px 0 0;
-    margin-top: 20px; display: flex; justify-content: space-between; align-items: center;
-    font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;
-  }
+  /* ITEMS LIST */
+  .group-header { background: #334155; color: white; padding: 8px 15px; border-radius: 8px 8px 0 0; margin-top: 20px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: bold; text-transform: uppercase; }
   .swipe-wrapper { position: relative; background: var(--accent); overflow: hidden; border-bottom: 1px solid #f1f5f9; }
-  .swipe-wrapper:last-child { border-radius: 0 0 8px 8px; border-bottom: none; }
   .swipe-action-bg { position: absolute; top: 0; bottom: 0; left: 0; width: 100px; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; z-index: 1; }
   
-  .wek-item { position: relative; z-index: 2; background: white; padding: 15px; display: flex; align-items: center; justify-content: space-between; transition: transform 0.2s ease-out; will-change: transform; cursor: pointer; }
-  
-  /* IMAGE PLUS GRANDE */
+  .wek-item { position: relative; z-index: 2; background: white; padding: 15px; display: flex; align-items: center; justify-content: space-between; transition: transform 0.2s ease-out; cursor: pointer; }
   .wek-img { width: 65px; height: 65px; border-radius: 8px; object-fit: contain; background: #fff; border: 1px solid #e2e8f0; margin-right: 15px; display: flex; align-items: center; justify-content: center; color: #cbd5e1; flex-shrink: 0; }
-  
-  /* TEXTE PLUS LARGE */
-  .wek-info { flex: 1; padding-right: 15px; overflow: hidden; }
-  .wek-name { font-weight: bold; font-size: 15px; color: var(--text); margin-bottom: 6px; line-height: 1.3; } /* Plus lisible */
-  
-  .wek-sub { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 12px; color: #64748b; }
+  .wek-info { flex: 1; overflow: hidden; }
+  .wek-name { font-weight: bold; font-size: 15px; color: var(--text); margin-bottom: 6px; line-height: 1.3; }
+  .wek-sub { display: flex; gap: 8px; font-size: 11px; color: #64748b; }
   .wek-qty { background: #f1f5f9; padding: 2px 8px; border-radius: 4px; border: 1px solid #e2e8f0; font-weight: bold; color: var(--primary); }
-  .wek-ean { font-family: monospace; letter-spacing: 0.5px; color: #64748b; }
 
   .date-badge { width: 50px; height: 50px; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; font-weight: bold; flex-shrink: 0; }
-  .date-day { font-size: 18px; line-height: 1; }
-  .date-month { font-size: 11px; text-transform: uppercase; margin-top: 2px; }
+  .date-day { font-size: 18px; } .date-month { font-size: 11px; text-transform: uppercase; }
   .badge-red { background: var(--accent); } .badge-orange { background: var(--warning); } .badge-green { background: var(--success); } .badge-gray { background: var(--gray); }
 
-  /* INPUTS */
+  /* USER MANAGEMENT */
+  .user-row { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #eee; }
+  .user-role { font-size: 10px; background: #eee; padding: 2px 5px; border-radius: 4px; }
+
+  /* COMMON */
   .input-group label { display: block; font-size: 11px; font-weight: 700; color: #64748b; margin-bottom: 4px; text-transform: uppercase; }
   input, select { width: 100%; padding: 14px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 16px; background: #fff; outline: none; }
+  .btn { width: 100%; padding: 16px; border-radius: 12px; border: none; font-weight: 700; font-size: 16px; background: var(--primary); color: white; cursor: pointer; }
+  .hidden { display: none !important; }
 
-  /* NAV */
+  /* MODAL BC */
+  .modal-bc { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+  .barcode-card { background: white; padding: 40px 20px; border-radius: 20px; text-align: center; width: 95%; max-width: 450px; }
+  
   nav { position: fixed; bottom: 0; width: 100%; background: white; height: 70px; display: flex; justify-content: center; align-items: center; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); z-index: 100; }
   .nav-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; color: #94a3b8; font-size: 10px; cursor: pointer; width: 80px; }
   .nav-btn.active { color: var(--primary); } .nav-btn i { font-size: 24px; margin-bottom: 4px; }
-  .btn { width: 100%; padding: 16px; border-radius: 12px; border: none; font-weight: 700; font-size: 16px; background: var(--primary); color: white; cursor: pointer; }
-  .hidden { display: none !important; }
-  .overlay { position: fixed; inset: 0; background: var(--primary); z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
-  
-  /* MODAL BARCODE LARGE */
-  .modal-bc { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
-  .barcode-card { background: white; padding: 40px 20px; border-radius: 20px; text-align: center; width: 95%; max-width: 450px; }
-  .bc-name { font-weight: bold; font-size: 20px; margin-bottom: 25px; color: var(--text); line-height: 1.4; }
-  .bc-close { margin-top: 30px; background: #f1f5f9; color: var(--text); font-size: 18px; }
 </style>
 </head>
 <body>
 
   <div id="login-overlay" class="overlay">
-    <img src="https://raw.githubusercontent.com/araujoexploitation/Magasin/main/LOGO.png" style="height:120px; margin-bottom:30px; border-radius:15px; background:white; padding:10px; object-fit:contain;">
-    <input type="password" id="login-pass" placeholder="Code (2008)" style="text-align: center; margin-bottom: 20px; max-width: 200px;">
-    <button class="btn" style="background: white; color: var(--primary); max-width: 200px;" onclick="window.app.login()">Connexion</button>
+    <div class="login-box">
+      <h3 style="margin:0 0 20px 0; color:var(--primary);">CONNEXION</h3>
+      <input type="password" id="login-pass" placeholder="VOTRE CODE">
+      <button class="btn" onclick="window.app.login()">ENTRER</button>
+    </div>
   </div>
 
   <div id="modal-barcode" class="modal-bc hidden">
     <div class="barcode-card">
-        <div id="bc-name" class="bc-name">Produit</div>
+        <div id="bc-name" style="font-weight:bold; font-size:20px; margin-bottom:20px;">Produit</div>
         <svg id="barcode"></svg>
-        <button class="btn bc-close" onclick="document.getElementById('modal-barcode').classList.add('hidden')">Fermer</button>
+        <button class="btn" style="margin-top:30px; background:#f1f5f9; color:#333" onclick="document.getElementById('modal-barcode').classList.add('hidden')">Fermer</button>
     </div>
   </div>
 
   <header>
     <img src="https://raw.githubusercontent.com/araujoexploitation/Magasin/main/LOGO.png" class="logo-img">
+    <div id="user-display" class="user-badge"></div>
   </header>
 
   <main>
     <div id="view-home">
-      <div class="card-home" onclick="window.app.nav('frais')">
+      <div class="card" onclick="window.app.nav('frais')" style="background: linear-gradient(135deg, #003896 0%, #002366 100%); color:white; text-align:center; padding:40px 20px; cursor:pointer;">
         <i class="fas fa-barcode" style="font-size:50px; margin-bottom:15px; opacity:0.9;"></i>
-        <h2 style="margin:0; font-size:22px;">GESTION DLC</h2>
+        <h2 style="margin:0;">GESTION DLC</h2>
         <p style="opacity:0.8; font-size:14px; margin-top:5px;">Scanner & Contrôler</p>
       </div>
-      <div style="margin-top:30px; text-align:center; color:#94a3b8; font-size:12px;">
-        <i class="fas fa-info-circle"></i> Sélectionner le module pour commencer
+
+      <div id="btn-team" class="card hidden" onclick="window.app.nav('team')" style="text-align:center; cursor:pointer; margin-top:20px;">
+        <i class="fas fa-users-cog" style="font-size:30px; color:var(--text); margin-bottom:10px;"></i>
+        <h4 style="margin:0;">Gérer l'Équipe</h4>
+        <p style="color:#999; font-size:12px;">Créer des codes</p>
       </div>
     </div>
 
@@ -147,56 +148,43 @@
 
       <div id="content-scan">
         <div id="scanner-container"><video id="video"></video></div>
-        <button id="btn-scan-toggle" class="scan-btn" onclick="window.app.toggleScanner()">
-            <i class="fas fa-camera"></i> LANCER SCAN
-        </button>
-
+        <button class="btn" onclick="window.app.toggleScanner()" style="margin-bottom:15px;"><i class="fas fa-camera"></i> LANCER SCAN</button>
         <div class="card">
-          <div id="frais-img-box" style="display:none; justify-content:center; margin-bottom:15px;">
-            <img id="frais-img" style="height:120px; border-radius:12px; object-fit:contain; border:1px solid #eee;">
+          <div id="frais-img-box" style="display:none; justify-content:center; margin-bottom:15px;"><img id="frais-img" style="height:100px;"></div>
+          <div class="input-group"><label>EAN</label><input type="number" id="frais-ean" placeholder="Scanner..." oninput="if(this.value.length>=8) window.app.scanApi(this.value)"></div>
+          <div class="input-group"><label>Famille</label><select id="frais-famille"><option>DIVERS</option><option>ULTRA FRAIS</option><option>CHARCUTERIE</option><option>VOLAILLE</option><option>BOUCHERIE</option><option>TRAITEUR</option><option>FROMAGE</option><option>SAURISSERIE</option></select></div>
+          <div class="input-group"><label>Nom</label><input type="text" id="frais-name"></div>
+          <div style="display:flex; gap:10px;">
+             <div class="input-group" style="flex:2"><label>DLC</label><input type="date" id="frais-date"></div>
+             <div class="input-group" style="flex:1"><label>Qté</label><input type="number" id="frais-qty" value="1"></div>
           </div>
-          <div class="input-group"><label>EAN</label><input type="number" id="frais-ean" placeholder="Code..." oninput="if(this.value.length>=8) window.app.scanApi(this.value)"></div>
-          <div class="input-group">
-            <label>Famille (Auto)</label>
-            <select id="frais-famille">
-                <option value="DIVERS">DIVERS</option>
-                <option value="ULTRA FRAIS">ULTRA FRAIS</option>
-                <option value="CHARCUTERIE">CHARCUTERIE</option>
-                <option value="VOLAILLE">VOLAILLE</option>
-                <option value="BOUCHERIE">BOUCHERIE</option>
-                <option value="TRAITEUR">TRAITEUR</option>
-                <option value="FROMAGE">FROMAGE</option>
-                <option value="SAURISSERIE">SAURISSERIE</option>
-            </select>
-          </div>
-          <div class="input-group"><label>Nom</label><input type="text" id="frais-name" placeholder="Auto..."></div>
-          <div style="display: flex; gap: 10px;">
-             <div class="input-group" style="flex:2;"><label>DLC</label><input type="date" id="frais-date"></div>
-             <div class="input-group" style="flex:1;"><label>Qté</label><input type="number" id="frais-qty" value="1" style="text-align:center;"></div>
-          </div>
-          <button class="btn" onclick="window.app.addFrais()">VALIDER</button>
+          <button class="btn" onclick="window.app.addFrais()" style="margin-top:10px;">VALIDER</button>
         </div>
       </div>
 
       <div id="content-list" class="hidden">
-        <div class="filter-bar">
-          <button class="filter-btn active" id="filter-all" onclick="window.app.filterList('all')">TOUT</button>
-          <button class="filter-btn red" id="filter-red" onclick="window.app.filterList('red')">🔴 J-0</button>
-          <button class="filter-btn orange" id="filter-orange" onclick="window.app.filterList('orange')">🟠 J+1</button>
-          <button class="filter-btn green" id="filter-green" onclick="window.app.filterList('green')">🟢 J+2</button>
-        </div>
         <div id="list-frais-container"></div>
       </div>
 
       <div id="content-hist" class="hidden">
-        <div class="card" onclick="window.app.exportHistory()" style="text-align:center; cursor:pointer; background:white; padding:15px; margin-bottom:15px; border:1px solid #eee;">
-            <i class="fas fa-file-csv" style="color:var(--success); font-size:24px;"></i>
-            <h4 style="margin:5px 0; color:var(--text)">Exporter CSV (Casse)</h4>
-        </div>
+        <button class="btn" onclick="window.app.exportHistory()" style="background:white; color:var(--primary); border:1px solid #eee; margin-bottom:15px;">Exporter CSV</button>
         <div id="list-hist-container"></div>
-        <button class="btn" onclick="window.app.clearHistory()" style="background:#64748b; margin-top:20px;">Vider Historique (Code Requis)</button>
       </div>
     </div>
+
+    <div id="view-team" class="hidden">
+      <div class="card">
+        <h4>Ajouter un employé</h4>
+        <div class="input-group"><label>Nom</label><input type="text" id="new-user-name" placeholder="Ex: Pierre"></div>
+        <div class="input-group"><label>Code (4 chiffres)</label><input type="number" id="new-user-code" placeholder="Ex: 1234"></div>
+        <button class="btn" onclick="window.app.addUser()">Créer Utilisateur</button>
+      </div>
+      <div class="card">
+        <h4>Utilisateurs Actifs</h4>
+        <div id="users-list"></div>
+      </div>
+    </div>
+
   </main>
 
   <nav>
@@ -211,32 +199,90 @@
 
   const firebaseConfig = { apiKey: "AIzaSyA0ffa4Nfa7kGLyaEcAocU9YzIhzmx3SkA", authDomain: "araujo-exploitation.firebaseapp.com", databaseURL: "https://araujo-exploitation-default-rtdb.europe-west1.firebasedatabase.app", projectId: "araujo-exploitation", storageBucket: "araujo-exploitation.firebasestorage.app", messagingSenderId: "292878114487", appId: "1:292878114487:web:2a450227310e970ce1b732" };
   const db = getFirestore(initializeApp(firebaseConfig));
-  const docRef = doc(db, "store_master", "v41");
+  
+  // !!! NOM DE LA BASE DE DONNEES FIXE POUR NE PLUS PERDRE LES DONNEES !!!
+  const docRef = doc(db, "store_master", "STOCK_MAGASIN_LIVE");
+  
   const codeReader = new ZXing.BrowserMultiFormatReader();
 
   window.app = {
-    data: { frais: [], history: [] },
+    data: { frais: [], history: [], users: [] },
+    currentUser: null,
     scanning: false,
-    currentFilter: 'all',
     currentImgUrl: "",
 
     init: function() {
       onSnapshot(docRef, (s) => {
         if(s.exists()) { 
             this.data = {...this.data, ...s.data()};
-            if(!this.data.history) this.data.history = []; 
-            this.renderList(); 
-            this.renderHistory();
+            // Si pas d'utilisateurs (premier lancement), on crée le Manager par défaut
+            if(!this.data.users || this.data.users.length === 0) {
+                this.data.users = [{code: "2008", name: "MANAGER", role: "admin"}];
+                this.save();
+            }
+        } else {
+            // Création de la DB initiale
+            this.data.users = [{code: "2008", name: "MANAGER", role: "admin"}];
+            this.save();
         }
+        this.renderList();
+        this.renderHistory();
+        this.renderUsers();
       });
     },
-    save: async function() { await setDoc(docRef, this.data, {merge:true}); this.renderList(); this.renderHistory(); },
-    
+
+    save: async function() { await setDoc(docRef, this.data, {merge:true}); },
+
     login: function() {
-      if(document.getElementById('login-pass').value === "2008") {
+      let code = document.getElementById('login-pass').value.trim();
+      let user = this.data.users ? this.data.users.find(u => u.code === code) : null;
+      
+      // Fallback au cas où la DB n'est pas chargée
+      if(!user && code === "2008") user = {name:"MANAGER", role:"admin"};
+
+      if(user) {
+        this.currentUser = user;
         document.getElementById('login-overlay').classList.add('hidden');
-        this.init();
-      } else alert("Code erreur");
+        document.getElementById('user-display').innerText = user.name;
+        if(user.role === 'admin') document.getElementById('btn-team').classList.remove('hidden');
+      } else {
+        alert("Code inconnu");
+      }
+    },
+
+    // GESTION UTILISATEURS
+    addUser: function() {
+        let name = document.getElementById('new-user-name').value;
+        let code = document.getElementById('new-user-code').value;
+        if(!name || !code) return alert("Remplir tout");
+        if(this.data.users.find(u => u.code === code)) return alert("Code déjà pris");
+        
+        this.data.users.push({name, code, role:'staff'});
+        this.save();
+        alert("Utilisateur créé !");
+        document.getElementById('new-user-name').value = "";
+        document.getElementById('new-user-code').value = "";
+    },
+    
+    delUser: function(code) {
+        if(code === "2008") return alert("Impossible de supprimer le Manager principal");
+        if(confirm("Supprimer cet accès ?")) {
+            this.data.users = this.data.users.filter(u => u.code !== code);
+            this.save();
+        }
+    },
+
+    renderUsers: function() {
+        const div = document.getElementById('users-list');
+        div.innerHTML = "";
+        if(!this.data.users) return;
+        this.data.users.forEach(u => {
+            div.innerHTML += `
+            <div class="user-row">
+                <div><b>${u.name}</b> <span class="user-role">${u.role}</span><br><small>Code: ${u.code}</small></div>
+                ${u.code !== "2008" ? `<button onclick="window.app.delUser('${u.code}')" style="background:red; color:white; border:none; padding:5px 10px; border-radius:5px;"><i class="fas fa-trash"></i></button>` : ''}
+            </div>`;
+        });
     },
 
     nav: function(v) {
@@ -253,39 +299,20 @@
       if(t !== 'scan') this.stopScanner();
     },
 
+    // SCAN & DATA LOGIC (Idem v42 mais avec gestion User)
     toggleScanner: function() { if(this.scanning) this.stopScanner(); else this.startScanner(); },
     startScanner: function() {
-        this.scanning = true;
-        document.getElementById('scanner-container').style.display = "block";
-        document.getElementById('btn-scan-toggle').innerHTML = "STOP SCAN";
+        this.scanning = true; document.getElementById('scanner-container').style.display="block";
         codeReader.decodeFromVideoDevice(null, 'video', (result) => {
-            if (result) {
-                document.getElementById('beep').play();
+            if(result) { 
+                document.getElementById('beep').play(); 
                 if(navigator.vibrate) navigator.vibrate(200);
                 document.getElementById('frais-ean').value = result.text;
-                this.scanApi(result.text);
-                this.stopScanner();
+                this.scanApi(result.text); this.stopScanner();
             }
         });
     },
-    stopScanner: function() {
-        this.scanning = false; codeReader.reset();
-        document.getElementById('scanner-container').style.display = "none";
-        document.getElementById('btn-scan-toggle').innerHTML = "<i class='fas fa-camera'></i> LANCER SCAN";
-    },
-
-    detectFamily: function(prod) {
-        let cats = (prod.categories || "") + " " + (prod.pnns_groups_2 || "") + " " + (prod.product_name || "");
-        cats = cats.toUpperCase();
-        if(cats.includes("YAOURT") || cats.includes("LAIT") || cats.includes("CRÈME") || cats.includes("DESSERT") || cats.includes("FROMAGE BLANC")) return "ULTRA FRAIS";
-        if(cats.includes("JAMBON") || cats.includes("SAUCIS") || cats.includes("LARD") || cats.includes("PÂTÉ") || cats.includes("RILLETTE")) return "CHARCUTERIE";
-        if(cats.includes("POULET") || cats.includes("DINDE") || cats.includes("CANARD") || cats.includes("VOLAILLE")) return "VOLAILLE";
-        if(cats.includes("STEAK") || cats.includes("BOEUF") || cats.includes("PORC") || cats.includes("VIANDE")) return "BOUCHERIE";
-        if(cats.includes("PIZZA") || cats.includes("QUICHE") || cats.includes("SANDWICH") || cats.includes("SALADE")) return "TRAITEUR";
-        if(cats.includes("SAUMON") || cats.includes("TRUITE") || cats.includes("FUMÉ")) return "SAURISSERIE";
-        if(cats.includes("FROMAGE") || cats.includes("CAMEMBERT") || cats.includes("COMTÉ") || cats.includes("EMMENTAL")) return "FROMAGE";
-        return "DIVERS"; 
-    },
+    stopScanner: function() { this.scanning=false; codeReader.reset(); document.getElementById('scanner-container').style.display="none"; },
 
     scanApi: async function(ean) {
       try {
@@ -294,19 +321,10 @@
         if(d.status === 1) {
           let brand = d.product.brands ? d.product.brands.split(',')[0] + " - " : "";
           let pName = d.product.product_name_fr || d.product.product_name || "";
-          if(!pName.toLowerCase().includes(brand.toLowerCase().replace(' - ',''))) {
-              pName = brand + pName;
-          }
+          if(!pName.toLowerCase().includes(brand.toLowerCase().replace(' - ',''))) pName = brand + pName;
           document.getElementById('frais-name').value = pName;
-          
-          let fam = this.detectFamily(d.product);
-          document.getElementById('frais-famille').value = fam;
-          let img = d.product.image_front_small_url || d.product.image_small_url || d.product.image_url || "";
-          this.currentImgUrl = img;
-          if(this.currentImgUrl) {
-             document.getElementById('frais-img').src = this.currentImgUrl;
-             document.getElementById('frais-img-box').style.display = 'flex';
-          }
+          this.currentImgUrl = d.product.image_front_small_url || d.product.image_url || "";
+          if(this.currentImgUrl) { document.getElementById('frais-img').src = this.currentImgUrl; document.getElementById('frais-img-box').style.display='flex'; }
         }
       } catch(e){}
     },
@@ -317,183 +335,122 @@
       let date = document.getElementById('frais-date').value;
       let qty = document.getElementById('frais-qty').value;
       let fam = document.getElementById('frais-famille').value;
-      if(!name || !date) return alert("Date requise !");
+      if(!name || !date) return alert("Date requise");
       this.data.frais.push({ id: Date.now(), ean, name, date, qty, fam, img: this.currentImgUrl });
       this.save();
+      alert("Ajouté");
       document.getElementById('frais-name').value = ""; document.getElementById('frais-ean').value = "";
-      document.getElementById('frais-qty').value = "1"; document.getElementById('frais-img-box').style.display = 'none';
-      this.currentImgUrl = ""; alert("Ajouté !");
+      document.getElementById('frais-img-box').style.display='none'; this.currentImgUrl="";
     },
 
     showBarcode: function(ean, name) {
         document.getElementById('modal-barcode').classList.remove('hidden');
         document.getElementById('bc-name').innerText = name;
-        if(ean) {
-            try { 
-                JsBarcode("#barcode", ean, { 
-                    format: "EAN13", lineColor: "#000", width: 3, height: 120, displayValue: true, fontSize: 22, margin: 10
-                }); 
-            } 
-            catch(e) { alert("Code Barre invalide: " + ean); }
-        } else { alert("Pas de code barre"); }
+        try { JsBarcode("#barcode", ean, {format:"EAN13", height:100, displayValue:true, fontSize:20}); } catch(e){}
     },
 
     moveToHistory: function(id) {
-      let item = this.data.frais.find(x => x.id === id);
-      if(item) {
-          this.data.history.push({...item, deletedAt: new Date().toISOString()});
-          this.data.frais = this.data.frais.filter(x => x.id !== id);
-          this.save();
-      }
-    },
-
-    clearHistory: function() {
-        let code = prompt("Code Manager requis pour vider l'historique :");
-        if(code !== "2008") return alert("Accès refusé");
-        if(confirm("Vider définitivement ?")) { this.data.history = []; this.save(); }
-    },
-
-    filterList: function(type) {
-        this.currentFilter = type;
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById('filter-'+type).classList.add('active');
-        this.renderList();
-    },
-
-    formatDateFR: function(dateStr) {
-        if(!dateStr) return "";
-        let d = new Date(dateStr);
-        return d.toLocaleDateString('fr-FR');
-    },
-
-    getDateBadgeParts: function(dateStr) {
-        let d = new Date(dateStr);
-        let day = d.getDate();
-        let month = d.toLocaleString('fr-FR', { month: 'short' }).replace('.','');
-        return { day, month };
-    },
-
-    initSwipe: function() {
-        document.querySelectorAll('.wek-item').forEach(item => {
-            let startX, currentX;
-            let id = item.dataset.id;
-            
-            item.addEventListener('touchstart', (e) => {
-                startX = e.touches[0].clientX;
-                item.style.transition = 'none';
-            });
-            
-            item.addEventListener('touchmove', (e) => {
-                currentX = e.touches[0].clientX;
-                let diff = currentX - startX;
-                if(diff > 0) {
-                    item.style.transform = `translateX(${diff}px)`;
-                    if(diff > 10) e.preventDefault();
-                }
-            });
-            
-            item.addEventListener('touchend', (e) => {
-                let diff = currentX - startX;
-                item.style.transition = 'transform 0.3s ease';
-                if(diff > 150) { 
-                    if(confirm("Retirer le produit : " + item.querySelector('.wek-name').innerText + " ?")) {
-                        item.style.transform = `translateX(100%)`;
-                        setTimeout(() => window.app.moveToHistory(Number(id)), 300);
-                    } else {
-                        item.style.transform = 'translateX(0)';
-                    }
-                } else {
-                    item.style.transform = 'translateX(0)';
-                }
-            });
-        });
+        let item = this.data.frais.find(x => x.id === id);
+        if(item) {
+            // ON AJOUTE LE NOM DE L'UTILISATEUR QUI SUPPRIME
+            let userName = this.currentUser ? this.currentUser.name : "Inconnu";
+            this.data.history.push({...item, deletedAt: new Date().toISOString(), deletedBy: userName});
+            this.data.frais = this.data.frais.filter(x => x.id !== id);
+            this.save();
+        }
     },
 
     renderList: function() {
       let today = new Date().toISOString().split('T')[0];
       const cont = document.getElementById('list-frais-container');
       cont.innerHTML = "";
-
       let grouped = {};
+      
       this.data.frais.sort((a,b) => a.date.localeCompare(b.date)).forEach(i => {
-         let diff = (new Date(i.date) - new Date(today)) / (86400000);
-         let show = false;
-         if (diff < 1 && ['all','red'].includes(this.currentFilter)) show = true;
-         else if (diff < 2 && diff >= 1 && ['all','orange'].includes(this.currentFilter)) show = true;
-         else if (diff >= 2 && ['all','green'].includes(this.currentFilter)) show = true;
-         
-         if(show) {
-             if(!grouped[i.fam]) grouped[i.fam] = [];
-             grouped[i.fam].push({ ...i, diff });
-         }
+         let diff = (new Date(i.date) - new Date(today)) / 86400000;
+         if(!grouped[i.fam]) grouped[i.fam] = [];
+         grouped[i.fam].push({...i, diff});
       });
 
       Object.keys(grouped).sort().forEach(fam => {
-          let items = grouped[fam];
-          cont.innerHTML += `
-            <div class="group-header">
-                ${fam} <span class="group-count">${items.length}</span>
-            </div>
-          `;
-          
-          items.forEach(i => {
-             let badgeColor = 'badge-green';
-             if(i.diff < 1) badgeColor = 'badge-red';
-             else if(i.diff < 2) badgeColor = 'badge-orange';
-             let {day, month} = this.getDateBadgeParts(i.date);
-             let imgHtml = i.img 
-                ? `<img src="${i.img}" class="wek-img" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-                   <div class="wek-img" style="display:none"><i class="fas fa-utensils"></i></div>`
-                : `<div class="wek-img"><i class="fas fa-utensils"></i></div>`;
+          cont.innerHTML += `<div class="group-header">${fam} <span style="background:rgba(255,255,255,0.2); padding:2px 8px; border-radius:10px;">${grouped[fam].length}</span></div>`;
+          grouped[fam].forEach(i => {
+             let badge = i.diff < 1 ? 'badge-red' : (i.diff < 2 ? 'badge-orange' : 'badge-green');
+             let d = new Date(i.date);
+             let day = d.getDate(); let month = d.toLocaleString('fr-FR', {month:'short'}).replace('.','');
+             let imgHtml = i.img ? `<img src="${i.img}" class="wek-img">` : `<div class="wek-img"><i class="fas fa-utensils"></i></div>`;
+             
+             // SAFE NAME
+             let safeName = i.name.replace(/"/g, '&quot;').replace(/'/g, "\\'");
 
              cont.innerHTML += `
                <div class="swipe-wrapper">
                    <div class="swipe-action-bg"><i class="fas fa-trash"></i></div>
-                   <div class="wek-item" data-id="${i.id}" onclick="window.app.showBarcode('${i.ean}', '${i.name.replace(/'/g, "\\'")}')">
+                   <div class="wek-item" data-id="${i.id}" data-name="${safeName}" onclick="window.app.showBarcode('${i.ean}', this.dataset.name)">
                       ${imgHtml}
                       <div class="wek-info">
                           <div class="wek-name">${i.name}</div>
-                          <div class="wek-sub">
-                             <span class="wek-qty">x${i.qty}</span>
-                             <span class="wek-ean">${i.ean}</span>
-                          </div>
+                          <div class="wek-sub"><span class="wek-qty">x${i.qty}</span> <span class="wek-ean">${i.ean}</span></div>
                       </div>
-                      <div class="date-badge ${badgeColor}">
-                          <span class="date-day">${day}</span>
-                          <span class="date-month">${month}</span>
-                      </div>
+                      <div class="date-badge ${badge}"><span class="date-day">${day}</span><span class="date-month">${month}</span></div>
                    </div>
-               </div>
-             `;
+               </div>`;
           });
       });
-
-      if(cont.innerHTML === "") cont.innerHTML = "<div style='text-align:center; padding:20px; color:#aaa'>Vide</div>";
+      if(cont.innerHTML === "") cont.innerHTML = "<div style='text-align:center; padding:30px; color:#aaa'>Aucun produit à date courte</div>";
       this.initSwipe();
+    },
+
+    initSwipe: function() {
+        document.querySelectorAll('.wek-item').forEach(item => {
+            let startX, currentX;
+            item.addEventListener('touchstart', e => { startX = e.touches[0].clientX; item.style.transition='none'; });
+            item.addEventListener('touchmove', e => {
+                currentX = e.touches[0].clientX;
+                let diff = currentX - startX;
+                if(diff > 0) { item.style.transform = `translateX(${diff}px)`; if(diff>10) e.preventDefault(); }
+            });
+            item.addEventListener('touchend', e => {
+                let diff = currentX - startX;
+                item.style.transition='transform 0.3s ease';
+                if(diff > 150) {
+                    if(confirm("Retirer le produit ?")) {
+                        item.style.transform = `translateX(100%)`;
+                        setTimeout(() => this.moveToHistory(Number(item.dataset.id)), 300);
+                    } else item.style.transform = 'translateX(0)';
+                } else item.style.transform = 'translateX(0)';
+            });
+        });
     },
 
     renderHistory: function() {
         const cont = document.getElementById('list-hist-container');
         cont.innerHTML = this.data.history.slice().reverse().map(i => `
-            <div class="wek-item" style="opacity:0.7; background:#f8fafc; border-bottom:1px solid #eee;">
+            <div class="wek-item" style="opacity:0.7; border-bottom:1px solid #eee;">
                 <div class="wek-info">
-                   <span style="font-size:10px; font-weight:bold; color:#003896">${i.fam}</span><br>
+                   <span style="font-size:10px; color:#003896; font-weight:bold;">${i.fam}</span>
                    <div class="wek-name">${i.name}</div>
-                   <small>Retiré le ${this.formatDateFR(i.deletedAt)}</small>
+                   <small>Par: <b>${i.deletedBy || '?'}</b> le ${new Date(i.deletedAt).toLocaleDateString()}</small>
                 </div>
-                <div class="date-badge badge-gray">
-                    <span class="date-day" style="font-size:14px;">x${i.qty}</span>
-                </div>
-            </div>
-        `).join('');
+                <div class="date-badge badge-gray"><span class="date-day">x${i.qty}</span></div>
+            </div>`).join('');
     },
-
+    
     exportHistory: function() {
-      let csv = "Date Retrait;Famille;Nom;EAN;DLC;Quantite\n";
-      this.data.history.forEach(i => csv += `${this.formatDateFR(i.deletedAt)};${i.fam || 'DIVERS'};${i.name};${i.ean};${this.formatDateFR(i.date)};${i.qty}\n`);
-      let a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv'})); a.download = 'Casse_Magasin.csv'; a.click();
+      let csv = "Date;Par;Famille;Nom;EAN;DLC;Quantite\n";
+      this.data.history.forEach(i => csv += `${new Date(i.deletedAt).toLocaleDateString()};${i.deletedBy};${i.fam};${i.name};${i.ean};${i.date};${i.qty}\n`);
+      let a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv'})); a.download='Casse.csv'; a.click();
+    },
+    
+    clearHistory: function() {
+       // Seul le manager 2008 peut vider l'historique global
+       if(this.currentUser.role !== 'admin') return alert("Seul le MANAGER peut faire ça");
+       if(confirm("Vider TOUT l'historique ?")) { this.data.history=[]; this.save(); } 
     }
   };
+  
+  // Lancer l'init
+  window.app.init();
 </script>
 </body>
 </html>
