@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
 <meta name="theme-color" content="#ffffff" />
-<title>Araujo Exploitation v45</title>
+<title>Araujo Exploitation v46</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 <script src="https://unpkg.com/@zxing/library@latest"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
@@ -31,8 +31,9 @@
     background-color: white; padding: 20px;
   }
   .login-logo { width: 80%; max-width: 300px; margin-bottom: 50px; object-fit: contain; }
+  
   #login-pass {
-    width: 200px; padding: 12px; font-size: 20px; letter-spacing: 5px; text-align: center;
+    width: 200px; padding: 12px; font-size: 24px; letter-spacing: 8px; text-align: center;
     border: 1px solid #e2e8f0; border-radius: 50px; background: #f8fafc;
     outline: none; margin-bottom: 20px; color: var(--text); font-weight: bold;
     box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
@@ -42,16 +43,18 @@
   /* --- HEADER BANNIERE --- */
   header {
     background: var(--surface); 
-    padding: 10px; padding-top: max(10px, env(safe-area-inset-top));
+    padding: 5px 15px; padding-top: max(10px, env(safe-area-inset-top));
     display: flex; justify-content: center; align-items: center; z-index: 50;
     box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
-    height: 100px; /* Plus haut pour effet bannière */
+    height: 90px;
   }
   .logo-header { 
-    height: 70px; /* Logo plus grand */
-    width: auto; object-fit: contain; 
+    height: 55px; /* Ajusté pour le format large */
+    width: auto; 
+    max-width: 80%;
+    object-fit: contain; 
   }
-  .user-badge { position: absolute; right: 15px; top: 15px; font-size: 10px; background: #e0f2fe; color: var(--primary); padding: 4px 8px; border-radius: 10px; font-weight: bold; }
+  .user-badge { position: absolute; right: 10px; top: 10px; font-size: 9px; background: #e0f2fe; color: var(--primary); padding: 3px 6px; border-radius: 8px; font-weight: bold; }
 
   /* TABS */
   .tabs { display: flex; background: #e2e8f0; padding: 4px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #cbd5e1; }
@@ -107,9 +110,9 @@
 
   <div id="login-overlay" class="overlay">
     <img src="https://raw.githubusercontent.com/araujoexploitation/Magasin/main/LOGO.png" alt="Carrefour Express" class="login-logo">
-    <input type="password" id="login-pass" placeholder="CODE">
+    <input type="password" id="login-pass">
     <button class="btn btn-green" onclick="window.app.login()" style="width: 200px; border-radius: 50px;">CONNEXION</button>
-    <p style="margin-top: 20px; color: #cbd5e1; font-size: 12px;">v45.0</p>
+    <p style="margin-top: 20px; color: #cbd5e1; font-size: 12px;">v46.0</p>
   </div>
 
   <div id="modal-barcode" class="modal-bc hidden">
@@ -121,7 +124,7 @@
   </div>
 
   <header>
-    <img src="https://raw.githubusercontent.com/araujoexploitation/Magasin/main/LOGO.png" class="logo-header">
+    <img src="https://raw.githubusercontent.com/araujoexploitation/Magasin/main/Carrefour-Express-2.webp" class="logo-header" onerror="this.src='https://raw.githubusercontent.com/araujoexploitation/Magasin/main/LOGO.png'">
     <div id="user-display" class="user-badge"></div>
   </header>
 
@@ -241,7 +244,6 @@
       } else { alert("Code incorrect !"); }
     },
 
-    // --- GESTION UTILISATEURS AVANCEE (EDIT/UPDATE) ---
     saveUser: function() {
         let name = document.getElementById('new-user-name').value;
         let code = document.getElementById('new-user-code').value;
@@ -249,7 +251,6 @@
 
         if(!name || !code) return alert("Remplir nom et code");
 
-        // Mode UPDATE
         if(originalCode) {
             let uIndex = this.data.users.findIndex(u => u.code === originalCode);
             if(uIndex > -1) {
@@ -260,7 +261,6 @@
                 this.cancelEdit();
             }
         } 
-        // Mode CREATE
         else {
             if(this.data.users.find(u => u.code === code)) return alert("Ce code existe déjà");
             this.data.users.push({name, code, role:'staff'});
@@ -275,7 +275,7 @@
         if(user) {
             document.getElementById('new-user-name').value = user.name;
             document.getElementById('new-user-code').value = user.code;
-            document.getElementById('edit-original-code').value = user.code; // Stocke l'ID original
+            document.getElementById('edit-original-code').value = user.code; 
             
             document.getElementById('team-form-title').innerHTML = "<i class='fas fa-edit'></i> Modifier Employé";
             document.getElementById('btn-save-user').innerText = "Enregistrer Modif";
@@ -297,7 +297,6 @@
 
     delUser: function(code) {
         let user = this.data.users.find(u => u.code === code);
-        // Protection Anti-Suicide : On ne peut pas supprimer le dernier admin
         let admins = this.data.users.filter(u => u.role === 'admin');
         if(user.role === 'admin' && admins.length === 1) return alert("Impossible : Il doit rester au moins un Responsable !");
         
@@ -327,7 +326,6 @@
         });
     },
 
-    // --- NAVIGATION & MODULES ---
     nav: function(v) {
       document.querySelectorAll('[id^="view-"]').forEach(e => e.classList.add('hidden'));
       document.getElementById('view-'+v).classList.remove('hidden');
