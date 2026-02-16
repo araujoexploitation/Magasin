@@ -4,17 +4,15 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
 <meta name="theme-color" content="#003896" />
-<title>Araujo Exploitation v38</title>
+<title>Araujo Exploitation v40</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 <script src="https://unpkg.com/@zxing/library@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
 
 <style>
   :root {
-    --primary: #003896; /* Bleu Carrefour */
-    --accent: #E2001A; /* Rouge Carrefour */
-    --success: #10b981; --warning: #f59e0b;
-    --bg: #f3f4f6; /* Gris très doux (reposant) */
-    --surface: #ffffff; --text: #1e293b; --radius: 16px; --gray: #64748b;
+    --primary: #003896; --accent: #E2001A; --success: #10b981; --warning: #f59e0b;
+    --bg: #f3f4f6; --surface: #ffffff; --text: #1e293b; --radius: 16px; --gray: #64748b;
     --header-bg: #2c3e50;
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: system-ui, -apple-system, sans-serif; }
@@ -22,11 +20,11 @@
 
   /* HEADER */
   header {
-    background: var(--surface); padding: 10px 20px; padding-top: max(10px, env(safe-area-inset-top));
+    background: var(--surface); padding: 10px; padding-top: max(10px, env(safe-area-inset-top));
     display: flex; justify-content: center; align-items: center; z-index: 50;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05); height: 70px;
   }
-  .logo-img { height: 60px; width: auto; object-fit: contain; }
+  .logo-img { height: 50px; width: auto; object-fit: contain; }
 
   /* TABS */
   .tabs { display: flex; background: #e2e8f0; padding: 4px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #cbd5e1; }
@@ -44,7 +42,7 @@
   /* MAIN */
   main { flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 100px; }
   
-  /* CARTE ACCUEIL BLEUE */
+  /* CARTE ACCUEIL */
   .card-home {
     background: linear-gradient(135deg, #003896 0%, #002366 100%);
     border-radius: 20px; padding: 40px 20px; 
@@ -53,7 +51,6 @@
     color: white; transform: translateY(0); transition: transform 0.2s;
   }
   .card-home:active { transform: translateY(3px); }
-
   .card { background: var(--surface); border-radius: var(--radius); padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); margin-bottom: 15px; }
 
   /* SCANNER */
@@ -61,7 +58,7 @@
   video { width: 100%; height: 100%; object-fit: cover; }
   .scan-btn { width: 100%; padding: 20px; background: var(--primary); color: white; font-weight: bold; font-size: 18px; border-radius: 12px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 15px; }
 
-  /* LISTE & SWIPE */
+  /* LISTE STYLE WEK */
   .group-header {
     background: #334155; color: white;
     padding: 8px 15px; border-radius: 8px 8px 0 0;
@@ -72,14 +69,16 @@
   .swipe-wrapper:last-child { border-radius: 0 0 8px 8px; border-bottom: none; }
   .swipe-action-bg { position: absolute; top: 0; bottom: 0; left: 0; width: 100px; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; z-index: 1; }
   
-  .wek-item { position: relative; z-index: 2; background: white; padding: 12px 15px; display: flex; align-items: center; justify-content: space-between; transition: transform 0.2s ease-out; will-change: transform; }
+  .wek-item { position: relative; z-index: 2; background: white; padding: 12px 15px; display: flex; align-items: center; justify-content: space-between; transition: transform 0.2s ease-out; will-change: transform; cursor: pointer; }
   
   .wek-img { width: 45px; height: 45px; border-radius: 8px; object-fit: cover; background: #f8fafc; border: 1px solid #e2e8f0; margin-right: 12px; display: flex; align-items: center; justify-content: center; color: #cbd5e1; }
   
   .wek-info { flex: 1; padding-right: 10px; }
-  .wek-name { font-weight: bold; font-size: 14px; color: var(--text); margin-bottom: 4px; }
-  .wek-qty { font-size: 11px; color: #666; background: #f1f5f9; padding: 2px 6px; border-radius: 4px; border: 1px solid #e2e8f0; }
-  
+  .wek-name { font-weight: bold; font-size: 14px; color: var(--text); margin-bottom: 2px; }
+  .wek-sub { display: flex; align-items: center; gap: 8px; font-size: 11px; color: #64748b; }
+  .wek-qty { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; border: 1px solid #e2e8f0; font-weight: bold; }
+  .wek-ean { font-family: monospace; letter-spacing: 0.5px; color: #94a3b8; }
+
   .date-badge { width: 45px; height: 45px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; font-weight: bold; flex-shrink: 0; }
   .date-day { font-size: 16px; line-height: 1; }
   .date-month { font-size: 10px; text-transform: uppercase; margin-top: 2px; }
@@ -93,19 +92,31 @@
   nav { position: fixed; bottom: 0; width: 100%; background: white; height: 70px; display: flex; justify-content: center; align-items: center; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); z-index: 100; }
   .nav-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; color: #94a3b8; font-size: 10px; cursor: pointer; width: 80px; }
   .nav-btn.active { color: var(--primary); } .nav-btn i { font-size: 24px; margin-bottom: 4px; }
-  
   .btn { width: 100%; padding: 16px; border-radius: 12px; border: none; font-weight: 700; font-size: 16px; background: var(--primary); color: white; cursor: pointer; }
   .hidden { display: none !important; }
   .overlay { position: fixed; inset: 0; background: var(--primary); z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+  
+  /* MODAL BARCODE */
+  .modal-bc { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+  .barcode-card { background: white; padding: 30px; border-radius: 20px; text-align: center; width: 100%; max-width: 350px; }
+  .bc-name { font-weight: bold; font-size: 18px; margin-bottom: 20px; color: var(--text); }
+  .bc-close { margin-top: 20px; background: #f1f5f9; color: var(--text); }
 </style>
 </head>
 <body>
 
   <div id="login-overlay" class="overlay">
-    <img src="https://raw.githubusercontent.com/araujoexploitation/Magasin/main/LOGO.png" style="height:100px; margin-bottom:20px; border-radius:10px; background:white; padding:10px;">
-    <h1 style="color: white; margin-bottom: 10px; font-size:20px;">EXPLOITATION</h1>
+    <img src="https://raw.githubusercontent.com/araujoexploitation/Magasin/main/LOGO.png" style="height:120px; margin-bottom:30px; border-radius:15px; background:white; padding:10px; object-fit:contain;">
     <input type="password" id="login-pass" placeholder="Code (2008)" style="text-align: center; margin-bottom: 20px; max-width: 200px;">
     <button class="btn" style="background: white; color: var(--primary); max-width: 200px;" onclick="window.app.login()">Connexion</button>
+  </div>
+
+  <div id="modal-barcode" class="modal-bc hidden">
+    <div class="barcode-card">
+        <div id="bc-name" class="bc-name">Produit</div>
+        <svg id="barcode"></svg>
+        <button class="btn bc-close" onclick="document.getElementById('modal-barcode').classList.add('hidden')">Fermer</button>
+    </div>
   </div>
 
   <header>
@@ -119,7 +130,6 @@
         <h2 style="margin:0; font-size:22px;">GESTION DLC</h2>
         <p style="opacity:0.8; font-size:14px; margin-top:5px;">Scanner & Contrôler</p>
       </div>
-
       <div style="margin-top:30px; text-align:center; color:#94a3b8; font-size:12px;">
         <i class="fas fa-info-circle"></i> Sélectionner le module pour commencer
       </div>
@@ -143,7 +153,6 @@
             <img id="frais-img" style="height:120px; border-radius:12px; object-fit:contain; border:1px solid #eee;">
           </div>
           <div class="input-group"><label>EAN</label><input type="number" id="frais-ean" placeholder="Code..." oninput="if(this.value.length>=8) window.app.scanApi(this.value)"></div>
-          
           <div class="input-group">
             <label>Famille (Auto)</label>
             <select id="frais-famille">
@@ -157,7 +166,6 @@
                 <option value="SAURISSERIE">SAURISSERIE</option>
             </select>
           </div>
-
           <div class="input-group"><label>Nom</label><input type="text" id="frais-name" placeholder="Auto..."></div>
           <div style="display: flex; gap: 10px;">
              <div class="input-group" style="flex:2;"><label>DLC</label><input type="date" id="frais-date"></div>
@@ -200,7 +208,7 @@
 
   const firebaseConfig = { apiKey: "AIzaSyA0ffa4Nfa7kGLyaEcAocU9YzIhzmx3SkA", authDomain: "araujo-exploitation.firebaseapp.com", databaseURL: "https://araujo-exploitation-default-rtdb.europe-west1.firebasedatabase.app", projectId: "araujo-exploitation", storageBucket: "araujo-exploitation.firebasestorage.app", messagingSenderId: "292878114487", appId: "1:292878114487:web:2a450227310e970ce1b732" };
   const db = getFirestore(initializeApp(firebaseConfig));
-  const docRef = doc(db, "store_master", "v38");
+  const docRef = doc(db, "store_master", "v40");
   const codeReader = new ZXing.BrowserMultiFormatReader();
 
   window.app = {
@@ -281,7 +289,14 @@
         let r = await fetch(`https://world.openfoodfacts.org/api/v0/product/${ean}.json`);
         let d = await r.json();
         if(d.status === 1) {
-          document.getElementById('frais-name').value = d.product.product_name_fr || d.product.product_name;
+          // NOM FIDÈLE: Utilise le nom complet français + Marque si court
+          let brand = d.product.brands ? d.product.brands.split(',')[0] + " - " : "";
+          let pName = d.product.product_name_fr || d.product.product_name || "";
+          if(!pName.toLowerCase().includes(brand.toLowerCase().replace(' - ',''))) {
+              pName = brand + pName;
+          }
+          document.getElementById('frais-name').value = pName;
+          
           let fam = this.detectFamily(d.product);
           document.getElementById('frais-famille').value = fam;
           let img = d.product.image_front_small_url || d.product.image_small_url || d.product.image_url || "";
@@ -306,6 +321,15 @@
       document.getElementById('frais-name').value = ""; document.getElementById('frais-ean').value = "";
       document.getElementById('frais-qty').value = "1"; document.getElementById('frais-img-box').style.display = 'none';
       this.currentImgUrl = ""; alert("Ajouté !");
+    },
+
+    showBarcode: function(ean, name) {
+        document.getElementById('modal-barcode').classList.remove('hidden');
+        document.getElementById('bc-name').innerText = name;
+        if(ean) {
+            try { JsBarcode("#barcode", ean, { format: "EAN13", lineColor: "#000", width: 3, height: 100, displayValue: true }); } 
+            catch(e) { alert("Code Barre invalide: " + ean); }
+        } else { alert("Pas de code barre"); }
     },
 
     moveToHistory: function(id) {
@@ -366,8 +390,13 @@
                 let diff = currentX - startX;
                 item.style.transition = 'transform 0.3s ease';
                 if(diff > 150) { 
-                    item.style.transform = `translateX(100%)`;
-                    setTimeout(() => window.app.moveToHistory(Number(id)), 300);
+                    // DEMANDE DE CONFIRMATION AVANT SUPPRESSION
+                    if(confirm("Confirmer le retrait du produit ?")) {
+                        item.style.transform = `translateX(100%)`;
+                        setTimeout(() => window.app.moveToHistory(Number(id)), 300);
+                    } else {
+                        item.style.transform = 'translateX(0)'; // Retour case départ si annulé
+                    }
                 } else {
                     item.style.transform = 'translateX(0)';
                 }
@@ -415,11 +444,14 @@
              cont.innerHTML += `
                <div class="swipe-wrapper">
                    <div class="swipe-action-bg"><i class="fas fa-trash"></i></div>
-                   <div class="wek-item" data-id="${i.id}">
+                   <div class="wek-item" data-id="${i.id}" onclick="window.app.showBarcode('${i.ean}', '${i.name.replace(/'/g, "\\'")}')">
                       ${imgHtml}
                       <div class="wek-info">
                           <div class="wek-name">${i.name}</div>
-                          <span class="wek-qty">x${i.qty}</span>
+                          <div class="wek-sub">
+                             <span class="wek-qty">x${i.qty}</span>
+                             <span class="wek-ean">${i.ean}</span>
+                          </div>
                       </div>
                       <div class="date-badge ${badgeColor}">
                           <span class="date-day">${day}</span>
@@ -452,8 +484,8 @@
     },
 
     exportHistory: function() {
-      let csv = "Date Retrait;Famille;Nom;DLC;Quantite\n";
-      this.data.history.forEach(i => csv += `${this.formatDateFR(i.deletedAt)};${i.fam || 'DIVERS'};${i.name};${this.formatDateFR(i.date)};${i.qty}\n`);
+      let csv = "Date Retrait;Famille;Nom;EAN;DLC;Quantite\n";
+      this.data.history.forEach(i => csv += `${this.formatDateFR(i.deletedAt)};${i.fam || 'DIVERS'};${i.name};${i.ean};${this.formatDateFR(i.date)};${i.qty}\n`);
       let a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv'})); a.download = 'Casse_Magasin.csv'; a.click();
     }
   };
