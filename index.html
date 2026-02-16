@@ -3,233 +3,230 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-    <title>Carrefour Store Master v28.0</title>
+    <title>Store Master v30 - DLC & Exploitation</title>
 
     <script src="https://unpkg.com/@zxing/library@latest"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyA0ffa4Nfa7kGLyaEcAocU9YzIhzmx3SkA",
-            authDomain: "araujo-exploitation.firebaseapp.com",
-            projectId: "araujo-exploitation",
-            storageBucket: "araujo-exploitation.firebasestorage.app",
-            messagingSenderId: "292878114487",
-            appId: "1:292878114487:web:2a450227310e970ce1b732"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const docRef = doc(db, "magasin", "data_globale");
-
-        window.db_local = {
-            dlc_items: [], pvp: [], trace: [], temp_log: [],
-            checklist_answers: {}, cleaning_log: {},
-            cleaning: [
-                {id:1, name:"Cuisine", tasks:[{n:"Sol", days:[0,1,2,3,4,5,6], freq:1}]},
-                {id:2, name:"Magasin", tasks:[{n:"Tapis Caisse", days:[0,1,2,3,4,5,6], freq:1}]}
-            ],
-            config: {
-                rayons: ["Ultra Frais", "BOF", "Surgelé", "Fruits & Légumes"],
-                pvp_types: ["Baguette", "Croissant", "Pain Choc"],
-                soonDays: 3
-            }
-        };
-
-        window.saveToCloud = async () => { try { await setDoc(docRef, window.db_local); } catch(e) { console.error(e); } };
-        onSnapshot(docRef, (snap) => { if (snap.exists()) { window.db_local = snap.data(); refreshUI(); } });
-    </script>
-
     <style>
-        :root { --blue: #003896; --red: #ed1c24; --bg: #f5f5f5; --green: #10b981; --orange: #f59e0b; }
-        body { margin: 0; font-family: sans-serif; background: var(--bg); padding-bottom: 90px; }
-        header { background: white; padding: 15px; text-align: center; border-bottom: 3px solid var(--blue); font-weight: bold; position: sticky; top:0; z-index:100; }
+        :root { --blue: #003896; --red: #ed1c24; --green: #10b981; --orange: #f59e0b; --bg: #f1f5f9; }
+        body { margin: 0; font-family: system-ui, -apple-system, sans-serif; background: var(--bg); padding-bottom: 90px; }
         
-        .screen { padding: 15px; }
+        header { background: white; padding: 15px; text-align: center; border-bottom: 3px solid var(--blue); position: sticky; top: 0; z-index: 1000; }
+        .logo { font-weight: 900; color: var(--blue); letter-spacing: -1px; font-size: 1.2rem; }
+
+        .screen { padding: 15px; max-width: 600px; margin: auto; }
         .hidden { display: none !important; }
-        
-        /* Menu Accueil */
-        .grid-menu { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .module-card { background: white; padding: 20px; border-radius: 15px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); cursor: pointer; }
-        .module-card i { font-size: 30px; color: var(--blue); margin-bottom: 10px; }
 
-        /* Scanner */
-        #scanner-container { width: 100%; height: 180px; background: black; border-radius: 12px; overflow: hidden; position: relative; margin-bottom: 10px; }
+        /* Menu Principal */
+        .grid-menu { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .mod-card { background: white; padding: 25px 15px; border-radius: 20px; text-align: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); cursor: pointer; transition: 0.2s; }
+        .mod-card:active { transform: scale(0.95); }
+        .mod-card i { font-size: 32px; color: var(--blue); margin-bottom: 12px; display: block; }
+        .mod-card span { font-weight: bold; font-size: 14px; }
+
+        /* Module DLC & Scan */
+        #scanner-view { width: 100%; height: 200px; background: #000; border-radius: 15px; overflow: hidden; position: relative; margin-bottom: 15px; }
         #video { width: 100%; height: 100%; object-fit: cover; }
-        
-        /* Liste DLC */
-        .dlc-card { background: white; padding: 12px; border-radius: 12px; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; border-left: 5px solid #ccc; }
-        .dlc-card.RED { border-left-color: var(--red); }
-        .dlc-card.ORANGE { border-left-color: var(--orange); }
-        .dlc-card.GREEN { border-left-color: var(--green); }
-        .prod-img { width: 50px; height: 50px; border-radius: 5px; object-fit: contain; background: #fff; }
+        .scan-line { position: absolute; top: 50%; left: 0; width: 100%; height: 2px; background: var(--red); box-shadow: 0 0 10px var(--red); animation: scanAnim 2s infinite linear; }
+        @keyframes scanAnim { 0% { top: 10%; } 50% { top: 90%; } 100% { top: 10%; } }
 
-        /* Formulaire */
-        input, select { width: 100%; padding: 12px; margin: 5px 0; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; box-sizing: border-box; }
-        .btn-main { width: 100%; padding: 15px; background: var(--blue); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        
+        .form-card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 10px; font-size: 16px; box-sizing: border-box; }
+        .btn-add { width: 100%; padding: 15px; background: var(--blue); color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
+
+        /* Liste des items */
+        .dlc-item { background: white; padding: 12px; border-radius: 12px; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; border-left: 6px solid #ccc; }
+        .dlc-item.RED { border-left-color: var(--red); }
+        .dlc-item.ORANGE { border-left-color: var(--orange); }
+        .dlc-item.GREEN { border-left-color: var(--green); }
+        .item-img { width: 50px; height: 50px; border-radius: 8px; object-fit: contain; background: #fff; border: 1px solid #eee; }
+        .item-content { flex: 1; }
+        .item-content b { font-size: 14px; display: block; }
+        .item-content small { color: #666; font-size: 12px; }
+        .btn-del { color: #ccc; border: none; background: none; font-size: 18px; padding: 10px; }
+
+        /* Navigation */
         nav { position: fixed; bottom: 0; width: 100%; background: white; display: flex; border-top: 1px solid #ddd; padding: 10px 0; }
-        .nav-item { flex: 1; text-align: center; color: #666; font-size: 12px; cursor: pointer; }
-        .nav-item.active { color: var(--blue); }
+        .nav-link { flex: 1; text-align: center; color: #94a3b8; font-size: 12px; cursor: pointer; border: none; background: none; }
+        .nav-link.active { color: var(--blue); }
+        .nav-link i { font-size: 20px; margin-bottom: 4px; }
     </style>
 </head>
 <body>
 
-<header>CARREFOUR STORE MASTER</header>
+<header>
+    <div class="logo">CARREFOUR <span style="font-weight:100">EXPLOTATION</span></div>
+</header>
 
 <div id="scr-home" class="screen">
     <div class="grid-menu">
-        <div class="module-card" onclick="openModule('dlc')"><i class="fas fa-barcode"></i><h4>DLC / Scan</h4></div>
-        <div class="module-card" onclick="openModule('pvp')"><i class="fas fa-bread-slice"></i><h4>PVP</h4></div>
-        <div class="module-card" onclick="openModule('clean')"><i class="fas fa-pump-soap"></i><h4>Ménage</h4></div>
-        <div class="module-card" onclick="openModule('temp')"><i class="fas fa-temperature-low"></i><h4>Températures</h4></div>
-        <div class="module-card" onclick="openModule('trace')"><i class="fas fa-box-open"></i><h4>Traçabilité</h4></div>
-        <div class="module-card" onclick="openModule('check')"><i class="fas fa-check-double"></i><h4>Checklist</h4></div>
+        <div class="mod-card" onclick="showScreen('dlc')"><i class="fas fa-barcode"></i><span>Suivi DLC</span></div>
+        <div class="mod-card" onclick="showScreen('clean')"><i class="fas fa-pump-soap"></i><span>Ménage</span></div>
+        <div class="mod-card" onclick="showScreen('temp')"><i class="fas fa-thermometer-half"></i><span>Températures</span></div>
+        <div class="mod-card" onclick="showScreen('check')"><i class="fas fa-tasks"></i><span>Checklist</span></div>
     </div>
 </div>
 
 <div id="scr-dlc" class="screen hidden">
-    <div onclick="go('home')" style="margin-bottom:15px; color:var(--blue); font-weight:bold;"><i class="fas fa-arrow-left"></i> RETOUR</div>
+    <button onclick="showScreen('home')" style="border:none; background:none; color:var(--blue); font-weight:bold; margin-bottom:15px;"><i class="fas fa-arrow-left"></i> Retour</button>
     
-    <div id="scanner-container">
+    <div id="scanner-view">
         <video id="video"></video>
+        <div class="scan-line"></div>
     </div>
 
-    <div style="background: white; padding: 15px; border-radius: 12px; margin-bottom: 15px;">
-        <input type="text" id="in-ean" placeholder="EAN Scanné">
+    <div class="form-card">
+        <input type="text" id="in-ean" placeholder="Code EAN (Scanné)">
         <input type="text" id="in-name" placeholder="Nom du produit">
-        <select id="in-rayon"><option>Ultra Frais</option><option>BOF</option><option>Surgelé</option></select>
-        <div style="display:flex; gap:10px">
+        <div style="display: flex; gap: 10px;">
             <input type="date" id="in-date">
-            <input type="number" id="in-qty" value="1" style="width:80px">
+            <input type="number" id="in-qty" value="1" style="width: 80px;">
         </div>
-        <img id="preview-img" src="" class="hidden" style="height:60px; margin: 10px 0;">
-        <button class="btn-main" onclick="addDLC()">ENREGISTRER DLC</button>
+        <div id="search-status" style="font-size: 11px; color: var(--blue); text-align: center; height: 15px;"></div>
+        <button class="btn-add" onclick="saveDLC()">ENREGISTRER LE PRODUIT</button>
     </div>
 
-    <div id="render-dlc-list"></div>
-</div>
-
-<div id="scr-clean" class="screen hidden">
-    <div onclick="go('home')">RETOUR</div>
-    <div id="render-clean"></div>
+    <div id="dlc-list-container"></div>
 </div>
 
 <nav>
-    <div class="nav-item active" onclick="go('home')"><i class="fas fa-home"></i><br>Accueil</div>
-    <div class="nav-item" onclick="openModule('dlc')"><i class="fas fa-barcode"></i><br>Scan DLC</div>
+    <button class="nav-link active" onclick="showScreen('home')"><i class="fas fa-home"></i><br>Accueil</button>
+    <button class="nav-link" onclick="showScreen('dlc')"><i class="fas fa-barcode"></i><br>DLC</button>
 </nav>
 
 <script>
+    // --- INITIALISATION DES DONNÉES ---
+    let dlc_data = JSON.parse(localStorage.getItem('carrefour_dlc')) || [];
     const codeReader = new ZXing.BrowserMultiFormatReader();
-    let currentImg = "";
+    let currentImage = "";
 
-    function go(id) {
+    // --- NAVIGATION ---
+    function showScreen(id) {
         document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
         document.getElementById('scr-' + id).classList.remove('hidden');
-        codeReader.reset();
+        
+        // Arrêter le scanner si on quitte le module DLC
+        if (id !== 'dlc') {
+            codeReader.reset();
+        } else {
+            initScanner();
+            renderDLC();
+        }
     }
 
-    function openModule(mod) {
-        go(mod);
-        if(mod === 'dlc') startScan();
-        refreshUI();
-    }
-
-    // --- LOGIQUE SCAN & OPEN FOOD FACTS ---
-    function startScan() {
+    // --- MODULE DLC : SCANNER & OPEN FOOD FACTS ---
+    function initScanner() {
         codeReader.decodeFromVideoDevice(null, 'video', (result, err) => {
             if (result) {
                 document.getElementById('in-ean').value = result.text;
                 if(navigator.vibrate) navigator.vibrate(100);
-                fetchOFF(result.text);
+                searchProduct(result.text);
             }
         });
     }
 
-    async function fetchOFF(ean) {
+    async function searchProduct(ean) {
+        const status = document.getElementById('search-status');
+        status.innerText = "🔍 Recherche base de données...";
         try {
             const res = await fetch(`https://world.openfoodfacts.org/api/v0/product/${ean}.json`);
             const data = await res.json();
-            if(data.status === 1) {
+            if (data.status === 1) {
                 document.getElementById('in-name').value = data.product.product_name_fr || data.product.product_name;
-                currentImg = data.product.image_small_url || "";
-                if(currentImg) {
-                    const pi = document.getElementById('preview-img');
-                    pi.src = currentImg; pi.classList.remove('hidden');
-                }
+                currentImage = data.product.image_small_url || "";
+                status.innerText = "✅ Produit trouvé";
+            } else {
+                status.innerText = "❌ Inconnu (Saisie manuelle)";
             }
-        } catch(e) { console.error("Erreur OFF"); }
+        } catch (e) {
+            status.innerText = "⚠️ Erreur réseau";
+        }
     }
 
-    // --- ACTIONS ---
-    function addDLC() {
+    // --- SAUVEGARDE & CALCULS ---
+    function saveDLC() {
+        const name = document.getElementById('in-name').value;
+        const date = document.getElementById('in-date').value;
+        const qty = document.getElementById('in-qty').value;
+        const ean = document.getElementById('in-ean').value;
+
+        if (!name || !date) {
+            alert("Veuillez remplir le nom et la date.");
+            return;
+        }
+
         const item = {
             id: Date.now(),
-            ean: document.getElementById('in-ean').value,
-            name: document.getElementById('in-name').value,
-            rayon: document.getElementById('in-rayon').value,
-            date: document.getElementById('in-date').value,
-            qty: document.getElementById('in-qty').value,
-            img: currentImg
+            name,
+            date,
+            qty,
+            ean,
+            img: currentImage
         };
-        if(!item.name || !item.date) return alert("Nom et Date obligatoires");
-        window.db_local.dlc_items.push(item);
-        window.saveToCloud();
-        // Reset
-        document.getElementById('in-ean').value = "";
+
+        dlc_data.push(item);
+        localStorage.setItem('carrefour_dlc', JSON.stringify(dlc_data));
+        
+        // Reset formulaire
         document.getElementById('in-name').value = "";
-        document.getElementById('preview-img').classList.add('hidden');
-        currentImg = "";
+        document.getElementById('in-date').value = "";
+        document.getElementById('in-ean').value = "";
+        currentImage = "";
+        document.getElementById('search-status').innerText = "";
+        
+        renderDLC();
     }
 
     function calculateStatus(dateStr) {
         const now = new Date();
         const expiry = new Date(dateStr);
         const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-        if(expiry <= today) return 'RED';
-        const soon = new Date(); soon.setDate(soon.getDate() + 3);
-        if(expiry <= soon) return 'ORANGE';
+        
+        if (expiry <= today) return 'RED'; // À retirer aujourd'hui ou périmé
+        
+        const soon = new Date();
+        soon.setDate(soon.getDate() + 3); // Orange si DLC à J+3
+        if (expiry <= soon) return 'ORANGE';
+        
         return 'GREEN';
     }
 
-    function refreshUI() {
-        if(!window.db_local) return;
-        
-        // Liste DLC
-        const render = document.getElementById('render-dlc-list');
-        if(render) {
-            render.innerHTML = window.db_local.dlc_items.sort((a,b) => new Date(a.date) - new Date(b.date)).map(i => {
-                const status = calculateStatus(i.date);
-                return `
-                    <div class="dlc-card ${status}">
-                        <img src="${i.img || 'https://via.placeholder.com/50'}" class="prod-img">
-                        <div style="flex:1">
-                            <b>${i.name}</b><br>
-                            <small>${i.rayon} | DLC : ${new Date(i.date).toLocaleDateString()}</small>
-                        </div>
-                        <div style="font-weight:bold">x${i.qty}</div>
-                        <button onclick="removeItem('dlc_items', ${i.id})" style="border:none; color:var(--red); background:none"><i class="fas fa-trash"></i></button>
+    function renderDLC() {
+        const container = document.getElementById('dlc-list-container');
+        container.innerHTML = "";
+
+        // Tri par date (plus urgent en haut)
+        dlc_data.sort((a,b) => new Date(a.date) - new Date(b.date));
+
+        dlc_data.forEach(item => {
+            const status = calculateStatus(item.date);
+            container.innerHTML += `
+                <div class="dlc-item ${status}">
+                    <img src="${item.img || 'https://via.placeholder.com/50?text=Scan'}" class="item-img">
+                    <div class="item-content">
+                        <b>${item.name}</b>
+                        <small>Échéance : ${new Date(item.date).toLocaleDateString()} | Qté: ${item.qty}</small>
                     </div>
-                `;
-            }).join('');
-        }
-
-        // Checklist, Températures, etc. (peuvent être ajoutés ici sur le même modèle)
+                    <button class="btn-del" onclick="deleteItem(${item.id})"><i class="fas fa-trash"></i></button>
+                </div>
+            `;
+        });
     }
 
-    function removeItem(key, id) {
-        if(confirm("Supprimer ?")) {
-            window.db_local[key] = window.db_local[key].filter(i => i.id !== id);
-            window.saveToCloud();
+    function deleteItem(id) {
+        if(confirm("Confirmer le retrait ?")) {
+            dlc_data = dlc_data.filter(i => i.id !== id);
+            localStorage.setItem('carrefour_dlc', JSON.stringify(dlc_data));
+            renderDLC();
         }
     }
 
-    refreshUI();
+    // Lancer au démarrage
+    window.onload = () => {
+        renderDLC();
+    };
 </script>
+
 </body>
 </html>
