@@ -1,263 +1,215 @@
 <!doctype html>
 <html lang="fr">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-<meta name="theme-color" content="#2563eb" />
-<title>Store Master v24.1 - Carrefour</title>
-<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Store Master v25</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+<script src="https://unpkg.com/@zxing/library@latest"></script>
 
 <style>
-  :root {
-    --bg:#f1f5f9; --card:#ffffff; 
-    --blue:#2563eb; --red:#ef4444; --green:#10b981; --orange:#f97316; --purple:#8b5cf6; --teal:#0ea5e9; --indigo:#6366f1;
-    --text:#0f172a; --muted:#64748b; --radius:16px; --app-width: 600px;
-  }
-  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; font-family: system-ui, -apple-system, sans-serif; }
-  body { margin:0; background:#cbd5e1; color:var(--text); padding-bottom:90px; overflow-x:hidden; display: flex; justify-content: center; min-height: 100vh; }
-  #app-container { width: 100%; max-width: var(--app-width); background: var(--bg); min-height: 100vh; box-shadow: 0 0 25px rgba(0,0,0,0.2); position: relative; }
-  header { padding:10px 16px; background:white; border-bottom:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; z-index:50; height: 70px; }
-  .logo-container img { height: 50px; width: auto; object-fit: contain; }
-  .grid-menu { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 16px; }
-  .module-card { background: white; border-radius: 20px; padding: 20px 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; box-shadow: 0 4px 6px -2px rgba(0,0,0,0.05); cursor: pointer; height: 120px; border:1px solid white; transition:0.2s; }
-  .module-card i { font-size: 32px; margin-bottom: 10px; }
-  .module-card h4 { margin:0; font-size:14px; color:var(--text); font-weight:600; }
-  .screen { animation: fadeIn 0.3s; padding-bottom:20px; }
-  .card { background:white; padding:20px; border-radius:var(--radius); box-shadow:0 2px 8px -2px rgba(0,0,0,0.05); margin: 0 16px 16px; position:relative; }
-  .hidden { display:none !important; }
-  .back-btn { padding: 10px 16px; color: var(--blue); cursor: pointer; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; margin-top:5px; }
-  input, select { width:100%; padding:14px; margin:8px 0 16px; border-radius:12px; border:1px solid #cbd5e1; background:#f8fafc; font-size:16px; }
-  button.btn-main { width:100%; padding:16px; border-radius:12px; border:none; font-weight:700; cursor:pointer; font-size:16px; background:var(--blue); color:white; display:flex; align-items:center; justify-content:center; gap:10px; }
-  .list-row { display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid #f1f5f9; }
-  .item-img { width:45px; height:45px; border-radius:8px; object-fit:cover; background:#f1f5f9; border:1px solid #e2e8f0; margin-right:12px; display:flex; align-items:center; justify-content:center; color:#cbd5e1; flex-shrink:0; }
-  .del-btn { color:var(--red); background:none; border:none; cursor:pointer; font-size:16px; }
-  .body-admin .adm-tools { display:inline-flex; }
-  .admin-btn { padding:8px; border-radius:8px; background:#f1f5f9; cursor:pointer; border:none; }
-  .admin-active { background:var(--red); color:white; }
-  
-  /* Status DLC colors */
-  .status-red { color: var(--red); font-weight: bold; }
-  .status-orange { color: var(--orange); font-weight: bold; }
+:root{
+--bg:#f1f5f9;
+--blue:#2563eb;
+--red:#ef4444;
+--green:#10b981;
+--orange:#f97316;
+--radius:16px;
+}
+body{margin:0;background:#cbd5e1;font-family:system-ui;display:flex;justify-content:center;}
+#app{max-width:600px;width:100%;background:var(--bg);min-height:100vh;padding-bottom:80px;}
+header{background:white;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;}
+.card{background:white;margin:16px;border-radius:var(--radius);padding:16px;box-shadow:0 3px 8px rgba(0,0,0,.05);}
+input{width:100%;padding:12px;margin:6px 0;border-radius:10px;border:1px solid #ddd;font-size:16px;}
+button{cursor:pointer}
+.btn{width:100%;padding:14px;border:none;border-radius:12px;background:var(--blue);color:white;font-weight:800;margin-top:6px;}
+.btn-small{padding:6px 10px;border:none;border-radius:8px;background:#e5e7eb;font-weight:900;}
+video{width:100%;height:160px;background:black;border-radius:12px;display:none;}
+.list-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #eee;}
+.item-img{width:55px;height:55px;border-radius:8px;object-fit:contain;background:#f8fafc;border:1px solid #eee;margin-right:10px;}
+.status-red{color:var(--red);font-weight:900;}
+.status-orange{color:var(--orange);font-weight:700;}
 </style>
 </head>
-<body id="main-body">
+<body>
 
-<div id="app-container">
-  <header>
-    <div class="logo-container"><b>Carrefour</b><br>Express</div>
-    <button id="lock-btn" class="admin-btn" onclick="toggleAdmin()"><i class="fas fa-lock"></i></button>
-  </header>
+<div id="app">
 
-  <div id="scr-home" class="screen">
-    <div style="display:flex; gap:10px; padding:20px 16px 0;">
-        <div style="flex:1; background:white; padding:15px; border-radius:16px; text-align:center;">
-            <b style="color:var(--red); font-size:24px" id="kpi-alert">0</b><br><small style="color:var(--muted)">DLC Alertes</small>
-        </div>
-        <div style="flex:1; background:white; padding:15px; border-radius:16px; text-align:center;">
-             <b style="color:var(--green); font-size:24px" id="kpi-clean">0%</b><br><small style="color:var(--muted)">Nettoyage</small>
-        </div>
-    </div>
-    <div class="grid-menu">
-      <div class="module-card" onclick="openModule('frais')"><i class="fas fa-barcode" style="color:var(--blue)"></i><h4>DLC / Frais</h4></div>
-      <div class="module-card" onclick="openModule('trace')"><i class="fas fa-box-open" style="color:var(--indigo)"></i><h4>Traçabilité</h4></div>
-      <div class="module-card" onclick="openModule('clean')"><i class="fas fa-pump-soap" style="color:var(--purple)"></i><h4>Nettoyage</h4></div>
-      <div class="module-card" onclick="openModule('pvp')"><i class="fas fa-bread-slice" style="color:var(--orange)"></i><h4>PVP</h4></div>
-      <div class="module-card" onclick="openModule('temp')"><i class="fas fa-temperature-low" style="color:var(--orange)"></i><h4>Frigos</h4></div>
-    </div>
-  </div>
+<header>
+<b style="color:var(--blue)">CARREFOUR</b>
+<div>Périmés : <b id="kpi" style="color:var(--red)">0</b></div>
+</header>
 
-  <div id="scr-modules" class="screen hidden">
-    <div class="back-btn" onclick="go('home')"><i class="fas fa-arrow-left"></i> Retour</div>
+<div class="card">
+<h3>Nouveau Produit</h3>
 
-    <div id="mod-frais" class="hidden">
-        <div class="card">
-            <h3 style="margin-top:0; color:var(--blue)">Saisie DLC</h3>
-            <div style="display:flex; gap:10px; margin-bottom:10px">
-                <input type="number" id="f-ean" placeholder="Scan EAN..." oninput="if(this.value.length >= 8) apiScan(this.value)">
-                <img id="f-img" style="width:50px;height:50px;display:none;border-radius:8px;border:1px solid #ccc">
-            </div>
-            <input type="text" id="f-name" placeholder="Libellé produit">
-            <input type="date" id="f-date">
-            <button class="btn-main" onclick="addFrais()">Valider DLC</button>
-        </div>
-        <div class="card">
-            <h4>Liste des Dates</h4>
-            <div id="list-frais"></div>
-        </div>
-    </div>
+<video id="video" playsinline></video>
 
-    <div id="mod-trace" class="hidden">
-        <div class="card">
-            <h3>Traçabilité</h3>
-            <select id="trace-name"></select>
-            <input type="file" id="trace-img" accept="image/*" capture="environment">
-            <button class="btn-main" style="background:var(--indigo)" onclick="addTrace()">Ouvrir Carton</button>
-        </div>
-        <div id="list-trace-active"></div>
-    </div>
+<button class="btn" onclick="startScan()">
+<i class="fas fa-camera"></i> Scanner EAN
+</button>
 
-    <div id="mod-temp" class="hidden">
-        <div class="card">
-            <h3>Relevé Frigos</h3>
-            <select id="temp-zone"></select>
-            <input type="number" id="temp-val" placeholder="°C">
-            <button class="btn-main" onclick="addTemp()">Valider</button>
-        </div>
-        <div class="card"><div id="list-temp"></div></div>
-    </div>
-  </div>
+<button class="btn" style="background:var(--red)" onclick="stopScan()">
+Stop
+</button>
+
+<input type="number" id="ean" placeholder="EAN...">
+<img id="imgPreview" style="width:80px;height:80px;object-fit:contain;display:none;margin:auto"/>
+
+<input type="text" id="name" placeholder="Nom produit">
+<div style="display:flex;gap:10px;">
+<input type="date" id="date" style="flex:1;">
+<input type="number" id="qty" value="1" min="1" style="width:100px;">
+</div>
+
+<button class="btn" onclick="addItem()">ENREGISTRER</button>
+</div>
+
+<div class="card">
+<h3>Produits en rayon</h3>
+<div id="list"></div>
+</div>
+
 </div>
 
 <script>
-/* --- DATABASE --- */
-let db = JSON.parse(localStorage.getItem('store_v24')) || { 
-    trace: [], frais: [], pvp: [], cleaning_log: {},
-    cleaning: [{id:1, name:"Cuisine", tasks:[{n:"Sol", days:[0,1,2,3,4,5,6], freq:1}]}],
-    config: {
-        trace: ["Pain", "Viennoiseries"],
-        frigos: ["Mural", "Réserve"],
-        pvp: ["Baguette", "Croissant"]
-    }
-};
+let db = JSON.parse(localStorage.getItem("store_master")) || {frais:[]};
+let currentImg="";
+let reader=null;
+let scanning=false;
 
-let isAdmin = false;
-
-/* --- NAVIGATION --- */
-function go(scr){
-    document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
-    document.getElementById('scr-'+scr).classList.remove('hidden');
-    updateKPIs();
+function save(){
+localStorage.setItem("store_master",JSON.stringify(db));
+updateKPI();
 }
 
-function openModule(mod){
-    go('modules');
-    document.querySelectorAll('#scr-modules > div[id^="mod-"]').forEach(d => d.classList.add('hidden'));
-    document.getElementById('mod-'+mod).classList.remove('hidden');
-    if(mod==='frais') renderFraisList();
-    if(mod==='trace') { updateSelect('trace-name','trace'); renderTraceList(); }
-    if(mod==='temp') { updateSelect('temp-zone','frigos'); renderTempList(); }
+function updateKPI(){
+let today=new Date();
+today.setHours(0,0,0,0);
+let count=db.frais.filter(i=>new Date(i.date)<=today).length;
+document.getElementById("kpi").innerText=count;
 }
 
-/* --- LOGIQUE DLC (OFF) --- */
-async function apiScan(ean) {
-    const imgEl = document.getElementById('f-img');
-    const nameEl = document.getElementById('f-name');
-    try {
-        const res = await fetch(`https://world.openfoodfacts.org/api/v0/product/${ean}.json`);
-        const data = await res.json();
-        if(data.status === 1) {
-            nameEl.value = data.product.product_name_fr || data.product.product_name;
-            imgEl.src = data.product.image_small_url;
-            imgEl.style.display = 'block';
-        }
-    } catch(e) { console.error("Erreur API"); }
+function startScan(){
+if(scanning)return;
+scanning=true;
+document.getElementById("video").style.display="block";
+reader=new ZXing.BrowserMultiFormatReader();
+reader.decodeFromVideoDevice(null,"video",(result)=>{
+if(result){
+document.getElementById("ean").value=result.text;
+if(navigator.vibrate)navigator.vibrate(100);
+apiScan(result.text);
+stopScan();
+}
+});
 }
 
-function addFrais() {
-    const name = document.getElementById('f-name').value;
-    const date = document.getElementById('f-date').value;
-    const img = document.getElementById('f-img').src;
-    if(!name || !date) return alert("Nom et Date requis");
-    
-    db.frais.push({ id: Date.now(), name, date, img: img.includes('data') ? img : img });
-    save();
-    renderFraisList();
-    // Reset
-    document.getElementById('f-name').value = "";
-    document.getElementById('f-ean').value = "";
-    document.getElementById('f-img').style.display = 'none';
+function stopScan(){
+if(reader)reader.reset();
+reader=null;
+scanning=false;
+document.getElementById("video").style.display="none";
 }
 
-function renderFraisList() {
-    const container = document.getElementById('list-frais');
-    const now = new Date();
-    now.setHours(0,0,0,0);
-
-    // Tri par date
-    db.frais.sort((a,b) => new Date(a.date) - new Date(b.date));
-
-    container.innerHTML = db.frais.map(item => {
-        const dlc = new Date(item.date);
-        const diff = (dlc - now) / (1000 * 3600 * 24);
-        let statusClass = "";
-        if(diff <= 0) statusClass = "status-red";
-        else if(diff <= 2) statusClass = "status-orange";
-
-        return `
-            <div class="list-row">
-                <div style="display:flex; align-items:center">
-                    <img src="${item.img || ''}" class="item-img" onerror="this.src='https://via.placeholder.com/45'">
-                    <div>
-                        <b>${item.name}</b><br>
-                        <small class="${statusClass}">DLC: ${new Date(item.date).toLocaleDateString()}</small>
-                    </div>
-                </div>
-                <button class="del-btn" onclick="delFrais(${item.id})"><i class="fas fa-trash"></i></button>
-            </div>
-        `;
-    }).join('');
-    updateKPIs();
+async function apiScan(ean){
+try{
+let res=await fetch(`https://world.openfoodfacts.org/api/v0/product/${ean}.json`);
+let data=await res.json();
+if(data.status===1){
+document.getElementById("name").value=data.product.product_name_fr||data.product.product_name||"";
+currentImg=data.product.image_small_url||data.product.image_url||"";
+if(currentImg){
+let img=document.getElementById("imgPreview");
+img.src=currentImg;
+img.style.display="block";
+}
+}
+}catch(e){console.log(e);}
 }
 
-function delFrais(id) {
-    db.frais = db.frais.filter(i => i.id !== id);
-    save(); renderFraisList();
+function addItem(){
+let ean=document.getElementById("ean").value.trim();
+let name=document.getElementById("name").value.trim();
+let date=document.getElementById("date").value;
+let qty=parseInt(document.getElementById("qty").value||1);
+
+if(!name||!date)return alert("Nom et date obligatoires");
+
+let existing=db.frais.find(i=>i.ean===ean && i.date===date);
+if(existing){
+existing.qty+=qty;
+}else{
+db.frais.push({
+id:Date.now(),
+ean,
+name,
+date,
+qty,
+img:currentImg
+});
 }
 
-/* --- TRACE --- */
-async function addTrace() {
-    let name = document.getElementById('trace-name').value;
-    let imgInput = document.getElementById('trace-img');
-    let imgData = "";
-    if(imgInput.files[0]) {
-        const reader = new FileReader();
-        reader.readAsDataURL(imgInput.files[0]);
-        await new Promise(r => reader.onload = r);
-        imgData = reader.result;
-    }
-    db.trace.push({id: Date.now(), name, start: new Date().toISOString(), end: null, img: imgData});
-    save(); renderTraceList();
+save();
+render();
+
+document.getElementById("ean").value="";
+document.getElementById("name").value="";
+document.getElementById("qty").value=1;
+document.getElementById("imgPreview").style.display="none";
+currentImg="";
 }
 
-function renderTraceList() {
-    document.getElementById('list-trace-active').innerHTML = db.trace.filter(i => !i.end).map(i => `
-        <div class="list-row">
-            <div style="display:flex; align-items:center">
-                <img src="${i.img || ''}" class="item-img">
-                <b>${i.name}</b>
-            </div>
-            <button class="btn-main" style="width:auto; padding:8px" onclick="closeTrace(${i.id})">Fin</button>
-        </div>
-    `).join('');
+function changeQty(id,delta){
+let item=db.frais.find(i=>i.id===id);
+if(!item)return;
+item.qty=Math.max(1,item.qty+delta);
+save();
+render();
 }
 
-function closeTrace(id) {
-    db.trace.find(i => i.id === id).end = new Date().toISOString();
-    save(); renderTraceList();
+function deleteItem(id){
+db.frais=db.frais.filter(i=>i.id!==id);
+save();
+render();
 }
 
-/* --- UTILS --- */
-function updateKPIs() {
-    const today = new Date(); today.setHours(0,0,0,0);
-    const alerts = db.frais.filter(i => new Date(i.date) <= today).length;
-    document.getElementById('kpi-alert').innerText = alerts;
+function render(){
+let list=document.getElementById("list");
+let today=new Date();
+today.setHours(0,0,0,0);
+
+db.frais.sort((a,b)=>new Date(a.date)-new Date(b.date));
+
+list.innerHTML=db.frais.map(i=>{
+let diff=(new Date(i.date)-today)/86400000;
+let status=diff<=0?"status-red":(diff<=2?"status-orange":"");
+return `
+<div class="list-row">
+<div style="display:flex;align-items:center;">
+<img src="${i.img||'https://via.placeholder.com/55'}" class="item-img">
+<div>
+<b>${i.name}</b><br>
+<small>EAN: ${i.ean||"-"} • Qté: <b>${i.qty}</b></small><br>
+<small class="${status}">DLC: ${i.date}</small>
+<div style="margin-top:4px;">
+<button class="btn-small" onclick="changeQty(${i.id},-1)">−</button>
+<button class="btn-small" onclick="changeQty(${i.id},1)">+</button>
+<button class="btn-small" style="background:var(--red);color:white" onclick="deleteItem(${i.id})">X</button>
+</div>
+</div>
+</div>
+</div>
+`;
+}).join("");
+
+updateKPI();
 }
 
-function updateSelect(id, key) {
-    document.getElementById(id).innerHTML = db.config[key].map(x => `<option>${x}</option>`).join('');
-}
-
-function toggleAdmin() {
-    isAdmin = !isAdmin;
-    document.getElementById('lock-btn').classList.toggle('admin-active', isAdmin);
-    document.body.classList.toggle('body-admin', isAdmin);
-}
-
-function save() { localStorage.setItem('store_v24', JSON.stringify(db)); }
-
-// Start
-updateKPIs();
+document.getElementById("date").valueAsDate=new Date();
+render();
 </script>
+
 </body>
 </html>
