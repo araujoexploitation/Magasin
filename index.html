@@ -4,16 +4,15 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
 <meta name="theme-color" content="#ffffff" />
-<title>Araujo Exploitation v35</title>
+<title>Araujo Exploitation v36</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 <script src="https://unpkg.com/@zxing/library@latest"></script>
 
 <style>
   :root {
-    --primary: #003896; /* Bleu Carrefour */
-    --accent: #E2001A; /* Rouge Carrefour */
-    --success: #10b981; --warning: #f59e0b;
-    --bg: #F4F6F9; --surface: #ffffff; --text: #1e293b; --radius: 16px; --gray: #64748b;
+    --primary: #003896; --accent: #E2001A; --success: #10b981; --warning: #f59e0b;
+    --bg: #F4F6F9; --surface: #ffffff; --text: #1e293b; --radius: 12px; --gray: #64748b;
+    --header-bg: #2c3e50; /* Couleur sombre des entêtes de famille style Wek */
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: system-ui, -apple-system, sans-serif; }
   body { margin: 0; background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
@@ -23,9 +22,7 @@
     background: var(--surface); padding: 10px 20px; padding-top: max(10px, env(safe-area-inset-top));
     display: flex; align-items: center; gap: 15px; box-shadow: 0 1px 0 rgba(0,0,0,0.05); z-index: 50;
   }
-  /* LOGO SVG */
-  .logo-svg { height: 40px; width: 40px; }
-
+  .logo-img { height: 45px; width: auto; object-fit: contain; }
   .brand { font-size: 16px; font-weight: 900; color: var(--primary); letter-spacing: -0.5px; text-transform: uppercase; line-height: 1.2; }
 
   /* TABS */
@@ -42,7 +39,7 @@
   .filter-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
 
   /* MAIN */
-  main { flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 100px; }
+  main { flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 100px; }
   .card { background: var(--surface); border-radius: var(--radius); padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); margin-bottom: 15px; }
 
   /* SCANNER */
@@ -50,22 +47,56 @@
   video { width: 100%; height: 100%; object-fit: cover; }
   .scan-btn { width: 100%; padding: 20px; background: var(--primary); color: white; font-weight: bold; font-size: 18px; border-radius: 12px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 15px; }
 
-  /* LISTE DLC */
-  .dlc-item { display: flex; align-items: center; padding: 12px; margin-bottom: 8px; background: white; border-radius: 12px; border-left: 5px solid #ccc; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-  .dlc-red { border-left-color: var(--accent); background: #FEF2F2; }
-  .dlc-orange { border-left-color: var(--warning); background: #FFF7ED; }
-  .dlc-green { border-left-color: var(--success); }
-  .dlc-gray { border-left-color: var(--gray); background: #f1f5f9; opacity: 0.8; }
+  /* --- STYLE WEK (NOUVEAU) --- */
   
-  .dlc-img { width: 50px; height: 50px; border-radius: 8px; object-fit: contain; background: white; border: 1px solid #eee; margin-right: 12px; }
-  .dlc-info { flex: 1; }
-  .family-tag { font-size: 10px; background: #e0f2fe; color: var(--primary); padding: 2px 6px; border-radius: 4px; font-weight: bold; text-transform: uppercase; margin-top: 4px; display: inline-block; }
+  /* Entête de Famille */
+  .group-header {
+    background: var(--header-bg); color: white;
+    padding: 10px 15px; border-radius: 8px 8px 0 0;
+    margin-top: 15px; display: flex; justify-content: space-between; align-items: center;
+    font-size: 13px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .group-count {
+    background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 10px; font-size: 11px;
+  }
 
+  /* Item de la liste */
+  .wek-item {
+    background: white; border-bottom: 1px solid #eee;
+    padding: 12px 15px; display: flex; align-items: center; justify-content: space-between;
+  }
+  .wek-item:last-child { border-radius: 0 0 8px 8px; border-bottom: none; }
+  
+  .wek-info { flex: 1; padding-right: 10px; }
+  .wek-name { font-weight: bold; font-size: 14px; color: var(--text); margin-bottom: 4px; }
+  .wek-qty { font-size: 12px; color: #666; background: #f1f5f9; padding: 2px 6px; border-radius: 4px; }
+  
+  /* Badge Date Carré (Style Wek) */
+  .date-badge {
+    width: 45px; height: 45px; border-radius: 8px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    color: white; font-weight: bold; text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    flex-shrink: 0;
+  }
+  .date-day { font-size: 16px; line-height: 1; }
+  .date-month { font-size: 10px; text-transform: uppercase; margin-top: 2px; }
+
+  /* Couleurs Badge */
+  .badge-red { background: var(--accent); }
+  .badge-orange { background: var(--warning); }
+  .badge-green { background: var(--success); }
+  .badge-gray { background: var(--gray); }
+
+  /* Bouton Poubelle discret */
+  .btn-trash {
+    background: none; border: none; color: #cbd5e1; margin-right: 10px; font-size: 16px; cursor: pointer;
+  }
+  
   /* INPUTS */
   .input-group label { display: block; font-size: 11px; font-weight: 700; color: #64748b; margin-bottom: 4px; text-transform: uppercase; }
   input, select { width: 100%; padding: 14px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 16px; background: #fff; outline: none; }
 
-  /* NAV (SIMPLE) */
+  /* NAV */
   nav { position: fixed; bottom: 0; width: 100%; background: white; height: 70px; display: flex; justify-content: center; align-items: center; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); z-index: 100; }
   .nav-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; color: #94a3b8; font-size: 10px; cursor: pointer; width: 80px; }
   .nav-btn.active { color: var(--primary); } .nav-btn i { font-size: 24px; margin-bottom: 4px; }
@@ -78,25 +109,15 @@
 <body>
 
   <div id="login-overlay" class="overlay">
-    <svg class="logo-svg" style="height:80px; width:80px; margin-bottom:20px;" viewBox="0 0 100 100">
-      <path fill="white" d="M50 0L93.3 25V75L50 100L6.7 75V25L50 0Z"/>
-      <path fill="var(--primary)" d="M45 20 C25 20 20 40 20 50 C20 60 25 80 45 80 L55 80 L55 70 L45 70 C35 70 30 60 30 50 C30 40 35 30 45 30 L55 30 L55 20 Z"/>
-      <path fill="white" d="M55 20 L55 30 L65 30 C75 30 80 40 80 50 C80 60 75 70 65 70 L55 70 L55 80 L65 80 C85 80 90 60 90 50 C90 40 85 20 65 20 Z"/>
-    </svg>
+    <img src="https://raw.githubusercontent.com/araujoexploitation/Magasin/main/LOGO.png" style="height:100px; margin-bottom:20px; border-radius:10px; background:white; padding:5px;">
     <h1 style="color: white; margin-bottom: 10px; font-size:20px;">ARAUJO EXPLOITATION</h1>
-    <p style="color:white; margin-bottom:30px; opacity:0.8">v35.0</p>
+    <p style="color:white; margin-bottom:30px; opacity:0.8">v36.0</p>
     <input type="password" id="login-pass" placeholder="Code (2008)" style="text-align: center; margin-bottom: 20px; max-width: 200px;">
     <button class="btn" style="background: white; color: var(--primary); max-width: 200px;" onclick="window.app.login()">Connexion</button>
   </div>
 
   <header>
-    <svg class="logo-svg" viewBox="0 0 100 100">
-      <path fill="var(--accent)" d="M6.7 25 L50 0 L50 100 L6.7 75 Z"/>
-      <path fill="var(--primary)" d="M50 0 L93.3 25 L93.3 75 L50 100 Z"/>
-      <path fill="white" d="M45 20 C25 20 20 40 20 50 C20 60 25 80 45 80 L65 80 C85 80 90 60 90 50 C90 40 85 20 65 20 Z"/>
-      <path fill="var(--primary)" d="M45 20 L55 20 L55 30 L45 30 C35 30 30 40 30 50 C30 60 35 70 45 70 L55 70 L55 80 L45 80 C25 80 20 60 20 50 C20 40 25 20 45 20"/>
-      <path fill="var(--accent)" d="M65 20 C85 20 90 40 90 50 C90 60 85 80 65 80 L55 80 L55 70 L65 70 C75 70 80 60 80 50 C80 40 75 30 65 30 L55 30 L55 20 L65 20"/>
-    </svg>
+    <img src="https://raw.githubusercontent.com/araujoexploitation/Magasin/main/LOGO.png" class="logo-img">
     <div class="brand">ARAUJO<br>EXPLOITATION</div>
   </header>
 
@@ -138,6 +159,7 @@
                 <option value="BOUCHERIE">BOUCHERIE</option>
                 <option value="TRAITEUR">TRAITEUR</option>
                 <option value="FROMAGE">FROMAGE</option>
+                <option value="SAURISSERIE">SAURISSERIE</option>
             </select>
           </div>
 
@@ -183,7 +205,7 @@
 
   const firebaseConfig = { apiKey: "AIzaSyA0ffa4Nfa7kGLyaEcAocU9YzIhzmx3SkA", authDomain: "araujo-exploitation.firebaseapp.com", databaseURL: "https://araujo-exploitation-default-rtdb.europe-west1.firebasedatabase.app", projectId: "araujo-exploitation", storageBucket: "araujo-exploitation.firebasestorage.app", messagingSenderId: "292878114487", appId: "1:292878114487:web:2a450227310e970ce1b732" };
   const db = getFirestore(initializeApp(firebaseConfig));
-  const docRef = doc(db, "store_master", "v35");
+  const docRef = doc(db, "store_master", "v36");
   const codeReader = new ZXing.BrowserMultiFormatReader();
 
   window.app = {
@@ -254,6 +276,7 @@
         if(cats.includes("POULET") || cats.includes("DINDE") || cats.includes("CANARD") || cats.includes("VOLAILLE")) return "VOLAILLE";
         if(cats.includes("STEAK") || cats.includes("BOEUF") || cats.includes("PORC") || cats.includes("VIANDE")) return "BOUCHERIE";
         if(cats.includes("PIZZA") || cats.includes("QUICHE") || cats.includes("SANDWICH") || cats.includes("SALADE")) return "TRAITEUR";
+        if(cats.includes("SAUMON") || cats.includes("TRUITE") || cats.includes("FUMÉ")) return "SAURISSERIE";
         if(cats.includes("FROMAGE") || cats.includes("CAMEMBERT") || cats.includes("COMTÉ") || cats.includes("EMMENTAL")) return "FROMAGE";
         return "DIVERS"; 
     },
@@ -319,43 +342,81 @@
         return d.toLocaleDateString('fr-FR');
     },
 
+    // HELPER POUR DATE BADGE
+    getDateBadgeParts: function(dateStr) {
+        let d = new Date(dateStr);
+        let day = d.getDate();
+        let month = d.toLocaleString('fr-FR', { month: 'short' }).replace('.',''); // JAN, FEV...
+        return { day, month };
+    },
+
     renderList: function() {
       let today = new Date().toISOString().split('T')[0];
       const cont = document.getElementById('list-frais-container');
       cont.innerHTML = "";
-      this.data.frais.sort((a,b) => a.date.localeCompare(b.date)).forEach(i => {
-        let diff = (new Date(i.date) - new Date(today)) / (86400000);
-        let cls = 'dlc-green'; let txt = this.formatDateFR(i.date); let show = false;
-        
-        if (diff < 1) { cls = 'dlc-red'; txt = "J-0"; if(['all','red'].includes(this.currentFilter)) show = true; } 
-        else if (diff < 2) { cls = 'dlc-orange'; txt = "J+1"; if(['all','orange'].includes(this.currentFilter)) show = true; } 
-        else { cls = 'dlc-green'; if(['all','green'].includes(this.currentFilter)) show = true; }
 
-        if(show) {
-            cont.innerHTML += `
-              <div class="dlc-item ${cls}">
-                <img src="${i.img || 'https://via.placeholder.com/50?text=IMG'}" class="dlc-img">
-                <div class="dlc-info">
-                  <span class="family-tag">${i.fam || 'DIVERS'}</span>
-                  <div style="font-weight:bold;">${i.name}</div>
-                  <div style="font-size:12px; color:#555;">${txt} • <b>x${i.qty}</b></div>
-                </div>
-                <button onclick="window.app.moveToHistory(${i.id})" style="background:none; border:none; color:#999; padding:15px;"><i class="fas fa-trash"></i></button>
-              </div>`;
-        }
+      // GROUP BY FAMILY
+      let grouped = {};
+      this.data.frais.sort((a,b) => a.date.localeCompare(b.date)).forEach(i => {
+         // Filter Logic
+         let diff = (new Date(i.date) - new Date(today)) / (86400000);
+         let show = false;
+         if (diff < 1 && ['all','red'].includes(this.currentFilter)) show = true;
+         else if (diff < 2 && diff >= 1 && ['all','orange'].includes(this.currentFilter)) show = true;
+         else if (diff >= 2 && ['all','green'].includes(this.currentFilter)) show = true;
+         
+         if(show) {
+             if(!grouped[i.fam]) grouped[i.fam] = [];
+             grouped[i.fam].push({ ...i, diff });
+         }
       });
+
+      // RENDER GROUPS
+      Object.keys(grouped).sort().forEach(fam => {
+          let items = grouped[fam];
+          cont.innerHTML += `
+            <div class="group-header">
+                ${fam} <span class="group-count">${items.length}</span>
+            </div>
+          `;
+          
+          items.forEach(i => {
+             let badgeColor = 'badge-green';
+             if(i.diff < 1) badgeColor = 'badge-red';
+             else if(i.diff < 2) badgeColor = 'badge-orange';
+             
+             let {day, month} = this.getDateBadgeParts(i.date);
+
+             cont.innerHTML += `
+               <div class="wek-item">
+                  <button class="btn-trash" onclick="window.app.moveToHistory(${i.id})"><i class="fas fa-trash"></i></button>
+                  <div class="wek-info">
+                      <div class="wek-name">${i.name}</div>
+                      <span class="wek-qty">x${i.qty}</span>
+                  </div>
+                  <div class="date-badge ${badgeColor}">
+                      <span class="date-day">${day}</span>
+                      <span class="date-month">${month}</span>
+                  </div>
+               </div>
+             `;
+          });
+      });
+
       if(cont.innerHTML === "") cont.innerHTML = "<div style='text-align:center; padding:20px; color:#aaa'>Vide</div>";
     },
 
     renderHistory: function() {
         const cont = document.getElementById('list-hist-container');
         cont.innerHTML = this.data.history.slice().reverse().map(i => `
-            <div class="dlc-item dlc-gray">
-                <div class="dlc-info">
-                   <span class="family-tag">${i.fam || 'DIVERS'}</span><br>
-                   <b>${i.name}</b> <br> <small>Retiré le ${this.formatDateFR(i.deletedAt)}</small>
+            <div class="wek-item" style="opacity:0.7">
+                <div class="wek-info">
+                   <div class="wek-name">${i.name}</div>
+                   <small>Retiré le ${this.formatDateFR(i.deletedAt)}</small>
                 </div>
-                <span style="font-weight:bold;">x${i.qty}</span>
+                <div class="date-badge badge-gray">
+                    <span class="date-day" style="font-size:12px;">x${i.qty}</span>
+                </div>
             </div>
         `).join('');
     },
