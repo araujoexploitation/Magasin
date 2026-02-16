@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
 <meta name="theme-color" content="#ffffff" />
-<title>Araujo Exploitation v32</title>
+<title>Araujo Exploitation v33</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 <script src="https://unpkg.com/@zxing/library@latest"></script>
 
@@ -17,10 +17,7 @@
   body { margin: 0; background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
   /* HEADER */
-  header {
-    background: var(--surface); padding: 15px 20px; padding-top: max(15px, env(safe-area-inset-top));
-    display: flex; justify-content: center; align-items: center; box-shadow: 0 1px 0 rgba(0,0,0,0.05); z-index: 50;
-  }
+  header { background: var(--surface); padding: 15px 20px; padding-top: max(15px, env(safe-area-inset-top)); display: flex; justify-content: center; align-items: center; box-shadow: 0 1px 0 rgba(0,0,0,0.05); z-index: 50; }
   .brand { font-size: 18px; font-weight: 900; color: var(--primary); letter-spacing: -0.5px; text-transform: uppercase; }
 
   /* TABS */
@@ -54,10 +51,11 @@
   
   .dlc-img { width: 50px; height: 50px; border-radius: 8px; object-fit: contain; background: white; border: 1px solid #eee; margin-right: 12px; }
   .dlc-info { flex: 1; }
-  
+  .family-tag { font-size: 10px; background: #e0f2fe; color: var(--primary); padding: 2px 6px; border-radius: 4px; font-weight: bold; text-transform: uppercase; margin-top: 4px; display: inline-block; }
+
   /* INPUTS */
   .input-group label { display: block; font-size: 11px; font-weight: 700; color: #64748b; margin-bottom: 4px; text-transform: uppercase; }
-  input { width: 100%; padding: 14px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 16px; background: #fff; outline: none; }
+  input, select { width: 100%; padding: 14px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 16px; background: #fff; outline: none; }
 
   /* NAV */
   nav { position: fixed; bottom: 0; width: 100%; background: white; height: 70px; display: flex; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); z-index: 100; }
@@ -72,7 +70,7 @@
 
   <div id="login-overlay" class="overlay">
     <h1 style="color: white; margin-bottom: 10px;">ARAUJO EXPLOITATION</h1>
-    <p style="color:white; margin-bottom:30px; opacity:0.8">v32.0</p>
+    <p style="color:white; margin-bottom:30px; opacity:0.8">v33.0</p>
     <input type="password" id="login-pass" placeholder="Code (2008)" style="text-align: center; margin-bottom: 20px; max-width: 200px;">
     <button class="btn" style="background: white; color: var(--primary); max-width: 200px;" onclick="window.app.login()">Connexion</button>
   </div>
@@ -83,14 +81,10 @@
 
   <main>
     <div id="view-home">
-      <div class="card" onclick="window.app.nav('frais')" style="text-align:center; cursor:pointer; padding:30px;">
-        <i class="fas fa-barcode" style="font-size:50px; color:var(--primary); margin-bottom:15px;"></i>
-        <h3 style="margin:0;">GESTION DLC</h3>
-        <p style="color:#64748b; font-size:13px;">Scanner / Liste / Historique</p>
-      </div>
-      <div class="card" onclick="window.app.exportHistory()" style="text-align:center; cursor:pointer;">
-        <i class="fas fa-file-export" style="font-size:30px; color:#64748b; margin-bottom:10px;"></i>
-        <h4 style="margin:0;">Export Historique (Casse)</h4>
+      <div class="card" onclick="window.app.nav('frais')" style="text-align:center; cursor:pointer; padding:40px;">
+        <i class="fas fa-barcode" style="font-size:60px; color:var(--primary); margin-bottom:20px;"></i>
+        <h2 style="margin:0;">GESTION DLC</h2>
+        <p style="color:#64748b; font-size:14px; margin-top:5px;">Accéder au module</p>
       </div>
     </div>
 
@@ -112,6 +106,20 @@
             <img id="frais-img" style="height:120px; border-radius:12px; object-fit:contain; border:1px solid #eee;">
           </div>
           <div class="input-group"><label>EAN</label><input type="number" id="frais-ean" placeholder="Code..." oninput="if(this.value.length>=8) window.app.scanApi(this.value)"></div>
+          
+          <div class="input-group">
+            <label>Famille (Auto)</label>
+            <select id="frais-famille">
+                <option value="DIVERS">DIVERS</option>
+                <option value="ULTRA FRAIS">ULTRA FRAIS</option>
+                <option value="CHARCUTERIE">CHARCUTERIE</option>
+                <option value="VOLAILLE">VOLAILLE</option>
+                <option value="BOUCHERIE">BOUCHERIE</option>
+                <option value="TRAITEUR">TRAITEUR</option>
+                <option value="FROMAGE">FROMAGE</option>
+            </select>
+          </div>
+
           <div class="input-group"><label>Nom</label><input type="text" id="frais-name" placeholder="Auto..."></div>
           <div style="display: flex; gap: 10px;">
              <div class="input-group" style="flex:2;"><label>DLC</label><input type="date" id="frais-date"></div>
@@ -132,9 +140,12 @@
       </div>
 
       <div id="content-hist" class="hidden">
-        <div style="text-align:center; padding:10px; color:#666; font-size:12px;">Produits retirés / jetés</div>
+        <div class="card" onclick="window.app.exportHistory()" style="text-align:center; cursor:pointer; background:#f1f5f9; padding:15px; margin-bottom:15px;">
+            <i class="fas fa-file-csv" style="color:#64748b; font-size:24px;"></i>
+            <h4 style="margin:5px 0;">Exporter CSV (Casse)</h4>
+        </div>
         <div id="list-hist-container"></div>
-        <button class="btn" onclick="window.app.clearHistory()" style="background:#64748b; margin-top:20px;">Vider Historique</button>
+        <button class="btn" onclick="window.app.clearHistory()" style="background:#64748b; margin-top:20px;">Vider Historique (Code Requis)</button>
       </div>
     </div>
   </main>
@@ -152,7 +163,7 @@
 
   const firebaseConfig = { apiKey: "AIzaSyA0ffa4Nfa7kGLyaEcAocU9YzIhzmx3SkA", authDomain: "araujo-exploitation.firebaseapp.com", databaseURL: "https://araujo-exploitation-default-rtdb.europe-west1.firebasedatabase.app", projectId: "araujo-exploitation", storageBucket: "araujo-exploitation.firebasestorage.app", messagingSenderId: "292878114487", appId: "1:292878114487:web:2a450227310e970ce1b732" };
   const db = getFirestore(initializeApp(firebaseConfig));
-  const docRef = doc(db, "store_master", "v32");
+  const docRef = doc(db, "store_master", "v33");
   const codeReader = new ZXing.BrowserMultiFormatReader();
 
   window.app = {
@@ -215,12 +226,32 @@
         document.getElementById('btn-scan-toggle').innerHTML = "<i class='fas fa-camera'></i> LANCER SCAN";
     },
 
+    // INTELLIGENCE CLASSIFICATION
+    detectFamily: function(prod) {
+        let cats = (prod.categories || "") + " " + (prod.pnns_groups_2 || "") + " " + (prod.product_name || "");
+        cats = cats.toUpperCase();
+        
+        if(cats.includes("YAOURT") || cats.includes("LAIT") || cats.includes("CRÈME") || cats.includes("DESSERT") || cats.includes("FROMAGE BLANC")) return "ULTRA FRAIS";
+        if(cats.includes("JAMBON") || cats.includes("SAUCIS") || cats.includes("LARD") || cats.includes("PÂTÉ") || cats.includes("RILLETTE")) return "CHARCUTERIE";
+        if(cats.includes("POULET") || cats.includes("DINDE") || cats.includes("CANARD") || cats.includes("VOLAILLE")) return "VOLAILLE";
+        if(cats.includes("STEAK") || cats.includes("BOEUF") || cats.includes("PORC") || cats.includes("VIANDE")) return "BOUCHERIE";
+        if(cats.includes("PIZZA") || cats.includes("QUICHE") || cats.includes("SANDWICH") || cats.includes("SALADE")) return "TRAITEUR";
+        if(cats.includes("FROMAGE") || cats.includes("CAMEMBERT") || cats.includes("COMTÉ") || cats.includes("EMMENTAL")) return "FROMAGE";
+        
+        return "DIVERS"; // Par défaut
+    },
+
     scanApi: async function(ean) {
       try {
         let r = await fetch(`https://world.openfoodfacts.org/api/v0/product/${ean}.json`);
         let d = await r.json();
         if(d.status === 1) {
           document.getElementById('frais-name').value = d.product.product_name_fr || d.product.product_name;
+          
+          // AUTO SELECT FAMILLE
+          let fam = this.detectFamily(d.product);
+          document.getElementById('frais-famille').value = fam;
+
           this.currentImgUrl = d.product.image_url || d.product.image_small_url || "";
           if(this.currentImgUrl) {
              document.getElementById('frais-img').src = this.currentImgUrl;
@@ -235,27 +266,35 @@
       let name = document.getElementById('frais-name').value;
       let date = document.getElementById('frais-date').value;
       let qty = document.getElementById('frais-qty').value;
+      let fam = document.getElementById('frais-famille').value;
+
       if(!name || !date) return alert("Date requise !");
-      this.data.frais.push({ id: Date.now(), ean, name, date, qty, img: this.currentImgUrl });
+      this.data.frais.push({ id: Date.now(), ean, name, date, qty, fam, img: this.currentImgUrl });
       this.save();
+      
       document.getElementById('frais-name').value = ""; document.getElementById('frais-ean').value = "";
       document.getElementById('frais-qty').value = "1"; document.getElementById('frais-img-box').style.display = 'none';
       this.currentImgUrl = ""; alert("Ajouté !");
     },
 
+    // SECURITÉ MANAGER SUR SUPPRESSION
     moveToHistory: function(id) {
-      if(confirm("Confirmer le retrait/casse ?")) {
-        let item = this.data.frais.find(x => x.id === id);
-        if(item) {
-            this.data.history.push({...item, deletedAt: new Date().toISOString()});
-            this.data.frais = this.data.frais.filter(x => x.id !== id);
-            this.save();
-        }
+      let code = prompt("Code Manager requis pour supprimer :");
+      if(code !== "2008") return alert("Accès refusé");
+
+      let item = this.data.frais.find(x => x.id === id);
+      if(item) {
+          this.data.history.push({...item, deletedAt: new Date().toISOString()});
+          this.data.frais = this.data.frais.filter(x => x.id !== id);
+          this.save();
       }
     },
 
     clearHistory: function() {
-        if(confirm("Vider définitivement l'historique ?")) {
+        let code = prompt("Code Manager requis pour vider l'historique :");
+        if(code !== "2008") return alert("Accès refusé");
+        
+        if(confirm("Vider définitivement ?")) {
             this.data.history = [];
             this.save();
         }
@@ -284,10 +323,11 @@
               <div class="dlc-item ${cls}">
                 <img src="${i.img || 'https://via.placeholder.com/50?text=IMG'}" class="dlc-img">
                 <div class="dlc-info">
+                  <span class="family-tag">${i.fam || 'DIVERS'}</span>
                   <div style="font-weight:bold;">${i.name}</div>
                   <div style="font-size:12px; color:#555;">${txt} • <b>x${i.qty}</b></div>
                 </div>
-                <button onclick="window.app.moveToHistory(${i.id})" style="background:none; border:none; color:#999; padding:10px;"><i class="fas fa-trash"></i></button>
+                <button onclick="window.app.moveToHistory(${i.id})" style="background:none; border:none; color:#999; padding:15px;"><i class="fas fa-trash"></i></button>
               </div>`;
         }
       });
@@ -299,6 +339,7 @@
         cont.innerHTML = this.data.history.slice().reverse().map(i => `
             <div class="dlc-item dlc-gray">
                 <div class="dlc-info">
+                   <span class="family-tag">${i.fam || 'DIVERS'}</span><br>
                    <b>${i.name}</b> <br> <small>Retiré le ${new Date(i.deletedAt).toLocaleDateString()}</small>
                 </div>
                 <span style="font-weight:bold;">x${i.qty}</span>
@@ -307,9 +348,9 @@
     },
 
     exportHistory: function() {
-      let csv = "Date Retrait;Nom;DLC;Quantite\n";
-      this.data.history.forEach(i => csv += `${new Date(i.deletedAt).toLocaleDateString()};${i.name};${i.date};${i.qty}\n`);
-      let a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv'})); a.download = 'Historique_Casse.csv'; a.click();
+      let csv = "Date Retrait;Famille;Nom;DLC;Quantite\n";
+      this.data.history.forEach(i => csv += `${new Date(i.deletedAt).toLocaleDateString()};${i.fam || 'DIVERS'};${i.name};${i.date};${i.qty}\n`);
+      let a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv'})); a.download = 'Casse_Magasin.csv'; a.click();
     }
   };
 </script>
