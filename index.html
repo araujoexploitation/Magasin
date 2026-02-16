@@ -4,68 +4,65 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
 <meta name="theme-color" content="#ffffff" />
-<title>Store Master v31 - Filtres & Images</title>
+<title>Araujo Exploitation v32</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 <script src="https://unpkg.com/@zxing/library@latest"></script>
 
 <style>
   :root {
     --primary: #0055AA; --accent: #E2001A; --success: #10b981; --warning: #f59e0b;
-    --bg: #F4F6F9; --surface: #ffffff; --text: #1e293b; --radius: 16px;
+    --bg: #F4F6F9; --surface: #ffffff; --text: #1e293b; --radius: 16px; --gray: #64748b;
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: system-ui, -apple-system, sans-serif; }
   body { margin: 0; background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
+  /* HEADER */
   header {
     background: var(--surface); padding: 15px 20px; padding-top: max(15px, env(safe-area-inset-top));
-    display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 0 rgba(0,0,0,0.05); z-index: 50;
+    display: flex; justify-content: center; align-items: center; box-shadow: 0 1px 0 rgba(0,0,0,0.05); z-index: 50;
   }
-  .brand { font-size: 18px; font-weight: 800; color: var(--primary); letter-spacing: -0.5px; }
+  .brand { font-size: 18px; font-weight: 900; color: var(--primary); letter-spacing: -0.5px; text-transform: uppercase; }
 
-  /* TABS NAVIGATION */
+  /* TABS */
   .tabs { display: flex; background: #e2e8f0; padding: 4px; border-radius: 12px; margin-bottom: 15px; }
-  .tab { flex: 1; text-align: center; padding: 12px; font-weight: 700; font-size: 13px; color: #64748b; border-radius: 10px; cursor: pointer; transition: 0.2s; }
+  .tab { flex: 1; text-align: center; padding: 10px; font-weight: 700; font-size: 11px; color: #64748b; border-radius: 9px; cursor: pointer; transition: 0.2s; white-space: nowrap; }
   .tab.active { background: white; color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
 
-  /* BARRE DE FILTRES (NOUVEAU) */
+  /* FILTRES */
   .filter-bar { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; margin-bottom: 10px; }
-  .filter-btn { 
-    flex: 1; border: 1px solid #cbd5e1; background: white; padding: 8px 12px; 
-    border-radius: 20px; font-size: 12px; font-weight: bold; color: #64748b; white-space: nowrap; cursor: pointer;
-  }
+  .filter-btn { flex: 1; border: 1px solid #cbd5e1; background: white; padding: 8px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; color: #64748b; white-space: nowrap; cursor: pointer; }
+  .filter-btn.active.red { background: var(--accent); color: white; border-color: var(--accent); }
+  .filter-btn.active.orange { background: var(--warning); color: white; border-color: var(--warning); }
+  .filter-btn.active.green { background: var(--success); color: white; border-color: var(--success); }
   .filter-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
-  .filter-btn.active.red { background: var(--accent); border-color: var(--accent); }
-  .filter-btn.active.orange { background: var(--warning); border-color: var(--warning); }
-  .filter-btn.active.green { background: var(--success); border-color: var(--success); }
 
-  /* MAIN CONTENT */
+  /* MAIN */
   main { flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 100px; }
   .card { background: var(--surface); border-radius: var(--radius); padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); margin-bottom: 15px; }
-  
+
   /* SCANNER */
-  #scanner-container { width: 100%; height: 250px; background: black; border-radius: 12px; margin-bottom: 15px; overflow: hidden; position: relative; display: none; }
+  #scanner-container { width: 100%; height: 250px; background: black; border-radius: 12px; margin-bottom: 15px; overflow: hidden; display: none; }
   video { width: 100%; height: 100%; object-fit: cover; }
   .scan-btn { width: 100%; padding: 20px; background: var(--primary); color: white; font-weight: bold; font-size: 18px; border-radius: 12px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 15px; }
-  
-  /* INPUTS */
-  .input-group { margin-bottom: 12px; }
-  .input-group label { display: block; font-size: 11px; font-weight: 700; color: #64748b; margin-bottom: 4px; text-transform: uppercase; }
-  input { width: 100%; padding: 14px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 16px; background: #fff; outline: none; }
-  input:focus { border-color: var(--primary); background: #f8fafc; }
-  
+
   /* LISTE DLC */
   .dlc-item { display: flex; align-items: center; padding: 12px; margin-bottom: 8px; background: white; border-radius: 12px; border-left: 5px solid #ccc; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
   .dlc-red { border-left-color: var(--accent); background: #FEF2F2; }
   .dlc-orange { border-left-color: var(--warning); background: #FFF7ED; }
   .dlc-green { border-left-color: var(--success); }
+  .dlc-gray { border-left-color: var(--gray); background: #f1f5f9; opacity: 0.8; }
+  
   .dlc-img { width: 50px; height: 50px; border-radius: 8px; object-fit: contain; background: white; border: 1px solid #eee; margin-right: 12px; }
   .dlc-info { flex: 1; }
   
+  /* INPUTS */
+  .input-group label { display: block; font-size: 11px; font-weight: 700; color: #64748b; margin-bottom: 4px; text-transform: uppercase; }
+  input { width: 100%; padding: 14px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 16px; background: #fff; outline: none; }
+
   /* NAV */
   nav { position: fixed; bottom: 0; width: 100%; background: white; height: 70px; display: flex; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); z-index: 100; }
   .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #94a3b8; font-size: 10px; cursor: pointer; }
   .nav-btn.active { color: var(--primary); } .nav-btn i { font-size: 24px; margin-bottom: 4px; }
-  
   .btn { width: 100%; padding: 16px; border-radius: 12px; border: none; font-weight: 700; font-size: 16px; background: var(--primary); color: white; cursor: pointer; }
   .hidden { display: none !important; }
   .overlay { position: fixed; inset: 0; background: var(--primary); z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
@@ -74,14 +71,14 @@
 <body>
 
   <div id="login-overlay" class="overlay">
-    <h1 style="color: white; margin-bottom: 20px;">Store Master v31</h1>
+    <h1 style="color: white; margin-bottom: 10px;">ARAUJO EXPLOITATION</h1>
+    <p style="color:white; margin-bottom:30px; opacity:0.8">v32.0</p>
     <input type="password" id="login-pass" placeholder="Code (2008)" style="text-align: center; margin-bottom: 20px; max-width: 200px;">
     <button class="btn" style="background: white; color: var(--primary); max-width: 200px;" onclick="window.app.login()">Connexion</button>
   </div>
 
   <header>
-    <div class="brand">STORE MASTER</div>
-    <div style="font-size:12px; font-weight:bold; color:var(--success);">CLOUD OK</div>
+    <div class="brand">ARAUJO EXPLOITATION</div>
   </header>
 
   <main>
@@ -89,23 +86,23 @@
       <div class="card" onclick="window.app.nav('frais')" style="text-align:center; cursor:pointer; padding:30px;">
         <i class="fas fa-barcode" style="font-size:50px; color:var(--primary); margin-bottom:15px;"></i>
         <h3 style="margin:0;">GESTION DLC</h3>
-        <p style="color:#64748b; font-size:13px;">Scanner / Liste / Retraits</p>
+        <p style="color:#64748b; font-size:13px;">Scanner / Liste / Historique</p>
       </div>
-      <div class="card" onclick="window.app.exportCSV()" style="text-align:center; cursor:pointer;">
-        <i class="fas fa-file-csv" style="font-size:30px; color:#64748b; margin-bottom:10px;"></i>
-        <h4 style="margin:0;">Export CSV</h4>
+      <div class="card" onclick="window.app.exportHistory()" style="text-align:center; cursor:pointer;">
+        <i class="fas fa-file-export" style="font-size:30px; color:#64748b; margin-bottom:10px;"></i>
+        <h4 style="margin:0;">Export Historique (Casse)</h4>
       </div>
     </div>
 
     <div id="view-frais" class="hidden">
       <div class="tabs">
         <div id="tab-scan" class="tab active" onclick="window.app.switchTab('scan')">SCANNER</div>
-        <div id="tab-list" class="tab" onclick="window.app.switchTab('list')">VOIR LISTE</div>
+        <div id="tab-list" class="tab" onclick="window.app.switchTab('list')">LISTE</div>
+        <div id="tab-hist" class="tab" onclick="window.app.switchTab('hist')">HISTORIQUE</div>
       </div>
 
       <div id="content-scan">
         <div id="scanner-container"><video id="video"></video></div>
-
         <button id="btn-scan-toggle" class="scan-btn" onclick="window.app.toggleScanner()">
             <i class="fas fa-camera"></i> LANCER SCAN
         </button>
@@ -114,28 +111,12 @@
           <div id="frais-img-box" style="display:none; justify-content:center; margin-bottom:15px;">
             <img id="frais-img" style="height:120px; border-radius:12px; object-fit:contain; border:1px solid #eee;">
           </div>
-
-          <div class="input-group">
-            <label>EAN</label>
-            <input type="number" id="frais-ean" placeholder="Code Barre..." oninput="if(this.value.length>=8) window.app.scanApi(this.value)">
-          </div>
-
-          <div class="input-group">
-            <label>Nom du Produit</label>
-            <input type="text" id="frais-name" placeholder="Automatique...">
-          </div>
-
+          <div class="input-group"><label>EAN</label><input type="number" id="frais-ean" placeholder="Code..." oninput="if(this.value.length>=8) window.app.scanApi(this.value)"></div>
+          <div class="input-group"><label>Nom</label><input type="text" id="frais-name" placeholder="Auto..."></div>
           <div style="display: flex; gap: 10px;">
-             <div class="input-group" style="flex:2;">
-               <label>Date Limite (DLC)</label>
-               <input type="date" id="frais-date">
-             </div>
-             <div class="input-group" style="flex:1;">
-               <label>Quantité</label>
-               <input type="number" id="frais-qty" value="1" style="text-align:center;">
-             </div>
+             <div class="input-group" style="flex:2;"><label>DLC</label><input type="date" id="frais-date"></div>
+             <div class="input-group" style="flex:1;"><label>Qté</label><input type="number" id="frais-qty" value="1" style="text-align:center;"></div>
           </div>
-
           <button class="btn" onclick="window.app.addFrais()">VALIDER</button>
         </div>
       </div>
@@ -147,16 +128,20 @@
           <button class="filter-btn orange" id="filter-orange" onclick="window.app.filterList('orange')">🟠 J+1</button>
           <button class="filter-btn green" id="filter-green" onclick="window.app.filterList('green')">🟢 J+2</button>
         </div>
-
         <div id="list-frais-container"></div>
+      </div>
+
+      <div id="content-hist" class="hidden">
+        <div style="text-align:center; padding:10px; color:#666; font-size:12px;">Produits retirés / jetés</div>
+        <div id="list-hist-container"></div>
+        <button class="btn" onclick="window.app.clearHistory()" style="background:#64748b; margin-top:20px;">Vider Historique</button>
       </div>
     </div>
   </main>
 
   <nav>
     <div class="nav-btn" onclick="window.app.nav('home')"><i class="fas fa-th-large"></i>Menu</div>
-    <div class="nav-btn" onclick="window.app.nav('frais'); window.app.switchTab('scan')"><i class="fas fa-plus-circle"></i>Scan</div>
-    <div class="nav-btn" onclick="window.app.nav('frais'); window.app.switchTab('list')"><i class="fas fa-list"></i>Stock</div>
+    <div class="nav-btn" onclick="window.app.nav('frais'); window.app.switchTab('scan')"><i class="fas fa-plus-circle"></i>DLC</div>
   </nav>
 
   <audio id="beep" src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3"></audio>
@@ -166,23 +151,27 @@
   import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
   const firebaseConfig = { apiKey: "AIzaSyA0ffa4Nfa7kGLyaEcAocU9YzIhzmx3SkA", authDomain: "araujo-exploitation.firebaseapp.com", databaseURL: "https://araujo-exploitation-default-rtdb.europe-west1.firebasedatabase.app", projectId: "araujo-exploitation", storageBucket: "araujo-exploitation.firebasestorage.app", messagingSenderId: "292878114487", appId: "1:292878114487:web:2a450227310e970ce1b732" };
-  
   const db = getFirestore(initializeApp(firebaseConfig));
-  const docRef = doc(db, "store_master", "v31");
+  const docRef = doc(db, "store_master", "v32");
   const codeReader = new ZXing.BrowserMultiFormatReader();
 
   window.app = {
-    data: { frais: [] },
+    data: { frais: [], history: [] },
     scanning: false,
     currentFilter: 'all',
-    currentImgUrl: "", // Stocke l'URL de l'image récupérée
+    currentImgUrl: "",
 
     init: function() {
       onSnapshot(docRef, (s) => {
-        if(s.exists()) { this.data = {...this.data, ...s.data()}; this.renderList(); }
+        if(s.exists()) { 
+            this.data = {...this.data, ...s.data()};
+            if(!this.data.history) this.data.history = []; 
+            this.renderList(); 
+            this.renderHistory();
+        }
       });
     },
-    save: async function() { await setDoc(docRef, this.data, {merge:true}); this.renderList(); },
+    save: async function() { await setDoc(docRef, this.data, {merge:true}); this.renderList(); this.renderHistory(); },
     
     login: function() {
       if(document.getElementById('login-pass').value === "2008") {
@@ -200,22 +189,17 @@
     switchTab: function(t) {
       document.querySelectorAll('.tab').forEach(e => e.classList.remove('active'));
       document.getElementById('tab-'+t).classList.add('active');
-      document.getElementById('content-scan').classList.add('hidden');
-      document.getElementById('content-list').classList.add('hidden');
+      ['content-scan','content-list','content-hist'].forEach(id => document.getElementById(id).classList.add('hidden'));
       document.getElementById('content-'+t).classList.remove('hidden');
-      if(t === 'list') this.stopScanner();
+      if(t !== 'scan') this.stopScanner();
     },
 
-    toggleScanner: function() {
-        if(this.scanning) this.stopScanner();
-        else this.startScanner();
-    },
-
+    toggleScanner: function() { if(this.scanning) this.stopScanner(); else this.startScanner(); },
     startScanner: function() {
         this.scanning = true;
         document.getElementById('scanner-container').style.display = "block";
         document.getElementById('btn-scan-toggle').innerHTML = "STOP SCAN";
-        codeReader.decodeFromVideoDevice(null, 'video', (result, err) => {
+        codeReader.decodeFromVideoDevice(null, 'video', (result) => {
             if (result) {
                 document.getElementById('beep').play();
                 if(navigator.vibrate) navigator.vibrate(200);
@@ -225,10 +209,8 @@
             }
         });
     },
-
     stopScanner: function() {
-        this.scanning = false;
-        codeReader.reset();
+        this.scanning = false; codeReader.reset();
         document.getElementById('scanner-container').style.display = "none";
         document.getElementById('btn-scan-toggle').innerHTML = "<i class='fas fa-camera'></i> LANCER SCAN";
     },
@@ -239,9 +221,7 @@
         let d = await r.json();
         if(d.status === 1) {
           document.getElementById('frais-name').value = d.product.product_name_fr || d.product.product_name;
-          // Sauvegarde l'image dans la variable globale
           this.currentImgUrl = d.product.image_url || d.product.image_small_url || "";
-          
           if(this.currentImgUrl) {
              document.getElementById('frais-img').src = this.currentImgUrl;
              document.getElementById('frais-img-box').style.display = 'flex';
@@ -255,36 +235,36 @@
       let name = document.getElementById('frais-name').value;
       let date = document.getElementById('frais-date').value;
       let qty = document.getElementById('frais-qty').value;
-      
       if(!name || !date) return alert("Date requise !");
-      
-      this.data.frais.push({
-        id: Date.now(), ean, name, date, qty,
-        img: this.currentImgUrl // Utilise l'image de l'API
-      });
+      this.data.frais.push({ id: Date.now(), ean, name, date, qty, img: this.currentImgUrl });
       this.save();
-      
-      // Reset
-      document.getElementById('frais-name').value = "";
-      document.getElementById('frais-ean').value = "";
-      document.getElementById('frais-qty').value = "1";
-      document.getElementById('frais-img-box').style.display = 'none';
-      this.currentImgUrl = ""; // Reset image
-      alert("Ajouté !");
+      document.getElementById('frais-name').value = ""; document.getElementById('frais-ean').value = "";
+      document.getElementById('frais-qty').value = "1"; document.getElementById('frais-img-box').style.display = 'none';
+      this.currentImgUrl = ""; alert("Ajouté !");
     },
 
-    delItem: function(id) {
-      if(confirm("Supprimer ?")) {
-        this.data.frais = this.data.frais.filter(x => x.id !== id);
-        this.save();
+    moveToHistory: function(id) {
+      if(confirm("Confirmer le retrait/casse ?")) {
+        let item = this.data.frais.find(x => x.id === id);
+        if(item) {
+            this.data.history.push({...item, deletedAt: new Date().toISOString()});
+            this.data.frais = this.data.frais.filter(x => x.id !== id);
+            this.save();
+        }
       }
     },
 
-    filterList: function(filterType) {
-        this.currentFilter = filterType;
-        // Update boutons
+    clearHistory: function() {
+        if(confirm("Vider définitivement l'historique ?")) {
+            this.data.history = [];
+            this.save();
+        }
+    },
+
+    filterList: function(type) {
+        this.currentFilter = type;
         document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById('filter-'+filterType).classList.add('active');
+        document.getElementById('filter-'+type).classList.add('active');
         this.renderList();
     },
 
@@ -292,50 +272,44 @@
       let today = new Date().toISOString().split('T')[0];
       const cont = document.getElementById('list-frais-container');
       cont.innerHTML = "";
-
-      let list = this.data.frais.sort((a,b) => a.date.localeCompare(b.date));
-
-      list.forEach(i => {
+      this.data.frais.sort((a,b) => a.date.localeCompare(b.date)).forEach(i => {
         let diff = (new Date(i.date) - new Date(today)) / (86400000);
-        let cls = 'dlc-green';
-        let txt = i.date;
-        let show = false;
-
-        // Logique Couleur et Filtre
-        if (diff < 1) { 
-            cls = 'dlc-red'; txt = "J-0 (Aujourd'hui)"; 
-            if(this.currentFilter === 'all' || this.currentFilter === 'red') show = true;
-        } 
-        else if (diff < 2) { 
-            cls = 'dlc-orange'; txt = "J+1 (Demain)"; 
-            if(this.currentFilter === 'all' || this.currentFilter === 'orange') show = true;
-        } 
-        else { 
-            cls = 'dlc-green'; 
-            if(this.currentFilter === 'all' || this.currentFilter === 'green') show = true;
-        }
+        let cls = 'dlc-green'; let txt = i.date; let show = false;
+        if (diff < 1) { cls = 'dlc-red'; txt = "J-0"; if(['all','red'].includes(this.currentFilter)) show = true; } 
+        else if (diff < 2) { cls = 'dlc-orange'; txt = "J+1"; if(['all','orange'].includes(this.currentFilter)) show = true; } 
+        else { cls = 'dlc-green'; if(['all','green'].includes(this.currentFilter)) show = true; }
 
         if(show) {
             cont.innerHTML += `
               <div class="dlc-item ${cls}">
-                <img src="${i.img || 'https://via.placeholder.com/50?text=No+Img'}" class="dlc-img">
+                <img src="${i.img || 'https://via.placeholder.com/50?text=IMG'}" class="dlc-img">
                 <div class="dlc-info">
                   <div style="font-weight:bold;">${i.name}</div>
-                  <div style="font-size:12px; color:#555;">${txt} • <span style="font-weight:bold">x${i.qty}</span></div>
+                  <div style="font-size:12px; color:#555;">${txt} • <b>x${i.qty}</b></div>
                 </div>
-                <button onclick="window.app.delItem(${i.id})" style="background:none; border:none; color:#999; padding:10px;"><i class="fas fa-trash"></i></button>
-              </div>
-            `;
+                <button onclick="window.app.moveToHistory(${i.id})" style="background:none; border:none; color:#999; padding:10px;"><i class="fas fa-trash"></i></button>
+              </div>`;
         }
       });
-
-      if(cont.innerHTML === "") cont.innerHTML = "<div style='text-align:center; padding:20px; color:#aaa'>Aucun produit dans cette catégorie</div>";
+      if(cont.innerHTML === "") cont.innerHTML = "<div style='text-align:center; padding:20px; color:#aaa'>Vide</div>";
     },
 
-    exportCSV: function() {
-      let csv = "Date;Nom;DLC;Quantite\n";
-      this.data.frais.forEach(i => csv += `${new Date().toLocaleDateString()};${i.name};${i.date};${i.qty}\n`);
-      let a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv'})); a.download = 'Stock_DLC.csv'; a.click();
+    renderHistory: function() {
+        const cont = document.getElementById('list-hist-container');
+        cont.innerHTML = this.data.history.slice().reverse().map(i => `
+            <div class="dlc-item dlc-gray">
+                <div class="dlc-info">
+                   <b>${i.name}</b> <br> <small>Retiré le ${new Date(i.deletedAt).toLocaleDateString()}</small>
+                </div>
+                <span style="font-weight:bold;">x${i.qty}</span>
+            </div>
+        `).join('');
+    },
+
+    exportHistory: function() {
+      let csv = "Date Retrait;Nom;DLC;Quantite\n";
+      this.data.history.forEach(i => csv += `${new Date(i.deletedAt).toLocaleDateString()};${i.name};${i.date};${i.qty}\n`);
+      let a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv'})); a.download = 'Historique_Casse.csv'; a.click();
     }
   };
 </script>
