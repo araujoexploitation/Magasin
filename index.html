@@ -283,3 +283,217 @@
         if(cats.includes("STEAK") || cats.includes("BOEUF") || cats.includes("PORC") || cats.includes("VIANDE")) return "BOUCHERIE";
         if(cats.includes("PIZZA") || cats.includes("QUICHE") || cats.includes("SANDWICH") || cats.includes("SALADE")) return "TRAITEUR";
         if(cats.includes("SAUMON") || cats.includes("TRUITE") || cats.includes("FUMÉ")) return "SAURISSERIE";
+        if(cats.includes("FROMAGE") || cats.includes("CAMEMBERT") || cats.includes("COMTÉ") || cats.includes("EMMENTAL")) return "FROMAGE";
+        return "DIVERS"; 
+    },
+
+    scanApi: async function(ean) {
+      try {
+        let r = await fetch(`https://world.openfoodfacts.org/api/v0/product/${ean}.json`);
+        let d = await r.json();
+        if(d.status === 1) {
+          let brand = d.product.brands ? d.product.brands.split(',')[0] + " - " : "";
+          let pName = d.product.product_name_fr || d.product.product_name || "";
+          if(!pName.toLowerCase().includes(brand.toLowerCase().replace(' - ',''))) {
+              pName = brand + pName;
+          }
+          document.getElementById('frais-name').value = pName;
+          
+          let fam = this.detectFamily(d.product);
+          document.getElementById('frais-famille').value = fam;
+          let img = d.product.image_front_small_url || d.product.image_small_url || d.product.image_url || "";
+          this.currentImgUrl = img;
+          if(this.currentImgUrl) {
+             document.getElementById('frais-img').src = this.currentImgUrl;
+             document.getElementById('frais-img-box').style.display = 'flex';
+          }
+        }
+      } catch(e){}
+    },
+
+    addFrais: function() {
+      let ean = document.getElementById('frais-ean').value;
+      let name = document.getElementById('frais-name').value;
+      let date = document.getElementById('frais-date').value;
+      let qty = document.getElementById('frais-qty').value;
+      let fam = document.getElementById('frais-famille').value;
+      if(!name || !date) return alert("Date requise !");
+      this.data.frais.push({ id: Date.now(), ean, name, date, qty, fam, img: this.currentImgUrl });
+      this.save();
+      document.getElementById('frais-name').value = ""; document.getElementById('frais-ean').value = "";
+      document.getElementById('frais-qty').value = "1"; document.getElementById('frais-img-box').style.display = 'none';
+      this.currentImgUrl = ""; alert("Ajouté !");
+    },
+
+    showBarcode: function(ean, name) {
+        document.getElementById('modal-barcode').classList.remove('hidden');
+        document.getElementById('bc-name').innerText = name;
+        if(ean) {
+            try { 
+                JsBarcode("#barcode", ean, { 
+                    format: "EAN13", lineColor: "#000", width: 3, height: 120, displayValue: true, fontSize: 22, margin: 10
+                }); 
+            } 
+            catch(e) { alert("Code Barre invalide: " + ean); }
+        } else { alert("Pas de code barre"); }
+    },
+
+    moveToHistory: function(id) {
+      let item = this.data.frais.find(x => x.id === id);
+      if(item) {
+          this.data.history.push({...item, deletedAt: new Date().toISOString()});
+          this.data.frais = this.data.frais.filter(x => x.id !== id);
+          this.save();
+      }
+    },
+
+    clearHistory: function() {
+        let code = prompt("Code Manager requis pour vider l'historique :");
+        if(code !== "2008") return alert("Accès refusé");
+        if(confirm("Vider définitivement ?")) { this.data.history = []; this.save(); }
+    },
+
+    filterList: function(type) {
+        this.currentFilter = type;
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('filter-'+type).classList.add('active');
+        this.renderList();
+    },
+
+    formatDateFR: function(dateStr) {
+        if(!dateStr) return "";
+        let d = new Date(dateStr);
+        return d.toLocaleDateString('fr-FR');
+    },
+
+    getDateBadgeParts: function(dateStr) {
+        let d = new Date(dateStr);
+        let day = d.getDate();
+        let month = d.toLocaleString('fr-FR', { month: 'short' }).replace('.','');
+        return { day, month };
+    },
+
+    initSwipe: function() {
+        document.querySelectorAll('.wek-item').forEach(item => {
+            let startX, currentX;
+            let id = item.dataset.id;
+            
+            item.addEventListener('touchstart', (e) => {
+                startX = e.touches[0].clientX;
+                item.style.transition = 'none';
+            });
+            
+            item.addEventListener('touchmove', (e) => {
+                currentX = e.touches[0].clientX;
+                let diff = currentX - startX;
+                if(diff > 0) {
+                    item.style.transform = `translateX(${diff}px)`;
+                    if(diff > 10) e.preventDefault();
+                }
+            });
+            
+            item.addEventListener('touchend', (e) => {
+                let diff = currentX - startX;
+                item.style.transition = 'transform 0.3s ease';
+                if(diff > 150) { 
+                    if(confirm("Retirer le produit : " + item.querySelector('.wek-name').innerText + " ?")) {
+                        item.style.transform = `translateX(100%)`;
+                        setTimeout(() => window.app.moveToHistory(Number(id)), 300);
+                    } else {
+                        item.style.transform = 'translateX(0)';
+                    }
+                } else {
+                    item.style.transform = 'translateX(0)';
+                }
+            });
+        });
+    },
+
+    renderList: function() {
+      let today = new Date().toISOString().split('T')[0];
+      const cont = document.getElementById('list-frais-container');
+      cont.innerHTML = "";
+
+      let grouped = {};
+      this.data.frais.sort((a,b) => a.date.localeCompare(b.date)).forEach(i => {
+         let diff = (new Date(i.date) - new Date(today)) / (86400000);
+         let show = false;
+         if (diff < 1 && ['all','red'].includes(this.currentFilter)) show = true;
+         else if (diff < 2 && diff >= 1 && ['all','orange'].includes(this.currentFilter)) show = true;
+         else if (diff >= 2 && ['all','green'].includes(this.currentFilter)) show = true;
+         
+         if(show) {
+             if(!grouped[i.fam]) grouped[i.fam] = [];
+             grouped[i.fam].push({ ...i, diff });
+         }
+      });
+
+      Object.keys(grouped).sort().forEach(fam => {
+          let items = grouped[fam];
+          cont.innerHTML += `
+            <div class="group-header">
+                ${fam} <span class="group-count">${items.length}</span>
+            </div>
+          `;
+          
+          items.forEach(i => {
+             let badgeColor = 'badge-green';
+             if(i.diff < 1) badgeColor = 'badge-red';
+             else if(i.diff < 2) badgeColor = 'badge-orange';
+             let {day, month} = this.getDateBadgeParts(i.date);
+             let imgHtml = i.img 
+                ? `<img src="${i.img}" class="wek-img" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                   <div class="wek-img" style="display:none"><i class="fas fa-utensils"></i></div>`
+                : `<div class="wek-img"><i class="fas fa-utensils"></i></div>`;
+
+             cont.innerHTML += `
+               <div class="swipe-wrapper">
+                   <div class="swipe-action-bg"><i class="fas fa-trash"></i></div>
+                   <div class="wek-item" data-id="${i.id}" onclick="window.app.showBarcode('${i.ean}', '${i.name.replace(/'/g, "\\'")}')">
+                      ${imgHtml}
+                      <div class="wek-info">
+                          <div class="wek-name">${i.name}</div>
+                          <div class="wek-sub">
+                             <span class="wek-qty">x${i.qty}</span>
+                             <span class="wek-ean">${i.ean}</span>
+                          </div>
+                      </div>
+                      <div class="date-badge ${badgeColor}">
+                          <span class="date-day">${day}</span>
+                          <span class="date-month">${month}</span>
+                      </div>
+                   </div>
+               </div>
+             `;
+          });
+      });
+
+      if(cont.innerHTML === "") cont.innerHTML = "<div style='text-align:center; padding:20px; color:#aaa'>Vide</div>";
+      this.initSwipe();
+    },
+
+    renderHistory: function() {
+        const cont = document.getElementById('list-hist-container');
+        cont.innerHTML = this.data.history.slice().reverse().map(i => `
+            <div class="wek-item" style="opacity:0.7; background:#f8fafc; border-bottom:1px solid #eee;">
+                <div class="wek-info">
+                   <span style="font-size:10px; font-weight:bold; color:#003896">${i.fam}</span><br>
+                   <div class="wek-name">${i.name}</div>
+                   <small>Retiré le ${this.formatDateFR(i.deletedAt)}</small>
+                </div>
+                <div class="date-badge badge-gray">
+                    <span class="date-day" style="font-size:14px;">x${i.qty}</span>
+                </div>
+            </div>
+        `).join('');
+    },
+
+    exportHistory: function() {
+      let csv = "Date Retrait;Famille;Nom;EAN;DLC;Quantite\n";
+      this.data.history.forEach(i => csv += `${this.formatDateFR(i.deletedAt)};${i.fam || 'DIVERS'};${i.name};${i.ean};${this.formatDateFR(i.date)};${i.qty}\n`);
+      let a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv'})); a.download = 'Casse_Magasin.csv'; a.click();
+    }
+  };
+</script>
+</body>
+</html>
