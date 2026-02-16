@@ -1,9 +1,9 @@
 <script type="module">
-  // 1. On importe les outils depuis Internet (CDN)
+  // 1. IMPORTATION DES OUTILS FIREBASE
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-  // 2. Ta configuration spécifique (Celle que tu m'as donnée)
+  // 2. TA CONFIGURATION (Celle que tu as envoyée)
   const firebaseConfig = {
     apiKey: "AIzaSyA0ffa4Nfa7kGLyaEcAocU9YzIhzmx3SkA",
     authDomain: "araujo-exploitation.firebaseapp.com",
@@ -14,63 +14,152 @@
     appId: "1:292878114487:web:2a450227310e970ce1b732"
   };
 
-  // 3. Initialisation de la connexion
-  const firebaseApp = initializeApp(firebaseConfig);
-  const dbFirestore = getFirestore(firebaseApp);
+  // 3. DÉMARRAGE DE LA BASE DE DONNÉES
+  const appFirebase = initializeApp(firebaseConfig);
+  const dbFirestore = getFirestore(appFirebase);
   
-  // On pointe vers le document de sauvegarde (v26 pour la dernière version)
+  // On pointe vers le dossier de sauvegarde "v26"
   const docRef = doc(dbFirestore, "store_master", "v26");
 
-  // --- LOGIQUE DE L'APPLICATION (Ne change pas) ---
-  window.app = {
-    data: { history: [], frais: [] }, // Structure de base
-    
-    // Initialisation et Synchronisation
-    init: function() {
-      // Écoute en temps réel les changements dans la base de données
-      onSnapshot(docRef, (docSnap) => {
-        if (docSnap.exists()) {
-          // Si des données existent, on les charge
-          this.data = { ...this.data, ...docSnap.data() };
-          
-          // Indicateur visuel que la connexion est OK
-          const statusEl = document.getElementById('user-display');
-          if(statusEl) statusEl.style.color = "#16a34a"; // Vert
-          
-          // On rafraîchit l'affichage
-          if(typeof updateConformite === 'function') updateConformite();
-          if(typeof renderInspect === 'function') renderInspect();
-          if(typeof renderFrais === 'function') renderFrais();
-          
-        } else {
-          // Si c'est la première fois, on crée la base
-          this.save();
-        }
-      }, (error) => {
-        console.error("Erreur connexion:", error);
-        alert("Attention : Mode Hors Ligne ou Erreur de connexion Firebase");
-      });
-    },
+  // --- FONCTIONS GLOBALES (Accessibles par les boutons HTML) ---
+  
+  // Variable locale pour stocker les données
+  window.db = { history: [] };
+  window.currentUser = "";
 
-    // Sauvegarde vers le Cloud
-    save: async function() {
-      try { 
-        await setDoc(docRef, this.data, { merge: true }); 
-      } catch(e) { 
-        console.error("Erreur sauvegarde", e); 
+  // FONCTION 1 : Connexion
+  window.login = function() {
+    const name = document.getElementById('user-name').value;
+    const pass = document.getElementById('user-pass').value;
+    if(name && pass === "2008") {
+      window.currentUser = name;
+      document.getElementById('login-overlay').style.display = 'none';
+      document.getElementById('user-display').innerText = "📍 " + name.toUpperCase();
+      
+      // Une fois connecté, on écoute la base de données
+      startSync();
+    } else { alert("Accès refusé (Code 2008)"); }
+  };
+
+  // FONCTION 2 : Synchronisation (Le coeur du système)
+  function startSync() {
+    onSnapshot(docRef, (docSnap) => {
+      if (docSnap.exists()) {
+        // On met à jour les données locales avec celles du Cloud
+        window.db = { ...window.db, ...docSnap.data() };
+        // On rafraîchit l'affichage
+        updateConformite();
+        if(!document.getElementById('mod-inspect').classList.contains('hidden')) renderInspect();
+      } else {
+        // Si la base est vide (première fois), on l'initialise
+        saveToCloud();
       }
+    });
+  }
+
+  // FONCTION 3 : Sauvegarder (Envoie vers Firebase)
+  window.saveToCloud = async function() {
+    try {
+      await setDoc(docRef, window.db, { merge: true });
+      updateConformite();
+    } catch(e) {
+      console.error("Erreur sauvegarde:", e);
+      alert("Erreur de sauvegarde. Vérifiez votre connexion.");
     }
   };
-  
-  // Rendre les fonctions accessibles globalement pour les boutons HTML
-  window.login = login;
-  window.go = go;
-  window.openModule = openModule;
-  window.apiScan = apiScan;
-  window.addItem = addItem;
-  window.renderInspect = renderInspect;
-  window.downloadCSV = downloadCSV;
 
-  // Si l'utilisateur est déjà connecté localement, on lance la sync
-  // (La fonction login() dans le script principal appellera app.init())
+  // --- FONCTIONS MÉTIER (Celles qui font marcher l'appli) ---
+
+  window.go = function(scr) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
+    document.getElementById('scr-'+scr).classList.remove('hidden');
+  }
+
+  window.openModule = function(mod) {
+    window.go('modules');
+    document.querySelectorAll('#scr-modules > div').forEach(d => d.classList.add('hidden'));
+    document.getElementById('mod-'+mod).classList.remove('hidden');
+    if(mod === 'inspect') window.renderInspect();
+  }
+
+  window.apiScan = function(ean) {
+    fetch(`https://world.openfoodfacts.org/api/v0/product/${ean}.json`)
+    .then(r => r.json()).then(data => {
+      if(data.status === 1) {
+        document.getElementById('beep-sound').play();
+        if(navigator.vibrate) navigator.vibrate(200);
+        document.getElementById('f-name').value = data.product.product_name_fr || data.product.product_name;
+        document.getElementById('f-img-preview').src = data.product.image_small_url || "";
+      }
+    });
+  }
+
+  window.addItem = function(type) {
+    const item = {
+      id: Date.now(),
+      type: type,
+      user: window.currentUser,
+      time: new Date().toLocaleString('fr-FR'),
+      name: type === 'TEMP' ? document.getElementById('t-zone').value : document.getElementById('f-name').value,
+      val: type === 'TEMP' ? document.getElementById('t-val').value : document.getElementById('f-date').value,
+      ean: type === 'DLC' ? document.getElementById('f-ean').value : ""
+    };
+
+    window.db.history.push(item);
+    window.saveToCloud(); // On sauvegarde directement sur le cloud
+    alert("Tâche enregistrée !");
+    window.go('home');
+    
+    // Reset champs
+    if(document.getElementById('f-name')) document.getElementById('f-name').value = "";
+    if(document.getElementById('t-val')) document.getElementById('t-val').value = "";
+  }
+
+  window.renderInspect = function() {
+    const cont = document.getElementById('list-inspect-full');
+    if(!cont) return;
+    
+    // On prend l'historique, on l'inverse (plus récent en haut)
+    cont.innerHTML = (window.db.history || []).slice().reverse().map(h => {
+      let alertStyle = (h.type === 'TEMP' && parseFloat(h.val) > 4) ? 'color:var(--red); font-weight:bold;' : '';
+      return `
+        <div class="card history-row">
+          <div>
+            <span style="font-size:10px; color:var(--blue)">[${h.type}]</span> <br>
+            <b style="${alertStyle}">${h.name}</b> <br>
+            <small>${h.time} par ${h.user}</small>
+          </div>
+          <div style="text-align:right">
+            <span style="${alertStyle}">${h.val}</span>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  window.updateConformite = function() {
+    const today = new Date().toLocaleDateString('fr-FR');
+    const doneToday = (window.db.history || []).filter(h => h.time.includes(today)).length;
+    const objectif = 10;
+    const pct = Math.min(Math.round((doneToday / objectif) * 100), 100);
+    
+    const bar = document.getElementById('pct-bar');
+    if(bar) {
+        bar.style.width = pct + "%";
+        document.getElementById('pct-text').innerText = pct + "%";
+    }
+  }
+
+  window.downloadCSV = function() {
+    let csv = "ID;Type;Date_Heure;Operateur;Libelle;Valeur_Echeance;EAN\n";
+    (window.db.history || []).forEach(h => {
+      csv += `${h.id};${h.type};${h.time};${h.user};${h.name};${h.val};${h.ean}\n`;
+    });
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `HACCP_REPORT_${new Date().toLocaleDateString()}.csv`;
+    a.click();
+  }
+
 </script>
