@@ -1,42 +1,82 @@
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { 
-    getFirestore, 
-    doc, 
-    setDoc, 
-    onSnapshot 
-  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-  /* ==========================
-     CONFIG FIREBASE
-  ========================== */
+const firebaseConfig = {
+  apiKey: "AIzaSyA0ffa4Nfa7kGLyaEcAocU9YzIhzmx3SkA",
+  authDomain: "araujo-exploitation.firebaseapp.com",
+  projectId: "araujo-exploitation",
+  storageBucket: "araujo-exploitation.firebasestorage.app",
+  messagingSenderId: "292878114487",
+  appId: "1:292878114487:web:2a450227310e970ce1b732"
+};
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyA0ffa4Nfa7kGLyaEcAocU9YzIhzmx3SkA",
-    authDomain: "araujo-exploitation.firebaseapp.com",
-    projectId: "araujo-exploitation",
-    storageBucket: "araujo-exploitation.firebasestorage.app",
-    messagingSenderId: "292878114487",
-    appId: "1:292878114487:web:2a450227310e970ce1b732"
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const docRef = doc(db, "magasin", "data_globale");
+
+let isSaving = false;
+
+/* ================= LOCAL DB ================= */
+
+window.db_local = {
+  frais: [],
+  reception: [],
+  pvp: [],
+  salad: [],
+  trace: [],
+  temp_log: [],
+  checklist_answers: {},
+  cleaning_log: {},
+  config: {},
+};
+
+/* ================= SAVE ================= */
+
+let saveTimer = null;
+
+window.queueSave = () => {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    saveToCloud();
+  }, 500);
+};
+
+async function saveToCloud() {
+  try {
+    isSaving = true;
+    await setDoc(docRef, window.db_local, { merge: true });
+    console.log("✔ Cloud sauvegardé");
+  } catch (e) {
+    console.error("Erreur save:", e);
+  } finally {
+    setTimeout(() => { isSaving = false; }, 300);
+  }
+}
+
+/* ================= REALTIME SYNC ================= */
+
+onSnapshot(docRef, (snap) => {
+  if (!snap.exists()) {
+    saveToCloud();
+    return;
+  }
+
+  if (isSaving) return; // ⚠️ évite écrasement pendant save
+
+  const cloudData = snap.data();
+
+  // 🔥 on fusionne au lieu d’écraser
+  window.db_local = {
+    ...window.db_local,
+    ...cloudData
   };
 
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
+  if (typeof refreshUI === "function") {
+    refreshUI();
+  }
 
-  // ⚠️ Document principal magasin
-  const docRef = doc(db, "magasin", "data_globale");
+  console.log("☁ Sync reçue");
+});
 
-  /* ==========================
-     BASE LOCALE
-  ========================== */
-
-  window.db_local = {
-    frais: [],
-    reception: [],
-    pvp: [],
-    salad: [],
-    trace: [],
-    temp_log: [],
-    checklist_answers: {},
-    cleaning_log: {},
-    cleaning: [
+</script>
