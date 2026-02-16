@@ -1,232 +1,263 @@
 <!doctype html>
 <html lang="fr">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-    <title>Store Master v30 - DLC & Exploitation</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<meta name="theme-color" content="#2563eb" />
+<title>Store Master v24.1 - Carrefour</title>
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
-    <script src="https://unpkg.com/@zxing/library@latest"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-
-    <style>
-        :root { --blue: #003896; --red: #ed1c24; --green: #10b981; --orange: #f59e0b; --bg: #f1f5f9; }
-        body { margin: 0; font-family: system-ui, -apple-system, sans-serif; background: var(--bg); padding-bottom: 90px; }
-        
-        header { background: white; padding: 15px; text-align: center; border-bottom: 3px solid var(--blue); position: sticky; top: 0; z-index: 1000; }
-        .logo { font-weight: 900; color: var(--blue); letter-spacing: -1px; font-size: 1.2rem; }
-
-        .screen { padding: 15px; max-width: 600px; margin: auto; }
-        .hidden { display: none !important; }
-
-        /* Menu Principal */
-        .grid-menu { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .mod-card { background: white; padding: 25px 15px; border-radius: 20px; text-align: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); cursor: pointer; transition: 0.2s; }
-        .mod-card:active { transform: scale(0.95); }
-        .mod-card i { font-size: 32px; color: var(--blue); margin-bottom: 12px; display: block; }
-        .mod-card span { font-weight: bold; font-size: 14px; }
-
-        /* Module DLC & Scan */
-        #scanner-view { width: 100%; height: 200px; background: #000; border-radius: 15px; overflow: hidden; position: relative; margin-bottom: 15px; }
-        #video { width: 100%; height: 100%; object-fit: cover; }
-        .scan-line { position: absolute; top: 50%; left: 0; width: 100%; height: 2px; background: var(--red); box-shadow: 0 0 10px var(--red); animation: scanAnim 2s infinite linear; }
-        @keyframes scanAnim { 0% { top: 10%; } 50% { top: 90%; } 100% { top: 10%; } }
-
-        .form-card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 10px; font-size: 16px; box-sizing: border-box; }
-        .btn-add { width: 100%; padding: 15px; background: var(--blue); color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
-
-        /* Liste des items */
-        .dlc-item { background: white; padding: 12px; border-radius: 12px; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; border-left: 6px solid #ccc; }
-        .dlc-item.RED { border-left-color: var(--red); }
-        .dlc-item.ORANGE { border-left-color: var(--orange); }
-        .dlc-item.GREEN { border-left-color: var(--green); }
-        .item-img { width: 50px; height: 50px; border-radius: 8px; object-fit: contain; background: #fff; border: 1px solid #eee; }
-        .item-content { flex: 1; }
-        .item-content b { font-size: 14px; display: block; }
-        .item-content small { color: #666; font-size: 12px; }
-        .btn-del { color: #ccc; border: none; background: none; font-size: 18px; padding: 10px; }
-
-        /* Navigation */
-        nav { position: fixed; bottom: 0; width: 100%; background: white; display: flex; border-top: 1px solid #ddd; padding: 10px 0; }
-        .nav-link { flex: 1; text-align: center; color: #94a3b8; font-size: 12px; cursor: pointer; border: none; background: none; }
-        .nav-link.active { color: var(--blue); }
-        .nav-link i { font-size: 20px; margin-bottom: 4px; }
-    </style>
+<style>
+  :root {
+    --bg:#f1f5f9; --card:#ffffff; 
+    --blue:#2563eb; --red:#ef4444; --green:#10b981; --orange:#f97316; --purple:#8b5cf6; --teal:#0ea5e9; --indigo:#6366f1;
+    --text:#0f172a; --muted:#64748b; --radius:16px; --app-width: 600px;
+  }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; font-family: system-ui, -apple-system, sans-serif; }
+  body { margin:0; background:#cbd5e1; color:var(--text); padding-bottom:90px; overflow-x:hidden; display: flex; justify-content: center; min-height: 100vh; }
+  #app-container { width: 100%; max-width: var(--app-width); background: var(--bg); min-height: 100vh; box-shadow: 0 0 25px rgba(0,0,0,0.2); position: relative; }
+  header { padding:10px 16px; background:white; border-bottom:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; z-index:50; height: 70px; }
+  .logo-container img { height: 50px; width: auto; object-fit: contain; }
+  .grid-menu { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 16px; }
+  .module-card { background: white; border-radius: 20px; padding: 20px 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; box-shadow: 0 4px 6px -2px rgba(0,0,0,0.05); cursor: pointer; height: 120px; border:1px solid white; transition:0.2s; }
+  .module-card i { font-size: 32px; margin-bottom: 10px; }
+  .module-card h4 { margin:0; font-size:14px; color:var(--text); font-weight:600; }
+  .screen { animation: fadeIn 0.3s; padding-bottom:20px; }
+  .card { background:white; padding:20px; border-radius:var(--radius); box-shadow:0 2px 8px -2px rgba(0,0,0,0.05); margin: 0 16px 16px; position:relative; }
+  .hidden { display:none !important; }
+  .back-btn { padding: 10px 16px; color: var(--blue); cursor: pointer; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; margin-top:5px; }
+  input, select { width:100%; padding:14px; margin:8px 0 16px; border-radius:12px; border:1px solid #cbd5e1; background:#f8fafc; font-size:16px; }
+  button.btn-main { width:100%; padding:16px; border-radius:12px; border:none; font-weight:700; cursor:pointer; font-size:16px; background:var(--blue); color:white; display:flex; align-items:center; justify-content:center; gap:10px; }
+  .list-row { display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid #f1f5f9; }
+  .item-img { width:45px; height:45px; border-radius:8px; object-fit:cover; background:#f1f5f9; border:1px solid #e2e8f0; margin-right:12px; display:flex; align-items:center; justify-content:center; color:#cbd5e1; flex-shrink:0; }
+  .del-btn { color:var(--red); background:none; border:none; cursor:pointer; font-size:16px; }
+  .body-admin .adm-tools { display:inline-flex; }
+  .admin-btn { padding:8px; border-radius:8px; background:#f1f5f9; cursor:pointer; border:none; }
+  .admin-active { background:var(--red); color:white; }
+  
+  /* Status DLC colors */
+  .status-red { color: var(--red); font-weight: bold; }
+  .status-orange { color: var(--orange); font-weight: bold; }
+</style>
 </head>
-<body>
+<body id="main-body">
 
-<header>
-    <div class="logo">CARREFOUR <span style="font-weight:100">EXPLOTATION</span></div>
-</header>
+<div id="app-container">
+  <header>
+    <div class="logo-container"><b>Carrefour</b><br>Express</div>
+    <button id="lock-btn" class="admin-btn" onclick="toggleAdmin()"><i class="fas fa-lock"></i></button>
+  </header>
 
-<div id="scr-home" class="screen">
-    <div class="grid-menu">
-        <div class="mod-card" onclick="showScreen('dlc')"><i class="fas fa-barcode"></i><span>Suivi DLC</span></div>
-        <div class="mod-card" onclick="showScreen('clean')"><i class="fas fa-pump-soap"></i><span>Ménage</span></div>
-        <div class="mod-card" onclick="showScreen('temp')"><i class="fas fa-thermometer-half"></i><span>Températures</span></div>
-        <div class="mod-card" onclick="showScreen('check')"><i class="fas fa-tasks"></i><span>Checklist</span></div>
-    </div>
-</div>
-
-<div id="scr-dlc" class="screen hidden">
-    <button onclick="showScreen('home')" style="border:none; background:none; color:var(--blue); font-weight:bold; margin-bottom:15px;"><i class="fas fa-arrow-left"></i> Retour</button>
-    
-    <div id="scanner-view">
-        <video id="video"></video>
-        <div class="scan-line"></div>
-    </div>
-
-    <div class="form-card">
-        <input type="text" id="in-ean" placeholder="Code EAN (Scanné)">
-        <input type="text" id="in-name" placeholder="Nom du produit">
-        <div style="display: flex; gap: 10px;">
-            <input type="date" id="in-date">
-            <input type="number" id="in-qty" value="1" style="width: 80px;">
+  <div id="scr-home" class="screen">
+    <div style="display:flex; gap:10px; padding:20px 16px 0;">
+        <div style="flex:1; background:white; padding:15px; border-radius:16px; text-align:center;">
+            <b style="color:var(--red); font-size:24px" id="kpi-alert">0</b><br><small style="color:var(--muted)">DLC Alertes</small>
         </div>
-        <div id="search-status" style="font-size: 11px; color: var(--blue); text-align: center; height: 15px;"></div>
-        <button class="btn-add" onclick="saveDLC()">ENREGISTRER LE PRODUIT</button>
+        <div style="flex:1; background:white; padding:15px; border-radius:16px; text-align:center;">
+             <b style="color:var(--green); font-size:24px" id="kpi-clean">0%</b><br><small style="color:var(--muted)">Nettoyage</small>
+        </div>
+    </div>
+    <div class="grid-menu">
+      <div class="module-card" onclick="openModule('frais')"><i class="fas fa-barcode" style="color:var(--blue)"></i><h4>DLC / Frais</h4></div>
+      <div class="module-card" onclick="openModule('trace')"><i class="fas fa-box-open" style="color:var(--indigo)"></i><h4>Traçabilité</h4></div>
+      <div class="module-card" onclick="openModule('clean')"><i class="fas fa-pump-soap" style="color:var(--purple)"></i><h4>Nettoyage</h4></div>
+      <div class="module-card" onclick="openModule('pvp')"><i class="fas fa-bread-slice" style="color:var(--orange)"></i><h4>PVP</h4></div>
+      <div class="module-card" onclick="openModule('temp')"><i class="fas fa-temperature-low" style="color:var(--orange)"></i><h4>Frigos</h4></div>
+    </div>
+  </div>
+
+  <div id="scr-modules" class="screen hidden">
+    <div class="back-btn" onclick="go('home')"><i class="fas fa-arrow-left"></i> Retour</div>
+
+    <div id="mod-frais" class="hidden">
+        <div class="card">
+            <h3 style="margin-top:0; color:var(--blue)">Saisie DLC</h3>
+            <div style="display:flex; gap:10px; margin-bottom:10px">
+                <input type="number" id="f-ean" placeholder="Scan EAN..." oninput="if(this.value.length >= 8) apiScan(this.value)">
+                <img id="f-img" style="width:50px;height:50px;display:none;border-radius:8px;border:1px solid #ccc">
+            </div>
+            <input type="text" id="f-name" placeholder="Libellé produit">
+            <input type="date" id="f-date">
+            <button class="btn-main" onclick="addFrais()">Valider DLC</button>
+        </div>
+        <div class="card">
+            <h4>Liste des Dates</h4>
+            <div id="list-frais"></div>
+        </div>
     </div>
 
-    <div id="dlc-list-container"></div>
-</div>
+    <div id="mod-trace" class="hidden">
+        <div class="card">
+            <h3>Traçabilité</h3>
+            <select id="trace-name"></select>
+            <input type="file" id="trace-img" accept="image/*" capture="environment">
+            <button class="btn-main" style="background:var(--indigo)" onclick="addTrace()">Ouvrir Carton</button>
+        </div>
+        <div id="list-trace-active"></div>
+    </div>
 
-<nav>
-    <button class="nav-link active" onclick="showScreen('home')"><i class="fas fa-home"></i><br>Accueil</button>
-    <button class="nav-link" onclick="showScreen('dlc')"><i class="fas fa-barcode"></i><br>DLC</button>
-</nav>
+    <div id="mod-temp" class="hidden">
+        <div class="card">
+            <h3>Relevé Frigos</h3>
+            <select id="temp-zone"></select>
+            <input type="number" id="temp-val" placeholder="°C">
+            <button class="btn-main" onclick="addTemp()">Valider</button>
+        </div>
+        <div class="card"><div id="list-temp"></div></div>
+    </div>
+  </div>
+</div>
 
 <script>
-    // --- INITIALISATION DES DONNÉES ---
-    let dlc_data = JSON.parse(localStorage.getItem('carrefour_dlc')) || [];
-    const codeReader = new ZXing.BrowserMultiFormatReader();
-    let currentImage = "";
+/* --- DATABASE --- */
+let db = JSON.parse(localStorage.getItem('store_v24')) || { 
+    trace: [], frais: [], pvp: [], cleaning_log: {},
+    cleaning: [{id:1, name:"Cuisine", tasks:[{n:"Sol", days:[0,1,2,3,4,5,6], freq:1}]}],
+    config: {
+        trace: ["Pain", "Viennoiseries"],
+        frigos: ["Mural", "Réserve"],
+        pvp: ["Baguette", "Croissant"]
+    }
+};
 
-    // --- NAVIGATION ---
-    function showScreen(id) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
-        document.getElementById('scr-' + id).classList.remove('hidden');
-        
-        // Arrêter le scanner si on quitte le module DLC
-        if (id !== 'dlc') {
-            codeReader.reset();
-        } else {
-            initScanner();
-            renderDLC();
+let isAdmin = false;
+
+/* --- NAVIGATION --- */
+function go(scr){
+    document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
+    document.getElementById('scr-'+scr).classList.remove('hidden');
+    updateKPIs();
+}
+
+function openModule(mod){
+    go('modules');
+    document.querySelectorAll('#scr-modules > div[id^="mod-"]').forEach(d => d.classList.add('hidden'));
+    document.getElementById('mod-'+mod).classList.remove('hidden');
+    if(mod==='frais') renderFraisList();
+    if(mod==='trace') { updateSelect('trace-name','trace'); renderTraceList(); }
+    if(mod==='temp') { updateSelect('temp-zone','frigos'); renderTempList(); }
+}
+
+/* --- LOGIQUE DLC (OFF) --- */
+async function apiScan(ean) {
+    const imgEl = document.getElementById('f-img');
+    const nameEl = document.getElementById('f-name');
+    try {
+        const res = await fetch(`https://world.openfoodfacts.org/api/v0/product/${ean}.json`);
+        const data = await res.json();
+        if(data.status === 1) {
+            nameEl.value = data.product.product_name_fr || data.product.product_name;
+            imgEl.src = data.product.image_small_url;
+            imgEl.style.display = 'block';
         }
-    }
+    } catch(e) { console.error("Erreur API"); }
+}
 
-    // --- MODULE DLC : SCANNER & OPEN FOOD FACTS ---
-    function initScanner() {
-        codeReader.decodeFromVideoDevice(null, 'video', (result, err) => {
-            if (result) {
-                document.getElementById('in-ean').value = result.text;
-                if(navigator.vibrate) navigator.vibrate(100);
-                searchProduct(result.text);
-            }
-        });
-    }
+function addFrais() {
+    const name = document.getElementById('f-name').value;
+    const date = document.getElementById('f-date').value;
+    const img = document.getElementById('f-img').src;
+    if(!name || !date) return alert("Nom et Date requis");
+    
+    db.frais.push({ id: Date.now(), name, date, img: img.includes('data') ? img : img });
+    save();
+    renderFraisList();
+    // Reset
+    document.getElementById('f-name').value = "";
+    document.getElementById('f-ean').value = "";
+    document.getElementById('f-img').style.display = 'none';
+}
 
-    async function searchProduct(ean) {
-        const status = document.getElementById('search-status');
-        status.innerText = "🔍 Recherche base de données...";
-        try {
-            const res = await fetch(`https://world.openfoodfacts.org/api/v0/product/${ean}.json`);
-            const data = await res.json();
-            if (data.status === 1) {
-                document.getElementById('in-name').value = data.product.product_name_fr || data.product.product_name;
-                currentImage = data.product.image_small_url || "";
-                status.innerText = "✅ Produit trouvé";
-            } else {
-                status.innerText = "❌ Inconnu (Saisie manuelle)";
-            }
-        } catch (e) {
-            status.innerText = "⚠️ Erreur réseau";
-        }
-    }
+function renderFraisList() {
+    const container = document.getElementById('list-frais');
+    const now = new Date();
+    now.setHours(0,0,0,0);
 
-    // --- SAUVEGARDE & CALCULS ---
-    function saveDLC() {
-        const name = document.getElementById('in-name').value;
-        const date = document.getElementById('in-date').value;
-        const qty = document.getElementById('in-qty').value;
-        const ean = document.getElementById('in-ean').value;
+    // Tri par date
+    db.frais.sort((a,b) => new Date(a.date) - new Date(b.date));
 
-        if (!name || !date) {
-            alert("Veuillez remplir le nom et la date.");
-            return;
-        }
+    container.innerHTML = db.frais.map(item => {
+        const dlc = new Date(item.date);
+        const diff = (dlc - now) / (1000 * 3600 * 24);
+        let statusClass = "";
+        if(diff <= 0) statusClass = "status-red";
+        else if(diff <= 2) statusClass = "status-orange";
 
-        const item = {
-            id: Date.now(),
-            name,
-            date,
-            qty,
-            ean,
-            img: currentImage
-        };
-
-        dlc_data.push(item);
-        localStorage.setItem('carrefour_dlc', JSON.stringify(dlc_data));
-        
-        // Reset formulaire
-        document.getElementById('in-name').value = "";
-        document.getElementById('in-date').value = "";
-        document.getElementById('in-ean').value = "";
-        currentImage = "";
-        document.getElementById('search-status').innerText = "";
-        
-        renderDLC();
-    }
-
-    function calculateStatus(dateStr) {
-        const now = new Date();
-        const expiry = new Date(dateStr);
-        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-        
-        if (expiry <= today) return 'RED'; // À retirer aujourd'hui ou périmé
-        
-        const soon = new Date();
-        soon.setDate(soon.getDate() + 3); // Orange si DLC à J+3
-        if (expiry <= soon) return 'ORANGE';
-        
-        return 'GREEN';
-    }
-
-    function renderDLC() {
-        const container = document.getElementById('dlc-list-container');
-        container.innerHTML = "";
-
-        // Tri par date (plus urgent en haut)
-        dlc_data.sort((a,b) => new Date(a.date) - new Date(b.date));
-
-        dlc_data.forEach(item => {
-            const status = calculateStatus(item.date);
-            container.innerHTML += `
-                <div class="dlc-item ${status}">
-                    <img src="${item.img || 'https://via.placeholder.com/50?text=Scan'}" class="item-img">
-                    <div class="item-content">
-                        <b>${item.name}</b>
-                        <small>Échéance : ${new Date(item.date).toLocaleDateString()} | Qté: ${item.qty}</small>
+        return `
+            <div class="list-row">
+                <div style="display:flex; align-items:center">
+                    <img src="${item.img || ''}" class="item-img" onerror="this.src='https://via.placeholder.com/45'">
+                    <div>
+                        <b>${item.name}</b><br>
+                        <small class="${statusClass}">DLC: ${new Date(item.date).toLocaleDateString()}</small>
                     </div>
-                    <button class="btn-del" onclick="deleteItem(${item.id})"><i class="fas fa-trash"></i></button>
                 </div>
-            `;
-        });
-    }
+                <button class="del-btn" onclick="delFrais(${item.id})"><i class="fas fa-trash"></i></button>
+            </div>
+        `;
+    }).join('');
+    updateKPIs();
+}
 
-    function deleteItem(id) {
-        if(confirm("Confirmer le retrait ?")) {
-            dlc_data = dlc_data.filter(i => i.id !== id);
-            localStorage.setItem('carrefour_dlc', JSON.stringify(dlc_data));
-            renderDLC();
-        }
-    }
+function delFrais(id) {
+    db.frais = db.frais.filter(i => i.id !== id);
+    save(); renderFraisList();
+}
 
-    // Lancer au démarrage
-    window.onload = () => {
-        renderDLC();
-    };
+/* --- TRACE --- */
+async function addTrace() {
+    let name = document.getElementById('trace-name').value;
+    let imgInput = document.getElementById('trace-img');
+    let imgData = "";
+    if(imgInput.files[0]) {
+        const reader = new FileReader();
+        reader.readAsDataURL(imgInput.files[0]);
+        await new Promise(r => reader.onload = r);
+        imgData = reader.result;
+    }
+    db.trace.push({id: Date.now(), name, start: new Date().toISOString(), end: null, img: imgData});
+    save(); renderTraceList();
+}
+
+function renderTraceList() {
+    document.getElementById('list-trace-active').innerHTML = db.trace.filter(i => !i.end).map(i => `
+        <div class="list-row">
+            <div style="display:flex; align-items:center">
+                <img src="${i.img || ''}" class="item-img">
+                <b>${i.name}</b>
+            </div>
+            <button class="btn-main" style="width:auto; padding:8px" onclick="closeTrace(${i.id})">Fin</button>
+        </div>
+    `).join('');
+}
+
+function closeTrace(id) {
+    db.trace.find(i => i.id === id).end = new Date().toISOString();
+    save(); renderTraceList();
+}
+
+/* --- UTILS --- */
+function updateKPIs() {
+    const today = new Date(); today.setHours(0,0,0,0);
+    const alerts = db.frais.filter(i => new Date(i.date) <= today).length;
+    document.getElementById('kpi-alert').innerText = alerts;
+}
+
+function updateSelect(id, key) {
+    document.getElementById(id).innerHTML = db.config[key].map(x => `<option>${x}</option>`).join('');
+}
+
+function toggleAdmin() {
+    isAdmin = !isAdmin;
+    document.getElementById('lock-btn').classList.toggle('admin-active', isAdmin);
+    document.body.classList.toggle('body-admin', isAdmin);
+}
+
+function save() { localStorage.setItem('store_v24', JSON.stringify(db)); }
+
+// Start
+updateKPIs();
 </script>
-
 </body>
 </html>
