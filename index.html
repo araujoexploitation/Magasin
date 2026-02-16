@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-<title>Store Master Cloud v25.0</title>
+<title>Carrefour Store Master v25.0</title>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -30,9 +30,11 @@
         {id:2, name:"Magasin", tasks:[{n:"Tapis Caisse", days:[0,1,2,3,4,5,6], freq:1}]}
     ],
     config: {
-        trace: ["Pains", "Viennoiseries"], 
-        pvp: ["Baguette", "Croissant", "Pain Choc"], 
-        questions: ["Rideau fermé ?", "Lumières éteintes ?", "Alarme mise ?"]
+        trace: ["Pain", "Viennoiseries", "Traiteur"], 
+        pvp: ["Baguette", "Croissant", "Pain Choc", "Pain Campagne"], 
+        salad: ["Tomates", "Oeufs", "Thon", "Salade Verte"],
+        frigos: ["Mural Frais", "Réserve 1", "Réserve 2", "Bac Surgelé"],
+        questions: ["Rideau fermé ?", "Alarme mise ?", "Lumières éteintes ?", "Poubelles vidées ?"]
     }
   };
 
@@ -52,7 +54,7 @@
 <style>
   :root { --bg:#f1f5f9; --blue:#2563eb; --red:#ef4444; --green:#10b981; --radius:16px; }
   body { margin:0; background:#cbd5e1; font-family: system-ui; display:flex; justify-content:center; }
-  #app-container { width:100%; max-width:600px; background:var(--bg); min-height:100vh; position:relative; padding-bottom:100px; }
+  #app-container { width:100%; max-width:600px; background:var(--bg); min-height:100vh; padding-bottom:100px; }
   header { padding:15px; background:white; display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; z-index:100; border-bottom:1px solid #ddd; }
   .grid-menu { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 16px; }
   .module-card { background: white; border-radius: 20px; padding: 20px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); cursor: pointer; }
@@ -65,6 +67,7 @@
   .nav-item { flex:1; text-align:center; font-size:12px; color:gray; cursor:pointer; }
   .nav-item.active { color:var(--blue); }
   input, select { width:100%; padding:12px; margin:8px 0; border-radius:10px; border:1px solid #ddd; font-size:16px; }
+  .chk-btn { padding:10px; border-radius:8px; background:#eee; cursor:pointer; font-weight:bold; width:45%; text-align:center;}
 </style>
 </head>
 
@@ -81,6 +84,8 @@
       <div class="module-card" onclick="openModule('clean')"><i class="fas fa-pump-soap"></i><h4>Ménage</h4></div>
       <div class="module-card" onclick="openModule('trace')"><i class="fas fa-box-open"></i><h4>Traçabilité</h4></div>
       <div class="module-card" onclick="openModule('checklist')"><i class="fas fa-check-double"></i><h4>Checklist</h4></div>
+      <div class="module-card" onclick="openModule('temp')"><i class="fas fa-temperature-low"></i><h4>Températures</h4></div>
+      <div class="module-card" onclick="openModule('salad')"><i class="fas fa-leaf"></i><h4>Salade Bar</h4></div>
     </div>
   </div>
 
@@ -88,12 +93,12 @@
     <div onclick="go('home')" style="padding:15px; color:var(--blue); font-weight:bold;"><i class="fas fa-arrow-left"></i> RETOUR</div>
     
     <div id="mod-trace" class="hidden">
-      <div class="card"><h3>Traçabilité</h3><select id="trace-name"></select><button class="btn-main" onclick="addTrace()">Ouvrir</button></div>
+      <div class="card"><h3>Traçabilité</h3><select id="trace-name"></select><button class="btn-main" onclick="addTrace()">Ouvrir Carton</button></div>
       <div id="list-trace"></div>
     </div>
 
     <div id="mod-clean" class="hidden">
-      <div class="card"><h3>Ménage</h3><div id="list-clean"></div></div>
+      <div class="card"><h3>Ménage du Jour</h3><div id="list-clean"></div></div>
     </div>
 
     <div id="mod-pvp" class="hidden">
@@ -108,6 +113,16 @@
 
     <div id="mod-checklist" class="hidden">
       <div class="card"><h3>Checklist</h3><div id="list-checklist"></div></div>
+    </div>
+
+    <div id="mod-temp" class="hidden">
+      <div class="card"><h3>Relevé Températures</h3><select id="temp-name"></select><input type="number" id="temp-val" placeholder="°C"><button class="btn-main" onclick="addTemp()">Enregistrer</button></div>
+      <div id="list-temp"></div>
+    </div>
+
+    <div id="mod-salad" class="hidden">
+      <div class="card"><h3>Salade Bar</h3><select id="salad-name"></select><button class="btn-main" onclick="addTimed('salad', 48)">Lancer 48H</button></div>
+      <div id="list-salad"></div>
     </div>
   </div>
 
@@ -139,6 +154,13 @@
     window.db_local.trace.push({ id:Date.now(), name, start:new Date().toISOString(), end:null });
     window.saveToCloud();
   }
+  function addTemp() {
+    let name = document.getElementById('temp-name').value;
+    let val = document.getElementById('temp-val').value;
+    if(!val) return;
+    window.db_local.temp_log.push({ id:Date.now(), name, val, date:new Date().toISOString() });
+    window.saveToCloud();
+  }
   function toggleClean(zid, tname, slot) {
     let key = `${new Date().toISOString().split('T')[0]}_${zid}_${tname}_${slot}`;
     window.db_local.cleaning_log[key] = !window.db_local.cleaning_log[key];
@@ -154,15 +176,28 @@
     if(!window.db_local) return;
     const now = new Date();
     const today = now.toISOString().split('T')[0];
+
     document.getElementById('pvp-name').innerHTML = window.db_local.config.pvp.map(p => `<option>${p}</option>`).join('');
-    document.getElementById('list-pvp').innerHTML = window.db_local.pvp.filter(i => new Date(i.exp) > now).map(i => `<div class="card">${i.name} - ${new Date(i.exp).toLocaleTimeString()}</div>`).join('');
+    document.getElementById('list-pvp').innerHTML = window.db_local.pvp.filter(i => new Date(i.exp) > now).map(i => `<div class="card"><b>${i.name}</b> - Fin: ${new Date(i.exp).toLocaleTimeString()}</div>`).join('');
+    
+    document.getElementById('salad-name').innerHTML = window.db_local.config.salad.map(p => `<option>${p}</option>`).join('');
+    document.getElementById('list-salad').innerHTML = window.db_local.salad.filter(i => new Date(i.exp) > now).map(i => `<div class="card"><b>${i.name}</b> - Exp: ${new Date(i.exp).toLocaleDateString()}</div>`).join('');
+
+    document.getElementById('temp-name').innerHTML = window.db_local.config.frigos.map(p => `<option>${p}</option>`).join('');
+    document.getElementById('list-temp').innerHTML = window.db_local.temp_log.slice(-5).map(i => `<div class="list-row">${i.name} : ${i.val}°C</div>`).join('');
+
     document.getElementById('list-clean').innerHTML = window.db_local.cleaning.map(z => z.tasks.map(t => {
       let ok = window.db_local.cleaning_log[`${today}_${z.id}_${t.n}_0`];
-      return `<div class="list-row">${t.n} <button onclick="toggleClean(${z.id},'${t.n}',0)" style="background:${ok?'#10b981':'#ccc'};color:white;border:none;padding:5px;border-radius:5px">OK</button></div>`;
+      return `<div class="list-row">${t.n} <button onclick="toggleClean(${z.id},'${t.n}',0)" style="background:${ok?'#10b981':'#ccc'};color:white;border:none;padding:8px;border-radius:8px">${ok?'FAIT':'À FAIRE'}</button></div>`;
     }).join('')).join('');
-    document.getElementById('list-checklist').innerHTML = window.db_local.config.questions.map(q => `<div class="list-row">${q} <button onclick="setCheck('${q}','yes')">OUI</button></div>`).join('');
+
+    const ans = window.db_local.checklist_answers[today] || {};
+    document.getElementById('list-checklist').innerHTML = window.db_local.config.questions.map(q => `
+      <div class="list-row"><span>${q}</span><div style="display:flex;gap:5px;width:50%"><div class="chk-btn" style="background:${ans[q]==='yes'?'green':'#eee'}" onclick="setCheck('${q}','yes')">OUI</div><div class="chk-btn" style="background:${ans[q]==='no'?'red':'#eee'}" onclick="setCheck('${q}','no')">NON</div></div></div>
+    `).join('');
+
     document.getElementById('trace-name').innerHTML = window.db_local.config.trace.map(p => `<option>${p}</option>`).join('');
-    document.getElementById('list-trace').innerHTML = window.db_local.trace.filter(i => !i.end).map(i => `<div class="card">${i.name} <button onclick="closeTrace(${i.id})">Fin</button></div>`).join('');
+    document.getElementById('list-trace').innerHTML = window.db_local.trace.filter(i => !i.end).map(i => `<div class="card">${i.name} <button onclick="closeTrace(${i.id})">Terminer</button></div>`).join('');
   }
   function closeTrace(id) { window.db_local.trace.find(i=>i.id===id).end = new Date().toISOString(); window.saveToCloud(); }
   refreshUI();
