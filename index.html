@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
 <meta name="theme-color" content="#ffffff" />
-<title>Araujo Exploitation v53</title>
+<title>Araujo Exploitation v54</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 <script src="https://unpkg.com/@zxing/library@latest"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
@@ -14,161 +14,152 @@
     --primary: #003896;
     --carrefour-green: #00563f;
     --accent: #E2001A;
-    --success: #10b981;
-    --warning: #f59e0b;
-    --bg: #f3f4f6;
+    --pvp-color: #d97706; /* Orange pour le PVP */
+    --bg-blue: #003896;
     --surface: #ffffff;
     --text: #1e293b;
-    --radius: 16px;
+    --radius: 12px;
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: system-ui, -apple-system, sans-serif; }
-  body { margin: 0; background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+  body { margin: 0; background: var(--bg-blue); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
-  /* --- LOGIN --- */
-  .overlay {
-    position: fixed; inset: 0; z-index: 999;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    background-color: white; padding: 20px;
-  }
-  .login-logo { width: 80%; max-width: 300px; margin-bottom: 50px; object-fit: contain; }
-  #login-pass {
-    width: 200px; padding: 12px; font-size: 20px; letter-spacing: 5px; text-align: center;
-    border: 1px solid #e2e8f0; border-radius: 50px; background: #f8fafc;
-    outline: none; margin-bottom: 20px; color: var(--text); font-weight: bold;
-    box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
-  }
-  #login-pass:focus { border-color: var(--carrefour-green); background: white; }
+  /* --- BANNIERE & LOGIN --- */
+  .header-banner { background: white; height: 85px; display: flex; justify-content: center; align-items: center; width: 100%; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.1); flex-shrink: 0; }
+  .logo-header { height: 50px; width: auto; object-fit: contain; }
+  .overlay { position: fixed; inset: 0; z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: var(--bg-blue); padding: 20px; }
+  .login-card { background: white; padding: 30px; border-radius: 16px; width: 100%; max-width: 320px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+  #login-pass { width: 100%; padding: 12px; font-size: 24px; letter-spacing: 5px; text-align: center; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 20px; outline: none; background: #f8fafc; }
 
-  /* --- HEADER BANNIERE --- */
-  header {
-    background: var(--surface); 
-    padding: 10px; padding-top: max(10px, env(safe-area-inset-top));
-    display: flex; justify-content: center; align-items: center; z-index: 50;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
-    height: 100px;
-  }
-  .logo-header { height: 70px; width: auto; object-fit: contain; }
-  .user-badge { position: absolute; right: 15px; top: 15px; font-size: 10px; background: #e0f2fe; color: var(--primary); padding: 4px 8px; border-radius: 10px; font-weight: bold; }
-
-  /* ALERTE QUANTITE */
-  #alert-box { 
-    background: var(--accent); color: white; padding: 15px; border-radius: 12px; 
-    margin: 15px 20px 0 20px; display: none; text-align: center; font-weight: bold; 
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1); animation: pulse 2s infinite;
-  }
-  @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.8; } 100% { opacity: 1; } }
-
-  /* TABS */
-  .tabs { display: flex; background: #e2e8f0; padding: 4px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #cbd5e1; }
-  .tab { flex: 1; text-align: center; padding: 12px; font-weight: 700; font-size: 12px; color: #64748b; border-radius: 9px; cursor: pointer; transition: 0.2s; white-space: nowrap; }
-  .tab.active { background: white; color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-
-  /* MAIN */
-  main { flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 100px; }
-  .card { background: var(--surface); border-radius: var(--radius); padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); margin-bottom: 15px; }
-
-  /* SCANNER */
-  #scanner-container { width: 100%; height: 250px; background: black; border-radius: 12px; margin-bottom: 15px; overflow: hidden; display: none; }
-  video { width: 100%; height: 100%; object-fit: cover; }
-
-  /* LISTE */
-  .group-header { background: #334155; color: white; padding: 8px 15px; border-radius: 8px 8px 0 0; margin-top: 20px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: bold; text-transform: uppercase; }
-  .swipe-wrapper { position: relative; background: var(--accent); overflow: hidden; border-bottom: 1px solid #f1f5f9; }
-  .swipe-wrapper:last-child { border-radius: 0 0 8px 8px; border-bottom: none; }
-  
-  .wek-item { position: relative; z-index: 2; background: white; padding: 15px; display: flex; align-items: center; justify-content: space-between; transition: transform 0.2s ease-out; cursor: pointer; }
-  
-  /* L'image reste cliquable pour le code barre */
-  .wek-img { width: 65px; height: 65px; border-radius: 8px; object-fit: contain; background: #fff; border: 1px solid #e2e8f0; margin-right: 15px; display: flex; align-items: center; justify-content: center; color: #cbd5e1; flex-shrink: 0; z-index: 10; }
-  
-  .wek-info { flex: 1; overflow: hidden; }
-  .wek-name { font-weight: bold; font-size: 15px; color: var(--text); margin-bottom: 6px; line-height: 1.3; }
-  .wek-sub { display: flex; gap: 8px; font-size: 11px; color: #64748b; }
-  
-  /* Styles quantité */
-  .wek-qty { background: #f1f5f9; padding: 2px 8px; border-radius: 4px; border: 1px solid #e2e8f0; font-weight: bold; color: var(--primary); }
-  .qty-missing { background: #fee2e2; color: #ef4444; border: 1px solid #fca5a5; }
-
-  .date-badge { width: 50px; height: 50px; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; font-weight: bold; flex-shrink: 0; }
-  .date-day { font-size: 18px; } .date-month { font-size: 11px; text-transform: uppercase; }
-  .badge-red { background: var(--accent); } .badge-orange { background: var(--warning); } .badge-green { background: var(--success); } .badge-gray { background: var(--gray); }
-
-  /* TEAM & COMMON */
-  .user-row { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #eee; }
-  .user-role { font-size: 10px; background: #eee; padding: 2px 5px; border-radius: 4px; }
-  .input-group label { display: block; font-size: 11px; font-weight: 700; color: #64748b; margin-bottom: 4px; text-transform: uppercase; }
-  input, select { width: 100%; padding: 14px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 16px; background: #fff; outline: none; }
-  .btn { width: 100%; padding: 16px; border-radius: 12px; border: none; font-weight: 700; font-size: 16px; background: var(--primary); color: white; cursor: pointer; }
-  .btn-green { background: var(--carrefour-green); }
-  .btn-red { background: #ef4444; color: white; }
+  /* --- STRUCTURE --- */
+  main { flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 80px; }
+  .card { background: var(--surface); border-radius: var(--radius); padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 15px; }
   .hidden { display: none !important; }
-  
-  /* MODALS */
-  .modal-bc { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
-  .barcode-card { background: white; padding: 40px 20px; border-radius: 20px; text-align: center; width: 95%; max-width: 450px; }
-  .edit-card { background: white; padding: 30px; border-radius: 20px; width: 95%; max-width: 350px; text-align: center; }
 
-  nav { position: fixed; bottom: 0; width: 100%; background: white; height: 70px; display: flex; justify-content: center; align-items: center; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); z-index: 100; }
-  .nav-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; color: #94a3b8; font-size: 10px; cursor: pointer; width: 80px; }
-  .nav-btn.active { color: var(--primary); } .nav-btn i { font-size: 24px; margin-bottom: 4px; }
+  /* --- HOME GRID --- */
+  .home-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+  .home-btn { 
+    background: rgba(255,255,255,0.1); border: 2px solid white; color: white; 
+    border-radius: 16px; padding: 30px 10px; text-align: center; cursor: pointer; 
+    transition: 0.2s;
+  }
+  .home-btn:active { transform: scale(0.98); background: rgba(255,255,255,0.2); }
+  .home-icon { font-size: 40px; margin-bottom: 10px; display: block; }
+  .home-title { font-weight: bold; font-size: 16px; margin: 0; }
+
+  /* --- TABS --- */
+  .tabs { display: flex; background: rgba(255,255,255,0.2); padding: 4px; border-radius: 12px; margin-bottom: 15px; }
+  .tab { flex: 1; text-align: center; padding: 12px; font-weight: 700; font-size: 12px; color: white; border-radius: 9px; cursor: pointer; }
+  .tab.active { background: white; color: var(--primary); }
+  .tab.active-pvp { background: white; color: var(--pvp-color); }
+
+  /* --- ITEMS LIST (FRAIS) --- */
+  .group-header { background: rgba(255,255,255,0.15); color: white; padding: 8px 12px; border-radius: 8px; margin-top: 20px; font-weight: bold; text-transform: uppercase; font-size: 12px; letter-spacing: 1px; }
+  .item-card { background: white; padding: 15px; border-radius: 12px; margin-top: 8px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 5px rgba(0,0,0,0.05); cursor: pointer; }
+  .item-img { width: 50px; height: 50px; border-radius: 8px; object-fit: contain; border: 1px solid #eee; margin-right: 12px; flex-shrink: 0; z-index: 10; }
+  .item-info { flex: 1; overflow: hidden; }
+  .item-name { font-weight: bold; font-size: 14px; color: #333; margin-bottom: 4px; line-height: 1.2; }
+  
+  .qty-badge { padding: 3px 8px; border-radius: 6px; font-weight: bold; font-size: 11px; display: inline-block; background: #f1f5f9; color: var(--primary); }
+  .qty-missing { background: #fee2e2; color: #ef4444; border: 1px solid #fca5a5; animation: blink 2s infinite; }
+  
+  .date-badge { width: 45px; height: 45px; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; font-weight: bold; margin-left: 10px; flex-shrink: 0; }
+  .badge-red { background: var(--accent); } .badge-orange { background: #f59e0b; } .badge-green { background: var(--success); }
+
+  /* --- PVP SPECIFIC --- */
+  .pvp-row { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #eee; }
+  .pvp-time { color: var(--accent); font-weight: bold; font-size: 14px; }
+  .pvp-target { font-size: 11px; color: #666; background: #f3f4f6; padding: 2px 6px; border-radius: 4px; }
+  
+  /* --- FORMS & BUTTONS --- */
+  .input-group label { display: block; font-size: 11px; font-weight: 700; color: #64748b; margin-bottom: 4px; text-transform: uppercase; text-align: left; }
+  input, select { width: 100%; padding: 14px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 16px; background: #fff; outline: none; }
+  .btn { width: 100%; padding: 16px; border-radius: 12px; border: none; font-weight: 700; font-size: 16px; cursor: pointer; margin-top: 10px; }
+  .btn-green { background: var(--carrefour-green); color: white; }
+  .btn-blue { background: var(--primary); color: white; }
+  .btn-orange { background: var(--pvp-color); color: white; }
+  .btn-red { background: #ef4444; color: white; }
+
+  /* --- MODALS --- */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 20px; }
+  .modal-content { background: white; padding: 25px; border-radius: 20px; width: 100%; max-width: 350px; text-align: center; max-height: 80vh; overflow-y: auto; }
+  .modal-bc-content { background: white; padding: 40px 20px; border-radius: 20px; text-align: center; width: 95%; max-width: 450px; }
+
+  /* NAV */
+  nav { position: fixed; bottom: 0; width: 100%; background: white; height: 70px; display: flex; justify-content: center; align-items: center; z-index: 100; box-shadow: 0 -4px 10px rgba(0,0,0,0.05); }
+  .nav-btn { display: flex; flex-direction: column; align-items: center; color: #94a3b8; font-size: 10px; width: 80px; cursor: pointer; }
+  .nav-btn i { font-size: 24px; margin-bottom: 4px; }
 </style>
 </head>
 <body>
 
-  <div id="login-overlay" class="overlay">
-    <img src="https://raw.githubusercontent.com/araujoexploitation/Magasin/main/LOGO.png" alt="Carrefour Express" class="login-logo">
-    <input type="password" id="login-pass" placeholder="CODE">
-    <button class="btn btn-green" onclick="window.app.login()" style="width: 200px; border-radius: 50px;">CONNEXION</button>
+  <div class="header-banner">
+    <img src="https://raw.githubusercontent.com/araujoexploitation/Magasin/main/Carrefour-Express-2.webp" class="logo-header">
   </div>
 
-  <div id="modal-barcode" class="modal-bc hidden">
-    <div class="barcode-card">
+  <div id="login-overlay" class="overlay">
+    <div class="login-card">
+      <h3 style="margin:0 0 20px 0; color:var(--primary);">ACCÈS MAGASIN</h3>
+      <input type="password" id="login-pass">
+      <button class="btn btn-green" onclick="window.app.login()">CONNEXION</button>
+    </div>
+  </div>
+
+  <div id="modal-barcode" class="modal-overlay hidden">
+    <div class="modal-bc-content">
         <div id="bc-name" style="font-weight:bold; font-size:20px; margin-bottom:20px;">Produit</div>
         <svg id="barcode"></svg>
         <button class="btn" style="margin-top:30px; background:#f1f5f9; color:#333" onclick="document.getElementById('modal-barcode').classList.add('hidden')">Fermer</button>
     </div>
   </div>
 
-  <div id="modal-edit" class="modal-bc hidden">
-    <div class="edit-card">
-        <h3 style="color:var(--primary); margin-top:0;">Modifier Produit</h3>
-        <p id="edit-name" style="font-size:14px; color:#666; font-weight:bold; margin-bottom:20px;"></p>
+  <div id="modal-edit-frais" class="modal-overlay hidden">
+    <div class="modal-content">
+        <h3 style="color:var(--primary); margin-top:0;">Modifier Frais</h3>
         <input type="hidden" id="edit-id">
-        
-        <div class="input-group" style="text-align:left;">
-            <label>Nouvelle Quantité</label>
-            <input type="number" id="edit-qty" placeholder="Vide = À saisir">
-        </div>
+        <div class="input-group"><label>Famille</label><select id="edit-famille"><option>SNACKING</option><option>TRAITEUR</option><option>ULTRA FRAIS</option><option>CHARCUTERIE</option><option>VOLAILLE</option><option>BOUCHERIE</option><option>FROMAGE</option><option>SAURISSERIE</option><option>DIVERS</option></select></div>
         <br>
-        <div class="input-group" style="text-align:left;">
-            <label>Nouvelle Date</label>
-            <input type="date" id="edit-date">
-        </div>
-
-        <button class="btn btn-green" onclick="window.app.saveEdit()" style="margin-top:20px;">Enregistrer</button>
-        <button class="btn btn-red" onclick="window.app.deleteItem()" style="margin-top:10px;">Supprimer</button>
-        <button class="btn" style="margin-top:10px; background:#f1f5f9; color:#333" onclick="document.getElementById('modal-edit').classList.add('hidden')">Annuler</button>
+        <div class="input-group"><label>Quantité</label><input type="number" id="edit-qty" placeholder="Vide = À saisir"></div>
+        <br>
+        <div class="input-group"><label>Date DLC</label><input type="date" id="edit-date"></div>
+        <button class="btn btn-green" onclick="window.app.saveEditFrais()">Enregistrer</button>
+        <button class="btn btn-red" onclick="window.app.deleteFrais()">Supprimer</button>
+        <button class="btn" style="background:#f1f5f9; color:#333" onclick="document.getElementById('modal-edit-frais').classList.add('hidden')">Annuler</button>
     </div>
   </div>
 
-  <header>
-    <img src="https://raw.githubusercontent.com/araujoexploitation/Magasin/main/Carrefour-Express-2.webp" class="logo-header" onerror="this.src='https://raw.githubusercontent.com/araujoexploitation/Magasin/main/LOGO.png'">
-    <div id="user-display" class="user-badge"></div>
-  </header>
+  <div id="modal-config-pvp" class="modal-overlay hidden">
+    <div class="modal-content">
+        <h3 style="color:var(--pvp-color); margin-top:0;">Nouveau Produit PVP</h3>
+        <div class="input-group"><label>Nom du Produit</label><input type="text" id="pvp-lib-name" placeholder="Ex: Croissant"></div>
+        <br>
+        <div class="input-group"><label>Durée de vie (Heures)</label><input type="number" id="pvp-lib-hours" value="24"></div>
+        <br>
+        <div class="input-group"><label>Objectif Quotidien (Qté)</label><input type="number" id="pvp-lib-target" value="0"></div>
+        <small style="color:#666">Combien en faut-il en rayon chaque matin ?</small>
+        
+        <button class="btn btn-orange" onclick="window.app.addPvpLib()">Ajouter à la bibliothèque</button>
+        <button class="btn" style="background:#f1f5f9; color:#333" onclick="document.getElementById('modal-config-pvp').classList.add('hidden')">Fermer</button>
+    </div>
+  </div>
 
   <main>
     <div id="view-home">
-      <div id="alert-box">⚠️ ATTENTION : Saisir quantités pour demain !</div>
-
-      <div class="card" onclick="window.app.nav('frais')" style="background: linear-gradient(135deg, #003896 0%, #002366 100%); color:white; text-align:center; padding:40px 20px; cursor:pointer;">
-        <i class="fas fa-barcode" style="font-size:50px; margin-bottom:15px; opacity:0.9;"></i>
-        <h2 style="margin:0;">GESTION DLC</h2>
-        <p style="opacity:0.8; font-size:14px; margin-top:5px;">Scanner & Contrôler</p>
+      <div id="alert-box" style="display:none; background:var(--accent); color:white; padding:15px; border-radius:12px; margin-bottom:15px; text-align:center; font-weight:bold;">⚠️ ATTENTION<br>Saisir quantités pour demain !</div>
+      
+      <div class="home-grid">
+        <div class="home-btn" onclick="window.app.nav('frais')" style="background: linear-gradient(135deg, #003896 0%, #002366 100%);">
+            <span class="home-icon"><i class="fas fa-barcode"></i></span>
+            <span class="home-title">DLC FRAIS</span>
+        </div>
+        <div class="home-btn" onclick="window.app.nav('pvp')" style="background: linear-gradient(135deg, #d97706 0%, #b45309 100%);">
+            <span class="home-icon"><i class="fas fa-bread-slice"></i></span>
+            <span class="home-title">GESTION PVP</span>
+        </div>
       </div>
-
-      <div id="btn-team" class="card hidden" onclick="window.app.nav('team')" style="text-align:center; cursor:pointer; margin-top:20px; border: 1px solid #e2e8f0;">
+      
+      <div id="btn-team" class="card hidden" onclick="window.app.nav('team')" style="text-align:center; cursor:pointer; margin-top:20px;">
         <i class="fas fa-users-cog" style="font-size:30px; color:var(--carrefour-green); margin-bottom:10px;"></i>
-        <h4 style="margin:0; color: var(--text);">Gérer l'Équipe</h4>
+        <h4>Gérer l'Équipe</h4>
       </div>
     </div>
 
@@ -179,59 +170,58 @@
       </div>
 
       <div id="content-scan">
-        <div id="scanner-container"><video id="video"></video></div>
-        <button class="btn" onclick="window.app.toggleScanner()" style="margin-bottom:15px;"><i class="fas fa-camera"></i> LANCER SCAN</button>
+        <div id="scanner-container" style="height:250px; background:black; border-radius:12px; margin-bottom:15px; overflow:hidden; display:none;"><video id="video"></video></div>
+        <button class="btn btn-blue" onclick="window.app.toggleScanner()" style="background:white; color:var(--primary); margin-bottom:15px;"><i class="fas fa-camera"></i> SCANNER</button>
+        
         <div class="card">
-          <div class="input-group"><label>EAN</label><input type="number" id="frais-ean" placeholder="Scanner..." oninput="if(this.value.length>=8) window.app.scanApi(this.value)"></div>
-          
-          <div class="input-group">
-            <label>Famille</label>
-            <select id="frais-famille">
-                <option value="TRAITEUR">TRAITEUR</option>
-                <option value="ULTRA FRAIS">ULTRA FRAIS</option>
-                <option value="CHARCUTERIE">CHARCUTERIE</option>
-                <option value="VOLAILLE">VOLAILLE</option>
-                <option value="BOUCHERIE">BOUCHERIE</option>
-                <option value="FROMAGE">FROMAGE</option>
-                <option value="SAURISSERIE">SAURISSERIE</option>
-                <option value="DIVERS">DIVERS</option>
-            </select>
-          </div>
-          
+          <div class="input-group"><label>EAN</label><input type="number" id="frais-ean" oninput="if(this.value.length>=8) window.app.scanApi(this.value)"></div>
+          <div class="input-group"><label>Famille</label><select id="frais-famille"><option>SNACKING</option><option>TRAITEUR</option><option>ULTRA FRAIS</option><option>CHARCUTERIE</option><option>VOLAILLE</option><option>BOUCHERIE</option><option>FROMAGE</option><option>SAURISSERIE</option><option>DIVERS</option></select></div>
           <div class="input-group"><label>Nom</label><input type="text" id="frais-name"></div>
           <div style="display:flex; gap:10px;">
              <div class="input-group" style="flex:2"><label>DLC</label><input type="date" id="frais-date"></div>
              <div class="input-group" style="flex:1"><label>Qté</label><input type="number" id="frais-qty" placeholder="?"></div>
           </div>
-          <small style="color:#999; margin-top:5px; display:block;">Laisser Qté vide si à saisir plus tard</small>
-          <button class="btn" onclick="window.app.addFrais()" style="margin-top:10px;">VALIDER</button>
+          <button class="btn btn-green" onclick="window.app.addFrais()">VALIDER</button>
         </div>
       </div>
 
-      <div id="content-list" class="hidden">
-        <div id="list-frais-container"></div>
+      <div id="content-list" class="hidden"><div id="list-frais-container"></div></div>
+    </div>
+
+    <div id="view-pvp" class="hidden">
+      <div class="tabs">
+        <div id="tp-stock" class="tab active-pvp" onclick="window.app.switchPvp('stock')">EN RAYON</div>
+        <div id="tp-sortie" class="tab" onclick="window.app.switchPvp('sortie')">SORTIE/CUISSON</div>
+        <div id="tp-plan" class="tab" onclick="window.app.switchPvp('plan')">BESOINS</div>
+      </div>
+
+      <div id="pvp-stock" class="hidden"><div id="list-pvp-stock"></div></div>
+
+      <div id="pvp-sortie" class="hidden">
+        <button class="btn" onclick="document.getElementById('modal-config-pvp').classList.remove('hidden')" style="background:#eee; color:#333; margin-bottom:15px;"><i class="fas fa-plus"></i> Créer Produit Bibliothèque</button>
+        <div id="list-pvp-lib"></div>
+      </div>
+
+      <div id="pvp-plan" class="hidden">
+        <div class="card" style="background:#e0f2fe; color:#003896; text-align:center;">
+            <b>PLAN POUR DEMAIN</b><br>
+            <small>Basé sur Objectifs - (Stock Valide - Périmés)</small>
+        </div>
+        <div id="list-pvp-plan"></div>
       </div>
     </div>
 
     <div id="view-team" class="hidden">
       <div class="card">
-        <h4 style="color:var(--primary)">Nouvel Employé</h4>
-        <input type="text" id="new-user-name" placeholder="Ex: Pierre" style="margin-bottom:10px;">
-        <input type="number" id="new-user-code" placeholder="Ex: 1234">
-        <button class="btn btn-green" onclick="window.app.saveUser()" style="margin-top:10px;">Créer Utilisateur</button>
+        <input type="text" id="new-user-name" placeholder="Prénom"><input type="number" id="new-user-code" placeholder="Code" style="margin-top:10px;"><button class="btn btn-green" onclick="window.app.saveUser()">Créer</button>
       </div>
-      <div class="card">
-        <h4>Utilisateurs Actifs</h4>
-        <div id="users-list"></div>
-      </div>
+      <div id="users-list"></div>
     </div>
   </main>
 
   <nav>
     <div class="nav-btn" onclick="window.app.nav('home')"><i class="fas fa-th-large"></i>Menu</div>
   </nav>
-
-  <audio id="beep" src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3"></audio>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -243,7 +233,7 @@
   const codeReader = new ZXing.BrowserMultiFormatReader();
 
   window.app = {
-    data: { frais: [], users: [] },
+    data: { frais: [], users: [], pvpLib: [], pvpStock: [] },
     currentUser: null,
     scanning: false,
     currentImgUrl: "",
@@ -251,10 +241,12 @@
     init: function() {
       onSnapshot(docRef, (s) => {
         if(s.exists()) {
-            this.data = {...this.data, ...s.data()};
-            if(!this.data.users) this.data.users = [{code: "2008", name: "MANAGER", role: "admin"}];
+          this.data = {...this.data, ...s.data()};
+          if(!this.data.pvpLib) this.data.pvpLib = [];
+          if(!this.data.pvpStock) this.data.pvpStock = [];
+          if(!this.data.users) this.data.users = [{code: "2008", name: "MANAGER", role: "admin"}];
         }
-        this.renderList(); this.renderUsers(); this.checkAlerts();
+        this.renderList(); this.renderUsers(); this.checkAlerts(); this.renderPvp();
       });
     },
 
@@ -266,33 +258,21 @@
       if(user) {
         this.currentUser = user;
         document.getElementById('login-overlay').classList.add('hidden');
-        document.getElementById('user-display').innerText = user.name;
         if(user.role === 'admin') document.getElementById('btn-team').classList.remove('hidden');
-      } else { alert("Code incorrect !"); }
+      } else alert("Code incorrect");
     },
 
-    checkAlerts: function() {
-        let tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
-        let tomStr = tomorrow.toISOString().split('T')[0];
-        let alert = this.data.frais.some(i => i.date === tomStr && (!i.qty || i.qty == 0));
-        document.getElementById('alert-box').style.display = alert ? 'block' : 'none';
-    },
-
-    // --- DETECTION FAMILLE AMELIOREE ---
+    // --- FRAIS : SCAN & LOGIC ---
     detectFamily: function(name, cats) {
         let s = (name + " " + cats).toUpperCase();
-        
-        // Priorité 1 : Traiteur et Plats Cuisinés (contient souvent viande/lait mais ne doit PAS aller là bas)
-        if(s.includes("SALADE") || s.includes("SANDWICH") || s.includes("PIZZA") || s.includes("TABOULE") || s.includes("CONCOMBRE") || s.includes("CAROTTE") || s.includes("WRAP") || s.includes("SUSH") || s.includes("BOX") || s.includes("PLAT") || s.includes("QUICHE") || s.includes("CROQUE") || s.includes("BURGER")) return "TRAITEUR";
-
-        // Priorité 2 : Le reste
-        if(s.includes("YAOURT") || s.includes("LAIT") || s.includes("CREME") || s.includes("DESSERT") || s.includes("BEURRE") || s.includes("SKYR") || s.includes("DANETTE")) return "ULTRA FRAIS";
-        if(s.includes("JAMBON") || s.includes("LARD") || s.includes("SAUCIS") || s.includes("PATE") || s.includes("RILLETTE") || s.includes("BACON") || s.includes("CHORIZO")) return "CHARCUTERIE";
-        if(s.includes("POULET") || s.includes("DINDE") || s.includes("CANARD") || s.includes("AIGUILLETTE")) return "VOLAILLE";
-        if(s.includes("BOEUF") || s.includes("STEAK") || s.includes("PORC") || s.includes("AGNEAU") || s.includes("HACKE") || s.includes("VEAU")) return "BOUCHERIE";
-        if(s.includes("FROMAGE") || s.includes("CAMEMBERT") || s.includes("COMTÉ") || s.includes("EMMENTAL") || s.includes("CHEVRE") || s.includes("BRIE") || s.includes("ROQUEFORT") || s.includes("MOZZARELLA")) return "FROMAGE";
-        if(s.includes("SAUMON") || s.includes("POISSON") || s.includes("TRUITE") || s.includes("CREVETTE") || s.includes("SURIMI") || s.includes("CABILLAUD")) return "SAURISSERIE";
-        
+        if(s.includes("SANDWICH")||s.includes("SALADE")||s.includes("BOX")||s.includes("BURGER")||s.includes("WRAP")) return "SNACKING";
+        if(s.includes("PIZZA")||s.includes("QUICHE")||s.includes("PLAT")) return "TRAITEUR";
+        if(s.includes("YAOURT")||s.includes("LAIT")||s.includes("CREME")) return "ULTRA FRAIS";
+        if(s.includes("JAMBON")||s.includes("LARD")||s.includes("SAUCIS")) return "CHARCUTERIE";
+        if(s.includes("POULET")||s.includes("DINDE")) return "VOLAILLE";
+        if(s.includes("BOEUF")||s.includes("STEAK")||s.includes("PORC")) return "BOUCHERIE";
+        if(s.includes("FROMAGE")||s.includes("CAMEMBERT")||s.includes("EMMENTAL")) return "FROMAGE";
+        if(s.includes("SAUMON")||s.includes("POISSON")) return "SAURISSERIE";
         return "DIVERS";
     },
 
@@ -301,16 +281,10 @@
         let r = await fetch(`https://world.openfoodfacts.org/api/v0/product/${ean}.json`);
         let d = await r.json();
         if(d.status === 1) {
-          let brand = d.product.brands ? d.product.brands.split(',')[0] + " - " : "";
           let pName = d.product.product_name_fr || d.product.product_name || "";
-          if(!pName.toLowerCase().includes(brand.toLowerCase().replace(' - ',''))) pName = brand + pName;
-          
           document.getElementById('frais-name').value = pName;
           this.currentImgUrl = d.product.image_front_small_url || "";
-          
-          // Detection intelligente avec Categories OFF
-          let fam = this.detectFamily(pName, d.product.categories || "");
-          document.getElementById('frais-famille').value = fam;
+          document.getElementById('frais-famille').value = this.detectFamily(pName, d.product.categories || "");
         }
       } catch(e){}
     },
@@ -321,113 +295,175 @@
       let date = document.getElementById('frais-date').value;
       let qty = document.getElementById('frais-qty').value;
       let fam = document.getElementById('frais-famille').value;
-      if(!name || !date) return alert("Date requise");
+      if(!name || !date) return alert("Nom & Date requis");
       this.data.frais.push({ id: Date.now(), ean, name, date, qty, fam, img: this.currentImgUrl });
-      this.save();
-      alert("Ajouté !");
-      document.getElementById('frais-name').value = ""; document.getElementById('frais-ean').value = "";
-      document.getElementById('frais-qty').value = ""; this.currentImgUrl="";
+      this.save(); alert("Ajouté");
+      document.getElementById('frais-name').value=""; document.getElementById('frais-ean').value="";
+      document.getElementById('frais-qty').value=""; this.currentImgUrl="";
     },
 
-    showBarcode: function(ean, name) {
-        document.getElementById('modal-barcode').classList.remove('hidden');
-        document.getElementById('bc-name').innerText = name;
-        try { JsBarcode("#barcode", ean, {format:"EAN13", height:100, displayValue:true, fontSize:20}); } catch(e){}
-    },
-
-    // --- MODIFICATION ---
-    openEdit: function(id) {
-        let item = this.data.frais.find(i => i.id == id);
-        if(!item) return;
-        document.getElementById('modal-edit').classList.remove('hidden');
-        document.getElementById('edit-id').value = id;
-        document.getElementById('edit-name').innerText = item.name;
-        document.getElementById('edit-qty').value = item.qty;
-        document.getElementById('edit-date').value = item.date;
-    },
-    saveEdit: function() {
-        let id = document.getElementById('edit-id').value;
-        let idx = this.data.frais.findIndex(i => i.id == id);
-        if(idx > -1) {
-            this.data.frais[idx].qty = document.getElementById('edit-qty').value;
-            this.data.frais[idx].date = document.getElementById('edit-date').value;
-            this.save();
-            document.getElementById('modal-edit').classList.add('hidden');
-        }
-    },
-    deleteItem: function() {
-        let id = document.getElementById('edit-id').value;
-        if(confirm("Supprimer ce produit ?")) {
-            this.data.frais = this.data.frais.filter(i => i.id != id);
-            this.save();
-            document.getElementById('modal-edit').classList.add('hidden');
-        }
+    // --- FRAIS : RENDER & EDIT ---
+    checkAlerts: function() {
+        let tom = new Date(); tom.setDate(tom.getDate()+1);
+        let tomStr = tom.toISOString().split('T')[0];
+        let alert = this.data.frais.some(i => i.date === tomStr && (!i.qty || i.qty==0));
+        document.getElementById('alert-box').style.display = alert ? 'block' : 'none';
     },
 
     renderList: function() {
-      let today = new Date().toISOString().split('T')[0];
-      const cont = document.getElementById('list-frais-container');
-      cont.innerHTML = "";
-      let grouped = {};
+        let today = new Date().toISOString().split('T')[0];
+        let tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate()+1);
+        let tomStr = tomorrow.toISOString().split('T')[0];
+        
+        const cont = document.getElementById('list-frais-container');
+        cont.innerHTML = "";
+        let grouped = {};
+        this.data.frais.sort((a,b) => (a.fam===b.fam) ? a.name.localeCompare(b.name) : a.fam.localeCompare(b.fam));
+        this.data.frais.forEach(i => { if(!grouped[i.fam]) grouped[i.fam]=[]; grouped[i.fam].push(i); });
 
-      // CLASSER PAR FAMILLE -> PUIS PAR NOM (Regroupement sous-famille)
-      this.data.frais.sort((a,b) => {
-         if(a.fam !== b.fam) return a.fam.localeCompare(b.fam);
-         if(a.name !== b.name) return a.name.localeCompare(b.name);
-         return a.date.localeCompare(b.date);
-      });
+        Object.keys(grouped).forEach(fam => {
+            cont.innerHTML += `<div class="group-header">${fam}</div>`;
+            grouped[fam].forEach(i => {
+                let diff = (new Date(i.date) - new Date(today))/86400000;
+                let badge = diff<1?'badge-red':(diff<2?'badge-orange':'badge-green');
+                let d = new Date(i.date);
+                
+                // Qty en rouge seulement si J ou J-1
+                let showRedQty = (!i.qty || i.qty==0) && (i.date <= tomStr);
+                let qtyHtml = showRedQty ? `<span class="qty-badge qty-missing">À SAISIR</span>` : (i.qty ? `<span class="qty-badge" style="background:#e0f2fe;color:#003896">x${i.qty}</span>` : `<span class="qty-badge">-</span>`);
+                
+                let img = i.img ? `<img src="${i.img}" class="item-img" onclick="event.stopPropagation(); window.app.showBc('${i.ean}','${i.name.replace(/'/g," ")}')">` : `<div class="item-img" onclick="event.stopPropagation(); window.app.showBc('${i.ean}','${i.name.replace(/'/g," ")}')"><i class="fas fa-barcode"></i></div>`;
 
-      this.data.frais.forEach(i => {
-         if(!grouped[i.fam]) grouped[i.fam] = [];
-         grouped[i.fam].push(i);
-      });
-
-      Object.keys(grouped).forEach(fam => {
-          cont.innerHTML += `<div class="group-header">${fam} <span style="background:rgba(255,255,255,0.2); padding:2px 8px; border-radius:10px;">${grouped[fam].length}</span></div>`;
-          grouped[fam].forEach(i => {
-             let diff = (new Date(i.date) - new Date(today)) / 86400000;
-             let badge = diff < 1 ? 'badge-red' : (diff < 2 ? 'badge-orange' : 'badge-green');
-             let d = new Date(i.date);
-             let day = d.getDate(); let month = d.toLocaleString('fr-FR', {month:'short'}).replace('.','');
-             
-             // GESTION CLIC IMAGE VS CLIC ITEM
-             let imgHtml = i.img ? 
-                `<img src="${i.img}" class="wek-img" onclick="event.stopPropagation(); window.app.showBarcode('${i.ean}', '${i.name.replace(/'/g," ")}')">` : 
-                `<div class="wek-img" onclick="event.stopPropagation(); window.app.showBarcode('${i.ean}', '${i.name.replace(/'/g," ")}')"><i class="fas fa-barcode"></i></div>`;
-             
-             let qtyDisplay = i.qty && i.qty!=0 ? `<span class="wek-qty">x${i.qty}</span>` : `<span class="wek-qty qty-missing">À SAISIR</span>`;
-
-             cont.innerHTML += `
-               <div class="swipe-wrapper">
-                   <div class="wek-item" onclick="window.app.openEdit(${i.id})">
-                      ${imgHtml}
-                      <div class="wek-info">
-                          <div class="wek-name">${i.name}</div>
-                          <div class="wek-sub">${qtyDisplay} <span class="wek-ean">${i.ean}</span></div>
-                      </div>
-                      <div class="date-badge ${badge}"><span class="date-day">${day}</span><span class="date-month">${month}</span></div>
-                   </div>
-               </div>`;
-          });
-      });
-      if(cont.innerHTML === "") cont.innerHTML = "<div style='text-align:center; padding:30px; color:#aaa'>Stock vide</div>";
+                cont.innerHTML += `
+                <div class="item-card" onclick="window.app.openEditFrais(${i.id})">
+                    ${img}
+                    <div class="item-info"><div class="item-name">${i.name}</div>${qtyHtml}</div>
+                    <div class="date-badge ${badge}"><span style="font-size:18px">${d.getDate()}</span><span style="font-size:10px">${d.toLocaleString('fr',{month:'short'})}</span></div>
+                </div>`;
+            });
+        });
     },
 
-    saveUser: function() {
-        let name = document.getElementById('new-user-name').value;
-        let code = document.getElementById('new-user-code').value;
-        if(!name || !code) return;
-        this.data.users.push({name, code, role:'staff'}); this.save();
-        document.getElementById('new-user-name').value=""; document.getElementById('new-user-code').value="";
+    openEditFrais: function(id) {
+        let i = this.data.frais.find(x => x.id == id);
+        if(!i) return;
+        document.getElementById('modal-edit-frais').classList.remove('hidden');
+        document.getElementById('edit-id').value = id;
+        document.getElementById('edit-famille').value = i.fam;
+        document.getElementById('edit-qty').value = i.qty;
+        document.getElementById('edit-date').value = i.date;
     },
-    delUser: function(code) {
-        if(code==="2008") return;
-        this.data.users = this.data.users.filter(u => u.code !== code); this.save();
+    saveEditFrais: function() {
+        let id = document.getElementById('edit-id').value;
+        let idx = this.data.frais.findIndex(x => x.id == id);
+        if(idx > -1) {
+            this.data.frais[idx].fam = document.getElementById('edit-famille').value;
+            this.data.frais[idx].qty = document.getElementById('edit-qty').value;
+            this.data.frais[idx].date = document.getElementById('edit-date').value;
+            this.save(); document.getElementById('modal-edit-frais').classList.add('hidden');
+        }
     },
-    renderUsers: function() {
-        const div = document.getElementById('users-list');
-        div.innerHTML = this.data.users ? this.data.users.map(u => `<div class="user-row"><b>${u.name}</b> ${u.code} <button onclick="window.app.delUser('${u.code}')" style="color:red;border:none;background:none;"><i class="fas fa-trash"></i></button></div>`).join('') : '';
+    deleteFrais: function() {
+        let id = document.getElementById('edit-id').value;
+        if(confirm("Supprimer ?")) { this.data.frais = this.data.frais.filter(x => x.id != id); this.save(); document.getElementById('modal-edit-frais').classList.add('hidden'); }
     },
+    showBc: function(ean, name) { document.getElementById('modal-barcode').classList.remove('hidden'); document.getElementById('bc-name').innerText=name; try{JsBarcode("#barcode", ean, {format:"EAN13", height:80, displayValue:true});}catch(e){} },
+
+    // --- PVP LOGIC ---
+    addPvpLib: function() {
+        let name = document.getElementById('pvp-lib-name').value;
+        let hrs = document.getElementById('pvp-lib-hours').value;
+        let target = document.getElementById('pvp-lib-target').value;
+        if(!name) return;
+        this.data.pvpLib.push({ id: Date.now(), name, hours: hrs, target: target });
+        this.save(); alert("Produit créé !"); document.getElementById('modal-config-pvp').classList.add('hidden');
+    },
+
+    outPvp: function(libId) {
+        let lib = this.data.pvpLib.find(x => x.id == libId);
+        let qty = prompt(`Combien de ${lib.name} sortez-vous ?`, "1");
+        if(qty && qty > 0) {
+            let now = new Date();
+            let end = new Date(now.getTime() + (lib.hours * 3600000));
+            this.data.pvpStock.push({
+                id: Date.now(), libId: libId, name: lib.name, qty: qty,
+                out: now.getTime(), end: end.getTime()
+            });
+            this.save(); alert("Sortie enregistrée !");
+        }
+    },
+
+    delPvpStock: function(id) {
+        if(confirm("Retirer du rayon (jeté ou vendu) ?")) {
+            this.data.pvpStock = this.data.pvpStock.filter(x => x.id != id);
+            this.save();
+        }
+    },
+
+    renderPvp: function() {
+        // RENDER STOCK
+        const stockDiv = document.getElementById('list-pvp-stock');
+        stockDiv.innerHTML = "";
+        let now = new Date().getTime();
+        
+        this.data.pvpStock.sort((a,b) => a.end - b.end).forEach(i => {
+            let left = (i.end - now) / 3600000; // Heures restantes
+            let color = left < 0 ? '#ef4444' : (left < 2 ? '#f59e0b' : '#10b981');
+            let dateEnd = new Date(i.end);
+            let timeStr = dateEnd.getHours().toString().padStart(2,'0') + "h" + dateEnd.getMinutes().toString().padStart(2,'0');
+            let dateStr = dateEnd.getDate() + "/" + (dateEnd.getMonth()+1);
+
+            stockDiv.innerHTML += `
+            <div class="item-card" onclick="window.app.delPvpStock(${i.id})">
+                <div style="flex:1">
+                    <div class="item-name">${i.name}</div>
+                    <span class="qty-badge" style="background:#e0f2fe;color:#003896">x${i.qty}</span>
+                    <small>Sorti le: ${new Date(i.out).toLocaleString()}</small>
+                </div>
+                <div style="text-align:right">
+                    <div style="color:${color}; font-weight:bold; font-size:18px;">${timeStr}</div>
+                    <div style="font-size:10px; color:#666">${dateStr}</div>
+                </div>
+            </div>`;
+        });
+
+        // RENDER LIB (SORTIE)
+        const libDiv = document.getElementById('list-pvp-lib');
+        libDiv.innerHTML = "";
+        this.data.pvpLib.forEach(l => {
+            libDiv.innerHTML += `
+            <div class="item-card" onclick="window.app.outPvp(${l.id})">
+                <div class="item-name">${l.name}</div>
+                <div><small>${l.hours}h</small> <span style="background:#eee; padding:2px 6px; border-radius:4px; font-size:10px;">Obj: ${l.target}</span></div>
+            </div>`;
+        });
+
+        // RENDER PLAN
+        const planDiv = document.getElementById('list-pvp-plan');
+        planDiv.innerHTML = "";
+        // Calcul simple pour demain : Target - (Stock Actuel non périmé demain matin)
+        // Simplification : On regarde juste Target vs Stock Actuel
+        this.data.pvpLib.forEach(l => {
+            let currentValid = this.data.pvpStock.filter(s => s.libId == l.id && s.end > (now + 36000000)).reduce((a,b) => a + parseInt(b.qty), 0); // Stock valide encore 10h
+            let need = l.target - currentValid;
+            if(need > 0) {
+                planDiv.innerHTML += `
+                <div class="item-card" style="border-left: 5px solid var(--pvp-color)">
+                    <div class="item-name">${l.name}</div>
+                    <div style="font-weight:bold; color:var(--pvp-color);">CUIR: ${need}</div>
+                </div>`;
+            }
+        });
+    },
+
+    switchPvp: function(t) {
+        document.querySelectorAll('.tab').forEach(e => e.classList.remove('active-pvp'));
+        document.getElementById('tp-'+t).classList.add('active-pvp');
+        ['pvp-stock','pvp-sortie','pvp-plan'].forEach(id => document.getElementById(id).classList.add('hidden'));
+        document.getElementById('pvp-'+t).classList.remove('hidden');
+    },
+
+    // --- NAV & COMMON ---
     nav: function(v) {
       document.querySelectorAll('[id^="view-"]').forEach(e => e.classList.add('hidden'));
       document.getElementById('view-'+v).classList.remove('hidden');
@@ -449,7 +485,16 @@
             }
         });
     },
-    stopScanner: function() { this.scanning=false; codeReader.reset(); document.getElementById('scanner-container').style.display="none"; }
+    stopScanner: function() { this.scanning=false; codeReader.reset(); document.getElementById('scanner-container').style.display="none"; },
+    saveUser: function() {
+        let name = document.getElementById('new-user-name').value;
+        let code = document.getElementById('new-user-code').value;
+        if(!name || !code) return;
+        this.data.users.push({name, code, role:'staff'}); this.save();
+    },
+    renderUsers: function() {
+        document.getElementById('users-list').innerHTML = this.data.users.map(u => `<div class="card">${u.name} (${u.code})</div>`).join('');
+    }
   };
   window.app.init();
 </script>
