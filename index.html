@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
 <meta name="theme-color" content="#ffffff" />
-<title>Araujo Exploitation v50</title>
+<title>Araujo Exploitation v51</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 <script src="https://unpkg.com/@zxing/library@latest"></script>
 
@@ -21,19 +21,19 @@
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: system-ui, -apple-system, sans-serif; }
   body { margin: 0; background: var(--bg-blue); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
-  /* BANNIERE */
+  /* --- BANNIERE BLANCHE (DESIGN VALIDÉ) --- */
   .header-banner {
     background: white; height: 85px; display: flex; justify-content: center; align-items: center;
     width: 100%; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.1); flex-shrink: 0;
   }
   .logo-header { height: 50px; width: auto; object-fit: contain; }
 
-  /* LOGIN */
+  /* --- LOGIN --- */
   .overlay { position: fixed; inset: 0; z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: var(--bg-blue); padding: 20px; }
   .login-card { background: white; padding: 30px; border-radius: 16px; width: 100%; max-width: 320px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
   #login-pass { width: 100%; padding: 12px; font-size: 24px; letter-spacing: 5px; text-align: center; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 20px; outline: none; background: #f8fafc; }
   
-  /* MAIN */
+  /* --- MAIN --- */
   main { flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 80px; }
   .card { background: var(--surface); border-radius: var(--radius); padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 15px; }
 
@@ -41,6 +41,7 @@
   #alert-box { 
     background: var(--accent); color: white; padding: 15px; border-radius: 12px; 
     margin-bottom: 15px; display: none; text-align: center; font-weight: bold; 
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
     animation: pulse 2s infinite;
   }
   @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.8; } 100% { opacity: 1; } }
@@ -50,8 +51,8 @@
   .tab { flex: 1; text-align: center; padding: 12px; font-weight: 700; font-size: 12px; color: white; border-radius: 9px; cursor: pointer; transition: 0.2s; }
   .tab.active { background: white; color: var(--primary); }
 
-  /* LISTE */
-  .group-header { background: rgba(255,255,255,0.15); color: white; padding: 10px 15px; border-radius: 8px; margin-top: 20px; font-weight: bold; text-transform: uppercase; font-size: 13px; letter-spacing: 1px; }
+  /* LISTE & ITEMS */
+  .group-header { background: rgba(255,255,255,0.15); color: white; padding: 10px 15px; border-radius: 8px; margin-top: 20px; font-weight: bold; text-transform: uppercase; font-size: 13px; letter-spacing: 1px; border: 1px solid rgba(255,255,255,0.1); }
   
   .item-card { 
     background: white; padding: 15px; border-radius: 12px; margin-top: 8px; 
@@ -62,13 +63,10 @@
   .item-img { width: 50px; height: 50px; border-radius: 8px; object-fit: contain; border: 1px solid #eee; margin-right: 12px; flex-shrink: 0; }
   .item-info { flex: 1; overflow: hidden; }
   .item-name { font-weight: bold; font-size: 14px; color: #333; line-height: 1.2; margin-bottom: 4px; }
-  .item-sub { font-size: 11px; color: #666; }
   
-  .qty-badge { 
-    padding: 5px 10px; border-radius: 6px; font-weight: bold; font-size: 12px; min-width: 40px; text-align: center; 
-  }
+  .qty-badge { padding: 4px 8px; border-radius: 6px; font-weight: bold; font-size: 11px; display: inline-block; }
   .qty-ok { background: #e0f2fe; color: var(--primary); border: 1px solid #bae6fd; }
-  .qty-missing { background: #fee2e2; color: #ef4444; border: 1px solid #fca5a5; animation: blink 2s infinite; }
+  .qty-missing { background: #fee2e2; color: #ef4444; border: 1px solid #fca5a5; }
   
   .date-badge { width: 50px; height: 50px; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; font-weight: bold; margin-left: 10px; flex-shrink: 0; }
   .badge-red { background: var(--accent); } .badge-orange { background: #f59e0b; } .badge-green { background: var(--success); }
@@ -110,12 +108,12 @@
   <div id="modal-edit" class="modal-overlay hidden">
     <div class="modal-content">
         <div class="modal-title">Modifier le Produit</div>
-        <p id="edit-name" style="font-size:14px; margin-bottom:20px; font-weight:bold;"></p>
+        <p id="edit-name" style="font-size:14px; margin-bottom:20px; font-weight:bold; color:#555;"></p>
         <input type="hidden" id="edit-id">
         
         <div class="input-group">
             <label>Nouvelle Quantité</label>
-            <input type="number" id="edit-qty" placeholder="Vide = À saisir plus tard">
+            <input type="number" id="edit-qty" placeholder="Laisser vide si incertain">
         </div>
         <br>
         <div class="input-group">
@@ -124,18 +122,19 @@
         </div>
 
         <button class="btn btn-green" onclick="window.app.saveEdit()">ENREGISTRER</button>
-        <button class="btn btn-red" onclick="window.app.deleteItem()">SUPPRIMER LE PRODUIT</button>
-        <button class="btn" style="background:#eee; color:#333;" onclick="document.getElementById('modal-edit').classList.add('hidden')">ANNULER</button>
+        <button class="btn btn-red" onclick="window.app.deleteItem()">SUPPRIMER</button>
+        <button class="btn" style="background:#f1f5f9; color:#333;" onclick="document.getElementById('modal-edit').classList.add('hidden')">ANNULER</button>
     </div>
   </div>
 
   <main>
     <div id="view-home">
-      <div id="alert-box">⚠️ ATTENTION<br>Saisir quantités pour demain !</div>
+      <div id="alert-box"><i class="fas fa-exclamation-triangle"></i> ATTENTION<br>Saisir quantités pour demain !</div>
       
       <div class="card" onclick="window.app.nav('frais')" style="background: rgba(255,255,255,0.1); border: 2px solid white; color:white; text-align:center; padding:40px 20px; cursor:pointer;">
         <i class="fas fa-barcode" style="font-size:50px; margin-bottom:15px;"></i>
         <h2 style="margin:0;">GESTION DLC</h2>
+        <p style="opacity:0.8; font-size:14px; margin-top:5px;">Scanner & Contrôler</p>
       </div>
 
       <div id="btn-team" class="card hidden" onclick="window.app.nav('team')" style="text-align:center; cursor:pointer;">
@@ -156,14 +155,27 @@
         
         <div class="card">
           <div class="input-group"><label>EAN</label><input type="number" id="frais-ean" oninput="if(this.value.length>=8) window.app.scanApi(this.value)"></div>
-          <div class="input-group"><label>Nom</label><input type="text" id="frais-name"></div>
-          <div class="input-group"><label>Famille</label><select id="frais-famille"><option>ULTRA FRAIS</option><option>CHARCUTERIE</option><option>VOLAILLE</option><option>BOUCHERIE</option><option>TRAITEUR</option><option>FROMAGE</option><option>SAURISSERIE</option><option>DIVERS</option></select></div>
+          <div class="input-group"><label>Nom Produit</label><input type="text" id="frais-name"></div>
+          
+          <div class="input-group">
+              <label>Famille (Auto)</label>
+              <select id="frais-famille">
+                  <option value="DIVERS">DIVERS</option>
+                  <option value="ULTRA FRAIS">ULTRA FRAIS</option>
+                  <option value="CHARCUTERIE">CHARCUTERIE</option>
+                  <option value="VOLAILLE">VOLAILLE</option>
+                  <option value="BOUCHERIE">BOUCHERIE</option>
+                  <option value="TRAITEUR">TRAITEUR</option>
+                  <option value="FROMAGE">FROMAGE</option>
+                  <option value="SAURISSERIE">SAURISSERIE</option>
+              </select>
+          </div>
           
           <div style="display:flex; gap:10px;">
              <div class="input-group" style="flex:2"><label>DLC</label><input type="date" id="frais-date"></div>
              <div class="input-group" style="flex:1"><label>Qté</label><input type="number" id="frais-qty" placeholder="?"></div>
           </div>
-          <small style="color:#666; display:block; margin-top:5px;">Laisser Qté vide si saisie plus tard.</small>
+          
           <button class="btn btn-green" onclick="window.app.addFrais()">VALIDER</button>
         </div>
       </div>
@@ -177,7 +189,7 @@
       <div class="card">
         <input type="text" id="new-user-name" placeholder="Prénom">
         <input type="number" id="new-user-code" placeholder="Code" style="margin-top:10px;">
-        <button class="btn btn-green" onclick="window.app.saveUser()">Créer</button>
+        <button class="btn btn-green" onclick="window.app.saveUser()">Créer Utilisateur</button>
       </div>
       <div id="users-list"></div>
     </div>
@@ -186,8 +198,6 @@
   <nav>
     <div class="nav-btn active" onclick="window.app.nav('home')"><i class="fas fa-home"></i>Menu</div>
   </nav>
-
-  <audio id="beep" src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3"></audio>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -199,7 +209,7 @@
   const codeReader = new ZXing.BrowserMultiFormatReader();
 
   window.app = {
-    data: { frais: [], users: [] }, // Historique supprimé
+    data: { frais: [], users: [] },
     currentUser: null,
     scanning: false,
     currentImgUrl: "",
@@ -226,33 +236,61 @@
       } else alert("Code incorrect");
     },
 
-    // --- LOGIQUE DLC & ALERTE ---
-    checkAlerts: function() {
-        let tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
-        let tomStr = tomorrow.toISOString().split('T')[0];
-        
-        // Vérifie si un produit pour demain a une quantité vide ou 0
-        let alert = this.data.frais.some(i => i.date === tomStr && (!i.qty || i.qty == 0));
-        document.getElementById('alert-box').style.display = alert ? 'block' : 'none';
+    // --- DETECTION INTELLIGENTE FAMILLE ---
+    detectFamily: function(name, cats) {
+        let s = (name + " " + cats).toUpperCase();
+        if(s.includes("YAOURT") || s.includes("LAIT") || s.includes("DESSERT") || s.includes("CREME")) return "ULTRA FRAIS";
+        if(s.includes("JAMBON") || s.includes("LARD") || s.includes("SAUCIS") || s.includes("PATE")) return "CHARCUTERIE";
+        if(s.includes("POULET") || s.includes("DINDE") || s.includes("CANARD")) return "VOLAILLE";
+        if(s.includes("BOEUF") || s.includes("STEAK") || s.includes("PORC") || s.includes("AGNEAU")) return "BOUCHERIE";
+        if(s.includes("PIZZA") || s.includes("SANDWICH") || s.includes("SALADE") || s.includes("QUICHE")) return "TRAITEUR";
+        if(s.includes("FROMAGE") || s.includes("CAMEMBERT") || s.includes("COMTÉ") || s.includes("EMMENTAL")) return "FROMAGE";
+        if(s.includes("SAUMON") || s.includes("POISSON") || s.includes("TRUITE") || s.includes("CREVETTE")) return "SAURISSERIE";
+        return "DIVERS";
+    },
+
+    scanApi: async function(ean) {
+      try {
+        let r = await fetch(`https://world.openfoodfacts.org/api/v0/product/${ean}.json`);
+        let d = await r.json();
+        if(d.status === 1) {
+          // Nom
+          let brand = d.product.brands ? d.product.brands.split(',')[0] + " - " : "";
+          let pName = d.product.product_name_fr || d.product.product_name || "";
+          if(!pName.toLowerCase().includes(brand.toLowerCase().replace(' - ',''))) pName = brand + pName;
+          document.getElementById('frais-name').value = pName;
+          
+          // Image
+          this.currentImgUrl = d.product.image_front_small_url || "";
+          
+          // Auto-Select Famille
+          let autoFam = this.detectFamily(pName, d.product.categories || "");
+          document.getElementById('frais-famille').value = autoFam;
+        }
+      } catch(e){}
     },
 
     addFrais: function() {
       let ean = document.getElementById('frais-ean').value;
       let name = document.getElementById('frais-name').value;
       let date = document.getElementById('frais-date').value;
-      let qty = document.getElementById('frais-qty').value; // Peut être vide
+      let qty = document.getElementById('frais-qty').value;
       let fam = document.getElementById('frais-famille').value;
-      
-      if(!name || !date) return alert("Nom et Date obligatoires");
-      
+      if(!name || !date) return alert("Date requise");
       this.data.frais.push({ id: Date.now(), ean, name, date, qty, fam, img: this.currentImgUrl });
       this.save();
-      alert("Ajouté !");
+      alert("Ajouté");
       document.getElementById('frais-name').value = ""; document.getElementById('frais-ean').value = "";
       document.getElementById('frais-qty').value = ""; this.currentImgUrl="";
     },
 
-    // --- MODIFICATION ---
+    checkAlerts: function() {
+        let tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
+        let tomStr = tomorrow.toISOString().split('T')[0];
+        let alert = this.data.frais.some(i => i.date === tomStr && (!i.qty || i.qty == 0));
+        document.getElementById('alert-box').style.display = alert ? 'block' : 'none';
+    },
+
     openEdit: function(id) {
         let item = this.data.frais.find(i => i.id == id);
         if(!item) return;
@@ -276,50 +314,11 @@
 
     deleteItem: function() {
         let id = document.getElementById('edit-id').value;
-        if(confirm("Supprimer définitivement ?")) {
+        if(confirm("Supprimer ?")) {
             this.data.frais = this.data.frais.filter(i => i.id != id);
             this.save();
             document.getElementById('modal-edit').classList.add('hidden');
         }
-    },
-
-    // --- NAVIGATION ---
-    nav: function(v) {
-      document.querySelectorAll('[id^="view-"]').forEach(e => e.classList.add('hidden'));
-      document.getElementById('view-'+v).classList.remove('hidden');
-    },
-
-    switchTab: function(t) {
-      document.querySelectorAll('.tab').forEach(e => e.classList.remove('active'));
-      document.getElementById('tab-'+t).classList.add('active');
-      ['content-scan','content-list'].forEach(id => document.getElementById(id).classList.add('hidden'));
-      document.getElementById('content-'+t).classList.remove('hidden');
-      if(t !== 'scan') this.stopScanner();
-    },
-
-    toggleScanner: function() { if(this.scanning) this.stopScanner(); else this.startScanner(); },
-    startScanner: function() {
-        this.scanning = true; document.getElementById('scanner-container').style.display="block";
-        codeReader.decodeFromVideoDevice(null, 'video', (result) => {
-            if(result) {
-                document.getElementById('frais-ean').value = result.text;
-                this.scanApi(result.text); this.stopScanner();
-            }
-        });
-    },
-    stopScanner: function() { this.scanning=false; codeReader.reset(); document.getElementById('scanner-container').style.display="none"; },
-
-    scanApi: async function(ean) {
-      try {
-        let r = await fetch(`https://world.openfoodfacts.org/api/v0/product/${ean}.json`);
-        let d = await r.json();
-        if(d.status === 1) {
-          let brand = d.product.brands ? d.product.brands.split(',')[0] + " - " : "";
-          let pName = d.product.product_name_fr || d.product.product_name || "";
-          document.getElementById('frais-name').value = brand + pName;
-          this.currentImgUrl = d.product.image_front_small_url || "";
-        }
-      } catch(e){}
     },
 
     renderList: function() {
@@ -328,7 +327,6 @@
       cont.innerHTML = "";
       let grouped = {};
 
-      // CLASSER PAR FAMILLE PUIS DATE
       this.data.frais.sort((a,b) => {
           if(a.fam === b.fam) return a.date.localeCompare(b.date);
           return a.fam.localeCompare(b.fam);
@@ -346,7 +344,6 @@
              let badgeColor = diff < 1 ? 'badge-red' : (diff < 2 ? 'badge-orange' : 'badge-green');
              let d = new Date(i.date);
              
-             // GESTION QTE
              let qtyDisplay = i.qty && i.qty != 0 ? `<span class="qty-badge qty-ok">x${i.qty}</span>` : `<span class="qty-badge qty-missing">À SAISIR</span>`;
 
              cont.innerHTML += `
@@ -363,16 +360,15 @@
                </div>`;
           });
       });
-      if(cont.innerHTML === "") cont.innerHTML = "<div style='text-align:center; color:white; padding:30px;'>Stock vide</div>";
+      if(cont.innerHTML === "") cont.innerHTML = "<div style='text-align:center; color:white; padding:30px;'>Aucun produit</div>";
     },
 
-    // GESTION TEAM
+    // TEAM & NAV
     saveUser: function() {
         let name = document.getElementById('new-user-name').value;
         let code = document.getElementById('new-user-code').value;
         if(!name || !code) return;
-        this.data.users.push({name, code, role:'staff'});
-        this.save();
+        this.data.users.push({name, code, role:'staff'}); this.save();
         document.getElementById('new-user-name').value=""; document.getElementById('new-user-code').value="";
     },
     renderUsers: function() {
@@ -380,10 +376,31 @@
         div.innerHTML = this.data.users ? this.data.users.map(u => `<div class="card" style="display:flex; justify-content:space-between;"><b>${u.name}</b> ${u.code} <button onclick="window.app.delUser('${u.code}')" style="color:red;border:none;background:none;"><i class="fas fa-trash"></i></button></div>`).join('') : '';
     },
     delUser: function(code) {
-        if(code==="2008") return alert("Admin ne peut être supprimé");
-        this.data.users = this.data.users.filter(u => u.code !== code);
-        this.save();
-    }
+        if(code==="2008") return;
+        this.data.users = this.data.users.filter(u => u.code !== code); this.save();
+    },
+    nav: function(v) {
+      document.querySelectorAll('[id^="view-"]').forEach(e => e.classList.add('hidden'));
+      document.getElementById('view-'+v).classList.remove('hidden');
+    },
+    switchTab: function(t) {
+      document.querySelectorAll('.tab').forEach(e => e.classList.remove('active'));
+      document.getElementById('tab-'+t).classList.add('active');
+      ['content-scan','content-list'].forEach(id => document.getElementById(id).classList.add('hidden'));
+      document.getElementById('content-'+t).classList.remove('hidden');
+      if(t !== 'scan') this.stopScanner();
+    },
+    toggleScanner: function() { if(this.scanning) this.stopScanner(); else this.startScanner(); },
+    startScanner: function() {
+        this.scanning = true; document.getElementById('scanner-container').style.display="block";
+        codeReader.decodeFromVideoDevice(null, 'video', (result) => {
+            if(result) {
+                document.getElementById('frais-ean').value = result.text;
+                this.scanApi(result.text); this.stopScanner();
+            }
+        });
+    },
+    stopScanner: function() { this.scanning=false; codeReader.reset(); document.getElementById('scanner-container').style.display="none"; }
   };
   
   window.app.init();
