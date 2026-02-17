@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
 <meta name="theme-color" content="#ffffff" />
-<title>Araujo Exploitation v57</title>
+<title>Araujo Exploitation v59</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 <script src="https://unpkg.com/@zxing/library@latest"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
@@ -52,7 +52,6 @@
   /* LIST ITEMS */
   .group-header { background: #334155; color: white; padding: 8px 15px; border-radius: 8px 8px 0 0; margin-top: 20px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: bold; text-transform: uppercase; }
   .swipe-wrapper { position: relative; background: var(--accent); overflow: hidden; border-bottom: 1px solid #f1f5f9; }
-  .swipe-wrapper:last-child { border-radius: 0 0 8px 8px; border-bottom: none; }
   
   .wek-item { position: relative; z-index: 2; background: white; padding: 15px; display: flex; align-items: center; justify-content: space-between; transition: transform 0.2s ease-out; cursor: pointer; }
   .wek-img { width: 65px; height: 65px; border-radius: 8px; object-fit: contain; background: #fff; border: 1px solid #e2e8f0; margin-right: 15px; display: flex; align-items: center; justify-content: center; color: #cbd5e1; flex-shrink: 0; z-index: 10; font-size: 24px; }
@@ -61,17 +60,15 @@
   .wek-sub { display: flex; gap: 8px; font-size: 11px; color: #64748b; }
   .wek-qty { background: #f1f5f9; padding: 2px 8px; border-radius: 4px; border: 1px solid #e2e8f0; font-weight: bold; color: var(--primary); }
   .qty-missing { background: #fee2e2; color: #ef4444; border: 1px solid #fca5a5; }
+
   .date-badge { width: 50px; height: 50px; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; font-weight: bold; flex-shrink: 0; }
-  .date-day { font-size: 18px; } .date-month { font-size: 11px; text-transform: uppercase; }
   .badge-red { background: var(--accent); } .badge-orange { background: var(--warning); } .badge-green { background: var(--success); }
 
   /* PVP SPECIFIC */
   .pvp-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #eee; background: white; }
-  
-  /* IMAGE PICKER GRID */
   .img-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 10px; }
-  .img-option { background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 8px; height: 50px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 24px; }
-  .img-option.selected { border-color: var(--pvp); background: #fff7ed; }
+  .img-option { background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 8px; height: 50px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 24px; color: #64748b; }
+  .img-option.selected { border-color: var(--pvp); background: #fff7ed; color: var(--pvp); }
 
   /* COMMON */
   .input-group label { display: block; font-size: 11px; font-weight: 700; color: #64748b; margin-bottom: 4px; text-transform: uppercase; }
@@ -122,475 +119,21 @@
 
   <div id="modal-pvp-lib" class="modal-bc hidden">
     <div class="modal-card">
-        <h3 style="color:var(--pvp); margin-top:0;">Éditer Produit PVP</h3>
+        <h3 style="color:var(--pvp); margin-top:0;">Édition Bibliothèque PVP</h3>
         <input type="hidden" id="lib-id"> 
         <input type="hidden" id="lib-icon" value="fas fa-bread-slice">
         
-        <div class="input-group" style="text-align:left"><label>Nom</label><input type="text" id="lib-name" placeholder="Ex: Croissant"></div><br>
-        <div class="input-group" style="text-align:left"><label>EAN (Optionnel)</label><input type="number" id="lib-ean" placeholder="Pour scanner..."></div><br>
+        <div class="input-group" style="text-align:left"><label>Nom du Produit</label><input type="text" id="lib-name" placeholder="Ex: Croissant"></div><br>
+        <div class="input-group" style="text-align:left"><label>Code EAN (Pour étiquette)</label><input type="number" id="lib-ean" placeholder="Ex: 123456"></div><br>
         
-        <div class="input-group" style="text-align:left"><label>Choisir une image</label></div>
+        <div class="input-group" style="text-align:left"><label>Choisir Icône</label></div>
         <div class="img-grid" id="img-picker">
             </div><br>
 
-        <div class="input-group" style="text-align:left"><label>Durée de vie (Jours/Heures)</label><input type="number" id="lib-hours" value="24"></div>
-        <small style="color:#666; display:block; margin-bottom:10px;">24h = Fin lendemain 22h, 48h = Surlendemain 22h</small>
-        
-        <div class="input-group" style="text-align:left"><label>Stock Idéal Matin</label><input type="number" id="lib-target" value="10"></div>
-        
-        <button class="btn btn-orange" onclick="window.app.savePvpLib()" style="margin-top:20px;">Enregistrer</button>
-        <button id="btn-del-lib" class="btn btn-red hidden" onclick="window.app.deletePvpLib()" style="margin-top:10px;">Supprimer</button>
-        <button class="btn" style="margin-top:10px; background:#f1f5f9; color:#333" onclick="document.getElementById('modal-pvp-lib').classList.add('hidden')">Fermer</button>
-    </div>
-  </div>
-
-  <div id="modal-edit-pvp-stock" class="modal-bc hidden">
-      <div class="modal-card">
-          <h3 style="color:var(--pvp);">Modifier Rayon</h3>
-          <input type="hidden" id="stock-id">
-          <p id="stock-name" style="font-weight:bold;"></p>
-          <div class="input-group" style="text-align:left"><label>Quantité</label><input type="number" id="stock-qty"></div>
-          <button class="btn btn-orange" onclick="window.app.saveEditPvpStock()" style="margin-top:20px;">Valider</button>
-          <button class="btn btn-red" onclick="window.app.deletePvpStock()" style="margin-top:10px;">Supprimer (Erreur)</button>
-          <button class="btn" style="margin-top:10px; background:#f1f5f9; color:#333" onclick="document.getElementById('modal-edit-pvp-stock').classList.add('hidden')">Annuler</button>
-      </div>
-  </div>
-
-  <header>
-    <img src="https://raw.githubusercontent.com/araujoexploitation/Magasin/main/LOGO.png" class="logo-header">
-    <div id="user-display" class="user-badge"></div>
-  </header>
-
-  <main>
-    <div id="view-home">
-      <div id="alert-box" style="display:none; background:var(--accent); color:white; padding:15px; border-radius:12px; margin-bottom:15px; text-align:center; font-weight:bold;">⚠️ ATTENTION : Saisir quantités pour demain !</div>
-
-      <div class="home-grid">
-        <div class="home-btn" onclick="window.app.nav('frais')" style="background: linear-gradient(135deg, #003896 0%, #002366 100%);">
-            <span class="home-icon"><i class="fas fa-barcode"></i></span>
-            <span>DLC FRAIS</span>
-        </div>
-        <div class="home-btn" onclick="window.app.nav('pvp')" style="background: linear-gradient(135deg, #d97706 0%, #b45309 100%);">
-            <span class="home-icon"><i class="fas fa-bread-slice"></i></span>
-            <span>GESTION PVP</span>
-        </div>
-      </div>
-      
-      <div class="card" style="text-align:center;">
-        <button class="btn btn-blue" onclick="window.app.toggleScanner()"><i class="fas fa-camera"></i> SCANNER UNIVERSEL</button>
-        <div id="scanner-container" style="margin-top:15px; width:100%; height:200px; background:black; border-radius:12px; overflow:hidden; display:none;"><video id="video" style="width:100%; height:100%; object-fit:cover;"></video></div>
-      </div>
-
-      <div id="btn-team" class="card hidden" onclick="window.app.nav('team')" style="text-align:center; cursor:pointer;">
-        <i class="fas fa-users-cog" style="font-size:30px; color:var(--carrefour-green); margin-bottom:10px;"></i>
-        <h4 style="margin:0; color: var(--text);">Gérer l'Équipe</h4>
-      </div>
-    </div>
-
-    <div id="view-frais" class="hidden">
-      <div class="tabs">
-        <div id="tab-scan" class="tab active" onclick="window.app.switchTab('scan')">AJOUT MANUEL</div>
-        <div id="tab-list" class="tab" onclick="window.app.switchTab('list')">LISTE</div>
-      </div>
-      <div id="content-scan">
-        <div class="card">
-          <div class="input-group"><label>EAN</label><input type="number" id="frais-ean" placeholder="Scanner..." oninput="if(this.value.length>=8) window.app.scanApi(this.value)"></div>
-          <div class="input-group"><label>Famille</label><select id="frais-famille"><option>SNACKING</option><option>TRAITEUR</option><option>ULTRA FRAIS</option><option>CHARCUTERIE</option><option>VOLAILLE</option><option>BOUCHERIE</option><option>FROMAGE</option><option>SAURISSERIE</option><option>DIVERS</option></select></div>
-          <div class="input-group"><label>Nom</label><input type="text" id="frais-name"></div>
-          <div style="display:flex; gap:10px;">
-             <div class="input-group" style="flex:2"><label>DLC</label><input type="date" id="frais-date"></div>
-             <div class="input-group" style="flex:1"><label>Qté</label><input type="number" id="frais-qty" placeholder="?"></div>
-          </div>
-          <button class="btn" onclick="window.app.addFrais()" style="margin-top:10px;">VALIDER</button>
-        </div>
-      </div>
-      <div id="content-list" class="hidden"><div id="list-frais-container"></div></div>
-    </div>
-
-    <div id="view-pvp" class="hidden">
-      <div class="tabs">
-        <div id="tp-stock" class="tab active-pvp" onclick="window.app.switchPvp('stock')">RAYON</div>
-        <div id="tp-bib" class="tab" onclick="window.app.switchPvp('bib')">BIBLIOTHÈQUE</div>
-        <div id="tp-calc" class="tab" onclick="window.app.switchPvp('calc')">BESOINS</div>
-      </div>
-
-      <div id="pvp-stock" class="hidden"><div id="list-pvp-stock"></div></div>
-
-      <div id="pvp-bib" class="hidden">
-        <button class="btn" onclick="window.app.openPvpLib()" style="background:#eee; color:#333; margin-bottom:15px;">+ Créer Nouveau Produit</button>
-        <div id="list-pvp-lib"></div>
-      </div>
-
-      <div id="pvp-calc" class="hidden">
-        <div class="card" style="background:#e0f2fe; color:#003896; text-align:center;">
-            <b>A CUIRE POUR DEMAIN MATIN</b>
-        </div>
-        <div id="list-pvp-calc"></div>
-      </div>
-    </div>
-
-    <div id="view-team" class="hidden">
-      <div class="card">
-        <input type="text" id="new-user-name" placeholder="Prénom"><input type="number" id="new-user-code" placeholder="Code" style="margin-top:10px;"><button class="btn btn-green" onclick="window.app.saveUser()">Créer</button>
-      </div>
-      <div class="card"><div id="users-list"></div></div>
-    </div>
-  </main>
-
-  <nav>
-    <div class="nav-btn" onclick="window.app.nav('home')"><i class="fas fa-th-large"></i>Menu</div>
-  </nav>
-
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-  const firebaseConfig = { apiKey: "AIzaSyA0ffa4Nfa7kGLyaEcAocU9YzIhzmx3SkA", authDomain: "araujo-exploitation.firebaseapp.com", databaseURL: "https://araujo-exploitation-default-rtdb.europe-west1.firebasedatabase.app", projectId: "araujo-exploitation", storageBucket: "araujo-exploitation.firebasestorage.app", messagingSenderId: "292878114487", appId: "1:292878114487:web:2a450227310e970ce1b732" };
-  const db = getFirestore(initializeApp(firebaseConfig));
-  const docRef = doc(db, "store_master", "STOCK_MAGASIN_LIVE");
-  const codeReader = new ZXing.BrowserMultiFormatReader();
-
-  // IMAGES PVP (ICONES)
-  const PVP_ICONS = [
-      {id:'bread', icon:'fas fa-bread-slice'}, {id:'croissant', icon:'fas fa-cloud-moon'}, // Approximatif pour croissant
-      {id:'cookie', icon:'fas fa-cookie'}, {id:'pizza', icon:'fas fa-pizza-slice'},
-      {id:'donut', icon:'fas fa-dot-circle'}, {id:'hotdog', icon:'fas fa-hotdog'},
-      {id:'sandwich', icon:'fas fa-hamburger'}, {id:'baguette', icon:'fas fa-utensils'}
-  ];
-
-  window.app = {
-    data: { frais: [], users: [], pvpLib: [], pvpStock: [] },
-    currentUser: null,
-    scanning: false,
-    currentImgUrl: "",
-
-    init: function() {
-      onSnapshot(docRef, (s) => {
-        if(s.exists()) {
-            this.data = {...this.data, ...s.data()};
-            if(!this.data.users) this.data.users = [{code: "2008", name: "MANAGER", role: "admin"}];
-            if(!this.data.pvpLib) this.data.pvpLib = [];
-            if(!this.data.pvpStock) this.data.pvpStock = [];
-        }
-        this.renderList(); this.renderUsers(); this.checkAlerts(); this.renderPvp();
-      });
-      this.initImgPicker();
-    },
-
-    initImgPicker: function() {
-        const d = document.getElementById('img-picker');
-        d.innerHTML = PVP_ICONS.map(i => `<div class="img-option" onclick="window.app.selectImg('${i.icon}', this)"><i class="${i.icon}"></i></div>`).join('');
-    },
-    selectImg: function(icon, el) {
-        document.getElementById('lib-icon').value = icon;
-        document.querySelectorAll('.img-option').forEach(e => e.classList.remove('selected'));
-        el.classList.add('selected');
-    },
-
-    save: async function() { await setDoc(docRef, this.data, {merge:true}); },
-
-    login: function() {
-      let code = document.getElementById('login-pass').value.trim();
-      let user = this.data.users ? this.data.users.find(u => u.code === code) : null;
-      if(user) {
-        this.currentUser = user;
-        document.getElementById('login-overlay').classList.add('hidden');
-        document.getElementById('user-display').innerText = user.name;
-        if(user.role === 'admin') document.getElementById('btn-team').classList.remove('hidden');
-      } else alert("Code incorrect");
-    },
-
-    // --- SCANNER UNIVERSEL ---
-    scanApi: async function(ean) {
-      // 1. PVP
-      let pvpItem = this.data.pvpLib.find(p => p.ean == ean);
-      if(pvpItem) {
-          if(confirm("PVP: " + pvpItem.name + "\nSortir du four ?")) {
-             this.addPvpStock(pvpItem.id);
-             this.nav('pvp');
-             return;
-          }
-      }
-      // 2. FRAIS (OFF)
-      try {
-        this.nav('frais');
-        let r = await fetch(`https://world.openfoodfacts.org/api/v0/product/${ean}.json`);
-        let d = await r.json();
-        if(d.status === 1) {
-          let pName = d.product.product_name_fr || d.product.product_name || "";
-          document.getElementById('frais-ean').value = ean;
-          document.getElementById('frais-name').value = pName;
-          this.currentImgUrl = d.product.image_front_small_url || "";
-          document.getElementById('frais-famille').value = this.detectFamily(pName, d.product.categories || "");
-        }
-      } catch(e){}
-    },
-
-    detectFamily: function(name, cats) {
-        let s = (name + " " + cats).toUpperCase();
-        if(s.includes("SANDWICH")||s.includes("SALADE")||s.includes("BOX")||s.includes("BURGER")||s.includes("WRAP")) return "SNACKING";
-        if(s.includes("PIZZA")||s.includes("QUICHE")||s.includes("PLAT")) return "TRAITEUR";
-        if(s.includes("YAOURT")||s.includes("LAIT")||s.includes("CREME")) return "ULTRA FRAIS";
-        if(s.includes("JAMBON")||s.includes("LARD")||s.includes("SAUCIS")) return "CHARCUTERIE";
-        if(s.includes("POULET")||s.includes("DINDE")) return "VOLAILLE";
-        if(s.includes("BOEUF")||s.includes("STEAK")||s.includes("PORC")) return "BOUCHERIE";
-        if(s.includes("FROMAGE")||s.includes("CAMEMBERT")) return "FROMAGE";
-        if(s.includes("SAUMON")||s.includes("POISSON")) return "SAURISSERIE";
-        return "DIVERS";
-    },
-
-    addFrais: function() {
-      let ean = document.getElementById('frais-ean').value;
-      let name = document.getElementById('frais-name').value;
-      let date = document.getElementById('frais-date').value;
-      let qty = document.getElementById('frais-qty').value;
-      let fam = document.getElementById('frais-famille').value;
-      if(!name || !date) return alert("Date requise");
-      this.data.frais.push({ id: Date.now(), ean, name, date, qty, fam, img: this.currentImgUrl });
-      this.save(); alert("Ajouté");
-      document.getElementById('frais-name').value=""; document.getElementById('frais-ean').value="";
-      document.getElementById('frais-qty').value=""; this.currentImgUrl="";
-    },
-
-    checkAlerts: function() {
-        let tom = new Date(); tom.setDate(tom.getDate()+1);
-        let tomStr = tom.toISOString().split('T')[0];
-        let todayStr = new Date().toISOString().split('T')[0];
-        let alert = this.data.frais.some(i => (i.date === todayStr || i.date === tomStr) && (!i.qty || i.qty==0));
-        document.getElementById('alert-box').style.display = alert ? 'block' : 'none';
-    },
-
-    renderList: function() {
-        let tom = new Date(); tom.setDate(tom.getDate()+1);
-        let tomStr = tom.toISOString().split('T')[0];
-        let today = new Date().toISOString().split('T')[0];
-        
-        const cont = document.getElementById('list-frais-container');
-        cont.innerHTML = "";
-        let grouped = {};
-        this.data.frais.sort((a,b) => (a.fam===b.fam) ? a.name.localeCompare(b.name) : a.fam.localeCompare(b.fam));
-        this.data.frais.forEach(i => { if(!grouped[i.fam]) grouped[i.fam]=[]; grouped[i.fam].push(i); });
-
-        Object.keys(grouped).forEach(fam => {
-            cont.innerHTML += `<div class="group-header">${fam}</div>`;
-            grouped[fam].forEach(i => {
-                let diff = (new Date(i.date) - new Date(today))/86400000;
-                let badge = diff<1?'badge-red':(diff<2?'badge-orange':'badge-green');
-                let d = new Date(i.date);
-                let showAlert = (!i.qty || i.qty==0) && (i.date <= tomStr);
-                let qtyHtml = showAlert ? `<span class="wek-qty qty-missing">À SAISIR</span>` : (i.qty ? `<span class="wek-qty">x${i.qty}</span>` : `<span class="wek-qty">-</span>`);
-                let imgHtml = i.img ? `<img src="${i.img}" class="wek-img" onclick="event.stopPropagation(); window.app.showBarcode('${i.ean}','${i.name.replace(/'/g," ")}')">` : `<div class="wek-img" onclick="event.stopPropagation(); window.app.showBarcode('${i.ean}','${i.name.replace(/'/g," ")}')"><i class="fas fa-barcode"></i></div>`;
-
-                cont.innerHTML += `
-                <div class="swipe-wrapper">
-                   <div class="wek-item" onclick="window.app.openEditFrais(${i.id})">
-                      ${imgHtml}
-                      <div class="wek-info">
-                          <div class="wek-name">${i.name}</div>
-                          <div class="wek-sub">${qtyHtml} <span class="wek-ean">${i.ean}</span></div>
-                      </div>
-                      <div class="date-badge ${badge}"><span class="date-day">${d.getDate()}</span><span class="date-month">${d.toLocaleString('fr',{month:'short'})}</span></div>
-                   </div>
-               </div>`;
-            });
-        });
-    },
-
-    openEditFrais: function(id) {
-        let i = this.data.frais.find(x => x.id == id);
-        if(!i) return;
-        document.getElementById('modal-edit-frais').classList.remove('hidden');
-        document.getElementById('edit-id').value = id;
-        document.getElementById('edit-famille').value = i.fam;
-        document.getElementById('edit-qty').value = i.qty;
-        document.getElementById('edit-date').value = i.date;
-    },
-    saveEditFrais: function() {
-        let id = document.getElementById('edit-id').value;
-        let idx = this.data.frais.findIndex(x => x.id == id);
-        if(idx > -1) {
-            this.data.frais[idx].fam = document.getElementById('edit-famille').value;
-            this.data.frais[idx].qty = document.getElementById('edit-qty').value;
-            this.data.frais[idx].date = document.getElementById('edit-date').value;
-            this.save(); document.getElementById('modal-edit-frais').classList.add('hidden');
-        }
-    },
-    deleteFrais: function() {
-        let id = document.getElementById('edit-id').value;
-        if(confirm("Supprimer ?")) { this.data.frais = this.data.frais.filter(x => x.id != id); this.save(); document.getElementById('modal-edit-frais').classList.add('hidden'); }
-    },
-    showBarcode: function(ean, name) { 
-        if(!ean || ean === "undefined") return alert("Pas de code barre enregistré");
-        document.getElementById('modal-barcode').classList.remove('hidden'); 
-        document.getElementById('bc-name').innerText=name; 
-        try{JsBarcode("#barcode", ean, {format:"EAN13", height:80, displayValue:true});}catch(e){} 
-    },
-
-    // --- PVP LOGIC ---
-    openPvpLib: function(id=null) {
-        document.getElementById('modal-pvp-lib').classList.remove('hidden');
-        if(id) {
-            let item = this.data.pvpLib.find(x => x.id == id);
-            document.getElementById('lib-id').value = id;
-            document.getElementById('lib-name').value = item.name;
-            document.getElementById('lib-ean').value = item.ean || "";
-            document.getElementById('lib-hours').value = item.hours || 24;
-            document.getElementById('lib-target').value = item.target || 10;
-            document.getElementById('lib-icon').value = item.icon || "fas fa-bread-slice";
-            document.getElementById('btn-del-lib').classList.remove('hidden');
-        } else {
-            document.getElementById('lib-id').value = "";
-            document.getElementById('lib-name').value = "";
-            document.getElementById('lib-ean').value = "";
-            document.getElementById('btn-del-lib').classList.add('hidden');
-        }
-    },
-
-    savePvpLib: function() {
-        let id = document.getElementById('lib-id').value;
-        let name = document.getElementById('lib-name').value;
-        let ean = document.getElementById('lib-ean').value;
-        let icon = document.getElementById('lib-icon').value;
-        let hrs = document.getElementById('lib-hours').value;
-        let target = document.getElementById('lib-target').value;
-        
-        if(!name) return;
-        
-        if(id) {
-             let idx = this.data.pvpLib.findIndex(x => x.id == id);
-             if(idx > -1) { this.data.pvpLib[idx] = { ...this.data.pvpLib[idx], name, ean, icon, hours:hrs, target }; }
-        } else {
-             this.data.pvpLib.push({ id: Date.now(), name, ean, icon, hours:hrs, target });
-        }
-        this.save(); document.getElementById('modal-pvp-lib').classList.add('hidden');
-    },
-
-    deletePvpLib: function() {
-        let id = document.getElementById('lib-id').value;
-        if(confirm("Supprimer ce produit de la bibliothèque ?")) {
-            this.data.pvpLib = this.data.pvpLib.filter(x => x.id != id);
-            this.save();
-            document.getElementById('modal-pvp-lib').classList.add('hidden');
-        }
-    },
-
-    addPvpStock: function(libId) {
-        let lib = this.data.pvpLib.find(x => x.id == libId);
-        let qty = prompt(`Quantité de ${lib.name} à mettre en rayon ?`, "1");
-        if(qty && qty > 0) {
-            // REGLE DES 22h00
-            // Durée de vie = X jours (basé sur lib.hours)
-            // Si 24h -> Fin J+1 à 22h
-            // Si 48h -> Fin J+2 à 22h
-            let now = new Date();
-            let daysToAdd = Math.ceil(lib.hours / 24); 
-            let endDate = new Date();
-            endDate.setDate(now.getDate() + daysToAdd);
-            endDate.setHours(22, 0, 0, 0);
-
-            this.data.pvpStock.push({
-                id: Date.now(), libId: libId, name: lib.name, qty: qty,
-                out: now.getTime(), end: endDate.getTime(), icon: lib.icon, ean: lib.ean
-            });
-            this.save();
-        }
-    },
-    
-    // EDITER STOCK RAYON PVP
-    openEditPvpStock: function(id) {
-        let item = this.data.pvpStock.find(i => i.id == id);
-        if(!item) return;
-        document.getElementById('modal-edit-pvp-stock').classList.remove('hidden');
-        document.getElementById('stock-id').value = id;
-        document.getElementById('stock-name').innerText = item.name;
-        document.getElementById('stock-qty').value = item.qty;
-    },
-    saveEditPvpStock: function() {
-        let id = document.getElementById('stock-id').value;
-        let qty = document.getElementById('stock-qty').value;
-        let idx = this.data.pvpStock.findIndex(i => i.id == id);
-        if(idx > -1 && qty > 0) {
-            this.data.pvpStock[idx].qty = qty;
-            this.save();
-            document.getElementById('modal-edit-pvp-stock').classList.add('hidden');
-        }
-    },
-    deletePvpStock: function() {
-        let id = document.getElementById('stock-id').value;
-        if(confirm("Supprimer cette ligne de stock ?")) {
-            this.data.pvpStock = this.data.pvpStock.filter(i => i.id != id);
-            this.save();
-            document.getElementById('modal-edit-pvp-stock').classList.add('hidden');
-        }
-    },
-
-    renderPvp: function() {
-        // STOCK RAYON
-        const sDiv = document.getElementById('list-pvp-stock'); sDiv.innerHTML="";
-        let now = Date.now();
-        this.data.pvpStock.sort((a,b) => a.end - b.end).forEach(i => {
-            let left = (i.end - now)/3600000;
-            let color = left < 0 ? '#ef4444' : (left < 2 ? '#f59e0b' : '#10b981'); 
-            let dEnd = new Date(i.end);
-            
-            // Clic sur l'image = Code Barre / Clic sur le reste = Edit
-            let imgHtml = `<div class="wek-img" onclick="event.stopPropagation(); window.app.showBarcode('${i.ean}','${i.name.replace(/'/g," ")}')"><i class="${i.icon}"></i></div>`;
-
-            sDiv.innerHTML += `
-            <div class="pvp-item" onclick="window.app.openEditPvpStock(${i.id})">
-                <div style="display:flex;align-items:center;">
-                    ${imgHtml}
-                    <div>
-                        <div style="font-weight:bold;">${i.name}</div>
-                        <span class="wek-qty">x${i.qty}</span>
-                    </div>
-                </div>
-                <div style="text-align:right">
-                    <div style="font-size:18px; font-weight:bold; color:${color}">${dEnd.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</div>
-                    <div style="font-size:10px; color:#666">${dEnd.getDate()}/${dEnd.getMonth()+1}</div>
-                </div>
-            </div>`;
-        });
-
-        // BIBLIOTHEQUE
-        const bDiv = document.getElementById('list-pvp-lib'); bDiv.innerHTML="";
-        this.data.pvpLib.forEach(l => {
-            bDiv.innerHTML += `
-            <div class="pvp-item">
-                <div style="display:flex;align-items:center;" onclick="window.app.openPvpLib(${l.id})">
-                    <div class="wek-img"><i class="${l.icon}"></i></div>
-                    <div>
-                        <div style="font-weight:bold;">${l.name}</div>
-                        <div style="font-size:10px; color:#666">${l.hours}h • Obj: ${l.target}</div>
-                    </div>
-                </div>
-                <button class="pvp-btn-icon" style="background:#e0f2fe; color:#003896" onclick="window.app.addPvpStock(${l.id})"><i class="fas fa-plus"></i></button>
-            </div>`;
-        });
-
-        // CALCUL
-        const cDiv = document.getElementById('list-pvp-calc'); cDiv.innerHTML="";
-        let limitTs = new Date(); limitTs.setDate(limitTs.getDate()+1); limitTs.setHours(6,0,0,0);
-        this.data.pvpLib.forEach(l => {
-            let valid = this.data.pvpStock.filter(s => s.libId == l.id && s.end > limitTs.getTime()).reduce((a,b)=>a+parseInt(b.qty),0);
-            let need = l.target - valid;
-            if(need > 0) {
-                cDiv.innerHTML += `<div class="pvp-item" style="border-left:5px solid var(--pvp);"><div style="font-weight:bold;">${l.name}</div><div style="font-weight:bold;color:var(--pvp);">A CUIRE: ${need}</div></div>`;
-            }
-        });
-    },
-
-    // COMMON
-    nav: function(v) { document.querySelectorAll('[id^="view-"]').forEach(e => e.classList.add('hidden')); document.getElementById('view-'+v).classList.remove('hidden'); },
-    switchTab: function(t) { document.querySelectorAll('.tab').forEach(e => e.classList.remove('active')); document.getElementById('tab-'+t).classList.add('active'); ['content-scan','content-list'].forEach(id => document.getElementById(id).classList.add('hidden')); document.getElementById('content-'+t).classList.remove('hidden'); if(t!=='scan') this.stopScanner(); },
-    toggleScanner: function() { if(this.scanning) this.stopScanner(); else this.startScanner(); },
-    startScanner: function() { this.scanning=true; document.getElementById('scanner-container').style.display="block"; codeReader.decodeFromVideoDevice(null, 'video', (r) => { if(r){this.scanApi(r.text); this.stopScanner();} }); },
-    stopScanner: function() { this.scanning=false; codeReader.reset(); document.getElementById('scanner-container').style.display="none"; },
-    saveUser: function() { let n=document.getElementById('new-user-name').value; let c=document.getElementById('new-user-code').value; if(n&&c){this.data.users.push({name:n,code:c,role:'staff'});this.save();} },
-    delUser: function(c) { if(c!=="2008"){this.data.users=this.data.users.filter(u=>u.code!==c);this.save();} },
-    renderUsers: function() { document.getElementById('users-list').innerHTML = this.data.users.map(u => `<div class="user-row"><b>${u.name}</b> ${u.code} <button onclick="window.app.delUser('${u.code}')" style="color:red;border:none;background:none;"><i class="fas fa-trash"></i></button></div>`).join(''); }
-  };
-  window.app.init();
-</script>
-</body>
-</html>
+        <div class="input-group" style="text-align:left"><label>Règle DLC</label>
+        <select id="lib-days">
+            <option value="0">0 Jour (Ce soir 22h) - Frais</option>
+            <option value="1">1 Jour (Demain 22h)</option>
+            <option value="2">2 Jours (Après-demain 22h)</option>
+            <option value="3">3 Jours</option>
+        </select
