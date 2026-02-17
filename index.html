@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
 <meta name="theme-color" content="#ffffff" />
-<title>Araujo Exploitation v52</title>
+<title>Araujo Exploitation v53</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 <script src="https://unpkg.com/@zxing/library@latest"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
@@ -76,7 +76,6 @@
   .swipe-wrapper { position: relative; background: var(--accent); overflow: hidden; border-bottom: 1px solid #f1f5f9; }
   .swipe-wrapper:last-child { border-radius: 0 0 8px 8px; border-bottom: none; }
   
-  /* L'élément devient cliquable pour modifier */
   .wek-item { position: relative; z-index: 2; background: white; padding: 15px; display: flex; align-items: center; justify-content: space-between; transition: transform 0.2s ease-out; cursor: pointer; }
   
   /* L'image reste cliquable pour le code barre */
@@ -184,7 +183,21 @@
         <button class="btn" onclick="window.app.toggleScanner()" style="margin-bottom:15px;"><i class="fas fa-camera"></i> LANCER SCAN</button>
         <div class="card">
           <div class="input-group"><label>EAN</label><input type="number" id="frais-ean" placeholder="Scanner..." oninput="if(this.value.length>=8) window.app.scanApi(this.value)"></div>
-          <div class="input-group"><label>Famille</label><select id="frais-famille"><option>DIVERS</option><option>ULTRA FRAIS</option><option>CHARCUTERIE</option><option>VOLAILLE</option><option>BOUCHERIE</option><option>TRAITEUR</option><option>FROMAGE</option><option>SAURISSERIE</option></select></div>
+          
+          <div class="input-group">
+            <label>Famille</label>
+            <select id="frais-famille">
+                <option value="TRAITEUR">TRAITEUR</option>
+                <option value="ULTRA FRAIS">ULTRA FRAIS</option>
+                <option value="CHARCUTERIE">CHARCUTERIE</option>
+                <option value="VOLAILLE">VOLAILLE</option>
+                <option value="BOUCHERIE">BOUCHERIE</option>
+                <option value="FROMAGE">FROMAGE</option>
+                <option value="SAURISSERIE">SAURISSERIE</option>
+                <option value="DIVERS">DIVERS</option>
+            </select>
+          </div>
+          
           <div class="input-group"><label>Nom</label><input type="text" id="frais-name"></div>
           <div style="display:flex; gap:10px;">
              <div class="input-group" style="flex:2"><label>DLC</label><input type="date" id="frais-date"></div>
@@ -258,7 +271,6 @@
       } else { alert("Code incorrect !"); }
     },
 
-    // --- ALERTE QUANTITE ---
     checkAlerts: function() {
         let tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
         let tomStr = tomorrow.toISOString().split('T')[0];
@@ -266,46 +278,23 @@
         document.getElementById('alert-box').style.display = alert ? 'block' : 'none';
     },
 
-    saveUser: function() {
-        let name = document.getElementById('new-user-name').value;
-        let code = document.getElementById('new-user-code').value;
-        if(!name || !code) return;
-        this.data.users.push({name, code, role:'staff'}); this.save();
-        document.getElementById('new-user-name').value=""; document.getElementById('new-user-code').value="";
-    },
-    delUser: function(code) {
-        if(code==="2008") return;
-        this.data.users = this.data.users.filter(u => u.code !== code); this.save();
-    },
-    renderUsers: function() {
-        const div = document.getElementById('users-list');
-        div.innerHTML = this.data.users ? this.data.users.map(u => `<div class="user-row"><b>${u.name}</b> ${u.code} <button onclick="window.app.delUser('${u.code}')" style="color:red;border:none;background:none;"><i class="fas fa-trash"></i></button></div>`).join('') : '';
-    },
+    // --- DETECTION FAMILLE AMELIOREE ---
+    detectFamily: function(name, cats) {
+        let s = (name + " " + cats).toUpperCase();
+        
+        // Priorité 1 : Traiteur et Plats Cuisinés (contient souvent viande/lait mais ne doit PAS aller là bas)
+        if(s.includes("SALADE") || s.includes("SANDWICH") || s.includes("PIZZA") || s.includes("TABOULE") || s.includes("CONCOMBRE") || s.includes("CAROTTE") || s.includes("WRAP") || s.includes("SUSH") || s.includes("BOX") || s.includes("PLAT") || s.includes("QUICHE") || s.includes("CROQUE") || s.includes("BURGER")) return "TRAITEUR";
 
-    nav: function(v) {
-      document.querySelectorAll('[id^="view-"]').forEach(e => e.classList.add('hidden'));
-      document.getElementById('view-'+v).classList.remove('hidden');
+        // Priorité 2 : Le reste
+        if(s.includes("YAOURT") || s.includes("LAIT") || s.includes("CREME") || s.includes("DESSERT") || s.includes("BEURRE") || s.includes("SKYR") || s.includes("DANETTE")) return "ULTRA FRAIS";
+        if(s.includes("JAMBON") || s.includes("LARD") || s.includes("SAUCIS") || s.includes("PATE") || s.includes("RILLETTE") || s.includes("BACON") || s.includes("CHORIZO")) return "CHARCUTERIE";
+        if(s.includes("POULET") || s.includes("DINDE") || s.includes("CANARD") || s.includes("AIGUILLETTE")) return "VOLAILLE";
+        if(s.includes("BOEUF") || s.includes("STEAK") || s.includes("PORC") || s.includes("AGNEAU") || s.includes("HACKE") || s.includes("VEAU")) return "BOUCHERIE";
+        if(s.includes("FROMAGE") || s.includes("CAMEMBERT") || s.includes("COMTÉ") || s.includes("EMMENTAL") || s.includes("CHEVRE") || s.includes("BRIE") || s.includes("ROQUEFORT") || s.includes("MOZZARELLA")) return "FROMAGE";
+        if(s.includes("SAUMON") || s.includes("POISSON") || s.includes("TRUITE") || s.includes("CREVETTE") || s.includes("SURIMI") || s.includes("CABILLAUD")) return "SAURISSERIE";
+        
+        return "DIVERS";
     },
-
-    switchTab: function(t) {
-      document.querySelectorAll('.tab').forEach(e => e.classList.remove('active'));
-      document.getElementById('tab-'+t).classList.add('active');
-      ['content-scan','content-list'].forEach(id => document.getElementById(id).classList.add('hidden'));
-      document.getElementById('content-'+t).classList.remove('hidden');
-      if(t !== 'scan') this.stopScanner();
-    },
-
-    toggleScanner: function() { if(this.scanning) this.stopScanner(); else this.startScanner(); },
-    startScanner: function() {
-        this.scanning = true; document.getElementById('scanner-container').style.display="block";
-        codeReader.decodeFromVideoDevice(null, 'video', (result) => {
-            if(result) {
-                document.getElementById('frais-ean').value = result.text;
-                this.scanApi(result.text); this.stopScanner();
-            }
-        });
-    },
-    stopScanner: function() { this.scanning=false; codeReader.reset(); document.getElementById('scanner-container').style.display="none"; },
 
     scanApi: async function(ean) {
       try {
@@ -315,19 +304,12 @@
           let brand = d.product.brands ? d.product.brands.split(',')[0] + " - " : "";
           let pName = d.product.product_name_fr || d.product.product_name || "";
           if(!pName.toLowerCase().includes(brand.toLowerCase().replace(' - ',''))) pName = brand + pName;
+          
           document.getElementById('frais-name').value = pName;
           this.currentImgUrl = d.product.image_front_small_url || "";
           
-          // Auto-Category
-          let s = (pName + " " + (d.product.categories||"")).toUpperCase();
-          let fam = "DIVERS";
-          if(s.includes("YAOURT")||s.includes("LAIT")||s.includes("CREME")) fam="ULTRA FRAIS";
-          if(s.includes("JAMBON")||s.includes("LARD")||s.includes("SAUCIS")) fam="CHARCUTERIE";
-          if(s.includes("POULET")||s.includes("DINDE")) fam="VOLAILLE";
-          if(s.includes("BOEUF")||s.includes("STEAK")) fam="BOUCHERIE";
-          if(s.includes("PIZZA")||s.includes("SANDWICH")||s.includes("SALADE")) fam="TRAITEUR";
-          if(s.includes("FROMAGE")||s.includes("CAMEMBERT")) fam="FROMAGE";
-          if(s.includes("SAUMON")||s.includes("POISSON")) fam="SAURISSERIE";
+          // Detection intelligente avec Categories OFF
+          let fam = this.detectFamily(pName, d.product.categories || "");
           document.getElementById('frais-famille').value = fam;
         }
       } catch(e){}
@@ -388,9 +370,11 @@
       cont.innerHTML = "";
       let grouped = {};
 
+      // CLASSER PAR FAMILLE -> PUIS PAR NOM (Regroupement sous-famille)
       this.data.frais.sort((a,b) => {
-         if(a.fam === b.fam) return a.date.localeCompare(b.date);
-         return a.fam.localeCompare(b.fam);
+         if(a.fam !== b.fam) return a.fam.localeCompare(b.fam);
+         if(a.name !== b.name) return a.name.localeCompare(b.name);
+         return a.date.localeCompare(b.date);
       });
 
       this.data.frais.forEach(i => {
@@ -405,7 +389,11 @@
              let badge = diff < 1 ? 'badge-red' : (diff < 2 ? 'badge-orange' : 'badge-green');
              let d = new Date(i.date);
              let day = d.getDate(); let month = d.toLocaleString('fr-FR', {month:'short'}).replace('.','');
-             let imgHtml = i.img ? `<img src="${i.img}" class="wek-img" onclick="event.stopPropagation(); window.app.showBarcode('${i.ean}', '${i.name.replace(/'/g," ")}')">` : `<div class="wek-img" onclick="event.stopPropagation(); window.app.showBarcode('${i.ean}', '${i.name.replace(/'/g," ")}')"><i class="fas fa-barcode"></i></div>`;
+             
+             // GESTION CLIC IMAGE VS CLIC ITEM
+             let imgHtml = i.img ? 
+                `<img src="${i.img}" class="wek-img" onclick="event.stopPropagation(); window.app.showBarcode('${i.ean}', '${i.name.replace(/'/g," ")}')">` : 
+                `<div class="wek-img" onclick="event.stopPropagation(); window.app.showBarcode('${i.ean}', '${i.name.replace(/'/g," ")}')"><i class="fas fa-barcode"></i></div>`;
              
              let qtyDisplay = i.qty && i.qty!=0 ? `<span class="wek-qty">x${i.qty}</span>` : `<span class="wek-qty qty-missing">À SAISIR</span>`;
 
@@ -423,7 +411,45 @@
           });
       });
       if(cont.innerHTML === "") cont.innerHTML = "<div style='text-align:center; padding:30px; color:#aaa'>Stock vide</div>";
-    }
+    },
+
+    saveUser: function() {
+        let name = document.getElementById('new-user-name').value;
+        let code = document.getElementById('new-user-code').value;
+        if(!name || !code) return;
+        this.data.users.push({name, code, role:'staff'}); this.save();
+        document.getElementById('new-user-name').value=""; document.getElementById('new-user-code').value="";
+    },
+    delUser: function(code) {
+        if(code==="2008") return;
+        this.data.users = this.data.users.filter(u => u.code !== code); this.save();
+    },
+    renderUsers: function() {
+        const div = document.getElementById('users-list');
+        div.innerHTML = this.data.users ? this.data.users.map(u => `<div class="user-row"><b>${u.name}</b> ${u.code} <button onclick="window.app.delUser('${u.code}')" style="color:red;border:none;background:none;"><i class="fas fa-trash"></i></button></div>`).join('') : '';
+    },
+    nav: function(v) {
+      document.querySelectorAll('[id^="view-"]').forEach(e => e.classList.add('hidden'));
+      document.getElementById('view-'+v).classList.remove('hidden');
+    },
+    switchTab: function(t) {
+      document.querySelectorAll('.tab').forEach(e => e.classList.remove('active'));
+      document.getElementById('tab-'+t).classList.add('active');
+      ['content-scan','content-list'].forEach(id => document.getElementById(id).classList.add('hidden'));
+      document.getElementById('content-'+t).classList.remove('hidden');
+      if(t !== 'scan') this.stopScanner();
+    },
+    toggleScanner: function() { if(this.scanning) this.stopScanner(); else this.startScanner(); },
+    startScanner: function() {
+        this.scanning = true; document.getElementById('scanner-container').style.display="block";
+        codeReader.decodeFromVideoDevice(null, 'video', (result) => {
+            if(result) {
+                document.getElementById('frais-ean').value = result.text;
+                this.scanApi(result.text); this.stopScanner();
+            }
+        });
+    },
+    stopScanner: function() { this.scanning=false; codeReader.reset(); document.getElementById('scanner-container').style.display="none"; }
   };
   window.app.init();
 </script>
