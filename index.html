@@ -4,13 +4,12 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
 <meta name="theme-color" content="#ffffff" />
-<title>Araujo Exploitation v62</title>
+<title>Araujo Exploitation v63</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 <script src="https://unpkg.com/@zxing/library@latest"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
 
 <style>
-  /* --- DESIGN V46 STRICT --- */
   :root {
     --primary: #003896;
     --carrefour-green: #00563f;
@@ -21,7 +20,7 @@
     --text: #1e293b;
     --radius: 16px;
   }
-  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: system-ui, -apple-system, sans-serif; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: system-ui, -apple-system, sans-serif; user-select: none; }
   body { margin: 0; background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
   /* LOGIN */
@@ -52,27 +51,21 @@
 
   /* LIST ITEMS */
   .group-header { background: #334155; color: white; padding: 8px 15px; border-radius: 8px 8px 0 0; margin-top: 20px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: bold; text-transform: uppercase; }
-  .swipe-wrapper { position: relative; background: var(--accent); overflow: hidden; border-bottom: 1px solid #f1f5f9; }
-  .wek-item { position: relative; z-index: 2; background: white; padding: 15px; display: flex; align-items: center; justify-content: space-between; transition: transform 0.2s ease-out; cursor: pointer; }
-  .wek-img { width: 65px; height: 65px; border-radius: 8px; object-fit: contain; background: #fff; border: 1px solid #e2e8f0; margin-right: 15px; display: flex; align-items: center; justify-content: center; color: #cbd5e1; flex-shrink: 0; z-index: 10; font-size: 24px; }
-  .wek-info { flex: 1; overflow: hidden; }
-  .wek-name { font-weight: bold; font-size: 15px; color: var(--text); margin-bottom: 6px; line-height: 1.3; }
-  .wek-sub { display: flex; gap: 8px; font-size: 11px; color: #64748b; }
-  .wek-qty { background: #f1f5f9; padding: 2px 8px; border-radius: 4px; border: 1px solid #e2e8f0; font-weight: bold; color: var(--primary); }
-  .qty-missing { background: #fee2e2; color: #ef4444; border: 1px solid #fca5a5; }
-
-  /* PVP SPECIFIC & WEEKLY TARGETS */
-  .pvp-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #eee; background: white; transition: transform 0.2s ease; user-select: none; }
-  .img-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 10px; }
-  .img-option { background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 8px; height: 50px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 24px; color: #64748b; }
-  .img-option.selected { border-color: var(--pvp); background: #fff7ed; color: var(--pvp); }
   
+  /* SWIPE STYLES */
+  .pvp-row-container { position: relative; overflow: hidden; margin-bottom: 10px; border-bottom: 1px solid #eee; background: #fee2e2; border-radius: 0; }
+  .pvp-row-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; padding-left: 20px; color: #ef4444; font-weight: bold; font-size: 14px; z-index: 1; }
+  .pvp-item { position: relative; z-index: 2; background: white; display: flex; justify-content: space-between; align-items: center; padding: 15px; transition: transform 0.1s linear; width: 100%; }
+  
+  .wek-img { width: 60px; height: 60px; border-radius: 8px; object-fit: cover; background: #f8fafc; border: 1px solid #e2e8f0; margin-right: 15px; display: flex; align-items: center; justify-content: center; color: #cbd5e1; flex-shrink: 0; }
+  .wek-qty { background: #f1f5f9; padding: 2px 8px; border-radius: 4px; border: 1px solid #e2e8f0; font-weight: bold; color: var(--primary); }
+
+  /* WEEK GRID & INPUTS */
   .week-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-bottom: 10px; }
   .week-day { text-align: center; }
   .week-day label { font-size: 9px; font-weight: bold; color: #666; display: block; margin-bottom: 2px; }
-  .week-day input { padding: 5px; text-align: center; font-size: 12px; border-radius: 6px; }
+  .week-day input { padding: 5px; text-align: center; font-size: 12px; border-radius: 6px; width: 100%; }
 
-  /* COMMON */
   .input-group label { display: block; font-size: 11px; font-weight: 700; color: #64748b; margin-bottom: 4px; text-transform: uppercase; }
   input, select { width: 100%; padding: 14px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 16px; background: #fff; outline: none; }
   .btn { width: 100%; padding: 16px; border-radius: 12px; border: none; font-weight: 700; font-size: 16px; background: var(--primary); color: white; cursor: pointer; }
@@ -80,12 +73,13 @@
   .btn-orange { background: var(--pvp); }
   .btn-red { background: #ef4444; color: white; }
   .hidden { display: none !important; }
-  .date-badge { width: 50px; height: 50px; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; font-weight: bold; flex-shrink: 0; }
-  .badge-red { background: var(--accent); } .badge-orange { background: var(--warning); } .badge-green { background: var(--success); }
 
   /* MODALS */
   .modal-bc { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
   .modal-card { background: white; padding: 30px; border-radius: 20px; text-align: center; width: 95%; max-width: 400px; max-height: 80vh; overflow-y: auto; }
+  
+  /* CAMERA PREVIEW */
+  #img-preview { width: 100px; height: 100px; object-fit: cover; border-radius: 10px; margin-top: 10px; border: 2px solid #ddd; display: none; margin-left: auto; margin-right: auto; }
 
   nav { position: fixed; bottom: 0; width: 100%; background: white; height: 70px; display: flex; justify-content: center; align-items: center; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); z-index: 100; }
   .nav-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; color: #94a3b8; font-size: 10px; cursor: pointer; width: 80px; }
@@ -127,13 +121,17 @@
     <div class="modal-card">
         <h3 style="color:var(--pvp); margin-top:0;">Édition PVP</h3>
         <input type="hidden" id="lib-id"> 
-        <input type="hidden" id="lib-icon" value="fas fa-bread-slice">
+        <input type="hidden" id="lib-img-data">
         
         <div class="input-group" style="text-align:left"><label>Nom du Produit</label><input type="text" id="lib-name" placeholder="Ex: Croissant"></div><br>
-        <div class="input-group" style="text-align:left"><label>Code EAN (13 chiffres)</label><input type="number" id="lib-ean" placeholder="123..."></div><br>
+        <div class="input-group" style="text-align:left"><label>Code EAN</label><input type="number" id="lib-ean" placeholder="123..."></div><br>
         
-        <div class="input-group" style="text-align:left"><label>Choisir Icône</label></div>
-        <div class="img-grid" id="img-picker"></div><br>
+        <div class="input-group" style="text-align:left">
+            <label>Photo du Produit</label>
+            <input type="file" id="camera-input" accept="image/*" capture="environment" onchange="window.app.handleImage(this)" style="display:none;">
+            <button class="btn" onclick="document.getElementById('camera-input').click()" style="background:#eee; color:#333; padding:10px;"><i class="fas fa-camera"></i> PRENDRE PHOTO</button>
+            <img id="img-preview" src="">
+        </div><br>
 
         <div class="input-group" style="text-align:left"><label>Règle DLC</label>
         <select id="lib-days">
@@ -263,12 +261,19 @@
   const docRef = doc(db, "store_master", "STOCK_MAGASIN_LIVE");
   const codeReader = new ZXing.BrowserMultiFormatReader();
 
-  const PVP_ICONS = [
-      {id:'bread', icon:'fas fa-bread-slice'}, {id:'croissant', icon:'fas fa-moon'},
-      {id:'cookie', icon:'fas fa-cookie'}, {id:'pizza', icon:'fas fa-pizza-slice'},
-      {id:'donut', icon:'fas fa-dot-circle'}, {id:'hotdog', icon:'fas fa-hotdog'},
-      {id:'sandwich', icon:'fas fa-hamburger'}, {id:'baguette', icon:'fas fa-utensils'},
-      {id:'ice', icon:'fas fa-ice-cream'}, {id:'cake', icon:'fas fa-birthday-cake'}
+  // DONNEES DU CADENCIER 
+  const INITIAL_PVP_DATA = [
+      {id:17001, name:"250G BAGUETTE BCS 0% POUSSE", ean:"3464382607832", days:0}, // [cite: 21, 22]
+      {id:17002, name:"PAIN 400G 0%P LD", ean:"3464382400112", days:0}, // [cite: 31, 34]
+      {id:17003, name:"250G BAGUETTE RUSTIQUE CRF", ean:"3276550243427", days:0}, // [cite: 47, 48]
+      {id:17004, name:"65G CROISSANT AOP PAC", ean:"3523680397057", days:0}, // [cite: 266, 267]
+      {id:17005, name:"70G PAIN CHOC AOP PAC STICKER", ean:"3523680397149", days:0}, // [cite: 281, 282]
+      {id:17006, name:"110G PAIN AUX RAISINS PAC", ean:"3523680423640", days:0}, // [cite: 296, 297]
+      {id:17007, name:"14G CHOUQUETTE", ean:"3523680486430", days:1}, // [cite: 148, 149]
+      {id:17008, name:"220G MUFFIN MILKA FOURRE X2", ean:"5413321002069", days:1}, // [cite: 171, 172]
+      {id:17009, name:"DONUTS COCO", ean:"5411823873255", days:1}, // [cite: 195, 198]
+      {id:17010, name:"85G COOKIE DOUBLE CHOCO", ean:"3523680495821", days:1}, // [cite: 213, 214]
+      {id:17011, name:"PAIN LIBANAIS CLASSIQUE 220G", ean:"3760120960062", days:1} // [cite: 122, 123]
   ];
 
   window.app = {
@@ -276,24 +281,25 @@
     currentUser: null,
     scanning: false,
     currentImgUrl: "",
-    touchStartX: 0,
-    touchEndX: 0,
 
     init: function() {
       onSnapshot(docRef, (s) => {
         if(s.exists()) {
             this.data = {...this.data, ...s.data()};
             if(!this.data.users || this.data.users.length === 0) this.data.users = [{code: "2008", name: "MANAGER", role: "admin"}];
-            if(!this.data.pvpLib) this.data.pvpLib = [];
+            if(!this.data.pvpLib || this.data.pvpLib.length === 0) {
+                 // CHARGEMENT INITIAL DU CADENCIER SI VIDE
+                 this.data.pvpLib = INITIAL_PVP_DATA.map(i => ({...i, id: Date.now() + Math.random(), targets:{}}));
+            }
             if(!this.data.pvpStock) this.data.pvpStock = [];
         } else {
              this.data.users = [{code: "2008", name: "MANAGER", role: "admin"}];
+             this.data.pvpLib = INITIAL_PVP_DATA.map(i => ({...i, id: Date.now() + Math.random(), targets:{}}));
              this.save();
         }
         this.renderList(); this.renderUsers(); this.checkAlerts(); this.renderPvp();
         this.populateLogin();
       });
-      this.initImgPicker();
     },
 
     populateLogin: function() {
@@ -301,14 +307,17 @@
         sel.innerHTML = this.data.users.map(u => `<option value="${u.name}">${u.name}</option>`).join('');
     },
 
-    initImgPicker: function() {
-        const d = document.getElementById('img-picker');
-        d.innerHTML = PVP_ICONS.map(i => `<div class="img-option" onclick="window.app.selectImg('${i.icon}', this)"><i class="${i.icon}"></i></div>`).join('');
-    },
-    selectImg: function(icon, el) {
-        document.getElementById('lib-icon').value = icon;
-        document.querySelectorAll('.img-option').forEach(e => e.classList.remove('selected'));
-        el.classList.add('selected');
+    // CAMERA LOGIC
+    handleImage: function(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                document.getElementById('img-preview').src = e.target.result;
+                document.getElementById('img-preview').style.display = 'block';
+                document.getElementById('lib-img-data').value = e.target.result;
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
     },
 
     save: async function() { await setDoc(docRef, this.data, {merge:true}); },
@@ -425,7 +434,6 @@
         document.getElementById('bc-name').innerText=name; 
         try{ JsBarcode("#barcode", ean, {format:"EAN13", height:80, displayValue:true}); } 
         catch(e){ 
-            // Fallback si EAN pas valide pour EAN13
             try { JsBarcode("#barcode", ean, {format:"CODE128", height:80, displayValue:true}); } catch(e2) { alert("Erreur génération CodeBarre"); }
         } 
     },
@@ -440,22 +448,27 @@
 
     openPvpLib: function(id=null) {
         document.getElementById('modal-pvp-lib').classList.remove('hidden');
+        document.getElementById('img-preview').style.display='none';
+        
         if(id) {
             let item = this.data.pvpLib.find(x => x.id == id);
             document.getElementById('lib-id').value = id;
             document.getElementById('lib-name').value = item.name;
             document.getElementById('lib-ean').value = item.ean || "";
             document.getElementById('lib-days').value = item.days || 0;
-            document.getElementById('lib-icon').value = item.icon || "fas fa-bread-slice";
+            document.getElementById('lib-img-data').value = item.img || "";
+            if(item.img) {
+                document.getElementById('img-preview').src = item.img;
+                document.getElementById('img-preview').style.display = 'block';
+            }
             document.getElementById('btn-del-lib').classList.remove('hidden');
-            
-            // Populate Week
             let t = item.targets || {};
             for(let k=0; k<=6; k++) document.getElementById('t-'+k).value = t[k] || 0;
         } else {
             document.getElementById('lib-id').value = "";
             document.getElementById('lib-name').value = "";
             document.getElementById('lib-ean').value = "";
+            document.getElementById('lib-img-data').value = "";
             document.getElementById('lib-days').value = 0;
             document.getElementById('btn-del-lib').classList.add('hidden');
             for(let k=0; k<=6; k++) document.getElementById('t-'+k).value = "";
@@ -466,7 +479,7 @@
         let id = document.getElementById('lib-id').value;
         let name = document.getElementById('lib-name').value;
         let ean = document.getElementById('lib-ean').value;
-        let icon = document.getElementById('lib-icon').value;
+        let img = document.getElementById('lib-img-data').value;
         let days = document.getElementById('lib-days').value;
         
         let targets = {};
@@ -475,9 +488,9 @@
         if(!name) return;
         if(id) {
              let idx = this.data.pvpLib.findIndex(x => x.id == id);
-             if(idx > -1) { this.data.pvpLib[idx] = { ...this.data.pvpLib[idx], name, ean, icon, days:days, targets }; }
+             if(idx > -1) { this.data.pvpLib[idx] = { ...this.data.pvpLib[idx], name, ean, img, days:days, targets }; }
         } else {
-             this.data.pvpLib.push({ id: Date.now(), name, ean, icon, days:days, targets });
+             this.data.pvpLib.push({ id: Date.now(), name, ean, img, days:days, targets });
         }
         this.save(); document.getElementById('modal-pvp-lib').classList.add('hidden');
     },
@@ -504,18 +517,9 @@
 
             this.data.pvpStock.push({
                 id: Date.now(), libId: libId, name: lib.name, qty: qty,
-                out: now.getTime(), end: endDate.getTime(), icon: lib.icon, ean: lib.ean
+                out: now.getTime(), end: endDate.getTime(), img: lib.img, ean: lib.ean
             });
             this.save();
-        }
-    },
-    
-    // SWIPE GESTURE
-    handleTouchStart: function(e, id) { this.touchStartX = e.changedTouches[0].screenX; },
-    handleTouchEnd: function(e, id) {
-        this.touchEndX = e.changedTouches[0].screenX;
-        if (this.touchEndX - this.touchStartX > 100) { // SWIPE RIGHT
-            this.deletePvpStock(id, true);
         }
     },
     
@@ -537,14 +541,43 @@
             document.getElementById('modal-edit-pvp-stock').classList.add('hidden');
         }
     },
-    deletePvpStock: function(id, skipConfirm = false) {
-        let item = this.data.pvpStock.find(i => i.id == id);
-        if(!item) return;
-        if(skipConfirm || confirm("Jeter/Vendre " + item.name + " ?")) {
-            this.data.pvpStock = this.data.pvpStock.filter(i => i.id != id);
-            this.save();
-            document.getElementById('modal-edit-pvp-stock').classList.add('hidden');
-        }
+    deletePvpStock: function(id) {
+        this.data.pvpStock = this.data.pvpStock.filter(i => i.id != id);
+        this.save();
+    },
+
+    // --- SWIPE LOGIC ---
+    touchStartX: 0,
+    currentSwipeId: null,
+
+    attachSwipe: function(el, id) {
+        el.addEventListener('touchstart', (e) => {
+            this.touchStartX = e.touches[0].clientX;
+            this.currentSwipeId = id;
+            el.style.transition = 'none';
+        });
+
+        el.addEventListener('touchmove', (e) => {
+            if(this.currentSwipeId !== id) return;
+            let diff = e.touches[0].clientX - this.touchStartX;
+            if(diff > 0) { // Swipe Right only
+                el.style.transform = `translateX(${diff}px)`;
+            }
+        });
+
+        el.addEventListener('touchend', (e) => {
+            if(this.currentSwipeId !== id) return;
+            let diff = e.changedTouches[0].clientX - this.touchStartX;
+            el.style.transition = 'transform 0.2s ease';
+            
+            if(diff > 150) { // Threshold for delete
+                 el.style.transform = `translateX(100%)`;
+                 setTimeout(() => this.deletePvpStock(id), 200);
+            } else {
+                 el.style.transform = `translateX(0)`;
+            }
+            this.currentSwipeId = null;
+        });
     },
 
     renderPvp: function() {
@@ -558,39 +591,39 @@
             let dEnd = new Date(i.end);
             let dStart = new Date(i.out);
             
-            let imgHtml = `<div class="wek-img" onclick="event.stopPropagation(); window.app.showBarcode('${i.ean}','${i.name.replace(/'/g," ")}')"><i class="${i.icon}"></i></div>`;
+            let imgHtml = i.img ? `<img src="${i.img}" class="wek-img" onclick="event.stopPropagation(); window.app.showBarcode('${i.ean}','${i.name.replace(/'/g," ")}')">` : `<div class="wek-img" onclick="event.stopPropagation(); window.app.showBarcode('${i.ean}','${i.name.replace(/'/g," ")}')"><i class="fas fa-bread-slice"></i></div>`;
             
-            // Item avec events Touch pour Swipe
-            let el = document.createElement('div');
-            el.className = 'pvp-item';
-            el.innerHTML = `<div style="display:flex;align-items:center;">${imgHtml}<div><div style="font-weight:bold;">${i.name}</div><span class="wek-qty">x${i.qty}</span></div></div><div style="text-align:right"><div style="font-size:10px;color:#999;margin-bottom:2px;">Sortie: ${dStart.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</div><div style="font-size:18px; font-weight:bold; color:${color}">${dEnd.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</div><div style="font-size:10px; color:#666">Fin</div></div>`;
+            let container = document.createElement('div');
+            container.className = 'pvp-row-container';
+            container.innerHTML = `<div class="pvp-row-bg"><i class="fas fa-trash"></i> JETER</div>`;
             
-            el.onclick = () => window.app.openEditPvpStock(i.id);
-            el.addEventListener('touchstart', (e) => window.app.handleTouchStart(e, i.id));
-            el.addEventListener('touchend', (e) => window.app.handleTouchEnd(e, i.id));
+            let item = document.createElement('div');
+            item.className = 'pvp-item';
+            item.innerHTML = `<div style="display:flex;align-items:center;">${imgHtml}<div><div style="font-weight:bold;">${i.name}</div><span class="wek-qty">x${i.qty}</span></div></div><div style="text-align:right"><div style="font-size:10px;color:#999;margin-bottom:2px;">Sortie: ${dStart.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</div><div style="font-size:18px; font-weight:bold; color:${color}">${dEnd.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</div><div style="font-size:10px; color:#666">Fin</div></div>`;
             
-            sDiv.appendChild(el);
+            item.onclick = () => window.app.openEditPvpStock(i.id);
+            this.attachSwipe(item, i.id);
+            
+            container.appendChild(item);
+            sDiv.appendChild(container);
         });
 
         const bDiv = document.getElementById('list-pvp-lib'); bDiv.innerHTML="";
         if(this.data.pvpLib.length === 0) bDiv.innerHTML = "<div style='text-align:center;color:#999;margin-top:20px;'>Bibliothèque vide</div>";
         this.data.pvpLib.forEach(l => {
-            bDiv.innerHTML += `<div class="pvp-item"><div style="display:flex;align-items:center;" onclick="window.app.openPvpLib(${l.id})"><div class="wek-img"><i class="${l.icon}"></i></div><div><div style="font-weight:bold;">${l.name}</div><div style="font-size:10px; color:#666">${l.days}J</div></div></div><button class="btn-orange" style="border-radius:50%; width:40px; height:40px; padding:0; display:flex; align-items:center; justify-content:center;" onclick="window.app.addPvpStock(${l.id})"><i class="fas fa-plus"></i></button></div>`;
+             let imgHtml = l.img ? `<img src="${l.img}" class="wek-img">` : `<div class="wek-img"><i class="fas fa-bread-slice"></i></div>`;
+             bDiv.innerHTML += `<div class="pvp-item"><div style="display:flex;align-items:center;" onclick="window.app.openPvpLib(${l.id})">${imgHtml}<div><div style="font-weight:bold;">${l.name}</div><div style="font-size:10px; color:#666">${l.days}J</div></div></div><button class="btn-orange" style="border-radius:50%; width:40px; height:40px; padding:0; display:flex; align-items:center; justify-content:center;" onclick="window.app.addPvpStock(${l.id})"><i class="fas fa-plus"></i></button></div>`;
         });
 
         const cDiv = document.getElementById('list-pvp-calc'); cDiv.innerHTML="";
         let limitTs = new Date(); limitTs.setDate(limitTs.getDate()+1); limitTs.setHours(6,0,0,0);
         let count = 0;
-        
-        // JOUR CIBLE = DEMAIN
         let tomorrowDayIndex = (new Date().getDay() + 1) % 7; 
         
         this.data.pvpLib.forEach(l => {
             let valid = this.data.pvpStock.filter(s => s.libId == l.id && s.end > limitTs.getTime()).reduce((a,b)=>a+parseInt(b.qty),0);
-            
             let target = (l.targets && l.targets[tomorrowDayIndex]) ? parseInt(l.targets[tomorrowDayIndex]) : 0;
             let need = target - valid;
-            
             if(need > 0) { 
                 count++;
                 cDiv.innerHTML += `<div class="pvp-item" style="border-left:5px solid var(--pvp);"><div style="font-weight:bold;">${l.name}</div><div style="font-weight:bold;color:var(--pvp);">A CUIRE: ${need}</div></div>`; 
