@@ -1,26 +1,406 @@
-<script>
-// Ajoute ces fonctions dans window.app.pvp
-window.app.pvp.changeQty = function(id, delta) {
-    let idx = window.app.data.pvpStock.findIndex(x => x.id == id);
-    if(idx > -1) {
-        let newQty = parseInt(window.app.data.pvpStock[idx].qty) + delta;
-        if(newQty <= 0) {
-            if(confirm("Supprimer ce produit du rayon ?")) {
-                window.app.data.pvpStock.splice(idx, 1);
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+<meta name="theme-color" content="#ffffff" />
+<title>Araujo Exploitation v78</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+<script src="https://unpkg.com/@zxing/library@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+
+<style>
+  :root {
+    --primary: #003896; --accent: #E2001A; --pvp: #d97706; --bg: #f3f4f6; --surface: #ffffff; --text: #1e293b; --success: #10b981; --danger: #ef4444;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: system-ui, sans-serif; user-select: none; }
+  body { margin: 0; background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+  .hidden { display: none !important; }
+  main { flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 100px; }
+  header { background: var(--surface); padding: 10px; height: 90px; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); position: relative; }
+  .logo-header { height: 60px; object-fit: contain; }
+  .user-badge { position: absolute; right: 15px; top: 15px; font-size: 11px; background: #e0f2fe; color: var(--primary); padding: 6px 12px; border-radius: 20px; font-weight: bold; }
+  nav { position: fixed; bottom: 0; width: 100%; background: white; height: 70px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); z-index: 100; padding: 0 30px; }
+  .nav-btn { text-align:center; color:#94a3b8; cursor: pointer; }
+  .tabs { display: flex; background: #e2e8f0; padding: 4px; border-radius: 12px; margin-bottom: 15px; }
+  .tab { flex: 1; text-align: center; padding: 12px; font-weight: 700; font-size: 12px; color: #64748b; border-radius: 9px; cursor: pointer; }
+  .tab.active-pvp { background: white; color: var(--pvp); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+  .group-header { background: #334155; color: white; padding: 12px 15px; border-radius: 10px; margin-top: 15px; font-weight: bold; text-transform: uppercase; font-size: 14px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+  .pvp-row-container { position: relative; overflow: hidden; margin-bottom: 8px; background: #fee2e2; border-radius: 12px; }
+  .pvp-row-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; padding-left: 20px; color: #ef4444; font-weight: bold; z-index: 1; }
+  .pvp-item { position: relative; z-index: 2; background: white; display: flex; justify-content: space-between; align-items: center; padding: 12px; width: 100%; border-radius: 12px; min-height: 85px; }
+  .wek-img { width: 55px; height: 55px; border-radius: 10px; object-fit: cover; background: #f1f5f9; margin-right: 12px; flex-shrink: 0; }
+  .qty-ctrl { display: flex; align-items: center; gap: 8px; background: #f8fafc; padding: 5px 10px; border-radius: 10px; border: 1px solid #e2e8f0; }
+  .qty-btn { width: 32px; height: 32px; border-radius: 8px; border: none; background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); font-weight: bold; font-size: 18px; color: var(--primary); }
+  .stock-dates { text-align: right; min-width: 85px; }
+  .date-out { font-size: 10px; color: #94a3b8; }
+  .date-end { font-size: 13px; font-weight: 800; color: var(--success); }
+  .date-end.expired { color: var(--danger); }
+  .target-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+  .target-box { display: flex; flex-direction: column; align-items: center; }
+  .target-box input { width: 100%; text-align: center; padding: 8px 0; font-size: 18px; font-weight: bold; border-radius: 8px; border: 1px solid #ddd; }
+  .checkbox-circle { width: 34px; height: 34px; border: 2px solid #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .checkbox-circle.checked { background: var(--success); border-color: var(--success); color: white; }
+  .done-item { opacity: 0.5; filter: grayscale(1); background: #f1f5f9; }
+  .modal-bc { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 4000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+  .modal-card { background: white; padding: 25px; border-radius: 20px; width: 100%; max-width: 400px; }
+</style>
+</head>
+<body>
+
+  <div id="login-overlay" class="overlay" style="position:fixed; inset:0; background:white; z-index:5000; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+    <img src="https://raw.githubusercontent.com/araujoexploitation/Magasin/main/LOGO.png" style="width:180px; margin-bottom:30px;">
+    <select id="login-user-select" style="width:220px; padding:12px; border-radius:10px; margin-bottom:10px;"></select>
+    <input type="password" id="login-pass" placeholder="CODE" style="width:220px; padding:12px; border-radius:10px; text-align:center; font-size:20px; margin-bottom:20px;">
+    <button onclick="app.login()" style="width:220px; padding:15px; background:#00563f; color:white; border:none; border-radius:50px; font-weight:bold;">CONNEXION</button>
+  </div>
+
+  <div id="modal-barcode" class="modal-bc hidden">
+    <div class="modal-card" style="text-align:center;">
+        <h3 id="bc-name"></h3>
+        <img id="bc-img-display" style="width:100%; height:200px; object-fit:contain; margin-bottom:15px; display:none;">
+        <svg id="barcode"></svg><br>
+        <button class="btn" style="background:#eee; color:#333; margin-top:20px; width:100%; border:none; padding:12px; border-radius:10px;" onclick="document.getElementById('modal-barcode').classList.add('hidden')">Fermer</button>
+    </div>
+  </div>
+
+  <div id="modal-pvp-lib" class="modal-bc hidden">
+    <div class="modal-card" style="max-height:90vh; overflow-y:auto;">
+        <h3>Fiche Produit PVP</h3>
+        <input type="hidden" id="lib-id"><input type="hidden" id="lib-img-data">
+        <label>Famille</label><select id="lib-fam-select" onchange="app.pvp.toggleFamInput()"></select>
+        <input type="text" id="lib-fam-new" placeholder="Nouvelle famille..." class="hidden" style="width:100%; padding:10px; margin-bottom:10px; border-radius:8px; border:1px solid #ddd;">
+        <label>Nom</label><input type="text" id="lib-name" style="width:100%; padding:10px; margin-bottom:10px; border-radius:8px; border:1px solid #ddd;">
+        <label>EAN</label><input type="number" id="lib-ean" style="width:100%; padding:10px; margin-bottom:10px; border-radius:8px; border:1px solid #ddd;">
+        <button class="btn" onclick="document.getElementById('cam-input').click()" style="width:100%; padding:10px; margin-bottom:10px; background:#eee; border:none; border-radius:8px;"><i class="fas fa-camera"></i> Photo</button>
+        <input type="file" id="cam-input" accept="image/*" capture="environment" class="hidden" onchange="app.pvp.handleImg(this)">
+        <img id="img-preview" style="width:80px; height:80px; object-fit:cover; margin:0 auto 10px auto; display:none; border-radius:8px;">
+        <label>Conservation</label>
+        <select id="lib-days" style="width:100%; padding:10px; margin-bottom:10px; border-radius:8px; border:1px solid #ddd;">
+            <option value="0">JOURNÉE (22h)</option>
+            <option value="48">48 Heures</option>
+            <option value="72">72 Heures</option>
+        </select>
+        <label>Objectifs (L->D)</label>
+        <div class="target-grid">
+            <div class="target-box"><label>L</label><input type="number" id="t-1"></div>
+            <div class="target-box"><label>M</label><input type="number" id="t-2"></div>
+            <div class="target-box"><label>M</label><input type="number" id="t-3"></div>
+            <div class="target-box"><label>J</label><input type="number" id="t-4"></div>
+            <div class="target-box"><label>V</label><input type="number" id="t-5"></div>
+            <div class="target-box"><label>S</label><input type="number" id="t-6"></div>
+            <div class="target-box"><label>D</label><input type="number" id="t-0"></div>
+        </div>
+        <button class="btn" onclick="app.pvp.saveLib()" style="width:100%; padding:15px; background:var(--pvp); color:white; border:none; border-radius:10px; margin-top:15px; font-weight:bold;">Enregistrer</button>
+        <button class="btn" onclick="app.pvp.delLib()" id="btn-del-lib" style="width:100%; padding:10px; background:var(--danger); color:white; border:none; border-radius:10px; margin-top:5px;">Supprimer</button>
+        <button class="btn" onclick="document.getElementById('modal-pvp-lib').classList.add('hidden')" style="width:100%; padding:10px; background:#f1f5f9; border:none; border-radius:10px; margin-top:5px;">Annuler</button>
+    </div>
+  </div>
+
+  <div id="modal-pvp-stock" class="modal-bc hidden">
+      <div class="modal-card">
+          <h3>Correction Rayon</h3>
+          <input type="hidden" id="stock-id">
+          <h4 id="stock-name" style="text-align:center;"></h4>
+          <label>Quantité</label><input type="number" id="stock-qty" style="width:100%; padding:12px; border-radius:10px; border:1px solid #ddd;">
+          <label>Sortie</label><input type="datetime-local" id="stock-start" style="width:100%; padding:10px; margin-bottom:10px;">
+          <label>Fin</label><input type="datetime-local" id="stock-end" style="width:100%; padding:10px; margin-bottom:10px;">
+          <button class="btn" onclick="app.pvp.saveStock()" style="width:100%; padding:15px; background:var(--pvp); color:white; border:none; border-radius:10px; font-weight:bold;">Valider</button>
+          <button class="btn" onclick="app.pvp.delStock()" style="width:100%; padding:10px; background:var(--danger); color:white; border:none; border-radius:10px; margin-top:5px;">Retirer</button>
+          <button class="btn" onclick="document.getElementById('modal-pvp-stock').classList.add('hidden')" style="width:100%; padding:10px; background:#eee; border:none; border-radius:10px; margin-top:5px;">Annuler</button>
+      </div>
+  </div>
+
+  <header id="app-header" class="hidden">
+    <img src="https://raw.githubusercontent.com/araujoexploitation/Magasin/main/LOGO.png" class="logo-header">
+    <div id="user-badge" class="user-badge">...</div>
+  </header>
+
+  <main>
+    <div id="view-home">
+        <div class="home-grid">
+            <div class="home-btn" onclick="app.nav('frais')" style="background: linear-gradient(135deg, #003896 0%, #002366 100%);"><i class="fas fa-barcode"></i><br>DLC FRAIS</div>
+            <div class="home-btn" onclick="app.nav('pvp')" style="background: linear-gradient(135deg, #d97706 0%, #b45309 100%);"><i class="fas fa-bread-slice"></i><br>GESTION PVP</div>
+        </div>
+    </div>
+
+    <div id="view-pvp" class="hidden">
+        <div class="tabs">
+            <div class="tab active-pvp" id="tp-1" onclick="app.pvp.tab('stock')">RAYON</div>
+            <div class="tab" id="tp-2" onclick="app.pvp.tab('bib')">BIBLIO</div>
+            <div class="tab" id="tp-3" onclick="app.pvp.tab('calc')">BESOINS</div>
+        </div>
+        <div id="pvp-stock"></div>
+        <div id="pvp-bib" class="hidden">
+            <button class="btn" onclick="app.pvp.openLib()" style="width:100%; padding:15px; background:#f1f5f9; border:1px dashed #cbd5e1; border-radius:12px; margin-bottom:15px; font-weight:bold;">+ Nouveau Produit</button>
+            <div id="lib-list"></div>
+        </div>
+        <div id="pvp-calc" class="hidden"></div>
+    </div>
+    
+    <div id="view-frais" class="hidden">
+        <p style="text-align:center; color:#999;">Module Frais (v77 compatible)</p>
+    </div>
+  </main>
+
+  <nav id="app-nav" class="hidden">
+      <div class="nav-btn" onclick="app.goBack()"><i class="fas fa-arrow-left"></i><br>RETOUR</div>
+      <div class="nav-btn" onclick="app.nav('home')"><i class="fas fa-th-large"></i><br>MENU</div>
+  </nav>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const db = getFirestore(initializeApp({ apiKey: "AIzaSyA0ffa4Nfa7kGLyaEcAocU9YzIhzmx3SkA", authDomain: "araujo-exploitation.firebaseapp.com", projectId: "araujo-exploitation" }));
+const docRef = doc(db, "store_master", "STOCK_MAGASIN_LIVE");
+const codeReader = new ZXing.BrowserMultiFormatReader();
+
+window.app = {
+    data: { frais: [], users: [], pvpLib: [], pvpStock: [], checkedNeeds: [] },
+    viewHistory: [],
+    closedFamilies: new Set(),
+    
+    common: {
+        showBarcode: function(ean, name, imgUrl=null) { 
+            document.getElementById('modal-barcode').classList.remove('hidden'); 
+            document.getElementById('bc-name').innerText=name; 
+            let imgEl = document.getElementById('bc-img-display');
+            if(imgUrl) { imgEl.src = imgUrl; imgEl.style.display='block'; } else { imgEl.style.display='none'; }
+            if(ean) {
+                try{JsBarcode("#barcode", ean, {format:"EAN13", height:80, displayValue:true});}
+                catch(e){try{JsBarcode("#barcode", ean, {format:"CODE128", height:80, displayValue:true});}catch(e2){}}
             }
-        } else {
-            window.app.data.pvpStock[idx].qty = newQty;
+        },
+        tsToInput: function(ts) {
+            let d = new Date(ts);
+            return new Date(d.getTime() - (d.getTimezoneOffset() * 60000)).toISOString().slice(0, 16);
+        },
+        calculateEnd: function(startTs, hours) {
+            let start = new Date(startTs);
+            let end = new Date(startTs);
+            let h = parseInt(hours);
+            if (h === 0) { end.setHours(22, 0, 0, 0); } else { end.setHours(end.getHours() + h); }
+            return end.getTime();
+        },
+        cleanName: function(name) { return name.toUpperCase().replace(/^[\d\s\.,xX]+(G|KG|ML|CL|L|P)?\s*/g, ''); },
+        compressImg: function(file, callback) {
+            let reader = new FileReader(); reader.readAsDataURL(file);
+            reader.onload = (e) => {
+                let img = new Image(); img.src = e.target.result;
+                img.onload = () => {
+                    let canvas = document.createElement('canvas'); let ctx = canvas.getContext('2d');
+                    let max = 400; let w = img.width, h = img.height;
+                    if (w > h) { if (w > max) { h *= max/w; w = max; } } else { if (h > max) { w *= max/h; h = max; } }
+                    canvas.width = w; canvas.height = h; ctx.drawImage(img, 0, 0, w, h);
+                    callback(canvas.toDataURL('image/jpeg', 0.6));
+                };
+            };
         }
-        window.app.save();
-    }
+    },
+
+    init: function() {
+        onSnapshot(docRef, (s) => {
+            if(s.exists()) { this.data = s.data(); } 
+            else { this.data = { frais:[], users:[{name:"MANAGER",code:"2008"}], pvpLib:[], pvpStock:[], checkedNeeds:[] }; this.save(); }
+            this.updateUI();
+        });
+    },
+
+    save: function() { setDoc(docRef, this.data, {merge:true}); },
+    
+    updateUI: function() {
+        let sel = document.getElementById('login-user-select');
+        sel.innerHTML = (this.data.users || []).map(u => `<option value="${u.name}">${u.name}</option>`).join('');
+        this.pvp.render();
+    },
+
+    login: function() {
+        let name = document.getElementById('login-user-select').value;
+        let code = document.getElementById('login-pass').value;
+        let u = (this.data.users || []).find(x => x.name == name && x.code == code);
+        if(u) {
+            document.getElementById('login-overlay').classList.add('hidden');
+            document.getElementById('user-badge').innerText = u.name;
+            document.getElementById('app-header').classList.remove('hidden');
+            document.getElementById('app-nav').classList.remove('hidden');
+        } else alert('Erreur Code');
+    },
+
+    nav: function(v, saveHistory = true) {
+        if(saveHistory) this.viewHistory.push(document.querySelector('main > div:not(.hidden)').id.replace('view-',''));
+        document.querySelectorAll('main > div').forEach(e => e.classList.add('hidden'));
+        document.getElementById('view-'+v).classList.remove('hidden');
+    },
+    
+    goBack: function() { if(this.viewHistory.length) this.nav(this.viewHistory.pop(), false); else this.nav('home', false); },
+
+    toggleFam: function(famName) {
+        if(this.closedFamilies.has(famName)) this.closedFamilies.delete(famName);
+        else this.closedFamilies.add(famName);
+        this.pvp.render();
+    },
+
+    // --- MODULE PVP ---
+    pvp: {
+        tab: function(t) {
+            document.querySelectorAll('#view-pvp .tab').forEach(e => e.classList.remove('active-pvp'));
+            document.getElementById(t=='stock'?'tp-1':(t=='bib'?'tp-2':'tp-3')).classList.add('active-pvp');
+            ['pvp-stock','pvp-bib','pvp-calc'].forEach(id => document.getElementById(id).classList.add('hidden'));
+            document.getElementById('pvp-'+t).classList.remove('hidden');
+        },
+        handleImg: function(input) { if(input.files[0]) window.app.common.compressImg(input.files[0], (b64) => { document.getElementById('img-preview').src = b64; document.getElementById('img-preview').style.display='block'; document.getElementById('lib-img-data').value = b64; }); },
+        toggleFamInput: function() { document.getElementById('lib-fam-new').classList.toggle('hidden', document.getElementById('lib-fam-select').value !== 'new'); },
+        
+        openLib: function(id=null) {
+            document.getElementById('modal-pvp-lib').classList.remove('hidden');
+            let uniqueFams = [...new Set(window.app.data.pvpLib.map(i => i.family || "DIVERS"))].sort();
+            document.getElementById('lib-fam-select').innerHTML = uniqueFams.map(f => `<option value="${f}">${f}</option>`).join('') + `<option value="new">+ Créer...</option>`;
+            if(id) {
+                let i = window.app.data.pvpLib.find(x=>x.id==id);
+                document.getElementById('lib-id').value=id; document.getElementById('lib-name').value=i.name; document.getElementById('lib-ean').value=i.ean||"";
+                document.getElementById('lib-img-data').value=i.img||""; document.getElementById('lib-days').value=i.days||0;
+                document.getElementById('img-preview').src=i.img||""; document.getElementById('img-preview').style.display=i.img?'block':'none';
+                for(let k=0;k<7;k++) document.getElementById('t-'+k).value = (i.targets||{})[k]||"";
+            } else {
+                document.getElementById('lib-id').value=""; document.getElementById('lib-name').value=""; document.getElementById('img-preview').style.display='none';
+                for(let k=0;k<7;k++) document.getElementById('t-'+k).value = "";
+            }
+        },
+
+        saveLib: function() {
+            let id = document.getElementById('lib-id').value;
+            let fam = document.getElementById('lib-fam-select').value === 'new' ? document.getElementById('lib-fam-new').value.toUpperCase() : document.getElementById('lib-fam-select').value;
+            let o = { id: id ? Number(id) : Date.now(), family: fam, name: document.getElementById('lib-name').value, ean: document.getElementById('lib-ean').value, img: document.getElementById('lib-img-data').value, days: document.getElementById('lib-days').value, targets: {} };
+            for(let k=0;k<7;k++) o.targets[k] = document.getElementById('t-'+k).value;
+            if(id) { let idx = window.app.data.pvpLib.findIndex(x=>x.id==id); window.app.data.pvpLib[idx] = o; } else { window.app.data.pvpLib.push(o); }
+            window.app.save(); document.getElementById('modal-pvp-lib').classList.add('hidden');
+        },
+
+        changeQty: function(id, delta) {
+            let idx = window.app.data.pvpStock.findIndex(x => x.id == id);
+            if(idx > -1) {
+                let n = parseInt(window.app.data.pvpStock[idx].qty) + delta;
+                if(n <= 0) window.app.data.pvpStock.splice(idx, 1); else window.app.data.pvpStock[idx].qty = n;
+                window.app.save();
+            }
+        },
+
+        addStock: function(libId) {
+            let l = window.app.data.pvpLib.find(x=>x.id==libId);
+            let q = prompt('Quantité ?', "1");
+            if(q > 0) {
+                let now = new Date();
+                window.app.data.pvpStock.push({ id:Date.now(), libId:libId, name:l.name, ean:l.ean, qty:q, out:now.getTime(), end:window.app.common.calculateEnd(now.getTime(), l.days), days:l.days });
+                window.app.save();
+            }
+        },
+
+        openEditStock: function(id) {
+            let i = window.app.data.pvpStock.find(x=>x.id==id);
+            document.getElementById('modal-pvp-stock').classList.remove('hidden');
+            document.getElementById('stock-id').value=id; document.getElementById('stock-name').innerText=i.name;
+            document.getElementById('stock-qty').value=i.qty; document.getElementById('stock-start').value = window.app.common.tsToInput(i.out);
+            document.getElementById('stock-end').value = window.app.common.tsToInput(i.end);
+        },
+
+        saveStock: function() {
+            let idx = window.app.data.pvpStock.findIndex(x=>x.id==document.getElementById('stock-id').value);
+            window.app.data.pvpStock[idx].qty = document.getElementById('stock-qty').value;
+            window.app.data.pvpStock[idx].out = new Date(document.getElementById('stock-start').value).getTime();
+            window.app.data.pvpStock[idx].end = new Date(document.getElementById('stock-end').value).getTime();
+            window.app.save(); document.getElementById('modal-pvp-stock').classList.add('hidden');
+        },
+
+        delStock: function() { window.app.data.pvpStock = window.app.data.pvpStock.filter(x=>x.id!=document.getElementById('stock-id').value); window.app.save(); document.getElementById('modal-pvp-stock').classList.add('hidden'); },
+
+        attachSwipe: function(el, id) {
+            let startX = 0;
+            el.addEventListener('touchstart', e => { startX = e.touches[0].clientX; el.style.transition = 'none'; });
+            el.addEventListener('touchmove', e => { if(e.touches[0].clientX - startX > 0) el.style.transform = `translateX(${e.touches[0].clientX - startX}px)`; });
+            el.addEventListener('touchend', e => {
+                el.style.transition = 'transform 0.3s ease';
+                if(e.changedTouches[0].clientX - startX > 200) { el.style.transform = `translateX(100%)`; setTimeout(() => { window.app.data.pvpStock = window.app.data.pvpStock.filter(x=>x.id!=id); window.app.save(); }, 300); }
+                else { el.style.transform = `translateX(0)`; }
+            });
+        },
+
+        toggleNeed: function(libId) {
+            let idx = window.app.data.checkedNeeds.indexOf(libId);
+            if(idx > -1) window.app.data.checkedNeeds.splice(idx, 1); else window.app.data.checkedNeeds.push(libId);
+            window.app.save();
+        },
+
+        render: function() {
+            // BIB
+            let bib = document.getElementById('lib-list'); bib.innerHTML = "";
+            let gLib = {};
+            window.app.data.pvpLib.sort((a,b)=>window.app.common.cleanName(a.name).localeCompare(window.app.common.cleanName(b.name)))
+                          .forEach(l => { let f = l.family||"DIVERS"; if(!gLib[f]) gLib[f]=[]; gLib[f].push(l); });
+            Object.keys(gLib).sort().forEach(f => {
+                let c = window.app.closedFamilies.has('L-'+f);
+                bib.innerHTML += `<div class="group-header" onclick="app.toggleFam('L-${f}')"><span>${f}</span><i class="fas fa-chevron-${c?'right':'down'}"></i></div>`;
+                if(!c) gLib[f].forEach(l => {
+                    bib.innerHTML += `<div class="pvp-item"><div style="display:flex;align-items:center;" onclick="app.pvp.openLib(${l.id})"><img src="${l.img||''}" class="wek-img" style="display:${l.img?'block':'none'}"><div class="wek-img" style="display:${l.img?'none':'flex'}"><i class="fas fa-bread-slice"></i></div><div><b>${l.name}</b><br><small>${l.days}h</small></div></div><button class="qty-btn" style="background:var(--pvp);color:white;" onclick="app.pvp.addStock(${l.id})">+</button></div>`;
+                });
+            });
+
+            // STOCK (Groupé + Plus/Moins)
+            let st = document.getElementById('pvp-stock'); st.innerHTML = window.app.data.pvpStock.length ? "" : "<p style='text-align:center;padding:20px;color:#999;'>Rayon Vide</p>";
+            let gStock = {};
+            window.app.data.pvpStock.sort((a,b)=>a.end-b.end).forEach(s => {
+                let l = window.app.data.pvpLib.find(x=>x.id==s.libId); let f = l ? l.family : "DIVERS";
+                if(!gStock[f]) gStock[f]=[]; gStock[f].push(s);
+            });
+            Object.keys(gStock).sort().forEach(f => {
+                let c = window.app.closedFamilies.has('S-'+f);
+                st.innerHTML += `<div class="group-header" style="background:var(--pvp)" onclick="app.toggleFam('S-${f}')"><span>${f}</span><i class="fas fa-chevron-${c?'right':'down'}"></i></div>`;
+                if(!c) gStock[f].forEach(i => {
+                    let dS = new Date(i.out), dE = new Date(i.end), isExp = dE < new Date() || (dE.toDateString() == new Date().toDateString());
+                    let l = window.app.data.pvpLib.find(x=>x.id==i.libId), img = l?l.img:null;
+                    let container = document.createElement('div'); container.className = 'pvp-row-container';
+                    container.innerHTML = `<div class="pvp-row-bg">JETER</div>`;
+                    let item = document.createElement('div'); item.className = 'pvp-item';
+                    item.innerHTML = `<div style="display:flex;align-items:center;flex:1;"><img src="${img||''}" class="wek-img" style="display:${img?'block':'none'}" onclick="event.stopPropagation(); app.common.showBarcode('${i.ean}','${i.name}','${img}')"><div class="wek-img" style="display:${img?'none':'flex'}" onclick="event.stopPropagation(); app.common.showBarcode('${i.ean}','${i.name}')"><i class="fas fa-barcode"></i></div>
+                        <div><div style="font-weight:bold;font-size:14px;" onclick="app.pvp.openEditStock(${i.id})">${i.name}</div>
+                        <div class="qty-ctrl"><button class="qty-btn" onclick="event.stopPropagation(); app.pvp.changeQty(${i.id},-1)">-</button><b>${i.qty}</b><button class="qty-btn" onclick="event.stopPropagation(); app.pvp.changeQty(${i.id},1)">+</button></div></div></div>
+                        <div class="stock-dates"><div class="date-out">Sorti: ${dS.getDate()}/${dS.getMonth()+1}</div><div class="date-end ${isExp?'expired':''}">FIN: ${dE.getHours()}H${dE.getMinutes()||'00'}</div></div>`;
+                    this.attachSwipe(item, i.id); container.appendChild(item); st.appendChild(container);
+                });
+            });
+
+            // BESOINS
+            let cl = document.getElementById('pvp-calc');
+            let tom = new Date(); tom.setDate(tom.getDate()+1); let cTime = new Date(tom); cTime.setHours(10,0,0,0);
+            let gTodo = {}, doneH = "";
+            window.app.data.pvpLib.forEach(l => {
+                let v = window.app.data.pvpStock.filter(s=>s.libId==l.id && s.end > cTime.getTime()).reduce((a,b)=>a+parseInt(b.qty),0);
+                let target = (l.targets||{})[tom.getDay()] || 0;
+                let need = target - v;
+                if(need > 0) {
+                    let isC = window.app.data.checkedNeeds.includes(l.id);
+                    let h = `<div class="pvp-item ${isC?'done-item':''}" style="border-left:5px solid var(--pvp); margin-bottom:8px;">
+                        <div style="display:flex;align-items:center;flex:1;"><img src="${l.img||''}" class="wek-img" style="display:${l.img?'block':'none'}"><div class="wek-img" style="display:${l.img?'none':'flex'}"><i class="fas fa-bread-slice"></i></div>
+                        <div><b>${l.name}</b><br><small>Stock: ${v} / Obj: ${target}</small><div style="color:var(--pvp);font-weight:bold;font-size:18px;">A SORTIR: ${need}</div></div></div>
+                        <div class="checkbox-circle ${isC?'checked':''}" onclick="app.pvp.toggleNeed(${l.id})">${isC?'<i class="fas fa-check"></i>':''}</div></div>`;
+                    if(isC) doneH += h; else { let f = l.family||"DIVERS"; if(!gTodo[f]) gTodo[f]=[]; gTodo[f].push(h); }
+                }
+            });
+            let resH = `<h4 style="text-align:center;color:var(--primary);">À SORTIR (DEMAIN)</h4>`;
+            Object.keys(gTodo).sort().forEach(f => {
+                let c = window.app.closedFamilies.has('N-'+f);
+                resH += `<div class="group-header" style="background:var(--primary)" onclick="app.toggleFam('N-${f}')"><span>${f}</span><i class="fas fa-chevron-${c?'right':'down'}"></i></div>`;
+                if(!c) resH += gTodo[f].join('');
+            });
+            cl.innerHTML = resH + `<h4 style="text-align:center;color:#64748b;margin-top:30px;">DÉJÀ SORTI</h4>` + (doneH || "<p style='text-align:center;font-size:12px;color:#ccc;'>Rien de fait</p>");
+        }
+    },
+    frais: { tab: function(t){}, render: function(){} },
+    goBack: function(){ if(this.viewHistory.length) this.nav(this.viewHistory.pop(), false); else this.nav('home', false); },
+    saveUser: function(){}, renderUsers: function(){}, checkAlerts: function(){}
 };
 
-// Dans la partie render() du stock, le HTML devient :
-/*
-<div style="display:flex; align-items:center; gap:10px; margin-left:10px;">
-    <button onclick="event.stopPropagation(); app.pvp.changeQty(${i.id}, -1)" style="width:30px; height:30px; border-radius:5px; border:1px solid #ddd; background:#fff;">-</button>
-    <b style="font-size:18px; min-width:20px; text-align:center;">${i.qty}</b>
-    <button onclick="event.stopPropagation(); app.pvp.changeQty(${i.id}, 1)" style="width:30px; height:30px; border-radius:5px; border:1px solid #ddd; background:#fff;">+</button>
-</div>
-*/
+window.app.init();
 </script>
+</body>
+</html>
