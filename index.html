@@ -46,7 +46,7 @@
   .tab.active { background: white; color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
   .tab.active-pvp { background: white; color: var(--pvp); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
 
-  /* HOME MENU (FIX) */
+  /* HOME MENU */
   .home-grid{
     display:grid;
     grid-template-columns: 1fr 1fr;
@@ -77,14 +77,14 @@
 
   /* LISTES */
   .group-header { background: #334155; color: white; padding: 12px 15px; border-radius: 10px; margin-top: 15px; font-weight: bold; text-transform: uppercase; font-size: 14px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
-  .list-item { background: white; border-radius: 12px; padding: 12px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 1px 3px rgba(0,0,0,0.05); min-height: 80px; }
 
-  /* Swipe Elements */
+  .list-item { background: white; border-radius: 12px; padding: 12px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 1px 3px rgba(0,0,0,0.05); min-height: 80px; }
   .swipe-wrapper { background: #ef4444; border-radius: 12px; margin-bottom: 8px; overflow: hidden; position: relative; }
   .swipe-content { background: white; position: relative; z-index: 2; transition: transform 0.2s; padding: 12px; display: flex; align-items: center; justify-content: space-between; min-height: 80px; width: 100%; gap: 10px; }
 
   .item-img { width: 55px; height: 55px; border-radius: 10px; object-fit: cover; background: #f1f5f9; margin-right: 12px; flex-shrink: 0; display:flex; align-items:center; justify-content:center; color:#cbd5e1; font-size: 20px; cursor: pointer; }
   .item-info { flex: 1; overflow: hidden; margin-right: 10px; min-width: 0; }
+
   .item-title {
     font-weight: bold;
     font-size: 15px;
@@ -102,8 +102,16 @@
     display:flex;
     gap:10px;
     flex-wrap:wrap;
+    align-items:center;
   }
   .item-meta .ean{ font-weight:900; color:#334155; }
+
+  /* Chips */
+  .chip { font-size:11px; padding:3px 8px; border-radius:999px; font-weight:900; display:inline-flex; align-items:center; gap:6px; }
+  .chip.admin { background:#fee2e2; color:#991b1b; }
+  .chip.staff { background:#e0f2fe; color:#075985; }
+  .chip.saisir { background:#fff7ed; color:#c2410c; border:1px solid #fed7aa; }
+  .small { font-size:12px; color:#64748b; }
 
   /* PVP Controls */
   .qty-ctrl { display: flex; align-items: center; gap: 10px; background: #f8fafc; width: fit-content; padding: 4px 8px; border-radius: 8px; border: 1px solid #e2e8f0; margin-top: 5px; }
@@ -122,10 +130,6 @@
   .modal-bc { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
   .modal-card { background: white; padding: 25px; border-radius: 20px; width: 100%; max-width: 420px; max-height: 85vh; overflow-y: auto; }
   .row { display:flex; gap:10px; }
-  .chip { font-size:11px; padding:3px 8px; border-radius:999px; font-weight:800; }
-  .chip.admin { background:#fee2e2; color:#991b1b; }
-  .chip.staff { background:#e0f2fe; color:#075985; }
-  .small { font-size:12px; color:#64748b; }
 </style>
 </head>
 
@@ -319,11 +323,9 @@
   const db = getFirestore(appFb);
   const auth = getAuth(appFb);
 
-  // Secondary app/auth => créer des comptes sans déconnecter l’admin
   const secondaryApp = initializeApp(firebaseConfig, "Secondary");
   const secondaryAuth = getAuth(secondaryApp);
 
-  // App Check (si activé dans console)
   try {
     initializeAppCheck(appFb, {
       provider: new ReCaptchaEnterpriseProvider("6LfhL3AsAAAAAOOeDxTiE1zqlhBgWff3pjhFsnax"),
@@ -525,10 +527,7 @@
 
     team: {
       ensureAdmin: function() {
-        if(!window.app.me || window.app.me.role !== "admin") {
-          alert("Accès admin requis.");
-          return false;
-        }
+        if(!window.app.me || window.app.me.role !== "admin") { alert("Accès admin requis."); return false; }
         return true;
       },
       createStaff: async function() {
@@ -559,28 +558,18 @@
           alert("Compte créé + email envoyé (reset mot de passe).");
           window.app.team.renderUsers();
         } catch(e) {
-          if(String(e?.code||"").includes("auth/email-already-in-use")) {
-            alert("Email déjà utilisé dans Firebase Auth. Utilise un autre email ou supprime l’ancien compte via console.");
-          } else if(String(e?.code||"").includes("auth/invalid-email")) {
-            alert("Email invalide.");
-          } else {
-            alert("Erreur création compte. Vérifie Auth activé + domain autorisé.");
-          }
+          if(String(e?.code||"").includes("auth/email-already-in-use")) alert("Email déjà utilisé dans Firebase Auth.");
+          else if(String(e?.code||"").includes("auth/invalid-email")) alert("Email invalide.");
+          else alert("Erreur création compte.");
           try { await signOut(secondaryAuth); } catch(err) {}
         }
       },
-
       resetPwd: async function(email) {
         if(!this.ensureAdmin()) return;
         if(!email) return alert("Pas d’email.");
-        try {
-          await sendPasswordResetEmail(auth, email);
-          alert("Reset envoyé.");
-        } catch(e) {
-          alert("Impossible d’envoyer le reset.");
-        }
+        try { await sendPasswordResetEmail(auth, email); alert("Reset envoyé."); }
+        catch(e) { alert("Impossible d’envoyer le reset."); }
       },
-
       setRole: async function(uid, role) {
         if(!this.ensureAdmin()) return;
         const u = window.app.data.users.find(x => x.uid === uid);
@@ -589,7 +578,6 @@
         await window.app.save("users");
         this.renderUsers();
       },
-
       setName: async function(uid) {
         if(!this.ensureAdmin()) return;
         const u = window.app.data.users.find(x => x.uid === uid);
@@ -600,7 +588,6 @@
         await window.app.save("users");
         this.renderUsers();
       },
-
       renderUsers: function() {
         const wrap = document.getElementById("user-list");
         if(!wrap) return;
@@ -701,6 +688,8 @@
       render: function() {
         let div = document.getElementById('frais-list'); div.innerHTML="";
         let grp = {};
+        const nowTs = Date.now();
+
         window.app.data.frais
           .slice()
           .sort((a,b) => (a.fam||"").localeCompare(b.fam||"") || (a.date||0)-(b.date||0))
@@ -717,6 +706,16 @@
                 let diff = (d - new Date())/(1000*60*60*24);
                 badge = diff<0?'bg-red':(diff<2?'bg-orange':'bg-green');
               }
+
+              // --- À SAISIR : J-1 à 18:00
+              let showSaisir = false;
+              if(!isNaN(d.getTime())) {
+                const dlcDay = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 0,0,0,0);
+                const seuil = new Date(dlcDay); seuil.setDate(seuil.getDate()-1); seuil.setHours(18,0,0,0);
+                const dlcEnd = new Date(dlcDay); dlcEnd.setHours(23,59,59,999);
+                showSaisir = nowTs >= seuil.getTime() && nowTs <= dlcEnd.getTime();
+              }
+
               let safeName = (i.name||"").replace(/'/g," ");
               let img = i.img
                 ? `<img src="${i.img}" class="item-img" onclick="event.stopPropagation(); app.common.showBarcode('${i.ean}','${safeName}','${i.img}')">`
@@ -732,6 +731,7 @@
                         <div class="item-meta">
                           <span>Qté: x${i.qty||0}</span>
                           <span class="ean">EAN: ${i.ean||""}</span>
+                          ${showSaisir ? `<span class="chip saisir"><i class="fas fa-pen"></i> À SAISIR</span>` : ``}
                         </div>
                       </div>
                     </div>
@@ -926,6 +926,23 @@
         this.render();
       },
 
+      // --- calcul stock "OK demain" (au moins jusqu'à 12:00 demain)
+      availableTomorrow: function(libId, noonTs) {
+        return (window.app.data.pvpStock || []).reduce((sum, s) => {
+          if(String(s.libId) !== String(libId)) return sum;
+          const qty = parseInt(s.qty || 0);
+          if(qty <= 0) return sum;
+          const outTs = Number(s.out || 0);
+          const endTs = Number(s.end || 0);
+
+          // Doit être présent à 12:00 demain:
+          // - sorti avant ou à 12:00
+          // - fin après ou à 12:00
+          if(outTs <= noonTs && endTs >= noonTs) return sum + qty;
+          return sum;
+        }, 0);
+      },
+
       render: function() {
         // BIBLIO
         let bib = document.getElementById('lib-list'); if(!bib) return;
@@ -949,7 +966,7 @@
           });
         });
 
-        // STOCK (RAYON) — FIX: clic image => barcode + image
+        // STOCK (RAYON)
         let st = document.getElementById('pvp-stock'); st.innerHTML = "";
         let gStock = {};
         window.app.data.pvpStock.slice().sort((a,b)=>(a.end||0)-(b.end||0)).forEach(s => {
@@ -970,12 +987,8 @@
 
             let safeName = (i.name||"").replace(/'/g," ");
             let displayImg = img
-              ? `<img src="${img}" class="item-img"
-                    onclick="event.stopPropagation(); app.common.showBarcode('${i.ean||""}','${safeName}','${img}')">`
-              : `<div class="item-img"
-                    onclick="event.stopPropagation(); app.common.showBarcode('${i.ean||""}','${safeName}')">
-                    <i class="fas fa-bread-slice"></i>
-                 </div>`;
+              ? `<img src="${img}" class="item-img" onclick="event.stopPropagation(); app.common.showBarcode('${i.ean||""}','${safeName}','${img}')">`
+              : `<div class="item-img" onclick="event.stopPropagation(); app.common.showBarcode('${i.ean||""}','${safeName}')"><i class="fas fa-bread-slice"></i></div>`;
 
             st.innerHTML += `
               <div class="swipe-wrapper"><div class="swipe-content">
@@ -997,29 +1010,47 @@
           });
         });
 
-        // BESOINS
+        // BESOINS (FIX: prend en compte stock qui tient au moins jusqu'à 12h demain)
         let cl = document.getElementById('pvp-calc');
         let tom = new Date(); tom.setDate(tom.getDate()+1);
+
+        const noonTomorrow = new Date(tom.getFullYear(), tom.getMonth(), tom.getDate(), 12, 0, 0, 0).getTime();
+        const dayKey = tom.getDay();
+
         let gTodo = {}; let doneH = ""; let hasNeeds = false;
 
         window.app.data.pvpLib.forEach(l => {
-          let target = (l.targets||{})[tom.getDay()] || 0;
+          const target = parseInt((l.targets||{})[dayKey] || 0);
           if(target > 0) {
+            const available = window.app.pvp.availableTomorrow(l.id, noonTomorrow);
+            const need = Math.max(0, target - available);
+
+            // si besoin = 0 => rien à sortir
+            if(need <= 0) return;
+
             hasNeeds = true;
+
             let isC = window.app.data.checkedNeeds.includes(l.id);
             let img = l.img ? `<img src="${l.img}" class="item-img">` : `<div class="item-img"><i class="fas fa-bread-slice"></i></div>`;
+
             let h = `
               <div class="list-item ${isC?'item-done':''}" style="border-left:5px solid var(--pvp);">
                 <div style="display:flex;align-items:center;flex:1;min-width:0;">${img}
                   <div style="min-width:0;">
                     <div class="item-title">${l.name}</div>
-                    <div style="color:var(--pvp);font-weight:bold;">A SORTIR : ${target}</div>
+                    <div style="color:var(--pvp);font-weight:900;">A SORTIR : ${need}</div>
+                    <div class="small">Objectif: ${target} • En rayon demain (≥12h): ${available}</div>
                   </div>
                 </div>
                 <div class="todo-check ${isC?'checked':''}" onclick="app.pvp.toggleNeed(${l.id})"><i class="fas fa-check"></i></div>
               </div>`;
+
             if(isC) doneH += h;
-            else { let f = l.family||"DIVERS"; if(!gTodo[f]) gTodo[f]=[]; gTodo[f].push(h); }
+            else {
+              let f = l.family||"DIVERS";
+              if(!gTodo[f]) gTodo[f]=[];
+              gTodo[f].push(h);
+            }
           }
         });
 
@@ -1030,6 +1061,7 @@
           resH += `<div class="group-header" style="background:var(--primary)" onclick="app.toggleFam('${id}')"><span>${f}</span><i class="fas fa-chevron-${c?'right':'down'}"></i></div>`;
           if(!c) resH += gTodo[f].join('');
         });
+
         cl.innerHTML = resH + `<h4 style="text-align:center;color:#64748b;margin-top:20px;">TERMINÉ</h4>` + (doneH || "<p style='text-align:center;color:#ccc;'>Rien de fait</p>");
       }
     },
