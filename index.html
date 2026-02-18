@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
 <meta name="theme-color" content="#ffffff" />
-<title>Araujo Exploitation v66</title>
+<title>Araujo Exploitation v67</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 <script src="https://unpkg.com/@zxing/library@latest"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
@@ -21,15 +21,23 @@
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: system-ui, sans-serif; user-select: none; }
   body { margin: 0; background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
-  /* NAVIGATION */
+  /* NAVIGATION & UI */
   .hidden { display: none !important; }
   main { flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 100px; }
   .card { background: var(--surface); border-radius: 16px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); margin-bottom: 15px; }
 
-  /* HEADER */
+  /* HEADER (Caché au login) */
   header { background: var(--surface); padding: 10px; height: 90px; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); position: relative; }
   .logo-header { height: 60px; object-fit: contain; }
   .user-badge { position: absolute; right: 15px; top: 15px; font-size: 11px; background: #e0f2fe; color: var(--primary); padding: 6px 12px; border-radius: 20px; font-weight: bold; }
+
+  /* NAVBAR (Caché au login) */
+  nav { position: fixed; bottom: 0; width: 100%; background: white; height: 70px; display: flex; justify-content: center; align-items: center; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); z-index: 100; }
+
+  /* LOGIN OVERLAY */
+  .overlay { position: fixed; inset: 0; z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center; background: white; }
+  #login-user-select { width: 220px; padding: 12px; margin-bottom: 15px; border-radius: 12px; border: 1px solid #cbd5e1; background: #f8fafc; font-size: 16px; font-weight: bold; text-align: center; }
+  #login-pass { width: 220px; padding: 12px; font-size: 20px; text-align: center; border: 1px solid #e2e8f0; border-radius: 50px; margin-bottom: 20px; font-weight: bold; }
 
   /* TABS */
   .tabs { display: flex; background: #e2e8f0; padding: 4px; border-radius: 12px; margin-bottom: 15px; }
@@ -42,20 +50,19 @@
   .btn { width: 100%; padding: 16px; border-radius: 12px; border: none; font-weight: 700; font-size: 16px; background: var(--primary); color: white; cursor: pointer; margin-top: 5px; }
   .btn-orange { background: var(--pvp); } .btn-red { background: #ef4444; }
 
-  /* FRAIS STYLES */
+  /* STYLE LISTES */
   .group-header { background: #334155; color: white; padding: 8px 15px; border-radius: 8px 8px 0 0; margin-top: 20px; font-weight: bold; text-transform: uppercase; font-size: 12px; }
   .swipe-wrapper { background: #ef4444; overflow: hidden; margin-bottom: 1px; }
   .wek-item { background: white; padding: 15px; display: flex; align-items: center; justify-content: space-between; position: relative; z-index: 2; transition: transform 0.2s; }
   .date-badge { width: 50px; height: 50px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; font-weight: bold; flex-shrink: 0; margin-left: 10px; }
   .badge-red { background: #ef4444; } .badge-orange { background: #f59e0b; } .badge-green { background: #10b981; }
 
-  /* PVP STYLES */
+  /* PVP SPECIFIC */
   .pvp-row-container { position: relative; overflow: hidden; margin-bottom: 10px; background: #fee2e2; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
   .pvp-row-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; padding-left: 20px; color: #ef4444; font-weight: bold; font-size: 14px; z-index: 1; }
   .pvp-item { position: relative; z-index: 2; background: white; display: flex; justify-content: space-between; align-items: center; padding: 15px; transition: transform 0.1s linear; width: 100%; border-radius: 12px; }
   .wek-img { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; background: #f1f5f9; margin-right: 15px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #cbd5e1; flex-shrink: 0; }
   
-  /* HOME GRID */
   .home-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
   .home-btn { padding: 30px 10px; text-align: center; border-radius: 16px; color: white; cursor: pointer; font-weight: bold; }
 
@@ -63,8 +70,6 @@
   .modal-bc { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
   .modal-card { background: white; padding: 25px; border-radius: 20px; width: 100%; max-width: 400px; max-height: 85vh; overflow-y: auto; }
   #img-preview { width: 100px; height: 100px; object-fit: cover; border-radius: 10px; margin: 10px auto; display: none; border: 2px solid #ddd; }
-  
-  nav { position: fixed; bottom: 0; width: 100%; background: white; height: 70px; display: flex; justify-content: center; align-items: center; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); z-index: 100; }
 </style>
 </head>
 <body>
@@ -103,8 +108,8 @@
         <input type="hidden" id="lib-id"> 
         <input type="hidden" id="lib-img-data">
         
-        <label>Nom</label><input type="text" id="lib-name">
-        <label>EAN</label><input type="number" id="lib-ean">
+        <label>Nom du Produit (Requis)</label><input type="text" id="lib-name" placeholder="Ex: Donut Sucre">
+        <label>EAN (Code Barre)</label><input type="number" id="lib-ean">
         
         <label>Photo</label>
         <input type="file" id="cam-input" accept="image/*" capture="environment" style="display:none" onchange="app.pvp.handleImg(this)">
@@ -114,7 +119,7 @@
         <label>Durée Timer (Défaut)</label>
         <select id="lib-days">
             <option value="24">24 Heures</option>
-            <option value="48">48 Heures</option>
+            <option value="48">48 Heures (Donuts, Muffins)</option>
             <option value="72">72 Heures</option>
         </select>
         
@@ -154,7 +159,7 @@
       </div>
   </div>
 
-  <header>
+  <header id="app-header" class="hidden">
     <img src="https://raw.githubusercontent.com/araujoexploitation/Magasin/main/LOGO.png" class="logo-header">
     <div id="user-badge" class="user-badge">...</div>
   </header>
@@ -212,7 +217,7 @@
     </div>
   </main>
 
-  <nav onclick="app.nav('home')">
+  <nav id="app-nav" class="hidden" onclick="app.nav('home')">
       <div style="text-align:center;color:#94a3b8;"><i class="fas fa-th-large" style="font-size:24px;"></i><br><span style="font-size:10px;">MENU</span></div>
   </nav>
 
@@ -244,14 +249,11 @@ window.app = {
             let end = new Date(startTs);
             end.setHours(end.getHours() + parseInt(hours));
             
-            // LA REGLE DU DONUT : SI FIN PREVUE AVANT 15H -> JETER VEILLE 22H
+            // REGLE DES 15H : Si fin prévue < 15h, on jette la VEILLE à 22h
             if(end.getHours() < 15) {
                 end.setDate(end.getDate() - 1);
                 end.setHours(22, 0, 0, 0);
             } else {
-                // SINON FIN AUJOURD'HUI 22H (Sauf si c'est 24h strict ?) 
-                // Généralement en boulangerie c'est fin de service.
-                // On va dire que si ça dépasse 15h, ça tient jusqu'au soir.
                 end.setHours(22, 0, 0, 0);
             }
             return end.getTime();
@@ -294,6 +296,10 @@ window.app = {
         if(u) {
             document.getElementById('login-overlay').classList.add('hidden');
             document.getElementById('user-badge').innerText = u.name;
+            // AFFICHER HEADER ET NAV
+            document.getElementById('app-header').classList.remove('hidden');
+            document.getElementById('app-nav').classList.remove('hidden');
+            
             if(u.role=='admin') document.getElementById('btn-team').classList.remove('hidden');
         } else alert('Code Erreur');
     },
@@ -455,7 +461,8 @@ window.app = {
             };
             for(let k=0;k<7;k++) o.targets[k] = document.getElementById('t-'+k).value;
             
-            if(!o.name) return;
+            if(!o.name) return alert("Nom du produit requis !");
+            
             if(id) {
                 let idx = window.app.data.pvpLib.findIndex(x=>x.id==id);
                 if(idx>-1) window.app.data.pvpLib[idx] = o;
