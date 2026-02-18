@@ -4,13 +4,13 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
 <meta name="theme-color" content="#ffffff" />
-<title>Araujo App V3.0</title>
+<title>Araujo App V3.1</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 <script src="https://unpkg.com/@zxing/library@latest"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
 
 <style>
-  :root { --primary: #003896; --accent: #E2001A; --pvp: #d97706; --bg: #f3f4f6; --surface: #ffffff; --text: #1e293b; --success: #10b981; --danger: #ef4444; }
+  :root { --primary: #003896; --accent: #E2001A; --pvp: #d97706; --salad: #00563f; --bg: #f3f4f6; --surface: #ffffff; --text: #1e293b; --success: #10b981; --danger: #ef4444; }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: system-ui, sans-serif; user-select: none; }
   body { margin: 0; background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
   .hidden { display: none !important; }
@@ -45,11 +45,12 @@
   .tab { flex: 1; text-align: center; padding: 12px; font-weight: 700; font-size: 12px; color: #64748b; border-radius: 9px; cursor: pointer; }
   .tab.active { background: white; color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
   .tab.active-pvp { background: white; color: var(--pvp); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+  .tab.active-salad { background: white; color: var(--salad); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
 
   /* HOME MENU */
   .home-grid{
     display:grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
     gap:12px;
     margin-bottom: 12px;
   }
@@ -70,10 +71,6 @@
     user-select:none;
   }
   .home-btn i{ font-size: 28px; margin-bottom: 10px; }
-  @media (max-width: 360px){
-    .home-grid{ grid-template-columns: 1fr; }
-    .home-btn{ min-height: 95px; }
-  }
 
   /* LISTES */
   .group-header { background: #334155; color: white; padding: 12px 15px; border-radius: 10px; margin-top: 15px; font-weight: bold; text-transform: uppercase; font-size: 14px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
@@ -111,6 +108,9 @@
   .chip.admin { background:#fee2e2; color:#991b1b; }
   .chip.staff { background:#e0f2fe; color:#075985; }
   .chip.saisir { background:#fff7ed; color:#c2410c; border:1px solid #fed7aa; }
+  .chip.warn { background:#fee2e2; color:#991b1b; border:1px solid #fecaca; }
+  .chip.ok { background:#dcfce7; color:#166534; border:1px solid #bbf7d0; }
+
   .small { font-size:12px; color:#64748b; }
 
   /* PVP Controls */
@@ -130,10 +130,29 @@
   .modal-bc { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
   .modal-card { background: white; padding: 25px; border-radius: 20px; width: 100%; max-width: 420px; max-height: 85vh; overflow-y: auto; }
   .row { display:flex; gap:10px; }
+
+  /* Save toast */
+  #save-toast{
+    position:fixed;
+    top:92px;
+    left:50%;
+    transform:translateX(-50%);
+    background:#111827;
+    color:white;
+    padding:8px 12px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:900;
+    display:none;
+    z-index:9999;
+    box-shadow:0 10px 25px rgba(0,0,0,0.25);
+  }
 </style>
 </head>
 
 <body>
+
+  <div id="save-toast">Sauvegarde…</div>
 
   <!-- LOGIN -->
   <div id="login-overlay">
@@ -188,7 +207,7 @@
   <!-- PVP MODALS -->
   <div id="modal-pvp-lib" class="modal-bc hidden">
     <div class="modal-card">
-        <h3 style="color:#d97706">Produit PVP</h3>
+        <h3 style="color:var(--pvp)">Produit PVP</h3>
         <input type="hidden" id="lib-id"><input type="hidden" id="lib-img-data">
         <label>Famille</label><select id="lib-fam-select" onchange="app.pvp.toggleFamInput()"></select>
         <input type="text" id="lib-fam-new" placeholder="Nouvelle famille..." class="hidden">
@@ -208,7 +227,7 @@
             <input type="number" id="t-6" placeholder="S" style="text-align:center;padding:5px;">
             <input type="number" id="t-0" placeholder="D" style="text-align:center;padding:5px;">
         </div>
-        <button class="btn" onclick="app.pvp.saveLib()" style="background:#d97706;">Enregistrer</button>
+        <button class="btn" onclick="app.pvp.saveLib()" style="background:var(--pvp);">Enregistrer</button>
         <button class="btn danger" onclick="app.pvp.delLib()">Supprimer</button>
         <button class="btn secondary" onclick="document.getElementById('modal-pvp-lib').classList.add('hidden')">Fermer</button>
     </div>
@@ -216,14 +235,46 @@
 
   <div id="modal-pvp-stock" class="modal-bc hidden">
     <div class="modal-card">
-      <h3 style="color:#d97706">Correction Rayon</h3>
+      <h3 style="color:var(--pvp)">Correction Rayon (PVP)</h3>
       <input type="hidden" id="stock-id"><h4 id="stock-name" style="text-align:center;"></h4>
       <label>Quantité</label><input type="number" id="stock-qty">
       <label>Sortie</label><input type="datetime-local" id="stock-start">
       <label>Fin</label><input type="datetime-local" id="stock-end">
-      <button class="btn" onclick="app.pvp.saveStock()" style="background:#d97706;">Valider</button>
+      <button class="btn" onclick="app.pvp.saveStock()" style="background:var(--pvp);">Valider</button>
       <button class="btn danger" onclick="app.pvp.delStock()">Retirer</button>
       <button class="btn secondary" onclick="document.getElementById('modal-pvp-stock').classList.add('hidden')">Annuler</button>
+    </div>
+  </div>
+
+  <!-- SALADE BAR MODALS -->
+  <div id="modal-salad-lib" class="modal-bc hidden">
+    <div class="modal-card">
+        <h3 style="color:var(--salad)">Produit Salade Bar</h3>
+        <input type="hidden" id="s-lib-id"><input type="hidden" id="s-lib-img-data">
+        <label>Groupe</label><select id="s-lib-fam-select" onchange="app.salad.toggleFamInput()"></select>
+        <input type="text" id="s-lib-fam-new" placeholder="Nouveau groupe..." class="hidden">
+        <label>Nom</label><input type="text" id="s-lib-name">
+        <label>EAN</label><input type="text" id="s-lib-ean" inputmode="numeric" maxlength="13">
+        <button class="btn secondary" onclick="document.getElementById('s-cam-input').click()" style="margin-bottom:10px;">Photo</button>
+        <input type="file" id="s-cam-input" accept="image/*" capture="environment" class="hidden" onchange="app.salad.handleImg(this)">
+        <img id="s-img-preview" style="width:100px;height:100px;object-fit:cover;border-radius:10px;display:none;margin:0 auto 10px auto;">
+        <label>Conservation</label><select id="s-lib-days"><option value="0">JOURNÉE</option><option value="24">24H</option><option value="48">48H</option></select>
+        <button class="btn" onclick="app.salad.saveLib()" style="background:var(--salad);">Enregistrer</button>
+        <button class="btn danger" onclick="app.salad.delLib()">Supprimer</button>
+        <button class="btn secondary" onclick="document.getElementById('modal-salad-lib').classList.add('hidden')">Fermer</button>
+    </div>
+  </div>
+
+  <div id="modal-salad-stock" class="modal-bc hidden">
+    <div class="modal-card">
+      <h3 style="color:var(--salad)">Correction Rayon (Salade Bar)</h3>
+      <input type="hidden" id="s-stock-id"><h4 id="s-stock-name" style="text-align:center;"></h4>
+      <label>Quantité</label><input type="number" id="s-stock-qty">
+      <label>Mise en rayon</label><input type="datetime-local" id="s-stock-start">
+      <label>DLC / Fin</label><input type="datetime-local" id="s-stock-end">
+      <button class="btn" onclick="app.salad.saveStock()" style="background:var(--salad);">Valider</button>
+      <button class="btn danger" onclick="app.salad.delStock()">Retirer</button>
+      <button class="btn secondary" onclick="document.getElementById('modal-salad-stock').classList.add('hidden')">Annuler</button>
     </div>
   </div>
 
@@ -237,13 +288,17 @@
   <main>
     <div id="view-home">
       <div id="alert-box" style="display:none;background:#ef4444;color:white;padding:15px;border-radius:12px;margin-bottom:15px;text-align:center;font-weight:bold;">⚠️ Dates Courtes !</div>
+
       <div class="home-grid">
         <div class="home-btn" onclick="app.nav('frais')" style="background: linear-gradient(135deg, #003896 0%, #002366 100%);"><i class="fas fa-barcode"></i><br>DLC FRAIS</div>
         <div class="home-btn" onclick="app.nav('pvp')" style="background: linear-gradient(135deg, #d97706 0%, #b45309 100%);"><i class="fas fa-bread-slice"></i><br>GESTION PVP</div>
+        <div class="home-btn" onclick="app.nav('salad')" style="background: linear-gradient(135deg, #00563f 0%, #064e3b 100%);"><i class="fas fa-bowl-food"></i><br>SALADE BAR</div>
       </div>
+
       <div class="card hidden" id="btn-team" onclick="app.nav('team')" style="text-align:center;"><i class="fas fa-users"></i> Équipe</div>
     </div>
 
+    <!-- FRAIS -->
     <div id="view-frais" class="hidden">
       <div class="tabs">
         <div class="tab active" id="tf-1" onclick="app.frais.tab('scan')">SCAN</div>
@@ -266,6 +321,7 @@
       <div id="frais-list" class="hidden"></div>
     </div>
 
+    <!-- PVP -->
     <div id="view-pvp" class="hidden">
       <div class="tabs">
         <div class="tab active" id="tp-1" onclick="app.pvp.tab('stock')">RAYON</div>
@@ -280,6 +336,19 @@
       <div id="pvp-calc" class="hidden"></div>
     </div>
 
+    <!-- SALADE BAR -->
+    <div id="view-salad" class="hidden">
+      <div class="tabs">
+        <div class="tab active" id="ts-1" onclick="app.salad.tab('stock')">RAYON</div>
+        <div class="tab" id="ts-2" onclick="app.salad.tab('bib')">BIBLIO</div>
+      </div>
+      <div id="salad-stock"></div>
+      <div id="salad-bib" class="hidden">
+        <button class="btn secondary" onclick="app.salad.openLib()" style="margin-bottom:15px;">+ Créer Produit</button>
+        <div id="salad-lib-list"></div>
+      </div>
+    </div>
+
     <!-- TEAM -->
     <div id="view-team" class="hidden">
       <div class="card">
@@ -291,7 +360,7 @@
           <option value="admin">admin</option>
         </select>
         <button class="btn" onclick="app.team.createStaff()">Créer + envoyer lien “mot de passe oublié”</button>
-        <div class="small">Le staff clique ensuite “Mot de passe oublié” sur l’écran de login, ou reçoit le mail si ton template est configuré.</div>
+        <div class="small">Le staff clique ensuite “Mot de passe oublié” sur l’écran de login.</div>
       </div>
 
       <div class="card">
@@ -336,15 +405,30 @@
   const docUsers = doc(db, "store_master", "DATA_USERS");
   const docFrais = doc(db, "store_master", "DATA_FRAIS");
   const docPVP   = doc(db, "store_master", "DATA_PVP");
+  const docSalad = doc(db, "store_master", "DATA_SALAD");
 
   const codeReader = new ZXing.BrowserMultiFormatReader();
 
   window.app = {
     me: null,
-    data: { frais: [], users: [], pvpLib: [], pvpStock: [], checkedNeeds: [] },
+    data: {
+      frais: [],
+      users: [],
+      pvpLib: [],
+      pvpStock: [],
+      checkedNeeds: [],
+      saladLib: [],
+      saladStock: []
+    },
     viewHistory: [],
     closed: new Set(),
     debounceTimer: null,
+
+    saveCtl: {
+      v: { pvp:0, salad:0 },
+      t: { pvp:null, salad:null },
+      toastHideT: null
+    },
 
     ui: {
       err: (msg) => {
@@ -356,7 +440,36 @@
         const box = document.getElementById("login-error");
         box.style.display = "none";
         box.textContent = "";
+      },
+      showSaving: () => {
+        const el = document.getElementById("save-toast");
+        el.style.display = "block";
+        if(window.app.saveCtl.toastHideT) clearTimeout(window.app.saveCtl.toastHideT);
+      },
+      hideSavingSoon: () => {
+        if(window.app.saveCtl.toastHideT) clearTimeout(window.app.saveCtl.toastHideT);
+        window.app.saveCtl.toastHideT = setTimeout(() => {
+          document.getElementById("save-toast").style.display = "none";
+        }, 450);
       }
+    },
+
+    queueSave: function(sec) {
+      if(!auth.currentUser) return;
+      this.ui.showSaving();
+      this.saveCtl.v[sec]++;
+
+      if(this.saveCtl.t[sec]) clearTimeout(this.saveCtl.t[sec]);
+      this.saveCtl.t[sec] = setTimeout(async () => {
+        const myV = this.saveCtl.v[sec];
+        try { await this.save(sec); } catch(e) {}
+        if(this.saveCtl.v[sec] !== myV) {
+          // une autre modif est arrivée pendant la save => resauve
+          this.queueSave(sec);
+        } else {
+          this.ui.hideSavingSoon();
+        }
+      }, 350);
     },
 
     common: {
@@ -460,9 +573,10 @@
     },
 
     loadAll: async function() {
-      const [uSnap, fSnap, pSnap] = await Promise.all([getDoc(docUsers), getDoc(docFrais), getDoc(docPVP)]);
+      const [uSnap, fSnap, pSnap, sSnap] = await Promise.all([getDoc(docUsers), getDoc(docFrais), getDoc(docPVP), getDoc(docSalad)]);
       this.data.users = uSnap.exists() ? (uSnap.data().list || []) : [];
       this.data.frais = fSnap.exists() ? (fSnap.data().list || []) : [];
+
       if(pSnap.exists()) {
         let d = pSnap.data();
         this.data.pvpLib = d.lib || [];
@@ -471,6 +585,14 @@
       } else {
         this.data.pvpLib = []; this.data.pvpStock = []; this.data.checkedNeeds = [];
       }
+
+      if(sSnap.exists()) {
+        let d = sSnap.data();
+        this.data.saladLib = d.lib || [];
+        this.data.saladStock = d.stock || [];
+      } else {
+        this.data.saladLib = []; this.data.saladStock = [];
+      }
     },
 
     save: async function(sec) {
@@ -478,6 +600,7 @@
       if(sec==='users') await setDoc(docUsers, { list: this.data.users });
       if(sec==='frais') await setDoc(docFrais, { list: this.data.frais });
       if(sec==='pvp')   await setDoc(docPVP,   { lib: this.data.pvpLib, stock: this.data.pvpStock, needs: this.data.checkedNeeds });
+      if(sec==='salad') await setDoc(docSalad, { lib: this.data.saladLib, stock: this.data.saladStock });
     },
 
     afterLoginBootstrap: async function() {
@@ -511,6 +634,7 @@
     updateUI: function() {
       this.frais.render();
       this.pvp.render();
+      this.salad.render();
       this.team.renderUsers();
       this.checkAlerts();
     },
@@ -523,8 +647,9 @@
       document.getElementById('view-'+v).classList.remove('hidden');
     },
     goBack: function() { if(this.viewHistory.length) this.nav(this.viewHistory.pop(), false); else this.nav('home', false); },
-    toggleFam: function(id) { if(this.closed.has(id)) this.closed.delete(id); else this.closed.add(id); this.frais.render(); this.pvp.render(); },
+    toggleFam: function(id) { if(this.closed.has(id)) this.closed.delete(id); else this.closed.add(id); this.frais.render(); this.pvp.render(); this.salad.render(); },
 
+    // ---- TEAM (admin)
     team: {
       ensureAdmin: function() {
         if(!window.app.me || window.app.me.role !== "admin") { alert("Accès admin requis."); return false; }
@@ -631,6 +756,7 @@
       }
     },
 
+    // ---- FRAIS
     frais: {
       scanning: false,
       imgUrl: "",
@@ -707,7 +833,7 @@
                 badge = diff<0?'bg-red':(diff<2?'bg-orange':'bg-green');
               }
 
-              // --- À SAISIR : J-1 à 18:00
+              // À SAISIR : J-1 à 18:00
               let showSaisir = false;
               if(!isNaN(d.getTime())) {
                 const dlcDay = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 0,0,0,0);
@@ -781,6 +907,7 @@
       }
     },
 
+    // ---- PVP
     pvp: {
       tab: function(t) {
         document.querySelectorAll('#view-pvp .tab').forEach(e => e.classList.remove('active-pvp'));
@@ -866,14 +993,14 @@
         window.app.pvp.render();
       },
 
-      addStock: async function(libId) {
+      addStock: function(libId) {
         let l = window.app.data.pvpLib.find(x=>x.id==libId);
         let q = prompt('Quantité ?', "1");
         if(q > 0) {
           let now = new Date();
           let endTs = window.app.common.calculateEnd(now.getTime(), l.days);
           window.app.data.pvpStock.push({ id:Date.now(), libId:libId, name:l.name, ean:l.ean, qty:q, out:now.getTime(), end:endTs, days:l.days });
-          await window.app.save('pvp');
+          window.app.queueSave('pvp');
           window.app.pvp.render();
         }
       },
@@ -888,46 +1015,58 @@
         document.getElementById('stock-end').value = window.app.common.tsToInput(i.end);
       },
 
-      saveStock: async function() {
+      saveStock: function() {
         let idx = window.app.data.pvpStock.findIndex(x=>String(x.id)===String(document.getElementById('stock-id').value));
         if(idx<0) return;
         window.app.data.pvpStock[idx].qty = document.getElementById('stock-qty').value;
         window.app.data.pvpStock[idx].out = new Date(document.getElementById('stock-start').value).getTime();
         window.app.data.pvpStock[idx].end = new Date(document.getElementById('stock-end').value).getTime();
-        await window.app.save('pvp');
         document.getElementById('modal-pvp-stock').classList.add('hidden');
+        window.app.queueSave('pvp');
         window.app.pvp.render();
       },
 
-      delStock: async function() {
+      delStock: function() {
         let id = document.getElementById('stock-id').value;
         window.app.data.pvpStock = window.app.data.pvpStock.filter(x=>String(x.id)!==String(id));
-        await window.app.save('pvp');
         document.getElementById('modal-pvp-stock').classList.add('hidden');
+        window.app.queueSave('pvp');
         window.app.pvp.render();
       },
 
-      changeQty: async function(id, delta) {
+      // ✅ FIX LATENCE : update UI direct + save debounced
+      changeQty: function(id, delta) {
         let idx = window.app.data.pvpStock.findIndex(x => x.id == id);
         if(idx > -1) {
           let n = parseInt(window.app.data.pvpStock[idx].qty) + delta;
           if(n <= 0) window.app.data.pvpStock.splice(idx, 1);
           else window.app.data.pvpStock[idx].qty = n;
-          await window.app.save('pvp');
-          this.render();
+          window.app.pvp.render();
+          window.app.queueSave('pvp');
         }
       },
 
-      toggleNeed: async function(libId) {
+      toggleNeed: function(libId) {
         let idx = window.app.data.checkedNeeds.indexOf(libId);
         if(idx > -1) window.app.data.checkedNeeds.splice(idx, 1);
         else window.app.data.checkedNeeds.push(libId);
-        await window.app.save('pvp');
-        this.render();
+        window.app.queueSave('pvp');
+        window.app.pvp.render();
       },
 
-      // --- calcul stock "OK demain" (au moins jusqu'à 12:00 demain)
-      availableTomorrow: function(libId, noonTs) {
+      availableAtNoon: function(libId, noonTs) {
+        return (window.app.data.pvpStock || []).reduce((sum, s) => {
+          if(String(s.libId) !== String(libId)) return sum;
+          const qty = parseInt(s.qty || 0);
+          if(qty <= 0) return sum;
+          const outTs = Number(s.out || 0);
+          const endTs = Number(s.end || 0);
+          if(outTs <= noonTs && endTs >= noonTs) return sum + qty;
+          return sum;
+        }, 0);
+      },
+
+      dyingBeforeNoon: function(libId, noonTs, nowTs) {
         return (window.app.data.pvpStock || []).reduce((sum, s) => {
           if(String(s.libId) !== String(libId)) return sum;
           const qty = parseInt(s.qty || 0);
@@ -935,10 +1074,8 @@
           const outTs = Number(s.out || 0);
           const endTs = Number(s.end || 0);
 
-          // Doit être présent à 12:00 demain:
-          // - sorti avant ou à 12:00
-          // - fin après ou à 12:00
-          if(outTs <= noonTs && endTs >= noonTs) return sum + qty;
+          // présent avant midi, mais expire avant midi (et pas déjà mort maintenant)
+          if(outTs <= noonTs && endTs < noonTs && endTs > nowTs) return sum + qty;
           return sum;
         }, 0);
       },
@@ -996,9 +1133,9 @@
                   <div style="min-width:0;">
                     <div class="item-title" onclick="app.pvp.openEditStock(${i.id})">${i.name}</div>
                     <div class="qty-ctrl">
-                      <button class="qty-btn" onclick="app.pvp.changeQty(${i.id},-1)">-</button>
+                      <button class="qty-btn" onclick="event.stopPropagation(); app.pvp.changeQty(${i.id},-1)">-</button>
                       <b>${i.qty}</b>
-                      <button class="qty-btn" onclick="app.pvp.changeQty(${i.id},1)">+</button>
+                      <button class="qty-btn" onclick="event.stopPropagation(); app.pvp.changeQty(${i.id},1)">+</button>
                     </div>
                   </div>
                 </div>
@@ -1010,22 +1147,30 @@
           });
         });
 
-        // BESOINS (FIX: prend en compte stock qui tient au moins jusqu'à 12h demain)
+        // BESOINS (avec encart)
         let cl = document.getElementById('pvp-calc');
         let tom = new Date(); tom.setDate(tom.getDate()+1);
 
         const noonTomorrow = new Date(tom.getFullYear(), tom.getMonth(), tom.getDate(), 12, 0, 0, 0).getTime();
         const dayKey = tom.getDay();
+        const nowTs = Date.now();
 
         let gTodo = {}; let doneH = ""; let hasNeeds = false;
+
+        let totalTarget = 0, totalAvail = 0, totalDie = 0, totalNeed = 0;
 
         window.app.data.pvpLib.forEach(l => {
           const target = parseInt((l.targets||{})[dayKey] || 0);
           if(target > 0) {
-            const available = window.app.pvp.availableTomorrow(l.id, noonTomorrow);
-            const need = Math.max(0, target - available);
+            const avail = window.app.pvp.availableAtNoon(l.id, noonTomorrow);
+            const die = window.app.pvp.dyingBeforeNoon(l.id, noonTomorrow, nowTs);
+            const need = Math.max(0, target - avail);
 
-            // si besoin = 0 => rien à sortir
+            totalTarget += target;
+            totalAvail += avail;
+            totalDie += die;
+            totalNeed += need;
+
             if(need <= 0) return;
 
             hasNeeds = true;
@@ -1033,16 +1178,24 @@
             let isC = window.app.data.checkedNeeds.includes(l.id);
             let img = l.img ? `<img src="${l.img}" class="item-img">` : `<div class="item-img"><i class="fas fa-bread-slice"></i></div>`;
 
+            let dieChip = die > 0
+              ? `<span class="chip warn"><i class="fas fa-hourglass-half"></i> Meurt &lt;12h: ${die}</span>`
+              : `<span class="chip ok"><i class="fas fa-check"></i> OK</span>`;
+
             let h = `
               <div class="list-item ${isC?'item-done':''}" style="border-left:5px solid var(--pvp);">
                 <div style="display:flex;align-items:center;flex:1;min-width:0;">${img}
                   <div style="min-width:0;">
                     <div class="item-title">${l.name}</div>
                     <div style="color:var(--pvp);font-weight:900;">A SORTIR : ${need}</div>
-                    <div class="small">Objectif: ${target} • En rayon demain (≥12h): ${available}</div>
+                    <div class="item-meta">
+                      <span>Objectif: ${target}</span>
+                      <span>En rayon ≥12h: ${avail}</span>
+                      ${dieChip}
+                    </div>
                   </div>
                 </div>
-                <div class="todo-check ${isC?'checked':''}" onclick="app.pvp.toggleNeed(${l.id})"><i class="fas fa-check"></i></div>
+                <div class="todo-check ${isC?'checked':''}" onclick="event.stopPropagation(); app.pvp.toggleNeed(${l.id})"><i class="fas fa-check"></i></div>
               </div>`;
 
             if(isC) doneH += h;
@@ -1054,6 +1207,22 @@
           }
         });
 
+        let dateTxt = tom.toLocaleDateString('fr-FR', {weekday:'long', day:'2-digit', month:'2-digit'});
+        let summary = `
+          <div class="card" style="border-left:6px solid var(--pvp);">
+            <div style="font-weight:900;color:var(--pvp);margin-bottom:8px;"><i class="fas fa-bullseye"></i> BESOINS POUR ${dateTxt.toUpperCase()}</div>
+            <div class="item-meta" style="gap:12px;">
+              <span><b>Objectif:</b> ${totalTarget}</span>
+              <span><b>En rayon ≥12h:</b> ${totalAvail}</span>
+              <span class="chip warn"><i class="fas fa-hourglass-half"></i> Meurt &lt;12h: ${totalDie}</span>
+              <span class="chip saisir"><i class="fas fa-truck"></i> À sortir: ${totalNeed}</span>
+            </div>
+            <div class="small" style="margin-top:8px;">
+              “Meurt &lt;12h” = stock qui expire avant midi demain, donc <b>non compté</b> pour couvrir la journée.
+            </div>
+          </div>
+        `;
+
         let resH = `<h4 style="text-align:center;color:var(--primary);">À SORTIR DEMAIN</h4>`;
         if(!hasNeeds) resH += "<p style='text-align:center;color:#999'>Rien de prévu</p>";
         else Object.keys(gTodo).sort().forEach(f => {
@@ -1062,7 +1231,215 @@
           if(!c) resH += gTodo[f].join('');
         });
 
-        cl.innerHTML = resH + `<h4 style="text-align:center;color:#64748b;margin-top:20px;">TERMINÉ</h4>` + (doneH || "<p style='text-align:center;color:#ccc;'>Rien de fait</p>");
+        cl.innerHTML = summary + resH + `<h4 style="text-align:center;color:#64748b;margin-top:20px;">TERMINÉ</h4>` + (doneH || "<p style='text-align:center;color:#ccc;'>Rien de fait</p>");
+      }
+    },
+
+    // ---- SALADE BAR (stock + biblio)
+    salad: {
+      tab: function(t){
+        document.querySelectorAll('#view-salad .tab').forEach(e => e.classList.remove('active-salad'));
+        document.getElementById(t=='stock'?'ts-1':'ts-2').classList.add('active-salad');
+        ['salad-stock','salad-bib'].forEach(id => document.getElementById(id).classList.add('hidden'));
+        document.getElementById('salad-'+t).classList.remove('hidden');
+      },
+
+      handleImg: function(input) {
+        if(input.files[0]) window.app.common.compressImg(input.files[0], (b64) => {
+          document.getElementById('s-img-preview').src = b64;
+          document.getElementById('s-img-preview').style.display='block';
+          document.getElementById('s-lib-img-data').value = b64;
+        });
+      },
+
+      toggleFamInput: function() {
+        let val = document.getElementById('s-lib-fam-select').value;
+        document.getElementById('s-lib-fam-new').classList.toggle('hidden', val !== 'new');
+      },
+
+      openLib: function(id=null){
+        document.getElementById('modal-salad-lib').classList.remove('hidden');
+        let uniqueFams = [...new Set(window.app.data.saladLib.map(i => i.family || "DIVERS"))].sort();
+        document.getElementById('s-lib-fam-select').innerHTML =
+          uniqueFams.map(f => `<option value="${f}">${f}</option>`).join('') + `<option value="new">+ Créer...</option>`;
+
+        if(id){
+          let i = window.app.data.saladLib.find(x=>x.id==id);
+          document.getElementById('s-lib-id').value=id;
+          document.getElementById('s-lib-name').value=i.name||"";
+          document.getElementById('s-lib-ean').value=i.ean||"";
+          document.getElementById('s-lib-days').value=i.days||0;
+          document.getElementById('s-lib-img-data').value=i.img||"";
+          document.getElementById('s-img-preview').src=i.img||"";
+          document.getElementById('s-img-preview').style.display=i.img?'block':'none';
+          document.getElementById('s-lib-fam-select').value = i.family || "DIVERS";
+        } else {
+          document.getElementById('s-lib-id').value="";
+          document.getElementById('s-lib-name').value="";
+          document.getElementById('s-lib-ean').value="";
+          document.getElementById('s-lib-days').value="0";
+          document.getElementById('s-lib-img-data').value="";
+          document.getElementById('s-img-preview').style.display='none';
+        }
+      },
+
+      saveLib: function(){
+        let id = document.getElementById('s-lib-id').value;
+        let fam = document.getElementById('s-lib-fam-select').value === 'new'
+          ? (document.getElementById('s-lib-fam-new').value || "DIVERS").toUpperCase()
+          : document.getElementById('s-lib-fam-select').value;
+
+        let o = {
+          id: id ? Number(id) : Date.now(),
+          family: fam,
+          name: document.getElementById('s-lib-name').value,
+          ean: document.getElementById('s-lib-ean').value,
+          img: document.getElementById('s-lib-img-data').value,
+          days: document.getElementById('s-lib-days').value
+        };
+        if(!o.name) return alert("Nom requis");
+
+        if(id){
+          let idx = window.app.data.saladLib.findIndex(x=>String(x.id)===String(id));
+          if(idx>-1) window.app.data.saladLib[idx] = o;
+        } else {
+          window.app.data.saladLib.push(o);
+        }
+
+        document.getElementById('modal-salad-lib').classList.add('hidden');
+        window.app.queueSave('salad');
+        window.app.salad.render();
+      },
+
+      delLib: function(){
+        let id = document.getElementById('s-lib-id').value;
+        window.app.data.saladLib = window.app.data.saladLib.filter(x=>String(x.id)!==String(id));
+        document.getElementById('modal-salad-lib').classList.add('hidden');
+        window.app.queueSave('salad');
+        window.app.salad.render();
+      },
+
+      addStock: function(libId){
+        let l = window.app.data.saladLib.find(x=>x.id==libId);
+        let q = prompt('Quantité ?', "1");
+        if(q > 0){
+          let now = new Date();
+          let endTs = window.app.common.calculateEnd(now.getTime(), l.days);
+          window.app.data.saladStock.push({ id:Date.now(), libId, name:l.name, ean:l.ean, qty:q, out:now.getTime(), end:endTs, days:l.days });
+          window.app.queueSave('salad');
+          window.app.salad.render();
+        }
+      },
+
+      openEditStock: function(id){
+        let i = window.app.data.saladStock.find(x=>x.id==id);
+        document.getElementById('modal-salad-stock').classList.remove('hidden');
+        document.getElementById('s-stock-id').value=id;
+        document.getElementById('s-stock-name').innerText=i.name;
+        document.getElementById('s-stock-qty').value=i.qty;
+        document.getElementById('s-stock-start').value = window.app.common.tsToInput(i.out);
+        document.getElementById('s-stock-end').value = window.app.common.tsToInput(i.end);
+      },
+
+      saveStock: function(){
+        let idx = window.app.data.saladStock.findIndex(x=>String(x.id)===String(document.getElementById('s-stock-id').value));
+        if(idx<0) return;
+        window.app.data.saladStock[idx].qty = document.getElementById('s-stock-qty').value;
+        window.app.data.saladStock[idx].out = new Date(document.getElementById('s-stock-start').value).getTime();
+        window.app.data.saladStock[idx].end = new Date(document.getElementById('s-stock-end').value).getTime();
+        document.getElementById('modal-salad-stock').classList.add('hidden');
+        window.app.queueSave('salad');
+        window.app.salad.render();
+      },
+
+      delStock: function(){
+        let id = document.getElementById('s-stock-id').value;
+        window.app.data.saladStock = window.app.data.saladStock.filter(x=>String(x.id)!==String(id));
+        document.getElementById('modal-salad-stock').classList.add('hidden');
+        window.app.queueSave('salad');
+        window.app.salad.render();
+      },
+
+      changeQty: function(id, delta){
+        let idx = window.app.data.saladStock.findIndex(x => x.id == id);
+        if(idx > -1) {
+          let n = parseInt(window.app.data.saladStock[idx].qty) + delta;
+          if(n <= 0) window.app.data.saladStock.splice(idx, 1);
+          else window.app.data.saladStock[idx].qty = n;
+          window.app.salad.render();
+          window.app.queueSave('salad');
+        }
+      },
+
+      render: function(){
+        // BIBLIO
+        let bib = document.getElementById('salad-lib-list'); if(!bib) return;
+        bib.innerHTML = "";
+        let gLib = {};
+        window.app.data.saladLib
+          .slice()
+          .sort((a,b)=>window.app.common.cleanName(a.name).localeCompare(window.app.common.cleanName(b.name)))
+          .forEach(l => { let f = l.family||"DIVERS"; if(!gLib[f]) gLib[f]=[]; gLib[f].push(l); });
+
+        Object.keys(gLib).sort().forEach(f => {
+          let id = 'SL-'+f; let c = window.app.closed.has(id);
+          bib.innerHTML += `<div class="group-header" style="background:var(--salad)" onclick="app.toggleFam('${id}')"><span>${f}</span><i class="fas fa-chevron-${c?'right':'down'}"></i></div>`;
+          if(!c) gLib[f].forEach(l => {
+            let img = l.img ? `<img src="${l.img}" class="item-img">` : `<div class="item-img"><i class="fas fa-bowl-food"></i></div>`;
+            bib.innerHTML += `<div class="list-item" onclick="app.common.showBarcode('${l.ean}','${(l.name||"").replace(/'/g," ")}','${l.img||""}')">
+              <div style="display:flex;align-items:center;min-width:0;">${img}<div style="min-width:0;"><b>${l.name}</b><br><small>${l.days}h</small></div></div>
+              <button class="qty-btn" style="background:var(--salad);color:white;width:40px;height:40px;" onclick="event.stopPropagation(); app.salad.openLib(${l.id})"><i class="fas fa-pen"></i></button>
+              <button class="qty-btn" style="background:var(--salad);color:white;width:40px;height:40px;margin-left:10px;" onclick="event.stopPropagation(); app.salad.addStock(${l.id})">+</button>
+            </div>`;
+          });
+        });
+
+        // STOCK
+        let st = document.getElementById('salad-stock'); st.innerHTML = "";
+        let gStock = {};
+        window.app.data.saladStock.slice().sort((a,b)=>(a.end||0)-(b.end||0)).forEach(s => {
+          let l = window.app.data.saladLib.find(x=>x.id==s.libId);
+          let f = l ? l.family : "DIVERS";
+          if(!gStock[f]) gStock[f]=[];
+          gStock[f].push(s);
+        });
+
+        Object.keys(gStock).sort().forEach(f => {
+          let id = 'SS-'+f; let c = window.app.closed.has(id);
+          st.innerHTML += `<div class="group-header" style="background:var(--salad)" onclick="app.toggleFam('${id}')"><span>${f}</span><i class="fas fa-chevron-${c?'right':'down'}"></i></div>`;
+          if(!c) gStock[f].forEach(i => {
+            let dS = window.app.common.formatDate(i.out);
+            let dE = window.app.common.formatDate(i.end);
+            let isExp = new Date(i.end) < new Date();
+            let l = window.app.data.saladLib.find(x=>x.id==i.libId), img = l?l.img:null;
+            let safeName = (i.name||"").replace(/'/g," ");
+            let displayImg = img
+              ? `<img src="${img}" class="item-img" onclick="event.stopPropagation(); app.common.showBarcode('${i.ean||""}','${safeName}','${img}')">`
+              : `<div class="item-img" onclick="event.stopPropagation(); app.common.showBarcode('${i.ean||""}','${safeName}')"><i class="fas fa-bowl-food"></i></div>`;
+
+            st.innerHTML += `
+              <div class="swipe-wrapper"><div class="swipe-content">
+                <div style="display:flex;align-items:center;flex:1;min-width:0;">${displayImg}
+                  <div style="min-width:0;">
+                    <div class="item-title" onclick="app.salad.openEditStock(${i.id})">${i.name}</div>
+                    <div class="qty-ctrl">
+                      <button class="qty-btn" onclick="event.stopPropagation(); app.salad.changeQty(${i.id},-1)">-</button>
+                      <b>${i.qty}</b>
+                      <button class="qty-btn" onclick="event.stopPropagation(); app.salad.changeQty(${i.id},1)">+</button>
+                    </div>
+                  </div>
+                </div>
+                <div class="date-col">
+                  <div class="d-lbl">Rayon: ${dS}</div>
+                  <div class="d-val ${isExp?'expired':''}">DLC: ${dE}</div>
+                </div>
+              </div></div>`;
+          });
+        });
+
+        // Re-render PVP needs (encart) si on est sur l’onglet besoins, pour garder cohérence
+        // (pas obligatoire, mais évite des "restes" si tu changes des libs)
+        try { window.app.pvp.render(); } catch(e){}
       }
     },
 
@@ -1075,13 +1452,14 @@
     }
   };
 
+  // Auth state
   onAuthStateChanged(auth, async (user) => {
     if(!user) {
       document.getElementById('login-overlay').classList.remove('hidden');
       document.getElementById('app-header').classList.add('hidden');
       document.getElementById('app-nav').classList.add('hidden');
       window.app.me = null;
-      window.app.data = { frais: [], users: [], pvpLib: [], pvpStock: [], checkedNeeds: [] };
+      window.app.data = { frais: [], users: [], pvpLib: [], pvpStock: [], checkedNeeds: [], saladLib: [], saladStock: [] };
       return;
     }
     await window.app.afterLoginBootstrap();
