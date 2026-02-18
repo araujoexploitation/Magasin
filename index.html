@@ -4,25 +4,17 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
 <meta name="theme-color" content="#ffffff" />
-<title>Araujo Exploitation v77 (Final)</title>
+<title>Araujo Exploitation v79 (Split Data)</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 <script src="https://unpkg.com/@zxing/library@latest"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
 
 <style>
   :root {
-    --primary: #003896;
-    --accent: #E2001A;
-    --pvp: #d97706;
-    --bg: #f3f4f6;
-    --surface: #ffffff;
-    --text: #1e293b;
-    --success: #10b981;
-    --danger: #ef4444;
+    --primary: #003896; --accent: #E2001A; --pvp: #d97706; --bg: #f3f4f6; --surface: #ffffff; --text: #1e293b; --success: #10b981; --danger: #ef4444;
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: system-ui, sans-serif; user-select: none; }
   body { margin: 0; background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
-
   .hidden { display: none !important; }
   main { flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 100px; }
   .card { background: var(--surface); border-radius: 16px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); margin-bottom: 15px; }
@@ -31,15 +23,9 @@
   header { background: var(--surface); padding: 10px; height: 90px; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); position: relative; }
   .logo-header { height: 60px; object-fit: contain; }
   .user-badge { position: absolute; right: 15px; top: 15px; font-size: 11px; background: #e0f2fe; color: var(--primary); padding: 6px 12px; border-radius: 20px; font-weight: bold; }
-  
   nav { position: fixed; bottom: 0; width: 100%; background: white; height: 70px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); z-index: 100; padding: 0 30px; }
   .nav-btn { text-align:center; color:#94a3b8; cursor: pointer; }
   .nav-btn.active { color: var(--primary); }
-
-  /* LOGIN */
-  .overlay { position: fixed; inset: 0; z-index: 3000; display: flex; flex-direction: column; align-items: center; justify-content: center; background: white; }
-  #login-user-select { width: 220px; padding: 12px; margin-bottom: 15px; border-radius: 12px; border: 1px solid #cbd5e1; background: #f8fafc; font-size: 16px; font-weight: bold; text-align: center; }
-  #login-pass { width: 220px; padding: 12px; font-size: 20px; text-align: center; border: 1px solid #e2e8f0; border-radius: 50px; margin-bottom: 20px; font-weight: bold; }
 
   /* TABS */
   .tabs { display: flex; background: #e2e8f0; padding: 4px; border-radius: 12px; margin-bottom: 15px; }
@@ -65,15 +51,20 @@
   .target-box label { font-size: 10px; font-weight: bold; margin-bottom: 2px; color: #64748b; }
   .target-box input { padding: 5px; text-align: center; font-weight: bold; border-radius: 8px; height: 45px; width: 100%; font-size: 18px; margin: 0; }
 
-  /* ITEMS */
+  /* LIST ITEMS */
   .swipe-wrapper { background: #ef4444; overflow: hidden; margin-bottom: 8px; border-radius: 12px; }
   .pvp-row-container { position: relative; overflow: hidden; margin-bottom: 8px; background: #fee2e2; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
   .pvp-row-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; padding-left: 20px; color: #ef4444; font-weight: bold; font-size: 14px; z-index: 1; }
   .pvp-item { position: relative; z-index: 2; background: white; display: flex; justify-content: space-between; align-items: center; padding: 12px; width: 100%; border-radius: 12px; will-change: transform; min-height: 80px; }
   
+  .wek-item-frais { background: white; padding: 15px; display: flex; align-items: center; justify-content: space-between; position: relative; z-index: 2; transition: transform 0.2s; }
   .wek-img { width: 55px; height: 55px; border-radius: 10px; object-fit: cover; background: #f1f5f9; margin-right: 15px; display: flex; align-items: center; justify-content: center; font-size: 22px; color: #cbd5e1; flex-shrink: 0; cursor: pointer; border: 1px solid #e2e8f0; }
-  
-  /* STOCK DATES */
+  .date-badge { width: 50px; height: 50px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; font-weight: bold; flex-shrink: 0; margin-left: 10px; }
+  .badge-red { background: #ef4444; } .badge-orange { background: #f59e0b; } .badge-green { background: #10b981; } .badge-grey { background: #94a3b8; }
+
+  /* PVP SPECIFIC */
+  .qty-ctrl { display: flex; align-items: center; gap: 8px; background: #f8fafc; padding: 5px 10px; border-radius: 10px; border: 1px solid #e2e8f0; }
+  .qty-btn { width: 32px; height: 32px; border-radius: 8px; border: none; background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); font-weight: bold; font-size: 18px; color: var(--primary); }
   .stock-dates { text-align: right; display: flex; flex-direction: column; justify-content: center; min-width: 90px; }
   .date-out { font-size: 11px; color: #94a3b8; margin-bottom: 4px; }
   .date-end { font-size: 14px; font-weight: 800; color: var(--success); }
@@ -246,10 +237,16 @@
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const db = getFirestore(initializeApp({ apiKey: "AIzaSyA0ffa4Nfa7kGLyaEcAocU9YzIhzmx3SkA", authDomain: "araujo-exploitation.firebaseapp.com", projectId: "araujo-exploitation" }));
-const docRef = doc(db, "store_master", "STOCK_MAGASIN_LIVE");
+
+// SPLIT DATA REFS
+const docUsers = doc(db, "store_master", "DATA_USERS");
+const docFrais = doc(db, "store_master", "DATA_FRAIS");
+const docPVP = doc(db, "store_master", "DATA_PVP");
+const docLegacy = doc(db, "store_master", "STOCK_MAGASIN_LIVE"); // Old one
+
 const codeReader = new ZXing.BrowserMultiFormatReader();
 
 window.app = {
@@ -286,454 +283,20 @@ window.app = {
                 let img = new Image(); img.src = e.target.result;
                 img.onload = () => {
                     let canvas = document.createElement('canvas'); let ctx = canvas.getContext('2d');
-                    let max = 600; let w = img.width, h = img.height;
+                    let max = 350; // REDUIT DE 600 à 350
+                    let w = img.width, h = img.height;
                     if (w > h) { if (w > max) { h *= max/w; w = max; } } else { if (h > max) { w *= max/h; h = max; } }
                     canvas.width = w; canvas.height = h; ctx.drawImage(img, 0, 0, w, h);
-                    callback(canvas.toDataURL('image/jpeg', 0.7));
+                    callback(canvas.toDataURL('image/jpeg', 0.5)); // QUALITE REDUITE DE 0.7 à 0.5
                 };
             };
         }
     },
 
-    init: function() {
-        onSnapshot(docRef, (s) => {
-            if(s.exists()) {
-                let d = s.data();
-                this.data = {
-                    frais: d.frais || [],
-                    users: d.users || [{name:"MANAGER",code:"2008",role:"admin"}],
-                    pvpLib: d.pvpLib || [],
-                    pvpStock: d.pvpStock || [],
-                    checkedNeeds: d.checkedNeeds || []
-                };
-            } else {
-                this.data = { frais:[], users:[{name:"MANAGER",code:"2008",role:"admin"}], pvpLib:[], pvpStock:[], checkedNeeds: [] };
-                this.save();
-            }
-            this.updateUI();
-        });
-    },
-
-    save: function() { setDoc(docRef, this.data, {merge:true}); },
-    
-    updateUI: function() {
-        let sel = document.getElementById('login-user-select');
-        sel.innerHTML = this.data.users.map(u => `<option value="${u.name}">${u.name}</option>`).join('');
-        this.frais.render();
-        this.pvp.render();
-        this.renderUsers();
-        this.checkAlerts();
-    },
-
-    login: function() {
-        let name = document.getElementById('login-user-select').value;
-        let code = document.getElementById('login-pass').value;
-        let u = this.data.users.find(x => x.name == name && x.code == code);
-        if(u) {
-            document.getElementById('login-overlay').classList.add('hidden');
-            document.getElementById('user-badge').innerText = u.name;
-            document.getElementById('app-header').classList.remove('hidden');
-            document.getElementById('app-nav').classList.remove('hidden');
-            if(u.role=='admin') document.getElementById('btn-team').classList.remove('hidden');
-        } else alert('Code Erreur');
-    },
-
-    nav: function(v, saveHistory = true) {
-        let current = document.querySelector('div[id^="view-"]:not(.hidden)');
-        if(saveHistory && current) {
-            let id = current.id.replace('view-', '');
-            if(id !== v) this.viewHistory.push(id);
-        }
-        document.querySelectorAll('[id^="view-"]').forEach(e => e.classList.add('hidden'));
-        document.getElementById('view-'+v).classList.remove('hidden');
-    },
-    
-    goBack: function() {
-        if(this.viewHistory.length > 0) { let prev = this.viewHistory.pop(); this.nav(prev, false); }
-        else { this.nav('home', false); }
-    },
-
-    toggleFam: function(famName) {
-        if(this.closedFamilies.has(famName)) this.closedFamilies.delete(famName);
-        else this.closedFamilies.add(famName);
-        this.frais.render();
-        this.pvp.render();
-    },
-
-    // --- MODULE FRAIS ---
-    frais: {
-        scanning: false,
-        imgUrl: "",
-        tab: function(t) {
-            document.querySelectorAll('#view-frais .tab').forEach(e => e.classList.remove('active'));
-            document.getElementById(t=='scan'?'tf-1':'tf-2').classList.add('active');
-            document.getElementById('frais-scan').classList.add('hidden');
-            document.getElementById('frais-list').classList.add('hidden');
-            document.getElementById('frais-'+t).classList.remove('hidden');
-        },
-        toggleScan: function() {
-            if(this.scanning) { this.scanning=false; document.getElementById('scanner-box').style.display='none'; codeReader.reset(); }
-            else { 
-                this.scanning=true; document.getElementById('scanner-box').style.display='block';
-                codeReader.decodeFromVideoDevice(null, 'video', (r) => { if(r){ this.api(r.text); document.getElementById('frais-ean').value=r.text; this.toggleScan(); } });
-            }
-        },
-        api: async function(ean) {
-            try {
-                let r = await fetch(`https://world.openfoodfacts.org/api/v0/product/${ean}.json`);
-                let d = await r.json();
-                if(d.status==1) {
-                    document.getElementById('frais-name').value = d.product.product_name_fr || "";
-                    this.imgUrl = d.product.image_front_small_url || "";
-                }
-            } catch(e){}
-        },
-        add: function() {
-            let o = {
-                id: Date.now(),
-                ean: document.getElementById('frais-ean').value,
-                fam: document.getElementById('frais-fam').value,
-                name: document.getElementById('frais-name').value,
-                qty: document.getElementById('frais-qty').value,
-                date: document.getElementById('frais-date').value,
-                img: this.imgUrl
-            };
-            if(!o.name || !o.date) return alert('Date requise');
-            window.app.data.frais.push(o); window.app.save(); alert('Ajouté');
-            this.imgUrl=""; document.getElementById('frais-name').value=""; document.getElementById('frais-ean').value="";
-        },
-        render: function() {
-            let div = document.getElementById('frais-list'); div.innerHTML="";
-            let grp = {};
-            window.app.data.frais.sort((a,b) => {
-                if(a.fam !== b.fam) return a.fam.localeCompare(b.fam);
-                return window.app.common.cleanName(a.name).localeCompare(window.app.common.cleanName(b.name));
-            });
-            window.app.data.frais.forEach(i=>{ if(!grp[i.fam])grp[i.fam]=[]; grp[i.fam].push(i); });
-            for(let f in grp) {
-                let isClosed = window.app.closedFamilies.has(f);
-                let icon = isClosed ? 'fa-chevron-right' : 'fa-chevron-down';
-                div.innerHTML += `<div class="group-header" onclick="app.toggleFam('${f}')"><span>${f}</span><i class="fas ${icon}"></i></div>`;
-                let content = document.createElement('div');
-                content.className = isClosed ? 'group-content closed' : 'group-content';
-                grp[f].forEach(i => {
-                    let d = new Date(i.date);
-                    let diff = (d - new Date())/(1000*60*60*24);
-                    let badge = diff<0?'badge-red':(diff<2?'badge-orange':'badge-green');
-                    let clickAction = `onclick="event.stopPropagation(); window.app.common.showBarcode('${i.ean}','${i.name.replace(/'/g," ")}','${i.img||""}')"`;
-                    let img = i.img ? `<img src="${i.img}" class="wek-img" ${clickAction}>` : `<div class="wek-img" ${clickAction}><i class="fas fa-barcode"></i></div>`;
-                    content.innerHTML += `
-                    <div class="swipe-wrapper"><div class="wek-item-frais" onclick="app.frais.openEdit(${i.id})">
-                        <div style="display:flex;align-items:center;">${img}<div><div style="font-weight:bold;">${i.name}</div><span class="wek-qty">x${i.qty}</span></div></div>
-                        <div class="date-badge ${badge}"><span style="font-size:16px;">${d.getDate()}</span><span style="font-size:10px;text-transform:uppercase;">${d.toLocaleString('fr',{month:'short'})}</span></div>
-                    </div></div>`;
-                });
-                div.appendChild(content);
-            }
-        },
-        openEdit: function(id) {
-            let i = window.app.data.frais.find(x => x.id == id);
-            document.getElementById('modal-edit-frais').classList.remove('hidden');
-            document.getElementById('edit-id').value = id;
-            document.getElementById('edit-famille').value = i.fam;
-            document.getElementById('edit-qty').value = i.qty;
-            document.getElementById('edit-date').value = i.date;
-        },
-        saveEdit: function() {
-            let id = document.getElementById('edit-id').value;
-            let idx = window.app.data.frais.findIndex(x => x.id == id);
-            if(idx>-1) {
-                window.app.data.frais[idx].fam = document.getElementById('edit-famille').value;
-                window.app.data.frais[idx].qty = document.getElementById('edit-qty').value;
-                window.app.data.frais[idx].date = document.getElementById('edit-date').value;
-                window.app.save(); document.getElementById('modal-edit-frais').classList.add('hidden');
-            }
-        },
-        del: function() {
-            let id = document.getElementById('edit-id').value;
-            window.app.data.frais = window.app.data.frais.filter(x => x.id != id);
-            window.app.save(); document.getElementById('modal-edit-frais').classList.add('hidden');
-        }
-    },
-
-    // --- MODULE PVP ---
-    pvp: {
-        tab: function(t) {
-            document.querySelectorAll('#view-pvp .tab').forEach(e => e.classList.remove('active-pvp'));
-            document.getElementById(t=='stock'?'tp-1':(t=='bib'?'tp-2':'tp-3')).classList.add('active-pvp');
-            ['pvp-stock','pvp-bib','pvp-calc'].forEach(id => document.getElementById(id).classList.add('hidden'));
-            document.getElementById('pvp-'+t).classList.remove('hidden');
-        },
-        handleImg: function(input) {
-            if(input.files && input.files[0]) {
-                window.app.common.compressImg(input.files[0], (base64) => {
-                    document.getElementById('img-preview').src = base64; 
-                    document.getElementById('img-preview').style.display='block';
-                    document.getElementById('lib-img-data').value = base64;
-                });
-            }
-        },
-        toggleFamInput: function() {
-            let val = document.getElementById('lib-fam-select').value;
-            if(val === 'new') document.getElementById('lib-fam-new').classList.remove('hidden');
-            else document.getElementById('lib-fam-new').classList.add('hidden');
-        },
-        openLib: function(id=null) {
-            document.getElementById('modal-pvp-lib').classList.remove('hidden');
-            document.getElementById('img-preview').style.display='none';
-            let uniqueFams = [...new Set(window.app.data.pvpLib.map(i => i.family || "DIVERS"))].sort();
-            let sel = document.getElementById('lib-fam-select');
-            sel.innerHTML = uniqueFams.map(f => `<option value="${f}">${f}</option>`).join('') + `<option value="new">Créer une nouvelle...</option>`;
-            if(id) {
-                let i = window.app.data.pvpLib.find(x=>x.id==id);
-                document.getElementById('lib-id').value=id;
-                document.getElementById('lib-name').value=i.name;
-                document.getElementById('lib-ean').value=i.ean||"";
-                document.getElementById('lib-days').value=i.days||0;
-                document.getElementById('lib-img-data').value=i.img||"";
-                document.getElementById('lib-fam-select').value = i.family || "DIVERS";
-                document.getElementById('lib-fam-new').classList.add('hidden');
-                if(i.img){ document.getElementById('img-preview').src=i.img; document.getElementById('img-preview').style.display='block'; }
-                document.getElementById('btn-del-lib').classList.remove('hidden');
-                for(let k=0;k<7;k++) document.getElementById('t-'+k).value = (i.targets||{})[k]||"";
-            } else {
-                document.getElementById('lib-id').value=""; document.getElementById('lib-name').value=""; document.getElementById('lib-ean').value="";
-                document.getElementById('lib-img-data').value=""; document.getElementById('lib-days').value=0;
-                document.getElementById('btn-del-lib').classList.add('hidden');
-                document.getElementById('lib-fam-new').classList.add('hidden');
-                for(let k=0;k<7;k++) document.getElementById('t-'+k).value = "";
-            }
-        },
-        saveLib: function() {
-            let id = document.getElementById('lib-id').value;
-            let famSelect = document.getElementById('lib-fam-select').value;
-            let famNew = document.getElementById('lib-fam-new').value;
-            let finalFam = (famSelect === 'new' && famNew) ? famNew.toUpperCase() : famSelect;
-            let o = {
-                id: id ? Number(id) : Date.now(),
-                family: finalFam,
-                name: document.getElementById('lib-name').value,
-                ean: document.getElementById('lib-ean').value,
-                img: document.getElementById('lib-img-data').value,
-                days: document.getElementById('lib-days').value,
-                targets: {}
-            };
-            for(let k=0;k<7;k++) o.targets[k] = document.getElementById('t-'+k).value;
-            if(!o.name) return alert("Nom du produit requis !");
-            if(id) {
-                let idx = window.app.data.pvpLib.findIndex(x=>x.id==id);
-                if(idx>-1) window.app.data.pvpLib[idx] = o;
-            } else { window.app.data.pvpLib.push(o); }
-            window.app.save(); document.getElementById('modal-pvp-lib').classList.add('hidden');
-        },
-        delLib: function() {
-            let id = document.getElementById('lib-id').value;
-            window.app.data.pvpLib = window.app.data.pvpLib.filter(x=>x.id!=id);
-            window.app.save(); document.getElementById('modal-pvp-lib').classList.add('hidden');
-        },
-        addStock: function(libId) {
-            let l = window.app.data.pvpLib.find(x=>x.id==libId);
-            let qty = prompt('Quantité ?', "1");
-            if(qty && qty>0) {
-                let now = new Date();
-                let endTs = window.app.common.calculateEnd(now.getTime(), l.days);
-                window.app.data.pvpStock.push({ id:Date.now(), libId:libId, name:l.name, ean:l.ean, qty:qty, out:now.getTime(), end:endTs, days:l.days });
-                window.app.save();
-                alert("Ajouté au rayon !");
-            }
-        },
-        openEditStock: function(id) {
-            let i = window.app.data.pvpStock.find(x=>x.id==id);
-            document.getElementById('modal-pvp-stock').classList.remove('hidden');
-            document.getElementById('stock-id').value=id;
-            document.getElementById('stock-name').innerText=i.name;
-            document.getElementById('stock-qty').value=i.qty;
-            document.getElementById('stock-start').value = window.app.common.tsToInput(i.out);
-            document.getElementById('stock-end').value = window.app.common.tsToInput(i.end);
-            document.getElementById('stock-start').onchange = function() {
-                let newStart = new Date(this.value).getTime();
-                let newEnd = window.app.common.calculateEnd(newStart, i.days);
-                document.getElementById('stock-end').value = window.app.common.tsToInput(newEnd);
-            };
-        },
-        saveStock: function() {
-            let id = document.getElementById('stock-id').value;
-            let idx = window.app.data.pvpStock.findIndex(x=>x.id==id);
-            if(idx>-1) {
-                window.app.data.pvpStock[idx].qty = document.getElementById('stock-qty').value;
-                window.app.data.pvpStock[idx].out = new Date(document.getElementById('stock-start').value).getTime();
-                window.app.data.pvpStock[idx].end = new Date(document.getElementById('stock-end').value).getTime();
-                window.app.save(); document.getElementById('modal-pvp-stock').classList.add('hidden');
-            }
-        },
-        delStock: function() {
-            let id = document.getElementById('stock-id').value;
-            window.app.data.pvpStock = window.app.data.pvpStock.filter(x=>x.id!=id);
-            window.app.save(); document.getElementById('modal-pvp-stock').classList.add('hidden');
-        },
-        attachSwipe: function(el, id) {
-            let startX = 0;
-            el.addEventListener('touchstart', e => { startX = e.touches[0].clientX; el.style.transition = 'none'; });
-            el.addEventListener('touchmove', e => { if(e.touches[0].clientX - startX > 0) el.style.transform = `translateX(${e.touches[0].clientX - startX}px)`; });
-            el.addEventListener('touchend', e => {
-                el.style.transition = 'transform 0.3s ease';
-                if(e.changedTouches[0].clientX - startX > 250) {
-                     el.style.transform = `translateX(100%)`;
-                     setTimeout(() => { window.app.data.pvpStock = window.app.data.pvpStock.filter(x=>x.id!=id); window.app.save(); }, 300);
-                } else { el.style.transform = `translateX(0)`; }
-            });
-        },
-        toggleNeed: function(libId) {
-            let idx = window.app.data.checkedNeeds.indexOf(libId);
-            if(idx > -1) window.app.data.checkedNeeds.splice(idx, 1);
-            else window.app.data.checkedNeeds.push(libId);
-            window.app.save();
-        },
-        render: function() {
-            // 1. BIB (Library)
-            let bib = document.getElementById('lib-list'); bib.innerHTML = window.app.data.pvpLib.length ? "" : "Vide";
-            let groupedLib = {};
-            window.app.data.pvpLib.sort((a,b) => window.app.common.cleanName(a.name).localeCompare(window.app.common.cleanName(b.name)));
-            window.app.data.pvpLib.forEach(l => { let f = l.family || "DIVERS"; if(!groupedLib[f]) groupedLib[f] = []; groupedLib[f].push(l); });
-            Object.keys(groupedLib).sort().forEach(fam => {
-                let isClosed = window.app.closedFamilies.has('L-'+fam);
-                let icon = isClosed ? 'fa-chevron-right' : 'fa-chevron-down';
-                bib.innerHTML += `<div class="group-header" onclick="app.toggleFam('L-${fam}')"><span>${fam}</span><i class="fas ${icon}"></i></div>`;
-                let content = document.createElement('div'); content.className = isClosed ? 'group-content closed' : 'group-content';
-                groupedLib[fam].forEach(l => {
-                    let clickAction = `onclick="event.stopPropagation(); window.app.common.showBarcode('${l.ean}','${l.name.replace(/'/g," ")}','${l.img||""}')"`
-                    let img = l.img ? `<img src="${l.img}" class="wek-img" ${clickAction}>` : `<div class="wek-img" ${clickAction}><i class="fas fa-bread-slice"></i></div>`;
-                    content.innerHTML += `<div class="pvp-item" style="justify-content:space-between;"><div style="display:flex;align-items:center;" onclick="app.pvp.openLib(${l.id})">${img}<div><b>${l.name}</b><br><small>${l.days}h</small></div></div><button class="btn-orange" style="width:40px;height:40px;border-radius:50%;padding:0;" onclick="app.pvp.addStock(${l.id})">+</button></div>`;
-                });
-                bib.appendChild(content);
-            });
-
-            // 2. STOCK
-            let st = document.getElementById('pvp-stock'); st.innerHTML = window.app.data.pvpStock.length ? "" : "<div style='text-align:center;margin-top:20px;color:#999'>Rayon Vide</div>";
-            let groupedStock = {};
-            window.app.data.pvpStock.sort((a,b)=>a.end-b.end);
-            window.app.data.pvpStock.forEach(s => {
-                let libItem = window.app.data.pvpLib.find(l => l.id == s.libId);
-                let fam = libItem ? (libItem.family || "DIVERS") : "DIVERS";
-                if(!groupedStock[fam]) groupedStock[fam] = [];
-                groupedStock[fam].push(s);
-            });
-
-            let now = new Date(); let todayStr = now.toDateString();
-            Object.keys(groupedStock).sort().forEach(fam => {
-                 let isClosed = window.app.closedFamilies.has('S-'+fam);
-                 let icon = isClosed ? 'fa-chevron-right' : 'fa-chevron-down';
-                 st.innerHTML += `<div class="group-header" style="background:#d97706" onclick="app.toggleFam('S-${fam}')"><span>${fam}</span><i class="fas ${icon}"></i></div>`;
-                 let content = document.createElement('div'); content.className = isClosed ? 'group-content closed' : 'group-content';
-                 
-                 groupedStock[fam].forEach(i => {
-                    let dStart = new Date(i.out); let dEnd = new Date(i.end);
-                    let isToday = dEnd.toDateString() === todayStr; let dateColor = isToday ? 'expired' : '';
-                    let lib = window.app.data.pvpLib.find(x => x.id == i.libId);
-                    let displayImg = lib && lib.img ? lib.img : null;
-                    let clickAction = `onclick="event.stopPropagation(); window.app.common.showBarcode('${i.ean}','${i.name.replace(/'/g," ")}','${displayImg||""}')"`
-                    let imgHTML = displayImg ? `<img src="${displayImg}" class="wek-img" ${clickAction}>` : `<div class="wek-img" ${clickAction}><i class="fas fa-bread-slice"></i></div>`;
-                    
-                    let container = document.createElement('div'); container.className = 'pvp-row-container';
-                    container.innerHTML = `<div class="pvp-row-bg"><i class="fas fa-trash"></i> JETER</div>`;
-                    let item = document.createElement('div'); item.className = 'pvp-item';
-                    item.innerHTML = `
-                    <div style="display:flex;align-items:center;flex:1;">
-                        ${imgHTML}
-                        <div style="overflow:hidden;margin-right:10px;">
-                            <div style="font-weight:bold;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:15px;">${i.name}</div>
-                            <span class="wek-qty">Qté: x${i.qty}</span>
-                        </div>
-                    </div>
-                    <div class="stock-dates">
-                        <div class="date-out">Sortie: ${dStart.getDate()}/${dStart.getMonth()+1} ${dStart.getHours()}h${dStart.getMinutes()<10?'0':''}${dStart.getMinutes()}</div>
-                        <div class="date-end ${dateColor}">FIN: ${dEnd.getDate()}/${dEnd.getMonth()+1} ${dEnd.getHours()}h${dEnd.getMinutes()<10?'0':''}${dEnd.getMinutes()}</div>
-                    </div>`;
-                    item.onclick = () => window.app.pvp.openEditStock(i.id);
-                    this.attachSwipe(item, i.id);
-                    container.appendChild(item);
-                    content.appendChild(container);
-                 });
-                 st.appendChild(content);
-            });
-
-            // 3. BESOINS (A SORTIR) - Grouped by Family
-            let cl = document.getElementById('pvp-calc'); 
-            let tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
-            let tomDayIndex = tomorrow.getDay(); 
-            let dayNames = ['DIMANCHE','LUNDI','MARDI','MERCREDI','JEUDI','VENDREDI','SAMEDI'];
-            let criticalTime = new Date(tomorrow); criticalTime.setHours(10, 0, 0, 0);
-
-            let groupedTodo = {};
-            let doneListHTML = "";
-            let hasNeeds = false;
-
-            window.app.data.pvpLib.forEach(l => {
-                let valid = window.app.data.pvpStock.filter(s => s.libId == l.id && s.end > criticalTime.getTime()).reduce((a,b)=>a+parseInt(b.qty),0);
-                let target = (l.targets && l.targets[tomDayIndex]) ? parseInt(l.targets[tomDayIndex]) : 0;
-                let need = target - valid;
-                
-                if(need > 0) {
-                    hasNeeds = true;
-                    let isChecked = window.app.data.checkedNeeds.includes(l.id);
-                    let displayImg = l.img ? l.img : null;
-                    let clickAction = `onclick="event.stopPropagation(); window.app.common.showBarcode('${l.ean}','${l.name.replace(/'/g," ")}','${displayImg||""}')"`
-                    let imgHTML = displayImg ? `<img src="${displayImg}" class="wek-img" ${clickAction}>` : `<div class="wek-img" ${clickAction}><i class="fas fa-bread-slice"></i></div>`;
-
-                    let htmlItem = `
-                    <div class="${isChecked?'pvp-item done-item':'pvp-item'}" style="margin-bottom:10px; border-left:5px solid #d97706;">
-                        <div style="flex:1;display:flex;align-items:center;">
-                            ${imgHTML}
-                            <div>
-                                <b>${l.name}</b><br>
-                                <small style="color:#666">Obj: ${target} - Stock: ${valid}</small>
-                                <div style="color:#d97706;font-weight:bold;font-size:18px;">A SORTIR: ${need}</div>
-                            </div>
-                        </div>
-                        <div class="${isChecked?'checkbox-circle checked':'checkbox-circle'}" onclick="app.pvp.toggleNeed(${l.id})">${isChecked?'<i class="fas fa-check"></i>':''}</div>
-                    </div>`;
-
-                    if(isChecked) {
-                        doneListHTML += htmlItem;
-                    } else {
-                        let fam = l.family || "DIVERS";
-                        if(!groupedTodo[fam]) groupedTodo[fam] = [];
-                        groupedTodo[fam].push(htmlItem);
-                    }
-                }
-            });
-
-            let finalHTML = `<h4 style="text-align:center;color:#003896;margin:0 0 15px 0;">A SORTIR (POUR ${dayNames[tomDayIndex]})</h4>`;
+    init: async function() {
+        // LOAD SPLIT DATA
+        try {
+            const [uSnap, fSnap, pSnap] = await Promise.all([getDoc(docUsers), getDoc(docFrais), getDoc(docPVP)]);
             
-            if(!hasNeeds) {
-                finalHTML += "<div style='text-align:center;margin-top:20px;color:#999'>Rien à préparer.</div>";
-            } else {
-                // Render Grouped TODOs
-                Object.keys(groupedTodo).sort().forEach(fam => {
-                    let isClosed = window.app.closedFamilies.has('N-'+fam);
-                    let icon = isClosed ? 'fa-chevron-right' : 'fa-chevron-down';
-                    finalHTML += `<div class="group-header" style="background:#003896" onclick="app.toggleFam('N-${fam}')"><span>${fam}</span><i class="fas ${icon}"></i></div>`;
-                    let contentClass = isClosed ? 'group-content closed' : 'group-content';
-                    finalHTML += `<div class="${contentClass}">${groupedTodo[fam].join('')}</div>`;
-                });
-            }
-
-            finalHTML += `<h4 style="text-align:center;color:#64748b;margin:30px 0 15px 0;">DÉJÀ SORTI</h4>`;
-            finalHTML += doneListHTML || "<div style='text-align:center;color:#ccc;font-size:12px;'>Aucun produit sorti</div>";
-
-            cl.innerHTML = finalHTML;
-        }
-    },
-
-    saveUser: function() { window.app.common.saveUser(); },
-    checkAlerts: function() {
-        let alert = window.app.data.frais.some(i => { return (new Date(i.date) - new Date())/(1000*60*60*24) < 1; });
-        document.getElementById('alert-box').style.display = alert ? 'block' : 'none';
-    },
-    renderUsers: function() { window.app.common.renderUsers(); }
-};
-
-window.app.init();
-</script>
-</body>
-</html>
+            if(uSnap.exists()) this.data.users = uSnap.data().list || [];
+            if(fSnap.exists()) this.data.frais = fSnap.
