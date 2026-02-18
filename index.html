@@ -4,379 +4,351 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
 <meta name="theme-color" content="#ffffff" />
-<title>Araujo Exploitation v64</title>
+<title>Araujo Exploitation v65</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 <script src="https://unpkg.com/@zxing/library@latest"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
 
 <style>
-  /* --- DESIGN V46 STRICT --- */
   :root {
     --primary: #003896;
-    --carrefour-green: #00563f;
     --accent: #E2001A;
     --pvp: #d97706;
     --bg: #f3f4f6;
     --surface: #ffffff;
     --text: #1e293b;
-    --radius: 16px;
   }
-  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: system-ui, -apple-system, sans-serif; user-select: none; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: system-ui, sans-serif; user-select: none; }
   body { margin: 0; background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
-  /* NAVIGATION & LAYOUT */
+  /* NAVIGATION */
   .hidden { display: none !important; }
   main { flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 100px; }
-  .card { background: var(--surface); border-radius: var(--radius); padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); margin-bottom: 15px; }
-
-  /* LOGIN */
-  .overlay { position: fixed; inset: 0; z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: white; padding: 20px; }
-  .login-logo { width: 80%; max-width: 300px; margin-bottom: 30px; object-fit: contain; }
-  #login-user-select { width: 220px; padding: 12px; margin-bottom: 15px; border-radius: 12px; border: 1px solid #cbd5e1; background: #f8fafc; font-size: 16px; font-weight: bold; text-align: center; }
-  #login-pass { width: 220px; padding: 12px; font-size: 20px; letter-spacing: 5px; text-align: center; border: 1px solid #e2e8f0; border-radius: 50px; background: #fff; outline: none; margin-bottom: 20px; color: var(--text); font-weight: bold; }
+  .card { background: var(--surface); border-radius: 16px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); margin-bottom: 15px; }
 
   /* HEADER */
-  header { background: var(--surface); padding: 10px; padding-top: max(10px, env(safe-area-inset-top)); display: flex; justify-content: center; align-items: center; z-index: 50; box-shadow: 0 4px 15px rgba(0,0,0,0.05); height: 100px; position: relative; }
-  .logo-header { height: 70px; width: auto; object-fit: contain; }
-  .user-badge { position: absolute; right: 15px; top: 15px; font-size: 11px; background: #e0f2fe; color: var(--primary); padding: 6px 12px; border-radius: 20px; font-weight: bold; border: 1px solid #bae6fd; }
+  header { background: var(--surface); padding: 10px; height: 90px; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); position: relative; }
+  .logo-header { height: 60px; object-fit: contain; }
+  .user-badge { position: absolute; right: 15px; top: 15px; font-size: 11px; background: #e0f2fe; color: var(--primary); padding: 6px 12px; border-radius: 20px; font-weight: bold; }
+
+  /* LOGIN */
+  .overlay { position: fixed; inset: 0; z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center; background: white; }
+  #login-user-select { width: 220px; padding: 12px; margin-bottom: 15px; border-radius: 12px; border: 1px solid #cbd5e1; background: #f8fafc; font-size: 16px; font-weight: bold; text-align: center; }
+  #login-pass { width: 220px; padding: 12px; font-size: 20px; text-align: center; border: 1px solid #e2e8f0; border-radius: 50px; margin-bottom: 20px; font-weight: bold; }
 
   /* TABS */
-  .tabs { display: flex; background: #e2e8f0; padding: 4px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #cbd5e1; }
-  .tab { flex: 1; text-align: center; padding: 12px; font-weight: 700; font-size: 12px; color: #64748b; border-radius: 9px; cursor: pointer; transition: 0.2s; white-space: nowrap; }
+  .tabs { display: flex; background: #e2e8f0; padding: 4px; border-radius: 12px; margin-bottom: 15px; }
+  .tab { flex: 1; text-align: center; padding: 12px; font-weight: 700; font-size: 12px; color: #64748b; border-radius: 9px; cursor: pointer; transition: 0.2s; }
   .tab.active { background: white; color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
   .tab.active-pvp { background: white; color: var(--pvp); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
 
+  /* BUTTONS & INPUTS */
+  input, select { width: 100%; padding: 14px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 16px; background: #fff; margin-bottom: 10px; outline: none; }
+  .btn { width: 100%; padding: 16px; border-radius: 12px; border: none; font-weight: 700; font-size: 16px; background: var(--primary); color: white; cursor: pointer; margin-top: 5px; }
+  .btn-orange { background: var(--pvp); } .btn-red { background: #ef4444; }
+
+  /* FRAIS LIST ITEMS */
+  .group-header { background: #334155; color: white; padding: 8px 15px; border-radius: 8px 8px 0 0; margin-top: 20px; font-weight: bold; text-transform: uppercase; font-size: 12px; }
+  .swipe-wrapper { background: #ef4444; overflow: hidden; margin-bottom: 1px; } /* Fond rouge du swipe */
+  .wek-item { background: white; padding: 15px; display: flex; align-items: center; justify-content: space-between; position: relative; z-index: 2; transition: transform 0.2s; }
+  
+  .date-badge { width: 50px; height: 50px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; font-weight: bold; flex-shrink: 0; margin-left: 10px; }
+  .badge-red { background: #ef4444; } .badge-orange { background: #f59e0b; } .badge-green { background: #10b981; }
+
+  /* PVP ITEMS */
+  .pvp-item { background: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; }
+  .wek-img { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; background: #f1f5f9; margin-right: 15px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #cbd5e1; flex-shrink: 0; }
+
   /* HOME */
   .home-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
-  .home-btn { padding: 30px 10px; text-align: center; border-radius: var(--radius); color: white; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-  .home-icon { font-size: 35px; margin-bottom: 10px; display: block; }
-
-  /* LISTES */
-  .group-header { background: #334155; color: white; padding: 8px 15px; border-radius: 8px 8px 0 0; margin-top: 20px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: bold; text-transform: uppercase; }
-  .swipe-wrapper { position: relative; background: var(--accent); overflow: hidden; border-bottom: 1px solid #f1f5f9; }
-  
-  /* PVP ITEM STYLE */
-  .pvp-row-container { position: relative; overflow: hidden; margin-bottom: 10px; background: #fee2e2; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-  .pvp-row-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; padding-left: 20px; color: #ef4444; font-weight: bold; font-size: 14px; z-index: 1; }
-  .pvp-item { position: relative; z-index: 2; background: white; display: flex; justify-content: space-between; align-items: center; padding: 15px; transition: transform 0.1s linear; width: 100%; border-radius: 12px; }
-  
-  .wek-img { width: 60px; height: 60px; border-radius: 8px; object-fit: cover; background: #f8fafc; border: 1px solid #e2e8f0; margin-right: 15px; display: flex; align-items: center; justify-content: center; color: #cbd5e1; flex-shrink: 0; }
-  .wek-qty { background: #f1f5f9; padding: 2px 8px; border-radius: 4px; border: 1px solid #e2e8f0; font-weight: bold; color: var(--primary); }
-
-  /* INPUTS */
-  .input-group label { display: block; font-size: 11px; font-weight: 700; color: #64748b; margin-bottom: 4px; text-transform: uppercase; }
-  input, select { width: 100%; padding: 14px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 16px; background: #fff; outline: none; }
-  .btn { width: 100%; padding: 16px; border-radius: 12px; border: none; font-weight: 700; font-size: 16px; background: var(--primary); color: white; cursor: pointer; }
-  .btn-green { background: var(--carrefour-green); }
-  .btn-orange { background: var(--pvp); }
-  .btn-red { background: #ef4444; color: white; }
-
-  /* WEEK GRID */
-  .week-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 10px; }
-  .week-day label { font-size: 9px; font-weight: bold; color: #666; display: block; text-align: center; }
-  .week-day input { padding: 5px; text-align: center; font-size: 12px; border-radius: 6px; width: 100%; }
+  .home-btn { padding: 30px 10px; text-align: center; border-radius: 16px; color: white; cursor: pointer; font-weight: bold; }
 
   /* MODALS */
   .modal-bc { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
-  .modal-card { background: white; padding: 30px; border-radius: 20px; text-align: center; width: 95%; max-width: 400px; max-height: 80vh; overflow-y: auto; }
-  #img-preview { width: 100px; height: 100px; object-fit: cover; border-radius: 10px; margin-top: 10px; border: 2px solid #ddd; display: none; margin-left: auto; margin-right: auto; }
-
+  .modal-card { background: white; padding: 25px; border-radius: 20px; width: 100%; max-width: 400px; max-height: 85vh; overflow-y: auto; }
+  #img-preview { width: 100px; height: 100px; object-fit: cover; border-radius: 10px; margin: 10px auto; display: none; border: 2px solid #ddd; }
+  
+  /* NAVBAR */
   nav { position: fixed; bottom: 0; width: 100%; background: white; height: 70px; display: flex; justify-content: center; align-items: center; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); z-index: 100; }
-  .nav-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; color: #94a3b8; font-size: 10px; cursor: pointer; width: 80px; }
-  .nav-btn.active { color: var(--primary); } .nav-btn i { font-size: 24px; margin-bottom: 4px; }
 </style>
 </head>
 <body>
 
   <div id="login-overlay" class="overlay">
-    <img src="https://raw.githubusercontent.com/araujoexploitation/Magasin/main/LOGO.png" alt="Carrefour Express" class="login-logo">
-    <label style="font-size:12px; color:#666; font-weight:bold; margin-bottom:5px;">QUI ÊTES-VOUS ?</label>
+    <img src="https://raw.githubusercontent.com/araujoexploitation/Magasin/main/LOGO.png" class="login-logo" style="width:200px; margin-bottom:30px;">
     <select id="login-user-select"></select>
-    <input type="password" id="login-pass" placeholder="CODE (ex: 2008)">
-    <button class="btn btn-green" onclick="window.app.common.login()" style="width: 220px; border-radius: 50px;">CONNEXION</button>
+    <input type="password" id="login-pass" placeholder="CODE">
+    <button class="btn" onclick="app.login()" style="width:220px;border-radius:50px;background:#00563f;">CONNEXION</button>
   </div>
 
   <div id="modal-barcode" class="modal-bc hidden">
-    <div class="modal-card">
-        <div id="bc-name" style="font-weight:bold; font-size:20px; margin-bottom:20px;">Produit</div>
+    <div class="modal-card" style="text-align:center;">
+        <h3 id="bc-name">Produit</h3>
         <svg id="barcode"></svg>
-        <button class="btn" style="margin-top:30px; background:#f1f5f9; color:#333" onclick="document.getElementById('modal-barcode').classList.add('hidden')">Fermer</button>
+        <button class="btn" style="background:#eee;color:#333;margin-top:20px;" onclick="document.getElementById('modal-barcode').classList.add('hidden')">Fermer</button>
     </div>
   </div>
 
   <div id="modal-edit-frais" class="modal-bc hidden">
     <div class="modal-card">
-        <h3 style="color:var(--primary); margin-top:0;">Modifier Frais</h3>
+        <h3>Modifier Frais</h3>
         <input type="hidden" id="edit-id">
-        <div class="input-group"><label>Famille</label><select id="edit-famille"><option>SNACKING</option><option>TRAITEUR</option><option>ULTRA FRAIS</option><option>CHARCUTERIE</option><option>VOLAILLE</option><option>BOUCHERIE</option><option>FROMAGE</option><option>SAURISSERIE</option><option>DIVERS</option></select></div><br>
-        <div class="input-group"><label>Quantité</label><input type="number" id="edit-qty"></div><br>
-        <div class="input-group"><label>DLC</label><input type="date" id="edit-date"></div>
-        <button class="btn btn-green" onclick="window.app.frais.saveEdit()" style="margin-top:20px;">Enregistrer</button>
-        <button class="btn btn-red" onclick="window.app.frais.delete()" style="margin-top:10px;">Supprimer</button>
-        <button class="btn" style="margin-top:10px; background:#f1f5f9; color:#333" onclick="document.getElementById('modal-edit-frais').classList.add('hidden')">Annuler</button>
+        <label>Famille</label><select id="edit-famille"><option>SNACKING</option><option>TRAITEUR</option><option>ULTRA FRAIS</option><option>CHARCUTERIE</option><option>VOLAILLE</option><option>BOUCHERIE</option><option>FROMAGE</option><option>SAURISSERIE</option><option>DIVERS</option></select>
+        <label>Qté</label><input type="number" id="edit-qty">
+        <label>DLC</label><input type="date" id="edit-date">
+        <button class="btn" onclick="app.frais.saveEdit()" style="background:#00563f;">Enregistrer</button>
+        <button class="btn" onclick="app.frais.del()" style="background:#ef4444;">Supprimer</button>
+        <button class="btn" onclick="document.getElementById('modal-edit-frais').classList.add('hidden')" style="background:#eee;color:#333;">Annuler</button>
     </div>
   </div>
 
   <div id="modal-pvp-lib" class="modal-bc hidden">
     <div class="modal-card">
-        <h3 style="color:var(--pvp); margin-top:0;">Fiche Produit PVP</h3>
+        <h3 style="color:#d97706">Produit PVP</h3>
         <input type="hidden" id="lib-id"> 
         <input type="hidden" id="lib-img-data">
         
-        <div class="input-group"><label>Nom</label><input type="text" id="lib-name"></div><br>
-        <div class="input-group"><label>EAN (Douchette)</label><input type="number" id="lib-ean"></div><br>
+        <label>Nom</label><input type="text" id="lib-name" placeholder="Nom du produit">
+        <label>EAN</label><input type="number" id="lib-ean" placeholder="Code barre">
         
-        <div class="input-group">
-            <label>Photo</label>
-            <input type="file" id="camera-input" accept="image/*" capture="environment" onchange="window.app.pvp.handleImage(this)" style="display:none;">
-            <button class="btn" onclick="document.getElementById('camera-input').click()" style="background:#eee; color:#333; padding:10px;"><i class="fas fa-camera"></i> PRENDRE PHOTO</button>
-            <img id="img-preview">
-        </div><br>
+        <label>Photo</label>
+        <input type="file" id="cam-input" accept="image/*" capture="environment" style="display:none" onchange="app.pvp.handleImg(this)">
+        <button class="btn" onclick="document.getElementById('cam-input').click()" style="background:#eee;color:#333;margin-bottom:10px;"><i class="fas fa-camera"></i> Prendre Photo</button>
+        <img id="img-preview">
 
-        <div class="input-group"><label>Durée de vie</label>
+        <label>Durée de vie</label>
         <select id="lib-days">
-            <option value="0">0 Jour (Baguettes, Croissants...)</option>
+            <option value="0">0 Jour (Baguettes, Croissants)</option>
             <option value="1">1 Jour (24h)</option>
-            <option value="2">2 Jours (48h - Donuts, Muffins)</option>
-            <option value="3">3 Jours</option>
+            <option value="2">2 Jours (Donuts, Muffins)</option>
         </select>
-        </div><br>
         
-        <div class="input-group"><label>Objectifs Semaine</label></div>
-        <div class="week-grid">
-            <div class="week-day"><label>LUN</label><input type="number" id="t-1"></div>
-            <div class="week-day"><label>MAR</label><input type="number" id="t-2"></div>
-            <div class="week-day"><label>MER</label><input type="number" id="t-3"></div>
-            <div class="week-day"><label>JEU</label><input type="number" id="t-4"></div>
-            <div class="week-day"><label>VEN</label><input type="number" id="t-5"></div>
-            <div class="week-day"><label>SAM</label><input type="number" id="t-6"></div>
-            <div class="week-day"><label>DIM</label><input type="number" id="t-0"></div>
+        <label>Objectif (Lundi au Dimanche)</label>
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;">
+            <input type="number" id="t-1" placeholder="L" style="padding:5px;font-size:12px;text-align:center;">
+            <input type="number" id="t-2" placeholder="M" style="padding:5px;font-size:12px;text-align:center;">
+            <input type="number" id="t-3" placeholder="M" style="padding:5px;font-size:12px;text-align:center;">
+            <input type="number" id="t-4" placeholder="J" style="padding:5px;font-size:12px;text-align:center;">
+            <input type="number" id="t-5" placeholder="V" style="padding:5px;font-size:12px;text-align:center;">
+            <input type="number" id="t-6" placeholder="S" style="padding:5px;font-size:12px;text-align:center;">
+            <input type="number" id="t-0" placeholder="D" style="padding:5px;font-size:12px;text-align:center;">
         </div>
-        
-        <button class="btn btn-orange" onclick="window.app.pvp.saveLib()" style="margin-top:10px;">Enregistrer</button>
-        <button id="btn-del-lib" class="btn btn-red hidden" onclick="window.app.pvp.delLib()" style="margin-top:10px;">Supprimer Produit</button>
-        <button class="btn" style="margin-top:10px; background:#f1f5f9; color:#333" onclick="document.getElementById('modal-pvp-lib').classList.add('hidden')">Fermer</button>
+
+        <button class="btn" onclick="app.pvp.saveLib()" style="background:#d97706;">Enregistrer</button>
+        <button class="btn" onclick="app.pvp.delLib()" style="background:#ef4444;" id="btn-del-lib">Supprimer</button>
+        <button class="btn" onclick="document.getElementById('modal-pvp-lib').classList.add('hidden')" style="background:#eee;color:#333;">Fermer</button>
     </div>
   </div>
 
-  <div id="modal-edit-pvp-stock" class="modal-bc hidden">
+  <div id="modal-pvp-stock" class="modal-bc hidden">
       <div class="modal-card">
-          <h3 style="color:var(--pvp);">Modifier Rayon</h3>
+          <h3 style="color:#d97706">Modifier Rayon</h3>
           <input type="hidden" id="stock-id">
-          <p id="stock-name" style="font-weight:bold; font-size:18px; margin-bottom:20px;"></p>
-          <div class="input-group"><label>Quantité</label><input type="number" id="stock-qty"></div>
-          <button class="btn btn-orange" onclick="window.app.pvp.saveStock()" style="margin-top:20px;">Valider</button>
-          <button class="btn" style="margin-top:10px; background:#f1f5f9; color:#333" onclick="document.getElementById('modal-edit-pvp-stock').classList.add('hidden')">Annuler</button>
+          <h4 id="stock-name"></h4>
+          <label>Quantité</label><input type="number" id="stock-qty">
+          <button class="btn" onclick="app.pvp.saveStock()" style="background:#d97706;">Valider</button>
+          <button class="btn" onclick="app.pvp.delStock()" style="background:#ef4444;">Retirer du Rayon</button>
+          <button class="btn" onclick="document.getElementById('modal-pvp-stock').classList.add('hidden')" style="background:#eee;color:#333;">Annuler</button>
       </div>
   </div>
 
   <header>
     <img src="https://raw.githubusercontent.com/araujoexploitation/Magasin/main/LOGO.png" class="logo-header">
-    <div id="user-display" class="user-badge">...</div>
+    <div id="user-badge" class="user-badge">...</div>
   </header>
 
   <main>
     <div id="view-home">
-      <div id="alert-box" style="display:none; background:var(--accent); color:white; padding:15px; border-radius:12px; margin-bottom:15px; text-align:center; font-weight:bold;">⚠️ ATTENTION : Saisir quantités pour demain !</div>
-
-      <div class="home-grid">
-        <div class="home-btn" onclick="window.app.common.nav('frais')" style="background: linear-gradient(135deg, #003896 0%, #002366 100%);">
-            <span class="home-icon"><i class="fas fa-barcode"></i></span>
-            <span>DLC FRAIS</span>
+        <div id="alert-box" style="display:none;background:#ef4444;color:white;padding:15px;border-radius:12px;margin-bottom:15px;text-align:center;font-weight:bold;">⚠️ Vérifier Dates !</div>
+        
+        <div class="home-grid">
+            <div class="home-btn" onclick="app.nav('frais')" style="background: linear-gradient(135deg, #003896 0%, #002366 100%);"><i class="fas fa-barcode home-icon"></i><br>DLC FRAIS</div>
+            <div class="home-btn" onclick="app.nav('pvp')" style="background: linear-gradient(135deg, #d97706 0%, #b45309 100%);"><i class="fas fa-bread-slice home-icon"></i><br>GESTION PVP</div>
         </div>
-        <div class="home-btn" onclick="window.app.common.nav('pvp')" style="background: linear-gradient(135deg, #d97706 0%, #b45309 100%);">
-            <span class="home-icon"><i class="fas fa-bread-slice"></i></span>
-            <span>GESTION PVP</span>
-        </div>
-      </div>
-      
-      <div id="btn-team" class="card hidden" onclick="window.app.common.nav('team')" style="text-align:center; cursor:pointer;">
-        <i class="fas fa-users-cog" style="font-size:30px; color:var(--carrefour-green); margin-bottom:10px;"></i>
-        <h4 style="margin:0; color: var(--text);">Gérer l'Équipe</h4>
-      </div>
+        <div class="card hidden" id="btn-team" onclick="app.nav('team')" style="text-align:center;"><i class="fas fa-users"></i> Équipe</div>
     </div>
 
     <div id="view-frais" class="hidden">
-      <div class="tabs">
-        <div id="tab-scan" class="tab active" onclick="window.app.frais.switch('scan')">AJOUT MANUEL</div>
-        <div id="tab-list" class="tab" onclick="window.app.frais.switch('list')">LISTE</div>
-      </div>
-      <div id="content-scan">
-        <div id="scanner-container" style="width:100%; height:250px; background:black; border-radius:12px; margin-bottom:15px; overflow:hidden; display:none;"><video id="video" style="width:100%; height:100%; object-fit:cover;"></video></div>
-        <button class="btn" onclick="window.app.frais.toggleScanner()" style="margin-bottom:15px;"><i class="fas fa-camera"></i> LANCER SCAN</button>
-        <div class="card">
-          <div class="input-group"><label>EAN</label><input type="number" id="frais-ean" oninput="if(this.value.length>=8) window.app.frais.scanApi(this.value)"></div>
-          <div class="input-group"><label>Famille</label><select id="frais-famille"><option>SNACKING</option><option>TRAITEUR</option><option>ULTRA FRAIS</option><option>CHARCUTERIE</option><option>VOLAILLE</option><option>BOUCHERIE</option><option>FROMAGE</option><option>SAURISSERIE</option><option>DIVERS</option></select></div>
-          <div class="input-group"><label>Nom</label><input type="text" id="frais-name"></div>
-          <div style="display:flex; gap:10px;">
-             <div class="input-group" style="flex:2"><label>DLC</label><input type="date" id="frais-date"></div>
-             <div class="input-group" style="flex:1"><label>Qté</label><input type="number" id="frais-qty"></div>
-          </div>
-          <button class="btn" onclick="window.app.frais.add()" style="margin-top:10px;">VALIDER</button>
+        <div class="tabs">
+            <div class="tab active" id="tf-1" onclick="app.frais.tab('scan')">SCAN</div>
+            <div class="tab" id="tf-2" onclick="app.frais.tab('list')">LISTE</div>
         </div>
-      </div>
-      <div id="content-list" class="hidden"><div id="list-frais-container"></div></div>
+        
+        <div id="frais-scan">
+            <div id="scanner-box" style="height:200px;background:black;margin-bottom:10px;display:none;"><video id="video" style="width:100%;height:100%;object-fit:cover;"></video></div>
+            <button class="btn" onclick="app.frais.toggleScan()"><i class="fas fa-camera"></i> SCANNER</button>
+            <div class="card">
+                <input id="frais-ean" placeholder="EAN" oninput="if(this.value.length>8) app.frais.api(this.value)">
+                <select id="frais-fam"><option>SNACKING</option><option>TRAITEUR</option><option>ULTRA FRAIS</option><option>CHARCUTERIE</option><option>BOUCHERIE</option><option>VOLAILLE</option><option>FROMAGE</option><option>SAURISSERIE</option><option>DIVERS</option></select>
+                <input id="frais-name" placeholder="Nom">
+                <div style="display:flex;gap:10px;"><input type="date" id="frais-date"><input type="number" id="frais-qty" placeholder="Qté"></div>
+                <button class="btn" onclick="app.frais.add()">AJOUTER</button>
+            </div>
+        </div>
+        <div id="frais-list" class="hidden"></div>
     </div>
 
     <div id="view-pvp" class="hidden">
-      <div class="tabs">
-        <div id="tab-pvp-stock" class="tab active" onclick="window.app.pvp.switch('stock')">RAYON</div>
-        <div id="tab-pvp-bib" class="tab" onclick="window.app.pvp.switch('bib')">BIBLIOTHÈQUE</div>
-        <div id="tab-pvp-calc" class="tab" onclick="window.app.pvp.switch('calc')">BESOINS</div>
-      </div>
-
-      <div id="pvp-stock" class="hidden"><div id="list-pvp-stock"></div></div>
-
-      <div id="pvp-bib" class="hidden">
-        <button class="btn" onclick="window.app.pvp.openLib()" style="background:#eee; color:#333; margin-bottom:15px;">+ Créer Nouveau Produit</button>
-        <div id="list-pvp-lib"></div>
-      </div>
-
-      <div id="pvp-calc" class="hidden">
-        <div class="card" style="background:#e0f2fe; color:#003896; text-align:center;">
-            <b>A CUIRE POUR DEMAIN MATIN</b>
+        <div class="tabs">
+            <div class="tab active" id="tp-1" onclick="app.pvp.tab('stock')">RAYON</div>
+            <div class="tab" id="tp-2" onclick="app.pvp.tab('bib')">BIBLIOTHÈQUE</div>
+            <div class="tab" id="tp-3" onclick="app.pvp.tab('calc')">BESOINS</div>
         </div>
-        <div id="list-pvp-calc"></div>
-      </div>
+
+        <div id="pvp-stock"></div>
+        <div id="pvp-bib" class="hidden">
+            <button class="btn" onclick="app.pvp.openLib()" style="background:#eee;color:#333;margin-bottom:15px;">+ Créer Produit</button>
+            <div id="lib-list"></div>
+        </div>
+        <div id="pvp-calc" class="hidden"></div>
     </div>
 
     <div id="view-team" class="hidden">
-      <div class="card">
-        <input type="text" id="new-user-name" placeholder="Prénom"><input type="number" id="new-user-code" placeholder="Code" style="margin-top:10px;"><button class="btn btn-green" onclick="window.app.common.saveUser()">Créer</button>
-      </div>
-      <div class="card"><div id="users-list"></div></div>
+        <div class="card">
+            <input id="new-u-name" placeholder="Nom"><input id="new-u-code" placeholder="Code">
+            <button class="btn" onclick="app.saveUser()">Créer Staff</button>
+        </div>
+        <div class="card" id="user-list"></div>
     </div>
   </main>
 
-  <nav>
-    <div class="nav-btn" onclick="window.app.common.nav('home')"><i class="fas fa-th-large"></i>Menu</div>
+  <nav onclick="app.nav('home')">
+      <div style="text-align:center;color:#94a3b8;"><i class="fas fa-th-large" style="font-size:24px;"></i><br><span style="font-size:10px;">MENU</span></div>
   </nav>
 
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-  const firebaseConfig = { apiKey: "AIzaSyA0ffa4Nfa7kGLyaEcAocU9YzIhzmx3SkA", authDomain: "araujo-exploitation.firebaseapp.com", databaseURL: "https://araujo-exploitation-default-rtdb.europe-west1.firebasedatabase.app", projectId: "araujo-exploitation", storageBucket: "araujo-exploitation.firebasestorage.app", messagingSenderId: "292878114487", appId: "1:292878114487:web:2a450227310e970ce1b732" };
-  const db = getFirestore(initializeApp(firebaseConfig));
-  const docRef = doc(db, "store_master", "STOCK_MAGASIN_LIVE");
-  const codeReader = new ZXing.BrowserMultiFormatReader();
+const db = getFirestore(initializeApp({ apiKey: "AIzaSyA0ffa4Nfa7kGLyaEcAocU9YzIhzmx3SkA", authDomain: "araujo-exploitation.firebaseapp.com", projectId: "araujo-exploitation" }));
+const docRef = doc(db, "store_master", "STOCK_MAGASIN_LIVE");
+const codeReader = new ZXing.BrowserMultiFormatReader();
 
-  // BIBLIOTHEQUE PAR DEFAUT (ISSUE DU CADENCIER)
-  const INITIAL_PVP_DATA = [
-      {id:17001, name:"250G BAGUETTE BCS 0% POUSSE", ean:"3464382607832", days:0}, 
-      {id:17002, name:"PAIN 400G 0%P LD", ean:"3464382400112", days:0}, 
-      {id:17003, name:"250G BAGUETTE RUSTIQUE CRF", ean:"3276550243427", days:0}, 
-      {id:17004, name:"65G CROISSANT AOP PAC", ean:"3523680397057", days:0}, 
-      {id:17005, name:"70G PAIN CHOC AOP PAC STICKER", ean:"3523680397149", days:0}, 
-      {id:17006, name:"110G PAIN AUX RAISINS PAC", ean:"3523680423640", days:0},
-      {id:17007, name:"CHAUSSON AUX POMMES", ean:"3355710818962", days:0},
-      // DECONGELES (48H = 2 JOURS)
-      {id:17008, name:"DONUT SUCRE", ean:"3461180388642", days:2}, 
-      {id:17009, name:"DONUTS OREO BLISTER X2", ean:"3040400220193", days:2},
-      {id:17010, name:"MINI BEIGNET CHOCO X8", ean:"3760008852861", days:2}, 
-      {id:17011, name:"220G MUFFIN MILKA FOURRE X2", ean:"5413321002069", days:2}, 
-      {id:17012, name:"85G COOKIE DOUBLE CHOCO", ean:"3523680495821", days:2}, 
-      {id:17013, name:"PAIN LIBANAIS CLASSIQUE 220G", ean:"3760120960062", days:2}
-  ];
-
-  window.app = {
+window.app = {
     data: { frais: [], users: [], pvpLib: [], pvpStock: [] },
     
-    // --- COMMON (Login, Nav, Save) ---
-    common: {
-        init: function() {
-            onSnapshot(docRef, (s) => {
-                if(s.exists()) {
-                    window.app.data = {...window.app.data, ...s.data()};
-                    if(!window.app.data.users || window.app.data.users.length === 0) window.app.data.users = [{code: "2008", name: "MANAGER", role: "admin"}];
-                    if(!window.app.data.pvpLib || window.app.data.pvpLib.length === 0) {
-                         window.app.data.pvpLib = INITIAL_PVP_DATA.map(i => ({...i, id: Date.now() + Math.random(), targets:{}}));
-                    }
-                    if(!window.app.data.pvpStock) window.app.data.pvpStock = [];
-                } else {
-                     window.app.data.users = [{code: "2008", name: "MANAGER", role: "admin"}];
-                     window.app.data.pvpLib = INITIAL_PVP_DATA.map(i => ({...i, id: Date.now() + Math.random(), targets:{}}));
-                     window.app.common.save();
-                }
-                window.app.frais.render();
-                window.app.common.renderUsers();
-                window.app.pvp.render();
-                window.app.common.populateLogin();
-            });
-        },
-        save: async function() { await setDoc(docRef, window.app.data, {merge:true}); },
-        nav: function(v) { document.querySelectorAll('[id^="view-"]').forEach(e => e.classList.add('hidden')); document.getElementById('view-'+v).classList.remove('hidden'); },
-        populateLogin: function() {
-            const sel = document.getElementById('login-user-select');
-            sel.innerHTML = window.app.data.users.map(u => `<option value="${u.name}">${u.name}</option>`).join('');
-        },
-        login: function() {
-            let selectedName = document.getElementById('login-user-select').value;
-            let code = document.getElementById('login-pass').value.trim();
-            let user = window.app.data.users.find(u => u.name === selectedName && u.code === code);
-            if(user) {
-                document.getElementById('login-overlay').classList.add('hidden');
-                document.getElementById('user-display').innerText = user.name.toUpperCase();
-                if(user.role === 'admin') document.getElementById('btn-team').classList.remove('hidden');
-            } else alert("Code incorrect");
-        },
-        saveUser: function() { let n=document.getElementById('new-user-name').value; let c=document.getElementById('new-user-code').value; if(n&&c){window.app.data.users.push({name:n,code:c,role:'staff'});window.app.common.save();} },
-        delUser: function(c) { if(c!=="2008"){window.app.data.users=window.app.data.users.filter(u=>u.code!==c);window.app.common.save();} },
-        renderUsers: function() { document.getElementById('users-list').innerHTML = window.app.data.users.map(u => `<div style="padding:10px;border-bottom:1px solid #eee;"><b>${u.name}</b> ${u.code} <button onclick="window.app.common.delUser('${u.code}')" style="color:red;border:none;background:none;float:right;"><i class="fas fa-trash"></i></button></div>`).join(''); },
-        showBarcode: function(ean, name) { 
-            if(!ean) return alert("Pas d'EAN");
-            document.getElementById('modal-barcode').classList.remove('hidden'); 
-            document.getElementById('bc-name').innerText=name; 
-            try{JsBarcode("#barcode", ean, {format:"EAN13", height:80, displayValue:true});}catch(e){try{JsBarcode("#barcode", ean, {format:"CODE128", height:80, displayValue:true});}catch(e2){}}
-        }
+    init: function() {
+        onSnapshot(docRef, (s) => {
+            if(s.exists()) {
+                let d = s.data();
+                this.data = {
+                    frais: d.frais || [],
+                    users: d.users || [{name:"MANAGER",code:"2008",role:"admin"}],
+                    pvpLib: d.pvpLib || [],
+                    pvpStock: d.pvpStock || []
+                };
+            } else {
+                this.data = { frais:[], users:[{name:"MANAGER",code:"2008",role:"admin"}], pvpLib:[], pvpStock:[] };
+                this.save();
+            }
+            this.updateUI();
+        });
     },
 
-    // --- FRAIS (DLC) ---
+    save: function() { setDoc(docRef, this.data, {merge:true}); },
+    
+    updateUI: function() {
+        // Populate Login
+        let sel = document.getElementById('login-user-select');
+        sel.innerHTML = this.data.users.map(u => `<option value="${u.name}">${u.name}</option>`).join('');
+        
+        // Render Modules
+        this.frais.render();
+        this.pvp.render();
+        this.renderUsers();
+        this.checkAlerts();
+    },
+
+    login: function() {
+        let name = document.getElementById('login-user-select').value;
+        let code = document.getElementById('login-pass').value;
+        let u = this.data.users.find(x => x.name == name && x.code == code);
+        if(u) {
+            document.getElementById('login-overlay').classList.add('hidden');
+            document.getElementById('user-badge').innerText = u.name;
+            if(u.role=='admin') document.getElementById('btn-team').classList.remove('hidden');
+        } else alert('Code Erreur');
+    },
+
+    nav: function(v) {
+        document.querySelectorAll('[id^="view-"]').forEach(e => e.classList.add('hidden'));
+        document.getElementById('view-'+v).classList.remove('hidden');
+    },
+
     frais: {
         scanning: false,
-        currentImgUrl: "",
-        switch: function(t) { document.querySelectorAll('.tab').forEach(e => e.classList.remove('active')); document.getElementById('tab-'+t).classList.add('active'); ['content-scan','content-list'].forEach(id => document.getElementById(id).classList.add('hidden')); document.getElementById('content-'+t).classList.remove('hidden'); if(t!=='scan') this.toggleScanner(false); },
-        scanApi: async function(ean) {
-          try {
-            let r = await fetch(`https://world.openfoodfacts.org/api/v0/product/${ean}.json`);
-            let d = await r.json();
-            if(d.status === 1) {
-              document.getElementById('frais-name').value = d.product.product_name_fr || d.product.product_name || "";
-              this.currentImgUrl = d.product.image_front_small_url || "";
+        imgUrl: "",
+        tab: function(t) {
+            document.querySelectorAll('#view-frais .tab').forEach(e => e.classList.remove('active'));
+            document.getElementById(t=='scan'?'tf-1':'tf-2').classList.add('active');
+            document.getElementById('frais-scan').classList.add('hidden');
+            document.getElementById('frais-list').classList.add('hidden');
+            document.getElementById('frais-'+t).classList.remove('hidden');
+        },
+        toggleScan: function() {
+            if(this.scanning) { this.scanning=false; document.getElementById('scanner-box').style.display='none'; codeReader.reset(); }
+            else { 
+                this.scanning=true; document.getElementById('scanner-box').style.display='block';
+                codeReader.decodeFromVideoDevice(null, 'video', (r) => { if(r){ this.api(r.text); document.getElementById('frais-ean').value=r.text; this.toggleScan(); } });
             }
-          } catch(e){}
+        },
+        api: async function(ean) {
+            try {
+                let r = await fetch(`https://world.openfoodfacts.org/api/v0/product/${ean}.json`);
+                let d = await r.json();
+                if(d.status==1) {
+                    document.getElementById('frais-name').value = d.product.product_name_fr || "";
+                    this.imgUrl = d.product.image_front_small_url || "";
+                }
+            } catch(e){}
         },
         add: function() {
-          let ean = document.getElementById('frais-ean').value;
-          let name = document.getElementById('frais-name').value;
-          let date = document.getElementById('frais-date').value;
-          let qty = document.getElementById('frais-qty').value;
-          let fam = document.getElementById('frais-famille').value;
-          if(!name || !date) return alert("Date requise");
-          window.app.data.frais.push({ id: Date.now(), ean, name, date, qty, fam, img: this.currentImgUrl });
-          window.app.common.save(); alert("Ajouté");
-          document.getElementById('frais-name').value=""; document.getElementById('frais-ean').value="";
+            let o = {
+                id: Date.now(),
+                ean: document.getElementById('frais-ean').value,
+                fam: document.getElementById('frais-fam').value,
+                name: document.getElementById('frais-name').value,
+                qty: document.getElementById('frais-qty').value,
+                date: document.getElementById('frais-date').value,
+                img: this.imgUrl
+            };
+            if(!o.name || !o.date) return alert('Date requise');
+            window.app.data.frais.push(o); window.app.save(); alert('Ajouté');
+            this.imgUrl=""; document.getElementById('frais-name').value=""; document.getElementById('frais-ean').value="";
         },
         render: function() {
-            const cont = document.getElementById('list-frais-container');
-            cont.innerHTML = "";
-            let grouped = {};
-            window.app.data.frais.sort((a,b) => (a.fam===b.fam) ? a.name.localeCompare(b.name) : a.fam.localeCompare(b.fam));
-            window.app.data.frais.forEach(i => { if(!grouped[i.fam]) grouped[i.fam]=[]; grouped[i.fam].push(i); });
-            Object.keys(grouped).forEach(fam => {
-                cont.innerHTML += `<div class="group-header">${fam}</div>`;
-                grouped[fam].forEach(i => {
+            let div = document.getElementById('frais-list'); div.innerHTML="";
+            let grp = {};
+            window.app.data.frais.sort((a,b)=>a.fam.localeCompare(b.fam)).forEach(i=>{ if(!grp[i.fam])grp[i.fam]=[]; grp[i.fam].push(i); });
+            
+            for(let f in grp) {
+                div.innerHTML += `<div class="group-header">${f}</div>`;
+                grp[f].forEach(i => {
                     let d = new Date(i.date);
-                    let diff = (d - new Date())/86400000;
-                    let badge = diff<1?'badge-red':(diff<2?'badge-orange':'badge-green');
-                    let imgHtml = i.img ? `<img src="${i.img}" class="wek-img" onclick="event.stopPropagation(); window.app.common.showBarcode('${i.ean}','${i.name.replace(/'/g," ")}')">` : `<div class="wek-img"><i class="fas fa-barcode"></i></div>`;
-                    cont.innerHTML += `<div class="swipe-wrapper"><div class="wek-item" onclick="window.app.frais.openEdit(${i.id})">${imgHtml}<div class="wek-info"><div class="wek-name">${i.name}</div><div class="wek-sub">x${i.qty}</div></div><div class="date-badge ${badge}"><span class="date-day">${d.getDate()}</span><span class="date-month">${d.toLocaleString('fr',{month:'short'})}</span></div></div></div>`;
+                    let today = new Date(); today.setHours(0,0,0,0);
+                    let target = new Date(i.date); target.setHours(0,0,0,0);
+                    let diff = (target - today)/(1000*60*60*24);
+                    let badge = diff<0?'badge-red':(diff<2?'badge-orange':'badge-green');
+                    let img = i.img ? `<img src="${i.img}" class="wek-img">` : `<div class="wek-img"><i class="fas fa-barcode"></i></div>`;
+                    
+                    div.innerHTML += `
+                    <div class="swipe-wrapper">
+                        <div class="wek-item" onclick="app.frais.openEdit(${i.id})">
+                            <div style="display:flex;align-items:center;">
+                                ${img}
+                                <div><div style="font-weight:bold;">${i.name}</div><span class="wek-qty">x${i.qty}</span></div>
+                            </div>
+                            <div class="date-badge ${badge}">
+                                <span style="font-size:16px;">${d.getDate()}</span>
+                                <span style="font-size:10px;text-transform:uppercase;">${d.toLocaleString('fr',{month:'short'})}</span>
+                            </div>
+                        </div>
+                    </div>`;
                 });
-            });
+            }
         },
         openEdit: function(id) {
             let i = window.app.data.frais.find(x => x.id == id);
-            if(!i) return;
             document.getElementById('modal-edit-frais').classList.remove('hidden');
             document.getElementById('edit-id').value = id;
             document.getElementById('edit-famille').value = i.fam;
@@ -386,174 +358,172 @@
         saveEdit: function() {
             let id = document.getElementById('edit-id').value;
             let idx = window.app.data.frais.findIndex(x => x.id == id);
-            if(idx > -1) {
+            if(idx>-1) {
                 window.app.data.frais[idx].fam = document.getElementById('edit-famille').value;
                 window.app.data.frais[idx].qty = document.getElementById('edit-qty').value;
                 window.app.data.frais[idx].date = document.getElementById('edit-date').value;
-                window.app.common.save(); document.getElementById('modal-edit-frais').classList.add('hidden');
+                window.app.save(); document.getElementById('modal-edit-frais').classList.add('hidden');
             }
         },
-        delete: function() {
+        del: function() {
             let id = document.getElementById('edit-id').value;
             window.app.data.frais = window.app.data.frais.filter(x => x.id != id);
-            window.app.common.save(); document.getElementById('modal-edit-frais').classList.add('hidden');
-        },
-        toggleScanner: function(force) {
-            if(force === false || this.scanning) { this.scanning=false; codeReader.reset(); document.getElementById('scanner-container').style.display="none"; }
-            else { this.scanning=true; document.getElementById('scanner-container').style.display="block"; codeReader.decodeFromVideoDevice(null, 'video', (r) => { if(r){this.scanApi(r.text); document.getElementById('frais-ean').value=r.text; this.toggleScanner(false);} }); }
+            window.app.save(); document.getElementById('modal-edit-frais').classList.add('hidden');
         }
     },
 
-    // --- PVP (BOULANGERIE) ---
     pvp: {
-        touchStartX: 0,
-        currentSwipeId: null,
-
-        switch: function(t) {
-            document.querySelectorAll('.tab').forEach(e => e.classList.remove('active'));
-            document.getElementById('tab-pvp-'+t).classList.add('active');
+        tab: function(t) {
+            document.querySelectorAll('#view-pvp .tab').forEach(e => e.classList.remove('active-pvp'));
+            document.getElementById(t=='stock'?'tp-1':(t=='bib'?'tp-2':'tp-3')).classList.add('active-pvp');
             ['pvp-stock','pvp-bib','pvp-calc'].forEach(id => document.getElementById(id).classList.add('hidden'));
             document.getElementById('pvp-'+t).classList.remove('hidden');
         },
-        handleImage: function(input) {
-            if (input.files && input.files[0]) {
-                var reader = new FileReader();
-                reader.onload = function (e) {
-                    document.getElementById('img-preview').src = e.target.result;
-                    document.getElementById('img-preview').style.display = 'block';
+        handleImg: function(input) {
+            if(input.files && input.files[0]) {
+                let r = new FileReader();
+                r.onload = function(e) { 
+                    document.getElementById('img-preview').src = e.target.result; 
+                    document.getElementById('img-preview').style.display='block';
                     document.getElementById('lib-img-data').value = e.target.result;
-                }
-                reader.readAsDataURL(input.files[0]);
+                };
+                r.readAsDataURL(input.files[0]);
             }
         },
         openLib: function(id=null) {
             document.getElementById('modal-pvp-lib').classList.remove('hidden');
             document.getElementById('img-preview').style.display='none';
             if(id) {
-                let item = window.app.data.pvpLib.find(x => x.id == id);
-                document.getElementById('lib-id').value = id;
-                document.getElementById('lib-name').value = item.name;
-                document.getElementById('lib-ean').value = item.ean || "";
-                document.getElementById('lib-days').value = item.days || 0;
-                document.getElementById('lib-img-data').value = item.img || "";
-                if(item.img) { document.getElementById('img-preview').src = item.img; document.getElementById('img-preview').style.display = 'block'; }
+                let i = window.app.data.pvpLib.find(x=>x.id==id);
+                document.getElementById('lib-id').value=id;
+                document.getElementById('lib-name').value=i.name;
+                document.getElementById('lib-ean').value=i.ean||"";
+                document.getElementById('lib-days').value=i.days||0;
+                document.getElementById('lib-img-data').value=i.img||"";
+                if(i.img){ document.getElementById('img-preview').src=i.img; document.getElementById('img-preview').style.display='block'; }
                 document.getElementById('btn-del-lib').classList.remove('hidden');
-                let t = item.targets || {};
-                for(let k=0; k<=6; k++) document.getElementById('t-'+k).value = t[k] || 0;
+                for(let k=0;k<7;k++) document.getElementById('t-'+k).value = (i.targets||{})[k]||"";
             } else {
-                document.getElementById('lib-id').value = ""; document.getElementById('lib-name').value = ""; document.getElementById('lib-ean').value = "";
-                document.getElementById('lib-img-data').value = ""; document.getElementById('lib-days').value = 0;
-                document.getElementById('btn-del-lib').classList.add('hidden');
-                for(let k=0; k<=6; k++) document.getElementById('t-'+k).value = "";
+                document.getElementById('lib-id').value=""; document.getElementById('lib-name').value=""; document.getElementById('lib-ean').value="";
+                document.getElementById('lib-img-data').value=""; document.getElementById('btn-del-lib').classList.add('hidden');
+                for(let k=0;k<7;k++) document.getElementById('t-'+k).value = "";
             }
         },
         saveLib: function() {
             let id = document.getElementById('lib-id').value;
-            let name = document.getElementById('lib-name').value;
-            let ean = document.getElementById('lib-ean').value;
-            let img = document.getElementById('lib-img-data').value;
-            let days = document.getElementById('lib-days').value;
-            let targets = {};
-            for(let k=0; k<=6; k++) targets[k] = document.getElementById('t-'+k).value;
-            if(!name) return;
+            let o = {
+                id: id ? Number(id) : Date.now(),
+                name: document.getElementById('lib-name').value,
+                ean: document.getElementById('lib-ean').value,
+                img: document.getElementById('lib-img-data').value,
+                days: document.getElementById('lib-days').value,
+                targets: {}
+            };
+            for(let k=0;k<7;k++) o.targets[k] = document.getElementById('t-'+k).value;
+            
+            if(!o.name) return;
             if(id) {
-                 let idx = window.app.data.pvpLib.findIndex(x => x.id == id);
-                 if(idx > -1) { window.app.data.pvpLib[idx] = { ...window.app.data.pvpLib[idx], name, ean, img, days:days, targets }; }
+                let idx = window.app.data.pvpLib.findIndex(x=>x.id==id);
+                if(idx>-1) window.app.data.pvpLib[idx] = o;
             } else {
-                 window.app.data.pvpLib.push({ id: Date.now(), name, ean, img, days:days, targets });
+                window.app.data.pvpLib.push(o);
             }
-            window.app.common.save(); document.getElementById('modal-pvp-lib').classList.add('hidden');
+            window.app.save(); document.getElementById('modal-pvp-lib').classList.add('hidden');
         },
         delLib: function() {
             let id = document.getElementById('lib-id').value;
-            window.app.data.pvpLib = window.app.data.pvpLib.filter(x => x.id != id);
-            window.app.common.save(); document.getElementById('modal-pvp-lib').classList.add('hidden');
+            window.app.data.pvpLib = window.app.data.pvpLib.filter(x=>x.id!=id);
+            window.app.save(); document.getElementById('modal-pvp-lib').classList.add('hidden');
         },
         addStock: function(libId) {
-            let lib = window.app.data.pvpLib.find(x => x.id == libId);
-            let qty = prompt(`Quantité de ${lib.name} ?`, "1");
-            if(qty && qty > 0) {
+            let l = window.app.data.pvpLib.find(x=>x.id==libId);
+            let qty = prompt('Quantité ?', "1");
+            if(qty && qty>0) {
                 let now = new Date();
-                let daysToAdd = parseInt(lib.days) || 0; 
-                let endDate = new Date();
-                endDate.setDate(now.getDate() + daysToAdd);
-                endDate.setHours(22, 0, 0, 0);
-                window.app.data.pvpStock.push({
-                    id: Date.now(), libId: libId, name: lib.name, qty: qty,
-                    out: now.getTime(), end: endDate.getTime(), img: lib.img, ean: lib.ean
-                });
-                window.app.common.save();
+                let end = new Date();
+                end.setDate(now.getDate() + parseInt(l.days));
+                end.setHours(22,0,0,0);
+                window.app.data.pvpStock.push({ id:Date.now(), libId:libId, name:l.name, ean:l.ean, img:l.img, qty:qty, out:now.getTime(), end:end.getTime() });
+                window.app.save();
+                alert("Ajouté au rayon !"); // Feedback immédiat
             }
         },
         openEditStock: function(id) {
-            let item = window.app.data.pvpStock.find(i => i.id == id);
-            if(!item) return;
-            document.getElementById('modal-edit-pvp-stock').classList.remove('hidden');
-            document.getElementById('stock-id').value = id;
-            document.getElementById('stock-name').innerText = item.name;
-            document.getElementById('stock-qty').value = item.qty;
+            let i = window.app.data.pvpStock.find(x=>x.id==id);
+            document.getElementById('modal-pvp-stock').classList.remove('hidden');
+            document.getElementById('stock-id').value=id;
+            document.getElementById('stock-name').innerText=i.name;
+            document.getElementById('stock-qty').value=i.qty;
         },
         saveStock: function() {
             let id = document.getElementById('stock-id').value;
-            let qty = document.getElementById('stock-qty').value;
-            let idx = window.app.data.pvpStock.findIndex(i => i.id == id);
-            if(idx > -1 && qty > 0) {
-                window.app.data.pvpStock[idx].qty = qty;
-                window.app.common.save(); document.getElementById('modal-edit-pvp-stock').classList.add('hidden');
+            let idx = window.app.data.pvpStock.findIndex(x=>x.id==id);
+            if(idx>-1) {
+                window.app.data.pvpStock[idx].qty = document.getElementById('stock-qty').value;
+                window.app.save(); document.getElementById('modal-pvp-stock').classList.add('hidden');
             }
         },
-        deleteStock: function(id) {
-            window.app.data.pvpStock = window.app.data.pvpStock.filter(i => i.id != id);
-            window.app.common.save();
-        },
-        attachSwipe: function(el, id) {
-            el.addEventListener('touchstart', (e) => { this.touchStartX = e.touches[0].clientX; });
-            el.addEventListener('touchend', (e) => {
-                let diff = e.changedTouches[0].clientX - this.touchStartX;
-                if(diff > 100) { el.style.transform = `translateX(100%)`; setTimeout(() => this.deleteStock(id), 200); }
-            });
+        delStock: function() {
+            let id = document.getElementById('stock-id').value;
+            window.app.data.pvpStock = window.app.data.pvpStock.filter(x=>x.id!=id);
+            window.app.save(); document.getElementById('modal-pvp-stock').classList.add('hidden');
         },
         render: function() {
-            const sDiv = document.getElementById('list-pvp-stock'); sDiv.innerHTML="";
+            // RENDER BIB
+            let bib = document.getElementById('lib-list'); bib.innerHTML = window.app.data.pvpLib.length ? "" : "Vide";
+            window.app.data.pvpLib.forEach(l => {
+                let img = l.img ? `<img src="${l.img}" class="wek-img">` : `<div class="wek-img"><i class="fas fa-bread-slice"></i></div>`;
+                bib.innerHTML += `<div class="pvp-item" style="justify-content:space-between;"><div style="display:flex;align-items:center;" onclick="app.pvp.openLib(${l.id})">${img}<div><b>${l.name}</b><br><small>${l.days}J</small></div></div><button class="btn-orange" style="width:40px;height:40px;border-radius:50%;padding:0;" onclick="app.pvp.addStock(${l.id})">+</button></div>`;
+            });
+
+            // RENDER STOCK
+            let st = document.getElementById('pvp-stock'); st.innerHTML = window.app.data.pvpStock.length ? "" : "<div style='text-align:center;margin-top:20px;color:#999'>Rayon Vide</div>";
             let now = Date.now();
-            window.app.data.pvpStock.sort((a,b) => a.end - b.end).forEach(i => {
+            window.app.data.pvpStock.sort((a,b)=>a.end-b.end).forEach(i => {
                 let dEnd = new Date(i.end);
-                let dateStr = dEnd.toLocaleDateString('fr-FR', {weekday:'short', day:'numeric'});
-                let timeStr = dEnd.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
+                let diff = (i.end - now)/3600000;
+                let color = diff<0?'#ef4444':(diff<2?'#f59e0b':'#10b981');
+                let img = i.img ? `<img src="${i.img}" class="wek-img" onclick="event.stopPropagation(); window.app.common.showBarcode('${i.ean}','${i.name.replace(/'/g," ")}')">` : `<div class="wek-img" onclick="event.stopPropagation(); window.app.common.showBarcode('${i.ean}','${i.name.replace(/'/g," ")}')"><i class="fas fa-bread-slice"></i></div>`;
                 
-                let imgHtml = i.img ? `<img src="${i.img}" class="wek-img" onclick="event.stopPropagation(); window.app.common.showBarcode('${i.ean}','${i.name.replace(/'/g," ")}')">` : `<div class="wek-img" onclick="event.stopPropagation(); window.app.common.showBarcode('${i.ean}','${i.name.replace(/'/g," ")}')"><i class="fas fa-bread-slice"></i></div>`;
-                
-                let container = document.createElement('div');
-                container.className = 'pvp-row-container';
-                container.innerHTML = `<div class="pvp-row-bg"><i class="fas fa-trash"></i> GLISSER POUR JETER</div>`;
-                let item = document.createElement('div');
-                item.className = 'pvp-item';
-                item.innerHTML = `<div style="display:flex;align-items:center;">${imgHtml}<div><div style="font-weight:bold;">${i.name}</div><span class="wek-qty">x${i.qty}</span></div></div><div style="text-align:right"><div style="font-size:12px;font-weight:bold;color:#d97706;">Fin: ${dateStr} à ${timeStr}</div></div>`;
-                item.onclick = () => window.app.pvp.openEditStock(i.id);
-                this.attachSwipe(item, i.id);
-                container.appendChild(item);
-                sDiv.appendChild(container);
+                st.innerHTML += `
+                <div class="swipe-wrapper" style="background:#ef4444;border-radius:12px;margin-bottom:10px;">
+                    <div class="wek-item" onclick="app.pvp.openEditStock(${i.id})" style="border-radius:12px;">
+                        <div style="display:flex;align-items:center;">${img}<div><b>${i.name}</b><br><span class="wek-qty">x${i.qty}</span></div></div>
+                        <div style="text-align:right">
+                            <div style="font-size:12px;color:#999;">Fin:</div>
+                            <div style="font-weight:bold;color:${color}">${dEnd.toLocaleDateString('fr',{weekday:'short'})} ${dEnd.getHours()}h</div>
+                        </div>
+                    </div>
+                </div>`;
             });
-
-            const bDiv = document.getElementById('list-pvp-lib'); bDiv.innerHTML="";
+            
+            // RENDER CALC
+            let cl = document.getElementById('pvp-calc'); cl.innerHTML = "";
+            let tomDay = (new Date().getDay() + 1) % 7;
+            let limit = new Date(); limit.setDate(limit.getDate()+1); limit.setHours(6,0,0,0);
+            
             window.app.data.pvpLib.forEach(l => {
-                 let imgHtml = l.img ? `<img src="${l.img}" class="wek-img">` : `<div class="wek-img"><i class="fas fa-bread-slice"></i></div>`;
-                 bDiv.innerHTML += `<div class="pvp-item"><div style="display:flex;align-items:center;" onclick="window.app.pvp.openLib(${l.id})">${imgHtml}<div><div style="font-weight:bold;">${l.name}</div><div style="font-size:10px; color:#666">${l.days}J</div></div></div><button class="btn-orange" style="border-radius:50%; width:40px; height:40px; padding:0; display:flex; align-items:center; justify-content:center;" onclick="window.app.pvp.addStock(${l.id})"><i class="fas fa-plus"></i></button></div>`;
-            });
-
-            const cDiv = document.getElementById('list-pvp-calc'); cDiv.innerHTML="";
-            let limitTs = new Date(); limitTs.setDate(limitTs.getDate()+1); limitTs.setHours(6,0,0,0);
-            let tomorrowDayIndex = (new Date().getDay() + 1) % 7; 
-            window.app.data.pvpLib.forEach(l => {
-                let valid = window.app.data.pvpStock.filter(s => s.libId == l.id && s.end > limitTs.getTime()).reduce((a,b)=>a+parseInt(b.qty),0);
-                let target = (l.targets && l.targets[tomorrowDayIndex]) ? parseInt(l.targets[tomorrowDayIndex]) : 0;
+                let valid = window.app.data.pvpStock.filter(s => s.libId == l.id && s.end > limit.getTime()).reduce((a,b)=>a+parseInt(b.qty),0);
+                let target = (l.targets && l.targets[tomDay]) ? parseInt(l.targets[tomDay]) : 0;
                 let need = target - valid;
-                if(need > 0) cDiv.innerHTML += `<div class="pvp-item" style="border-left:5px solid var(--pvp);"><div style="font-weight:bold;">${l.name}</div><div style="font-weight:bold;color:var(--pvp);">A CUIRE: ${need}</div></div>`; 
+                if(need>0) cl.innerHTML += `<div class="pvp-item" style="border-left:5px solid #d97706"><div><b>${l.name}</b></div><div style="color:#d97706;font-weight:bold;">A CUIRE: ${need}</div></div>`;
             });
+            if(cl.innerHTML=="") cl.innerHTML = "<div style='text-align:center;margin-top:20px;color:#999'>Stock OK</div>";
         }
-    }
-  };
-  window.app.common.init();
+    },
+
+    saveUser: function() { window.app.common.saveUser(); },
+    checkAlerts: function() {
+        let alert = window.app.data.frais.some(i => {
+            let diff = (new Date(i.date) - new Date())/(1000*60*60*24);
+            return diff < 1; 
+        });
+        document.getElementById('alert-box').style.display = alert ? 'block' : 'none';
+    },
+    renderUsers: function() { window.app.common.renderUsers(); }
+};
+
+window.app.init();
 </script>
 </body>
 </html>
