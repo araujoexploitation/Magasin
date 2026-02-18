@@ -5,13 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
 <meta name="theme-color" content="#ffffff" />
 <title>Araujo App V3.0</title>
-
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 <script src="https://unpkg.com/@zxing/library@latest"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
-
-<!-- reCAPTCHA Enterprise (site key OK côté client) -->
-<script src="https://www.google.com/recaptcha/enterprise.js?render=6LfhL3AsAAAAAOOeDxTiE1zqlhBgWff3pjhFsnax"></script>
 
 <style>
   :root { --primary: #003896; --accent: #E2001A; --pvp: #d97706; --bg: #f3f4f6; --surface: #ffffff; --text: #1e293b; --success: #10b981; --danger: #ef4444; }
@@ -19,13 +15,17 @@
   body { margin: 0; background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
   .hidden { display: none !important; }
 
-  /* LOGIN (Z-Index Max) */
-  #login-overlay { position: fixed; inset: 0; z-index: 10000; background: white; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100vw; height: 100vh; }
+  /* LOGIN */
+  #login-overlay { position: fixed; inset: 0; z-index: 10000; background: white; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100vw; height: 100vh; padding: 18px; }
+  .login-card { width: min(380px, 92vw); }
+  .login-help { font-size: 12px; color:#64748b; text-align:center; margin-top:10px; cursor:pointer; }
+  .login-error { display:none; background:#fee2e2; color:#991b1b; padding:10px 12px; border-radius:10px; font-weight:700; font-size:13px; margin-top:10px; }
 
   /* HEADER & NAV */
   header { background: var(--surface); padding: 10px; height: 80px; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); position: relative; z-index: 50; }
   .logo-header { height: 50px; object-fit: contain; }
   .user-badge { position: absolute; right: 15px; top: 15px; font-size: 11px; background: #e0f2fe; color: var(--primary); padding: 4px 10px; border-radius: 20px; font-weight: bold; }
+  .logout-btn { position:absolute; left:15px; top:18px; border:none; background:#f1f5f9; color:#334155; padding:10px 12px; border-radius:12px; cursor:pointer; font-weight:800; }
 
   main { flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 90px; }
 
@@ -33,15 +33,13 @@
   .nav-btn { text-align:center; color:#94a3b8; cursor: pointer; font-size: 12px; }
   .nav-btn i { font-size: 24px; margin-bottom: 4px; }
 
-  /* HOME */
-  .home-grid { display:grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-  .home-btn { color:white; border-radius: 18px; padding: 20px; text-align:center; font-weight: 900; box-shadow: 0 8px 18px rgba(0,0,0,0.08); cursor:pointer; }
-  .home-btn i { font-size: 28px; margin-bottom: 8px; }
-
   /* UI ELEMENTS */
   .card { background: var(--surface); border-radius: 16px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); margin-bottom: 15px; }
   input, select { width: 100%; padding: 14px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 16px; background: #fff; margin-bottom: 10px; outline: none; }
   .btn { width: 100%; padding: 16px; border-radius: 12px; border: none; font-weight: 700; font-size: 16px; background: var(--primary); color: white; cursor: pointer; margin-top: 5px; }
+  .btn.secondary { background:#eee; color:#333; }
+  .btn.danger { background:#ef4444; }
+  .btn.success { background:#00563f; }
 
   .tabs { display: flex; background: #e2e8f0; padding: 4px; border-radius: 12px; margin-bottom: 15px; }
   .tab { flex: 1; text-align: center; padding: 12px; font-weight: 700; font-size: 12px; color: #64748b; border-radius: 9px; cursor: pointer; }
@@ -73,17 +71,14 @@
   .date-badge { width: 50px; height: 50px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; font-weight: bold; flex-shrink: 0; margin-left: 10px; }
   .bg-red { background: #ef4444; } .bg-orange { background: #f59e0b; } .bg-green { background: #10b981; } .bg-grey { background: #94a3b8; }
 
-  /* ToDo */
-  .todo-check { width: 32px; height: 32px; border: 2px solid #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; margin-left: 15px; cursor: pointer; transition: 0.2s; }
-  .todo-check.checked { background: var(--success); border-color: var(--success); color: white; }
-  .item-done { opacity: 0.6; background: #f8fafc; }
-  .item-done .item-title { text-decoration: line-through; color: #94a3b8; }
-
   /* Modals */
   .modal-bc { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
-  .modal-card { background: white; padding: 25px; border-radius: 20px; width: 100%; max-width: 400px; max-height: 85vh; overflow-y: auto; }
-
-  .small-muted { color:#64748b; font-size: 12px; text-align:center; margin: 6px 0 10px; }
+  .modal-card { background: white; padding: 25px; border-radius: 20px; width: 100%; max-width: 420px; max-height: 85vh; overflow-y: auto; }
+  .row { display:flex; gap:10px; }
+  .chip { font-size:11px; padding:3px 8px; border-radius:999px; font-weight:800; }
+  .chip.admin { background:#fee2e2; color:#991b1b; }
+  .chip.staff { background:#e0f2fe; color:#075985; }
+  .small { font-size:12px; color:#64748b; }
 </style>
 </head>
 
@@ -91,27 +86,35 @@
 
   <!-- LOGIN -->
   <div id="login-overlay">
-    <img src="https://raw.githubusercontent.com/araujoexploitation/Magasin/main/LOGO.png" style="width:200px; margin-bottom:30px;">
-    <select id="login-user-select" style="width:220px; margin-bottom:10px; text-align:center;" onchange="app.updateLoginHint()"></select>
-    <div id="login-email-hint" class="small-muted">—</div>
-    <input type="password" id="login-pass" placeholder="MOT DE PASSE" style="width:220px; text-align:center; font-size:18px;">
-    <button class="btn" onclick="app.login()" style="width:220px; background:#00563f; border-radius:50px;">CONNEXION</button>
-    <button class="btn" onclick="app.forgotPassword()" style="width:220px; background:#eee; color:#333; border-radius:50px; margin-top:10px;">
-      Mot de passe oublié
-    </button>
+    <div class="login-card">
+      <div style="text-align:center;">
+        <img src="https://raw.githubusercontent.com/araujoexploitation/Magasin/main/LOGO.png" style="width:200px; margin-bottom:20px;">
+      </div>
+
+      <input type="email" id="login-email" placeholder="Email" autocomplete="username" inputmode="email">
+      <input type="password" id="login-pass" placeholder="Mot de passe" autocomplete="current-password">
+      <button class="btn success" onclick="app.auth.login()"><i class="fas fa-right-to-bracket"></i> CONNEXION</button>
+
+      <div class="login-help" onclick="app.auth.forgot()"><i class="fas fa-unlock-keyhole"></i> Mot de passe oublié ?</div>
+      <div id="login-error" class="login-error"></div>
+
+      <div class="small" style="text-align:center;margin-top:14px;">
+        Astuce : si tu viens de créer un compte staff, utilise “Mot de passe oublié” pour définir son mot de passe.
+      </div>
+    </div>
   </div>
 
-  <!-- MODAL BARCODE -->
+  <!-- BARCODE MODAL -->
   <div id="modal-barcode" class="modal-bc hidden">
     <div class="modal-card" style="text-align:center;">
         <h3 id="bc-name"></h3>
         <img id="bc-img-display" style="width:100%;height:200px;object-fit:contain;margin-bottom:15px;display:none;background:#f8fafc;border-radius:10px;">
         <svg id="barcode"></svg><br>
-        <button class="btn" style="background:#eee;color:#333;margin-top:20px;" onclick="document.getElementById('modal-barcode').classList.add('hidden')">Fermer</button>
+        <button class="btn secondary" style="margin-top:20px;" onclick="document.getElementById('modal-barcode').classList.add('hidden')">Fermer</button>
     </div>
   </div>
 
-  <!-- MODAL EDIT FRAIS -->
+  <!-- EDIT FRAIS MODAL -->
   <div id="modal-edit-frais" class="modal-bc hidden">
     <div class="modal-card">
         <h3>Modifier Frais</h3>
@@ -125,13 +128,13 @@
         </select>
         <label>Qté</label><input type="number" id="edit-qty">
         <label>DLC</label><input type="date" id="edit-date">
-        <button class="btn" onclick="app.frais.saveEdit()" style="background:#00563f;">Enregistrer</button>
-        <button class="btn" onclick="app.frais.del()" style="background:#ef4444;">Supprimer</button>
-        <button class="btn" onclick="document.getElementById('modal-edit-frais').classList.add('hidden')" style="background:#eee;color:#333;">Annuler</button>
+        <button class="btn success" onclick="app.frais.saveEdit()">Enregistrer</button>
+        <button class="btn danger" onclick="app.frais.del()">Supprimer</button>
+        <button class="btn secondary" onclick="document.getElementById('modal-edit-frais').classList.add('hidden')">Annuler</button>
     </div>
   </div>
 
-  <!-- MODAL PVP LIB -->
+  <!-- PVP MODALS -->
   <div id="modal-pvp-lib" class="modal-bc hidden">
     <div class="modal-card">
         <h3 style="color:#d97706">Produit PVP</h3>
@@ -140,7 +143,7 @@
         <input type="text" id="lib-fam-new" placeholder="Nouvelle famille..." class="hidden">
         <label>Nom</label><input type="text" id="lib-name">
         <label>EAN</label><input type="text" id="lib-ean" inputmode="numeric" maxlength="13">
-        <button class="btn" onclick="document.getElementById('cam-input').click()" style="background:#eee;color:#333;margin-bottom:10px;">Photo</button>
+        <button class="btn secondary" onclick="document.getElementById('cam-input').click()" style="margin-bottom:10px;">Photo</button>
         <input type="file" id="cam-input" accept="image/*" capture="environment" class="hidden" onchange="app.pvp.handleImg(this)">
         <img id="img-preview" style="width:100px;height:100px;object-fit:cover;border-radius:10px;display:none;margin:0 auto 10px auto;">
         <label>Conservation</label><select id="lib-days"><option value="0">JOURNÉE</option><option value="48">48H</option><option value="72">72H</option></select>
@@ -155,781 +158,862 @@
             <input type="number" id="t-0" placeholder="D" style="text-align:center;padding:5px;">
         </div>
         <button class="btn" onclick="app.pvp.saveLib()" style="background:#d97706;">Enregistrer</button>
-        <button class="btn" onclick="app.pvp.delLib()" style="background:#ef4444;">Supprimer</button>
-        <button class="btn" onclick="document.getElementById('modal-pvp-lib').classList.add('hidden')" style="background:#eee;color:#333;">Fermer</button>
+        <button class="btn danger" onclick="app.pvp.delLib()">Supprimer</button>
+        <button class="btn secondary" onclick="document.getElementById('modal-pvp-lib').classList.add('hidden')">Fermer</button>
     </div>
   </div>
 
-  <!-- MODAL PVP STOCK -->
   <div id="modal-pvp-stock" class="modal-bc hidden">
-      <div class="modal-card">
-          <h3 style="color:#d97706">Correction Rayon</h3>
-          <input type="hidden" id="stock-id"><h4 id="stock-name" style="text-align:center;"></h4>
-          <label>Quantité</label><input type="number" id="stock-qty">
-          <label>Sortie</label><input type="datetime-local" id="stock-start">
-          <label>Fin</label><input type="datetime-local" id="stock-end">
-          <button class="btn" onclick="app.pvp.saveStock()" style="background:#d97706;">Valider</button>
-          <button class="btn" onclick="app.pvp.delStock()" style="background:#ef4444;">Retirer</button>
-          <button class="btn" onclick="document.getElementById('modal-pvp-stock').classList.add('hidden')" style="background:#eee;color:#333;">Annuler</button>
-      </div>
+    <div class="modal-card">
+      <h3 style="color:#d97706">Correction Rayon</h3>
+      <input type="hidden" id="stock-id"><h4 id="stock-name" style="text-align:center;"></h4>
+      <label>Quantité</label><input type="number" id="stock-qty">
+      <label>Sortie</label><input type="datetime-local" id="stock-start">
+      <label>Fin</label><input type="datetime-local" id="stock-end">
+      <button class="btn" onclick="app.pvp.saveStock()" style="background:#d97706;">Valider</button>
+      <button class="btn danger" onclick="app.pvp.delStock()">Retirer</button>
+      <button class="btn secondary" onclick="document.getElementById('modal-pvp-stock').classList.add('hidden')">Annuler</button>
+    </div>
   </div>
 
   <!-- HEADER -->
   <header id="app-header" class="hidden">
-    <button onclick="app.logout()" title="Déconnexion"
-      style="position:absolute;left:15px;top:18px;background:#eee;border:0;border-radius:12px;padding:8px 10px;cursor:pointer;">
-      <i class="fas fa-right-from-bracket"></i>
-    </button>
+    <button class="logout-btn" onclick="app.auth.logout()"><i class="fas fa-right-from-bracket"></i></button>
     <img src="https://raw.githubusercontent.com/araujoexploitation/Magasin/main/LOGO.png" class="logo-header">
     <div id="user-badge" class="user-badge">...</div>
   </header>
 
-  <!-- VIEWS -->
   <main>
     <div id="view-home">
-        <div id="alert-box" style="display:none;background:#ef4444;color:white;padding:15px;border-radius:12px;margin-bottom:15px;text-align:center;font-weight:bold;">⚠️ Dates Courtes !</div>
-        <div class="home-grid">
-            <div class="home-btn" onclick="app.nav('frais')" style="background: linear-gradient(135deg, #003896 0%, #002366 100%);"><i class="fas fa-barcode"></i><br>DLC FRAIS</div>
-            <div class="home-btn" onclick="app.nav('pvp')" style="background: linear-gradient(135deg, #d97706 0%, #b45309 100%);"><i class="fas fa-bread-slice"></i><br>GESTION PVP</div>
-        </div>
-        <div class="card hidden" id="btn-team" onclick="app.nav('team')" style="text-align:center;margin-top:15px;"><i class="fas fa-users"></i> Équipe</div>
+      <div id="alert-box" style="display:none;background:#ef4444;color:white;padding:15px;border-radius:12px;margin-bottom:15px;text-align:center;font-weight:bold;">⚠️ Dates Courtes !</div>
+      <div class="home-grid">
+        <div class="home-btn" onclick="app.nav('frais')" style="background: linear-gradient(135deg, #003896 0%, #002366 100%);"><i class="fas fa-barcode"></i><br>DLC FRAIS</div>
+        <div class="home-btn" onclick="app.nav('pvp')" style="background: linear-gradient(135deg, #d97706 0%, #b45309 100%);"><i class="fas fa-bread-slice"></i><br>GESTION PVP</div>
+      </div>
+      <div class="card hidden" id="btn-team" onclick="app.nav('team')" style="text-align:center;"><i class="fas fa-users"></i> Équipe</div>
     </div>
 
     <div id="view-frais" class="hidden">
-        <div class="tabs">
-            <div class="tab active" id="tf-1" onclick="app.frais.tab('scan')">SCAN</div>
-            <div class="tab" id="tf-2" onclick="app.frais.tab('list')">LISTE</div>
+      <div class="tabs">
+        <div class="tab active" id="tf-1" onclick="app.frais.tab('scan')">SCAN</div>
+        <div class="tab" id="tf-2" onclick="app.frais.tab('list')">LISTE</div>
+      </div>
+      <div id="frais-scan">
+        <div id="scanner-box" style="height:200px;background:black;margin-bottom:10px;display:none;"><video id="video" style="width:100%;height:100%;object-fit:cover;"></video></div>
+        <button class="btn" onclick="app.frais.toggleScan()"><i class="fas fa-camera"></i> SCANNER</button>
+        <div class="card">
+          <input id="frais-ean" type="text" inputmode="numeric" placeholder="EAN" oninput="app.frais.handleInput(this.value)">
+          <select id="frais-fam">
+            <option>SNACKING</option><option>TRAITEUR</option><option>ULTRA FRAIS</option><option>CHARCUTERIE</option>
+            <option>BOUCHERIE</option><option>VOLAILLE</option><option>FROMAGE</option><option>SAURISSERIE</option><option>DIVERS</option>
+          </select>
+          <input id="frais-name" placeholder="Nom">
+          <div class="row"><input type="date" id="frais-date"><input type="number" id="frais-qty" placeholder="Qté"></div>
+          <button class="btn" onclick="app.frais.add()">AJOUTER</button>
         </div>
-        <div id="frais-scan">
-            <div id="scanner-box" style="height:200px;background:black;margin-bottom:10px;display:none;"><video id="video" style="width:100%;height:100%;object-fit:cover;"></video></div>
-            <button class="btn" onclick="app.frais.toggleScan()"><i class="fas fa-camera"></i> SCANNER</button>
-            <div class="card">
-                <input id="frais-ean" type="text" inputmode="numeric" placeholder="EAN" oninput="app.frais.handleInput(this.value)">
-                <select id="frais-fam">
-                  <option>SNACKING</option><option>TRAITEUR</option><option>ULTRA FRAIS</option><option>CHARCUTERIE</option>
-                  <option>BOUCHERIE</option><option>VOLAILLE</option><option>FROMAGE</option><option>SAURISSERIE</option><option>DIVERS</option>
-                </select>
-                <input id="frais-name" placeholder="Nom">
-                <div style="display:flex;gap:10px;"><input type="date" id="frais-date"><input type="number" id="frais-qty" placeholder="Qté"></div>
-                <button class="btn" onclick="app.frais.add()">AJOUTER</button>
-            </div>
-        </div>
-        <div id="frais-list" class="hidden"></div>
+      </div>
+      <div id="frais-list" class="hidden"></div>
     </div>
 
     <div id="view-pvp" class="hidden">
-        <div class="tabs">
-            <div class="tab active" id="tp-1" onclick="app.pvp.tab('stock')">RAYON</div>
-            <div class="tab" id="tp-2" onclick="app.pvp.tab('bib')">BIBLIO</div>
-            <div class="tab" id="tp-3" onclick="app.pvp.tab('calc')">BESOINS</div>
-        </div>
-        <div id="pvp-stock"></div>
-        <div id="pvp-bib" class="hidden">
-            <button class="btn" onclick="app.pvp.openLib()" style="background:#eee;color:#333;margin-bottom:15px;">+ Créer Produit</button>
-            <div id="lib-list"></div>
-        </div>
-        <div id="pvp-calc" class="hidden"></div>
+      <div class="tabs">
+        <div class="tab active" id="tp-1" onclick="app.pvp.tab('stock')">RAYON</div>
+        <div class="tab" id="tp-2" onclick="app.pvp.tab('bib')">BIBLIO</div>
+        <div class="tab" id="tp-3" onclick="app.pvp.tab('calc')">BESOINS</div>
+      </div>
+      <div id="pvp-stock"></div>
+      <div id="pvp-bib" class="hidden">
+        <button class="btn secondary" onclick="app.pvp.openLib()" style="margin-bottom:15px;">+ Créer Produit</button>
+        <div id="lib-list"></div>
+      </div>
+      <div id="pvp-calc" class="hidden"></div>
     </div>
 
+    <!-- TEAM -->
     <div id="view-team" class="hidden">
-        <div class="card">
-            <input id="new-u-name" placeholder="Nom (ex: PAUL)">
-            <input id="new-u-mail" placeholder="Email (ex: paul@...)" inputmode="email">
-            <button class="btn" onclick="app.saveUser()">Créer Staff (envoi mail)</button>
-            <p class="small-muted">Un email de définition du mot de passe sera envoyé.</p>
-        </div>
-        <div class="card" id="user-list"></div>
+      <div class="card">
+        <h3 style="margin-top:0;">Créer un compte staff</h3>
+        <input id="new-u-name" placeholder="Nom (ex: LUCAS)" autocomplete="off">
+        <input id="new-u-email" placeholder="Email (ex: lucas@...)" inputmode="email" autocomplete="off">
+        <select id="new-u-role">
+          <option value="staff">staff</option>
+          <option value="admin">admin</option>
+        </select>
+        <button class="btn" onclick="app.team.createStaff()">Créer + envoyer lien “mot de passe oublié”</button>
+        <div class="small">Le staff clique ensuite “Mot de passe oublié” sur l’écran de login, ou reçoit le mail si ton template est configuré.</div>
+      </div>
+
+      <div class="card">
+        <h3 style="margin-top:0;">Utilisateurs</h3>
+        <div id="user-list"></div>
+      </div>
     </div>
+
   </main>
 
-  <!-- NAV -->
   <nav id="app-nav" class="hidden">
-      <div class="nav-btn" onclick="app.goBack()"><i class="fas fa-arrow-left"></i><br>RETOUR</div>
-      <div class="nav-btn" onclick="app.nav('home')"><i class="fas fa-th-large"></i><br>MENU</div>
+    <div class="nav-btn" onclick="app.goBack()"><i class="fas fa-arrow-left"></i><br>RETOUR</div>
+    <div class="nav-btn" onclick="app.nav('home')"><i class="fas fa-th-large"></i><br>MENU</div>
   </nav>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import {
-  getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut,
-  sendPasswordResetEmail, createUserWithEmailAndPassword,
-  setPersistence, inMemoryPersistence
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { initializeAppCheck, ReCaptchaEnterpriseProvider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app-check.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, sendPasswordResetEmail, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+  import { initializeAppCheck, ReCaptchaEnterpriseProvider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app-check.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyA0ffa4Nfa7kGLyaEcAocU9YzIhzmx3SkA",
-  authDomain: "araujo-exploitation.firebaseapp.com",
-  projectId: "araujo-exploitation"
-};
+  // ---- Firebase config (le tien)
+  const firebaseConfig = {
+    apiKey: "AIzaSyA0ffa4Nfa7kGLyaEcAocU9YzIhzmx3SkA",
+    authDomain: "araujo-exploitation.firebaseapp.com",
+    projectId: "araujo-exploitation"
+  };
 
-const firebaseApp = initializeApp(firebaseConfig);
+  const appFb = initializeApp(firebaseConfig);
+  const db = getFirestore(appFb);
+  const auth = getAuth(appFb);
 
-// ✅ App Check (reCAPTCHA Enterprise)
-initializeAppCheck(firebaseApp, {
-  provider: new ReCaptchaEnterpriseProvider("6LfhL3AsAAAAAOOeDxTiE1zqlhBgWff3pjhFsnax"),
-  isTokenAutoRefreshEnabled: true
-});
+  // Secondary app/auth => créer des comptes sans déconnecter l’admin
+  const secondaryApp = initializeApp(firebaseConfig, "Secondary");
+  const secondaryAuth = getAuth(secondaryApp);
 
-const db = getFirestore(firebaseApp);
-const auth = getAuth(firebaseApp);
+  // App Check (reCAPTCHA Enterprise) — nécessite activation dans la console App Check
+  try {
+    initializeAppCheck(appFb, {
+      provider: new ReCaptchaEnterpriseProvider("6LfhL3AsAAAAAOOeDxTiE1zqlhBgWff3pjhFsnax"),
+      isTokenAutoRefreshEnabled: true
+    });
+  } catch(e) {
+    // si déjà initialisé, ou si AppCheck non supporté ici
+  }
 
-// Secondary auth (création user sans déconnecter l’admin)
-const adminApp = initializeApp(firebaseConfig, "admin-create");
-const adminAuth = getAuth(adminApp);
-await setPersistence(adminAuth, inMemoryPersistence);
+  // Firestore docs
+  const docUsers = doc(db, "store_master", "DATA_USERS");
+  const docFrais = doc(db, "store_master", "DATA_FRAIS");
+  const docPVP   = doc(db, "store_master", "DATA_PVP");
 
-const docUsers = doc(db, "store_master", "DATA_USERS");
-const docFrais = doc(db, "store_master", "DATA_FRAIS");
-const docPVP   = doc(db, "store_master", "DATA_PVP");
+  const codeReader = new ZXing.BrowserMultiFormatReader();
 
-const codeReader = new ZXing.BrowserMultiFormatReader();
+  window.app = {
+    me: null,
+    data: { frais: [], users: [], pvpLib: [], pvpStock: [], checkedNeeds: [] },
+    viewHistory: [],
+    closed: new Set(),
+    debounceTimer: null,
 
-function escapeHtml(s="") {
-  return String(s).replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
-}
-
-window.app = {
-  data: { frais: [], users: [], pvpLib: [], pvpStock: [], checkedNeeds: [] },
-  viewHistory: [],
-  closed: new Set(),
-  debounceTimer: null,
-  session: { profile: null },
-
-  common: {
-    showBarcode: function(ean, name, imgUrl=null) {
-      document.getElementById('modal-barcode').classList.remove('hidden');
-      document.getElementById('bc-name').innerText = name || "";
-      let imgEl = document.getElementById('bc-img-display');
-      if(imgUrl) { imgEl.src = imgUrl; imgEl.style.display='block'; } else { imgEl.style.display='none'; }
-      if(ean) {
-        try{JsBarcode("#barcode", ean, {format:"EAN13", height:80, displayValue:true});}
-        catch(e){try{JsBarcode("#barcode", ean, {format:"CODE128", height:80, displayValue:true});}catch(e2){}}
+    ui: {
+      err: (msg) => {
+        const box = document.getElementById("login-error");
+        box.style.display = "block";
+        box.textContent = msg;
+      },
+      clearErr: () => {
+        const box = document.getElementById("login-error");
+        box.style.display = "none";
+        box.textContent = "";
       }
     },
-    parseDateLocal: function(dateStr) {
-      if(!dateStr) return null;
-      let parts = dateStr.split('-');
-      return new Date(parts[0], parts[1]-1, parts[2], 12, 0, 0).getTime();
-    },
-    dateToInputLocal: function(ts) {
-      if(!ts) return "";
-      let d = new Date(ts);
-      let y = d.getFullYear();
-      let m = String(d.getMonth()+1).padStart(2,'0');
-      let day = String(d.getDate()).padStart(2,'0');
-      return `${y}-${m}-${day}`;
-    },
-    tsToInput: function(ts) {
-      let d = new Date(ts);
-      let local = new Date(d.getTime() - (d.getTimezoneOffset() * 60000));
-      return local.toISOString().slice(0, 16);
-    },
-    calculateEnd: function(startTs, hours) {
-      let end = new Date(startTs);
-      let h = parseInt(hours);
-      if (h === 0) end.setHours(22, 0, 0, 0);
-      else end.setHours(end.getHours() + h);
-      return end.getTime();
-    },
-    cleanName: function(name) { return String(name||"").toUpperCase().replace(/^[\d\s\.,xX]+(G|KG|ML|CL|L|P)?\s*/g, ''); },
-    compressImg: function(file, callback) {
-      let reader = new FileReader(); reader.readAsDataURL(file);
-      reader.onload = (e) => {
-        let img = new Image(); img.src = e.target.result;
-        img.onload = () => {
-          let canvas = document.createElement('canvas');
-          let ctx = canvas.getContext('2d');
-          let max = 300; let w = img.width, h = img.height;
-          if (w > h) { if (w > max) { h *= max/w; w = max; } }
-          else { if (h > max) { w *= max/h; h = max; } }
-          canvas.width = w; canvas.height = h;
-          ctx.drawImage(img, 0, 0, w, h);
-          callback(canvas.toDataURL('image/jpeg', 0.5));
-        };
-      };
-    },
-    formatDate: function(ts) {
-      let d = new Date(ts);
-      if(isNaN(d.getTime())) return "--/--";
-      let h = d.getHours(); let m = d.getMinutes();
-      return `${d.getDate()}/${d.getMonth()+1} ${h<10?'0'+h:h}:${m<10?'0'+m:m}`;
-    }
-  },
 
-  init: async function() {
-    try {
+    common: {
+      showBarcode: function(ean, name, imgUrl=null) {
+        document.getElementById('modal-barcode').classList.remove('hidden');
+        document.getElementById('bc-name').innerText = name || "";
+        let imgEl = document.getElementById('bc-img-display');
+        if(imgUrl) { imgEl.src = imgUrl; imgEl.style.display='block'; } else { imgEl.style.display='none'; }
+        if(ean) {
+          try { JsBarcode("#barcode", ean, {format:"EAN13", height:80, displayValue:true}); }
+          catch(e) { try{ JsBarcode("#barcode", ean, {format:"CODE128", height:80, displayValue:true}); } catch(e2){} }
+        }
+      },
+      parseDateLocal: function(dateStr) {
+        if(!dateStr) return null;
+        let parts = dateStr.split('-');
+        return new Date(parts[0], parts[1]-1, parts[2], 12, 0, 0).getTime();
+      },
+      dateToInputLocal: function(ts) {
+        if(!ts) return "";
+        let d = new Date(ts);
+        let y = d.getFullYear();
+        let m = String(d.getMonth()+1).padStart(2,'0');
+        let day = String(d.getDate()).padStart(2,'0');
+        return `${y}-${m}-${day}`;
+      },
+      tsToInput: function(ts) {
+        let d = new Date(ts);
+        let local = new Date(d.getTime() - (d.getTimezoneOffset() * 60000));
+        return local.toISOString().slice(0, 16);
+      },
+      calculateEnd: function(startTs, hours) {
+        let end = new Date(startTs);
+        let h = parseInt(hours);
+        if (h === 0) end.setHours(22, 0, 0, 0);
+        else end.setHours(end.getHours() + h);
+        return end.getTime();
+      },
+      cleanName: function(name) {
+        return (name||"").toUpperCase().replace(/^[\d\s\.,xX]+(G|KG|ML|CL|L|P)?\s*/g, '');
+      },
+      compressImg: function(file, callback) {
+        let reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (e) => {
+          let img = new Image();
+          img.src = e.target.result;
+          img.onload = () => {
+            let canvas = document.createElement('canvas');
+            let ctx = canvas.getContext('2d');
+            let max = 300; let w = img.width, h = img.height;
+            if (w > h) { if (w > max) { h *= max/w; w = max; } }
+            else { if (h > max) { w *= max/h; h = max; } }
+            canvas.width = w; canvas.height = h;
+            ctx.drawImage(img, 0, 0, w, h);
+            callback(canvas.toDataURL('image/jpeg', 0.5));
+          };
+        };
+      },
+      formatDate: function(ts) {
+        let d = new Date(ts);
+        if(isNaN(d.getTime())) return "--/--";
+        let h = d.getHours(); let m = d.getMinutes();
+        return `${d.getDate()}/${d.getMonth()+1} ${h<10?'0'+h:h}:${m<10?'0'+m:m}`;
+      },
+      randPwd: function(len=14) {
+        const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%";
+        let out = "";
+        for(let i=0;i<len;i++) out += chars[Math.floor(Math.random()*chars.length)];
+        return out;
+      }
+    },
+
+    auth: {
+      login: async function() {
+        window.app.ui.clearErr();
+        const email = (document.getElementById("login-email").value || "").trim();
+        const pass  = (document.getElementById("login-pass").value || "").trim();
+        if(!email || !pass) return window.app.ui.err("Email et mot de passe requis.");
+        try {
+          await signInWithEmailAndPassword(auth, email, pass);
+          document.getElementById("login-pass").value = "";
+        } catch(e) {
+          window.app.ui.err("Connexion refusée. Vérifie l’email / mot de passe.");
+        }
+      },
+      forgot: async function() {
+        window.app.ui.clearErr();
+        const email = (document.getElementById("login-email").value || "").trim();
+        if(!email) return window.app.ui.err("Tape ton email puis clique “Mot de passe oublié”.");
+        try {
+          await sendPasswordResetEmail(auth, email);
+          alert("Email de réinitialisation envoyé.");
+        } catch(e) {
+          window.app.ui.err("Impossible d’envoyer le reset. Vérifie l’email.");
+        }
+      },
+      logout: async function() {
+        try { await signOut(auth); } catch(e){}
+      }
+    },
+
+    // ---- Firestore load/save
+    loadAll: async function() {
       const [uSnap, fSnap, pSnap] = await Promise.all([getDoc(docUsers), getDoc(docFrais), getDoc(docPVP)]);
-      if(uSnap.exists()) this.data.users = uSnap.data().list || [];
-      if(fSnap.exists()) this.data.frais = fSnap.data().list || [];
+      this.data.users = uSnap.exists() ? (uSnap.data().list || []) : [];
+      this.data.frais = fSnap.exists() ? (fSnap.data().list || []) : [];
       if(pSnap.exists()) {
         let d = pSnap.data();
         this.data.pvpLib = d.lib || [];
         this.data.pvpStock = d.stock || [];
         this.data.checkedNeeds = d.needs || [];
+      } else {
+        this.data.pvpLib = []; this.data.pvpStock = []; this.data.checkedNeeds = [];
       }
+    },
 
-      // Si vide, on initialise une liste minimale (à compléter avec email admin)
+    save: async function(sec) {
+      // NOTE : protège côté UI, MAIS mets aussi des Rules Firestore !
+      if(!auth.currentUser) throw new Error("Not logged");
+      if(sec==='users') await setDoc(docUsers, { list: this.data.users });
+      if(sec==='frais') await setDoc(docFrais, { list: this.data.frais });
+      if(sec==='pvp')   await setDoc(docPVP,   { lib: this.data.pvpLib, stock: this.data.pvpStock, needs: this.data.checkedNeeds });
+    },
+
+    afterLoginBootstrap: async function() {
+      await this.loadAll();
+
+      // Si aucun user en base => on bootstrap l’admin avec le user connecté
       if(!this.data.users.length) {
-        this.data.users = [{ name:"MANAGER", email:"", role:"admin" }];
-        this.save('users');
+        const email = auth.currentUser.email || "";
+        const name = (email.split("@")[0] || "ADMIN").toUpperCase();
+        this.data.users = [{ uid: auth.currentUser.uid, email, name, role:"admin" }];
+        await this.save("users");
       }
+
+      // Trouver profil
+      this.me = this.data.users.find(u => u.uid === auth.currentUser.uid) || null;
+      if(!this.me) {
+        alert("Votre compte n’est pas autorisé (UID inconnu dans DATA_USERS).");
+        await signOut(auth);
+        return;
+      }
+
+      // UI
+      document.getElementById('login-overlay').classList.add('hidden');
+      document.getElementById('app-header').classList.remove('hidden');
+      document.getElementById('app-nav').classList.remove('hidden');
+      document.getElementById('user-badge').innerText = this.me.name || (this.me.email || "USER");
+
+      // Admin UI
+      if(this.me.role === 'admin') document.getElementById('btn-team').classList.remove('hidden');
+      else document.getElementById('btn-team').classList.add('hidden');
 
       this.updateUI();
-    } catch(e) {
-      if(!this.data.users.length) this.data.users = [{ name:"MANAGER", email:"", role:"admin" }];
-      this.updateUI();
-    }
-
-    onAuthStateChanged(auth, (user) => {
-      if(user?.email) {
-        const email = user.email.toLowerCase();
-        this.session.profile = (this.data.users||[]).find(u => (u.email||"").toLowerCase() === email) || null;
-
-        document.getElementById('login-overlay').classList.add('hidden');
-        document.getElementById('app-header').classList.remove('hidden');
-        document.getElementById('app-nav').classList.remove('hidden');
-
-        document.getElementById('user-badge').innerText = this.session.profile?.name || user.email;
-
-        if(this.session.profile?.role === 'admin') document.getElementById('btn-team').classList.remove('hidden');
-        else document.getElementById('btn-team').classList.add('hidden');
-      } else {
-        this.session.profile = null;
-        document.getElementById('login-overlay').classList.remove('hidden');
-        document.getElementById('app-header').classList.add('hidden');
-        document.getElementById('app-nav').classList.add('hidden');
-        document.getElementById('btn-team').classList.add('hidden');
-      }
-    });
-
-    this.updateLoginHint();
-  },
-
-  save: function(sec) {
-    if(sec==='users') setDoc(docUsers, { list: this.data.users });
-    if(sec==='frais') setDoc(docFrais, { list: this.data.frais });
-    if(sec==='pvp') setDoc(docPVP, { lib: this.data.pvpLib, stock: this.data.pvpStock, needs: this.data.checkedNeeds });
-  },
-
-  updateUI: function() {
-    let sel = document.getElementById('login-user-select');
-    sel.innerHTML = (this.data.users || [])
-      .map(u => `<option value="${escapeHtml(u.name)}">${escapeHtml(u.name)}</option>`)
-      .join('');
-    this.updateLoginHint();
-    this.frais.render();
-    this.pvp.render();
-    this.renderUsers();
-    this.checkAlerts();
-  },
-
-  updateLoginHint: function() {
-    const name = document.getElementById('login-user-select').value;
-    const u = (this.data.users||[]).find(x => x.name === name);
-    document.getElementById('login-email-hint').innerText = u?.email ? u.email : "⚠️ Email manquant (admin: va dans Équipe)";
-  },
-
-  login: async function() {
-    let name = document.getElementById('login-user-select').value;
-    let pass = document.getElementById('login-pass').value;
-    let u = (this.data.users || []).find(x => x.name === name);
-
-    if(!u?.email) return alert("Email manquant pour cet utilisateur. Ajoute-le dans Équipe.");
-    if(!pass) return alert("Mot de passe requis");
-
-    try {
-      await signInWithEmailAndPassword(auth, u.email, pass);
-      document.getElementById('login-pass').value = "";
-    } catch(e) {
-      alert("Erreur connexion: " + (e?.code || e));
-    }
-  },
-
-  forgotPassword: async function() {
-    let name = document.getElementById('login-user-select').value;
-    let u = (this.data.users || []).find(x => x.name === name);
-    if(!u?.email) return alert("Pas d'email pour ce compte.");
-
-    try {
-      await sendPasswordResetEmail(auth, u.email);
-      alert("Email de réinitialisation envoyé à : " + u.email);
-    } catch(e) {
-      alert("Erreur reset: " + (e?.code || e));
-    }
-  },
-
-  logout: async function() {
-    await signOut(auth);
-    this.nav('home', false);
-  },
-
-  nav: function(v, saveHistory = true) {
-    if(v === 'team' && this.session.profile?.role !== 'admin') return alert("Accès admin requis.");
-    if(this.frais.scanning) this.frais.toggleScan();
-
-    let current = document.querySelector('main > div:not(.hidden)');
-    if(saveHistory && current) this.viewHistory.push(current.id.replace('view-',''));
-    document.querySelectorAll('main > div').forEach(e => e.classList.add('hidden'));
-    document.getElementById('view-'+v).classList.remove('hidden');
-  },
-  goBack: function() { if(this.viewHistory.length) this.nav(this.viewHistory.pop(), false); else this.nav('home', false); },
-  toggleFam: function(id) { if(this.closed.has(id)) this.closed.delete(id); else this.closed.add(id); this.frais.render(); this.pvp.render(); },
-
-  // --- FRAIS ---
-  frais: {
-    scanning: false,
-    imgUrl: "",
-    tab: function(t) {
-      document.querySelectorAll('#view-frais .tab').forEach(e => e.classList.remove('active'));
-      document.getElementById(t=='scan'?'tf-1':'tf-2').classList.add('active');
-      document.getElementById('frais-scan').classList.add('hidden');
-      document.getElementById('frais-list').classList.add('hidden');
-      document.getElementById('frais-'+t).classList.remove('hidden');
     },
-    toggleScan: function() {
-      if(this.scanning) {
-        this.scanning=false;
-        document.getElementById('scanner-box').style.display='none';
-        codeReader.reset();
-      } else {
-        this.scanning=true;
-        document.getElementById('scanner-box').style.display='block';
-        codeReader.decodeFromVideoDevice(null, 'video', (r) => {
-          if(r){
-            this.handleInput(r.text);
-            this.toggleScan();
-          }
-        });
-      }
+
+    updateUI: function() {
+      this.frais.render();
+      this.pvp.render();
+      this.team.renderUsers();
+      this.checkAlerts();
     },
-    handleInput: function(val) {
-      let clean = String(val||"").replace(/\D/g, '').slice(0, 13);
-      document.getElementById('frais-ean').value = clean;
-      if(window.app.debounceTimer) clearTimeout(window.app.debounceTimer);
-      window.app.debounceTimer = setTimeout(() => {
-        if(clean.length === 13) this.api(clean);
-      }, 250);
+
+    nav: function(v, saveHistory = true) {
+      if(this.frais.scanning) this.frais.toggleScan();
+      let current = document.querySelector('main > div:not(.hidden)');
+      if(saveHistory && current) this.viewHistory.push(current.id.replace('view-',''));
+      document.querySelectorAll('main > div').forEach(e => e.classList.add('hidden'));
+      document.getElementById('view-'+v).classList.remove('hidden');
     },
-    api: async function(ean) {
-      try {
-        let r = await fetch(`https://world.openfoodfacts.org/api/v0/product/${ean}.json`);
-        let d = await r.json();
-        if(d.status==1) {
-          document.getElementById('frais-name').value = d.product.product_name_fr || "";
-          this.imgUrl = d.product.image_front_small_url || "";
+    goBack: function() { if(this.viewHistory.length) this.nav(this.viewHistory.pop(), false); else this.nav('home', false); },
+    toggleFam: function(id) { if(this.closed.has(id)) this.closed.delete(id); else this.closed.add(id); this.frais.render(); this.pvp.render(); },
+
+    // ---- TEAM (admin)
+    team: {
+      ensureAdmin: function() {
+        if(!window.app.me || window.app.me.role !== "admin") {
+          alert("Accès admin requis.");
+          return false;
         }
-      } catch(e){}
-    },
-    add: function() {
-      let dateVal = document.getElementById('frais-date').value;
-      let finalDate = window.app.common.parseDateLocal(dateVal);
-      let o = {
-        id: Date.now(),
-        ean: document.getElementById('frais-ean').value,
-        fam: document.getElementById('frais-fam').value,
-        name: document.getElementById('frais-name').value,
-        qty: document.getElementById('frais-qty').value,
-        date: finalDate,
-        img: this.imgUrl
-      };
-      if(!o.name || !o.date) return alert('Date requise');
-      window.app.data.frais.push(o);
-      window.app.save('frais');
-      alert('Ajouté');
-      this.imgUrl="";
-      document.getElementById('frais-name').value="";
-      document.getElementById('frais-ean').value="";
-    },
-    render: function() {
-      let div = document.getElementById('frais-list'); div.innerHTML="";
-      let grp = {};
-      window.app.data.frais.sort((a,b) => {
-        if(a.fam !== b.fam) return a.fam.localeCompare(b.fam);
-        return a.date - b.date;
-      }).forEach(i=>{ if(!grp[i.fam]) grp[i.fam]=[]; grp[i.fam].push(i); });
+        return true;
+      },
+      createStaff: async function() {
+        if(!this.ensureAdmin()) return;
 
-      for(let f in grp) {
-        let id = 'F-'+f; let c = window.app.closed.has(id);
-        div.innerHTML += `<div class="group-header" onclick="app.toggleFam('${id}')"><span>${escapeHtml(f)}</span><i class="fas fa-chevron-${c?'right':'down'}"></i></div>`;
-        if(!c) {
-          grp[f].forEach(i => {
-            let d = new Date(i.date);
-            let badge = 'bg-grey';
-            if(!isNaN(d.getTime())) {
-              let diff = (d - new Date())/(1000*60*60*24);
-              badge = diff<0?'bg-red':(diff<2?'bg-orange':'bg-green');
-            }
-            let safeName = String(i.name||"").replace(/'/g," ");
-            let safeEan  = String(i.ean||"").replace(/'/g," ");
-            let img = i.img
-              ? `<img src="${i.img}" class="item-img" onclick="event.stopPropagation(); app.common.showBarcode('${safeEan}','${safeName}','${i.img}')">`
-              : `<div class="item-img" onclick="event.stopPropagation(); app.common.showBarcode('${safeEan}','${safeName}')"><i class="fas fa-barcode"></i></div>`;
+        const name = (document.getElementById("new-u-name").value || "").trim().toUpperCase();
+        const email = (document.getElementById("new-u-email").value || "").trim().toLowerCase();
+        const role = document.getElementById("new-u-role").value || "staff";
+        if(!name || !email) return alert("Nom + email requis.");
 
-            div.innerHTML += `
-              <div class="swipe-wrapper">
-                <div class="swipe-content" onclick="app.frais.openEdit(${i.id})">
-                  <div style="display:flex;align-items:center;flex:1;">
-                    ${img}
+        // éviter doublons dans Firestore
+        if(window.app.data.users.some(u => (u.email||"").toLowerCase() === email)) {
+          return alert("Email déjà présent dans la liste.");
+        }
+
+        try {
+          const tmpPwd = window.app.common.randPwd();
+          const cred = await createUserWithEmailAndPassword(secondaryAuth, email, tmpPwd);
+
+          // Ajout Firestore users
+          window.app.data.users.push({
+            uid: cred.user.uid,
+            email,
+            name,
+            role
+          });
+          await window.app.save("users");
+
+          // Envoi reset (permet au staff de définir son mot de passe)
+          await sendPasswordResetEmail(secondaryAuth, email);
+
+          // Clean + UI
+          try { await signOut(secondaryAuth); } catch(e) {}
+          document.getElementById("new-u-name").value = "";
+          document.getElementById("new-u-email").value = "";
+          document.getElementById("new-u-role").value = "staff";
+          alert("Compte créé + email envoyé (reset mot de passe).");
+          window.app.team.renderUsers();
+        } catch(e) {
+          // erreurs classiques
+          if(String(e?.code||"").includes("auth/email-already-in-use")) {
+            alert("Email déjà utilisé dans Firebase Auth. Utilise un autre email ou supprime l’ancien compte via console.");
+          } else if(String(e?.code||"").includes("auth/invalid-email")) {
+            alert("Email invalide.");
+          } else {
+            alert("Erreur création compte. Vérifie Auth activé + domain autorisé.");
+          }
+          try { await signOut(secondaryAuth); } catch(err) {}
+        }
+      },
+
+      resetPwd: async function(email) {
+        if(!this.ensureAdmin()) return;
+        if(!email) return alert("Pas d’email.");
+        try {
+          await sendPasswordResetEmail(auth, email);
+          alert("Reset envoyé.");
+        } catch(e) {
+          alert("Impossible d’envoyer le reset.");
+        }
+      },
+
+      setRole: async function(uid, role) {
+        if(!this.ensureAdmin()) return;
+        const u = window.app.data.users.find(x => x.uid === uid);
+        if(!u) return;
+        u.role = role;
+        await window.app.save("users");
+        this.renderUsers();
+      },
+
+      setName: async function(uid) {
+        if(!this.ensureAdmin()) return;
+        const u = window.app.data.users.find(x => x.uid === uid);
+        if(!u) return;
+        const n = prompt("Nom :", u.name || "");
+        if(!n) return;
+        u.name = n.trim().toUpperCase();
+        await window.app.save("users");
+        this.renderUsers();
+      },
+
+      renderUsers: function() {
+        const wrap = document.getElementById("user-list");
+        if(!wrap) return;
+
+        const users = (window.app.data.users || []).slice()
+          .sort((a,b) => (a.role||"").localeCompare(b.role||"") || (a.name||"").localeCompare(b.name||""));
+
+        wrap.innerHTML = users.map(u => {
+          const chip = u.role === "admin"
+            ? `<span class="chip admin">ADMIN</span>`
+            : `<span class="chip staff">STAFF</span>`;
+
+          return `
+            <div style="padding:12px;border-bottom:1px solid #eee;">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+                <div style="min-width:0;">
+                  <div style="font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                    ${u.name || "(Sans nom)"} ${chip}
+                  </div>
+                  <div class="small" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                    ${u.email || "<i>email manquant</i>"}<br>
+                    <span class="small">uid: ${(u.uid||"").slice(0,10)}...</span>
+                  </div>
+                </div>
+
+                <div style="display:flex;gap:8px;flex-shrink:0;">
+                  <button class="qty-btn" title="Renommer" onclick="app.team.setName('${u.uid}')"><i class="fas fa-pen"></i></button>
+                  <button class="qty-btn" title="Reset MDP" onclick="app.team.resetPwd('${u.email||""}')"><i class="fas fa-unlock-keyhole"></i></button>
+                </div>
+              </div>
+
+              <div style="margin-top:10px;display:flex;gap:10px;">
+                <select onchange="app.team.setRole('${u.uid}', this.value)" style="margin:0; padding:10px; font-size:14px;">
+                  <option value="staff" ${u.role==="staff"?"selected":""}>staff</option>
+                  <option value="admin" ${u.role==="admin"?"selected":""}>admin</option>
+                </select>
+              </div>
+            </div>
+          `;
+        }).join("") || "<div class='small'>Aucun utilisateur.</div>";
+      }
+    },
+
+    // ---- FRAIS
+    frais: {
+      scanning: false,
+      imgUrl: "",
+      tab: function(t) {
+        document.querySelectorAll('#view-frais .tab').forEach(e => e.classList.remove('active'));
+        document.getElementById(t=='scan'?'tf-1':'tf-2').classList.add('active');
+        document.getElementById('frais-scan').classList.add('hidden');
+        document.getElementById('frais-list').classList.add('hidden');
+        document.getElementById('frais-'+t).classList.remove('hidden');
+      },
+      toggleScan: function() {
+        if(this.scanning) {
+          this.scanning=false; document.getElementById('scanner-box').style.display='none'; codeReader.reset();
+        } else {
+          this.scanning=true; document.getElementById('scanner-box').style.display='block';
+          codeReader.decodeFromVideoDevice(null, 'video', (r) => { if(r){ this.handleInput(r.text); this.toggleScan(); } });
+        }
+      },
+      handleInput: function(val) {
+        let clean = String(val||"").replace(/\D/g, '').slice(0, 13);
+        document.getElementById('frais-ean').value = clean;
+        if(window.app.debounceTimer) clearTimeout(window.app.debounceTimer);
+        window.app.debounceTimer = setTimeout(() => { if(clean.length === 13) this.api(clean); }, 250);
+      },
+      api: async function(ean) {
+        try {
+          let r = await fetch(`https://world.openfoodfacts.org/api/v0/product/${ean}.json`);
+          let d = await r.json();
+          if(d.status==1) {
+            document.getElementById('frais-name').value = d.product.product_name_fr || "";
+            this.imgUrl = d.product.image_front_small_url || "";
+          }
+        } catch(e){}
+      },
+      add: async function() {
+        let dateVal = document.getElementById('frais-date').value;
+        let finalDate = window.app.common.parseDateLocal(dateVal);
+        let o = {
+          id: Date.now(),
+          ean: document.getElementById('frais-ean').value,
+          fam: document.getElementById('frais-fam').value,
+          name: document.getElementById('frais-name').value,
+          qty: document.getElementById('frais-qty').value,
+          date: finalDate,
+          img: this.imgUrl
+        };
+        if(!o.name || !o.date) return alert('Date requise');
+        window.app.data.frais.push(o);
+        await window.app.save('frais');
+        alert('Ajouté');
+        this.imgUrl="";
+        document.getElementById('frais-name').value="";
+        document.getElementById('frais-ean').value="";
+      },
+      render: function() {
+        let div = document.getElementById('frais-list'); div.innerHTML="";
+        let grp = {};
+        window.app.data.frais.sort((a,b) => (a.fam||"").localeCompare(b.fam||"") || (a.date||0)-(b.date||0))
+          .forEach(i=>{ if(!grp[i.fam])grp[i.fam]=[]; grp[i.fam].push(i); });
+
+        for(let f in grp) {
+          let id = 'F-'+f; let c = window.app.closed.has(id);
+          div.innerHTML += `<div class="group-header" onclick="app.toggleFam('${id}')"><span>${f}</span><i class="fas fa-chevron-${c?'right':'down'}"></i></div>`;
+          if(!c) {
+            grp[f].forEach(i => {
+              let d = new Date(i.date);
+              let badge = 'bg-grey';
+              if(!isNaN(d.getTime())) {
+                let diff = (d - new Date())/(1000*60*60*24);
+                badge = diff<0?'bg-red':(diff<2?'bg-orange':'bg-green');
+              }
+              let safeName = (i.name||"").replace(/'/g," ");
+              let img = i.img
+                ? `<img src="${i.img}" class="item-img" onclick="event.stopPropagation(); app.common.showBarcode('${i.ean}','${safeName}','${i.img}')">`
+                : `<div class="item-img" onclick="event.stopPropagation(); app.common.showBarcode('${i.ean}','${safeName}')"><i class="fas fa-barcode"></i></div>`;
+
+              div.innerHTML += `
+                <div class="swipe-wrapper"><div class="swipe-content" onclick="app.frais.openEdit(${i.id})">
+                  <div style="display:flex;align-items:center;flex:1;">${img}
                     <div class="item-info">
-                      <div class="item-title">${escapeHtml(i.name)}</div>
-                      <span>x${escapeHtml(i.qty)}</span>
+                      <div class="item-title">${i.name||""}</div><span>x${i.qty||0}</span>
                     </div>
                   </div>
                   <div class="date-badge ${badge}">
                     <span>${!isNaN(d.getTime())?d.getDate():'?'}</span>
                     <span style="font-size:10px;">${!isNaN(d.getTime())?d.toLocaleString('fr',{month:'short'}):'Err'}</span>
                   </div>
-                </div>
-              </div>`;
-          });
+                </div></div>`;
+            });
+          }
         }
-      }
-    },
-    openEdit: function(id) {
-      let i = window.app.data.frais.find(x => x.id == id);
-      document.getElementById('modal-edit-frais').classList.remove('hidden');
-      document.getElementById('edit-id').value = id;
-      document.getElementById('edit-famille').value = i.fam;
-      document.getElementById('edit-qty').value = i.qty;
-      document.getElementById('edit-name').value = i.name;
-      document.getElementById('edit-ean').value = i.ean;
-      document.getElementById('edit-date').value = window.app.common.dateToInputLocal(i.date);
-    },
-    saveEdit: function() {
-      let id = document.getElementById('edit-id').value;
-      let idx = window.app.data.frais.findIndex(x => x.id == id);
-      if(idx>-1) {
-        window.app.data.frais[idx].fam  = document.getElementById('edit-famille').value;
-        window.app.data.frais[idx].qty  = document.getElementById('edit-qty').value;
-        window.app.data.frais[idx].name = document.getElementById('edit-name').value;
-        window.app.data.frais[idx].ean  = document.getElementById('edit-ean').value;
-        window.app.data.frais[idx].date = window.app.common.parseDateLocal(document.getElementById('edit-date').value);
-        window.app.save('frais');
+      },
+      openEdit: function(id) {
+        let i = window.app.data.frais.find(x => x.id == id);
+        document.getElementById('modal-edit-frais').classList.remove('hidden');
+        document.getElementById('edit-id').value = id;
+        document.getElementById('edit-famille').value = i.fam;
+        document.getElementById('edit-qty').value = i.qty;
+        document.getElementById('edit-name').value = i.name;
+        document.getElementById('edit-ean').value = i.ean;
+        document.getElementById('edit-date').value = window.app.common.dateToInputLocal(i.date);
+      },
+      saveEdit: async function() {
+        let id = document.getElementById('edit-id').value;
+        let idx = window.app.data.frais.findIndex(x => String(x.id) === String(id));
+        if(idx>-1) {
+          window.app.data.frais[idx].fam  = document.getElementById('edit-famille').value;
+          window.app.data.frais[idx].qty  = document.getElementById('edit-qty').value;
+          window.app.data.frais[idx].name = document.getElementById('edit-name').value;
+          window.app.data.frais[idx].ean  = document.getElementById('edit-ean').value;
+          window.app.data.frais[idx].date = window.app.common.parseDateLocal(document.getElementById('edit-date').value);
+          await window.app.save('frais');
+          document.getElementById('modal-edit-frais').classList.add('hidden');
+          window.app.frais.render();
+          window.app.checkAlerts();
+        }
+      },
+      del: async function() {
+        let id = document.getElementById('edit-id').value;
+        window.app.data.frais = window.app.data.frais.filter(x => String(x.id) !== String(id));
+        await window.app.save('frais');
         document.getElementById('modal-edit-frais').classList.add('hidden');
-      }
-    },
-    del: function() {
-      window.app.data.frais = window.app.data.frais.filter(x => x.id != document.getElementById('edit-id').value);
-      window.app.save('frais');
-      document.getElementById('modal-edit-frais').classList.add('hidden');
-    }
-  },
-
-  // --- PVP ---
-  pvp: {
-    tab: function(t) {
-      document.querySelectorAll('#view-pvp .tab').forEach(e => e.classList.remove('active-pvp'));
-      document.getElementById(t=='stock'?'tp-1':(t=='bib'?'tp-2':'tp-3')).classList.add('active-pvp');
-      ['pvp-stock','pvp-bib','pvp-calc'].forEach(id => document.getElementById(id).classList.add('hidden'));
-      document.getElementById('pvp-'+t).classList.remove('hidden');
-    },
-    handleImg: function(input) {
-      if(input.files[0]) window.app.common.compressImg(input.files[0], (b64) => {
-        document.getElementById('img-preview').src = b64;
-        document.getElementById('img-preview').style.display='block';
-        document.getElementById('lib-img-data').value = b64;
-      });
-    },
-    toggleFamInput: function() {
-      let val = document.getElementById('lib-fam-select').value;
-      document.getElementById('lib-fam-new').classList.toggle('hidden', val !== 'new');
-    },
-
-    openLib: function(id=null) {
-      document.getElementById('modal-pvp-lib').classList.remove('hidden');
-      let uniqueFams = [...new Set(window.app.data.pvpLib.map(i => i.family || "DIVERS"))].sort();
-      document.getElementById('lib-fam-select').innerHTML =
-        uniqueFams.map(f => `<option value="${escapeHtml(f)}">${escapeHtml(f)}</option>`).join('') +
-        `<option value="new">+ Créer...</option>`;
-
-      if(id) {
-        let i = window.app.data.pvpLib.find(x=>x.id==id);
-        document.getElementById('lib-id').value=id;
-        document.getElementById('lib-name').value=i.name;
-        document.getElementById('lib-ean').value=i.ean||"";
-        document.getElementById('lib-days').value=i.days||0;
-        document.getElementById('lib-img-data').value=i.img||"";
-        document.getElementById('img-preview').src=i.img||"";
-        document.getElementById('img-preview').style.display=i.img?'block':'none';
-        document.getElementById('lib-fam-select').value = i.family || "DIVERS";
-        for(let k=0;k<7;k++) document.getElementById('t-'+k).value = (i.targets||{})[k]||"";
-      } else {
-        document.getElementById('lib-id').value="";
-        document.getElementById('lib-name').value="";
-        document.getElementById('lib-ean').value="";
-        document.getElementById('lib-days').value="0";
-        document.getElementById('lib-img-data').value="";
-        document.getElementById('img-preview').style.display='none';
-        document.getElementById('lib-fam-new').value="";
-        for(let k=0;k<7;k++) document.getElementById('t-'+k).value = "";
+        window.app.frais.render();
+        window.app.checkAlerts();
       }
     },
 
-    saveLib: function() {
-      let id = document.getElementById('lib-id').value;
-      let fam = document.getElementById('lib-fam-select').value === 'new'
-        ? document.getElementById('lib-fam-new').value.toUpperCase()
-        : document.getElementById('lib-fam-select').value;
-
-      let o = {
-        id: id ? Number(id) : Date.now(),
-        family: fam || "DIVERS",
-        name: document.getElementById('lib-name').value,
-        ean: document.getElementById('lib-ean').value,
-        img: document.getElementById('lib-img-data').value,
-        days: document.getElementById('lib-days').value,
-        targets: {}
-      };
-      for(let k=0;k<7;k++) o.targets[k] = document.getElementById('t-'+k).value;
-
-      if(!o.name) return alert("Nom requis");
-
-      if(id) {
-        let idx = window.app.data.pvpLib.findIndex(x=>x.id==id);
-        window.app.data.pvpLib[idx] = o;
-      } else {
-        window.app.data.pvpLib.push(o);
-      }
-      window.app.save('pvp');
-      document.getElementById('modal-pvp-lib').classList.add('hidden');
-    },
-
-    delLib: function() {
-      window.app.data.pvpLib = window.app.data.pvpLib.filter(x=>x.id!=document.getElementById('lib-id').value);
-      window.app.save('pvp');
-      document.getElementById('modal-pvp-lib').classList.add('hidden');
-    },
-
-    addStock: function(libId) {
-      let l = window.app.data.pvpLib.find(x=>x.id==libId);
-      let q = prompt('Quantité ?', "1");
-      if(q > 0) {
-        let now = new Date();
-        let endTs = window.app.common.calculateEnd(now.getTime(), l.days);
-        window.app.data.pvpStock.push({ id:Date.now(), libId:libId, name:l.name, ean:l.ean, qty:q, out:now.getTime(), end:endTs, days:l.days });
-        window.app.save('pvp');
-        this.render();
-      }
-    },
-
-    openEditStock: function(id) {
-      let i = window.app.data.pvpStock.find(x=>x.id==id);
-      document.getElementById('modal-pvp-stock').classList.remove('hidden');
-      document.getElementById('stock-id').value=id;
-      document.getElementById('stock-name').innerText=i.name;
-      document.getElementById('stock-qty').value=i.qty;
-      document.getElementById('stock-start').value = window.app.common.tsToInput(i.out);
-      document.getElementById('stock-end').value = window.app.common.tsToInput(i.end);
-    },
-
-    saveStock: function() {
-      let idx = window.app.data.pvpStock.findIndex(x=>x.id==document.getElementById('stock-id').value);
-      window.app.data.pvpStock[idx].qty = document.getElementById('stock-qty').value;
-      window.app.data.pvpStock[idx].out = new Date(document.getElementById('stock-start').value).getTime();
-      window.app.data.pvpStock[idx].end = new Date(document.getElementById('stock-end').value).getTime();
-      window.app.save('pvp');
-      document.getElementById('modal-pvp-stock').classList.add('hidden');
-      this.render();
-    },
-
-    delStock: function() {
-      window.app.data.pvpStock = window.app.data.pvpStock.filter(x=>x.id!=document.getElementById('stock-id').value);
-      window.app.save('pvp');
-      document.getElementById('modal-pvp-stock').classList.add('hidden');
-      this.render();
-    },
-
-    changeQty: function(id, delta) {
-      let idx = window.app.data.pvpStock.findIndex(x => x.id == id);
-      if(idx > -1) {
-        let n = parseInt(window.app.data.pvpStock[idx].qty) + delta;
-        if(n <= 0) window.app.data.pvpStock.splice(idx, 1);
-        else window.app.data.pvpStock[idx].qty = n;
-        window.app.save('pvp');
-        this.render();
-      }
-    },
-
-    toggleNeed: function(libId) {
-      let idx = window.app.data.checkedNeeds.indexOf(libId);
-      if(idx > -1) window.app.data.checkedNeeds.splice(idx, 1);
-      else window.app.data.checkedNeeds.push(libId);
-      window.app.save('pvp');
-      this.render();
-    },
-
-    render: function() {
-      // BIBLIO
-      let bib = document.getElementById('lib-list'); bib.innerHTML = "";
-      let gLib = {};
-      window.app.data.pvpLib
-        .sort((a,b)=>window.app.common.cleanName(a.name).localeCompare(window.app.common.cleanName(b.name)))
-        .forEach(l => {
-          let f = l.family||"DIVERS";
-          if(!gLib[f]) gLib[f]=[];
-          gLib[f].push(l);
+    // ---- PVP (identique à ton V2, gardé)
+    pvp: {
+      tab: function(t) {
+        document.querySelectorAll('#view-pvp .tab').forEach(e => e.classList.remove('active-pvp'));
+        document.getElementById(t=='stock'?'tp-1':(t=='bib'?'tp-2':'tp-3')).classList.add('active-pvp');
+        ['pvp-stock','pvp-bib','pvp-calc'].forEach(id => document.getElementById(id).classList.add('hidden'));
+        document.getElementById('pvp-'+t).classList.remove('hidden');
+      },
+      handleImg: function(input) {
+        if(input.files[0]) window.app.common.compressImg(input.files[0], (b64) => {
+          document.getElementById('img-preview').src = b64;
+          document.getElementById('img-preview').style.display='block';
+          document.getElementById('lib-img-data').value = b64;
         });
+      },
+      toggleFamInput: function() {
+        let val = document.getElementById('lib-fam-select').value;
+        document.getElementById('lib-fam-new').classList.toggle('hidden', val !== 'new');
+      },
 
-      Object.keys(gLib).sort().forEach(f => {
-        let id = 'L-'+f; let c = window.app.closed.has(id);
-        bib.innerHTML += `<div class="group-header" onclick="app.toggleFam('${id}')"><span>${escapeHtml(f)}</span><i class="fas fa-chevron-${c?'right':'down'}"></i></div>`;
-        if(!c) gLib[f].forEach(l => {
-          let img = l.img ? `<img src="${l.img}" class="item-img">` : `<div class="item-img"><i class="fas fa-bread-slice"></i></div>`;
-          bib.innerHTML += `
-            <div class="list-item" onclick="app.common.showBarcode('${String(l.ean||"").replace(/'/g," ")}','${String(l.name||"").replace(/'/g," ")}','${l.img||""}')">
-              <div style="display:flex;align-items:center;">
-                ${img}
-                <div><b>${escapeHtml(l.name)}</b><br><small>${escapeHtml(l.days)}h</small></div>
-              </div>
+      openLib: function(id=null) {
+        document.getElementById('modal-pvp-lib').classList.remove('hidden');
+        let uniqueFams = [...new Set(window.app.data.pvpLib.map(i => i.family || "DIVERS"))].sort();
+        document.getElementById('lib-fam-select').innerHTML =
+          uniqueFams.map(f => `<option value="${f}">${f}</option>`).join('') + `<option value="new">+ Créer...</option>`;
+
+        if(id) {
+          let i = window.app.data.pvpLib.find(x=>x.id==id);
+          document.getElementById('lib-id').value=id;
+          document.getElementById('lib-name').value=i.name;
+          document.getElementById('lib-ean').value=i.ean||"";
+          document.getElementById('lib-days').value=i.days||0;
+          document.getElementById('lib-img-data').value=i.img||"";
+          document.getElementById('img-preview').src=i.img||"";
+          document.getElementById('img-preview').style.display=i.img?'block':'none';
+          document.getElementById('lib-fam-select').value = i.family || "DIVERS";
+          for(let k=0;k<7;k++) document.getElementById('t-'+k).value = (i.targets||{})[k]||"";
+        } else {
+          document.getElementById('lib-id').value="";
+          document.getElementById('lib-name').value="";
+          document.getElementById('lib-ean').value="";
+          document.getElementById('lib-img-data').value="";
+          document.getElementById('img-preview').style.display='none';
+          for(let k=0;k<7;k++) document.getElementById('t-'+k).value = "";
+        }
+      },
+
+      saveLib: async function() {
+        let id = document.getElementById('lib-id').value;
+        let fam = document.getElementById('lib-fam-select').value === 'new'
+          ? (document.getElementById('lib-fam-new').value || "DIVERS").toUpperCase()
+          : document.getElementById('lib-fam-select').value;
+
+        let o = {
+          id: id ? Number(id) : Date.now(),
+          family: fam,
+          name: document.getElementById('lib-name').value,
+          ean: document.getElementById('lib-ean').value,
+          img: document.getElementById('lib-img-data').value,
+          days: document.getElementById('lib-days').value,
+          targets: {}
+        };
+        for(let k=0;k<7;k++) o.targets[k] = document.getElementById('t-'+k).value;
+
+        if(!o.name) return alert("Nom requis");
+
+        if(id) {
+          let idx = window.app.data.pvpLib.findIndex(x=>String(x.id)===String(id));
+          if(idx>-1) window.app.data.pvpLib[idx] = o;
+        } else {
+          window.app.data.pvpLib.push(o);
+        }
+
+        await window.app.save('pvp');
+        document.getElementById('modal-pvp-lib').classList.add('hidden');
+        window.app.pvp.render();
+      },
+
+      delLib: async function() {
+        let id = document.getElementById('lib-id').value;
+        window.app.data.pvpLib = window.app.data.pvpLib.filter(x=>String(x.id)!==String(id));
+        await window.app.save('pvp');
+        document.getElementById('modal-pvp-lib').classList.add('hidden');
+        window.app.pvp.render();
+      },
+
+      addStock: async function(libId) {
+        let l = window.app.data.pvpLib.find(x=>x.id==libId);
+        let q = prompt('Quantité ?', "1");
+        if(q > 0) {
+          let now = new Date();
+          let endTs = window.app.common.calculateEnd(now.getTime(), l.days);
+          window.app.data.pvpStock.push({ id:Date.now(), libId:libId, name:l.name, ean:l.ean, qty:q, out:now.getTime(), end:endTs, days:l.days });
+          await window.app.save('pvp');
+          window.app.pvp.render();
+        }
+      },
+
+      openEditStock: function(id) {
+        let i = window.app.data.pvpStock.find(x=>x.id==id);
+        document.getElementById('modal-pvp-stock').classList.remove('hidden');
+        document.getElementById('stock-id').value=id;
+        document.getElementById('stock-name').innerText=i.name;
+        document.getElementById('stock-qty').value=i.qty;
+        document.getElementById('stock-start').value = window.app.common.tsToInput(i.out);
+        document.getElementById('stock-end').value = window.app.common.tsToInput(i.end);
+      },
+
+      saveStock: async function() {
+        let idx = window.app.data.pvpStock.findIndex(x=>String(x.id)===String(document.getElementById('stock-id').value));
+        if(idx<0) return;
+        window.app.data.pvpStock[idx].qty = document.getElementById('stock-qty').value;
+        window.app.data.pvpStock[idx].out = new Date(document.getElementById('stock-start').value).getTime();
+        window.app.data.pvpStock[idx].end = new Date(document.getElementById('stock-end').value).getTime();
+        await window.app.save('pvp');
+        document.getElementById('modal-pvp-stock').classList.add('hidden');
+        window.app.pvp.render();
+      },
+
+      delStock: async function() {
+        let id = document.getElementById('stock-id').value;
+        window.app.data.pvpStock = window.app.data.pvpStock.filter(x=>String(x.id)!==String(id));
+        await window.app.save('pvp');
+        document.getElementById('modal-pvp-stock').classList.add('hidden');
+        window.app.pvp.render();
+      },
+
+      changeQty: async function(id, delta) {
+        let idx = window.app.data.pvpStock.findIndex(x => x.id == id);
+        if(idx > -1) {
+          let n = parseInt(window.app.data.pvpStock[idx].qty) + delta;
+          if(n <= 0) window.app.data.pvpStock.splice(idx, 1);
+          else window.app.data.pvpStock[idx].qty = n;
+          await window.app.save('pvp');
+          this.render();
+        }
+      },
+
+      toggleNeed: async function(libId) {
+        let idx = window.app.data.checkedNeeds.indexOf(libId);
+        if(idx > -1) window.app.data.checkedNeeds.splice(idx, 1);
+        else window.app.data.checkedNeeds.push(libId);
+        await window.app.save('pvp');
+        this.render();
+      },
+
+      render: function() {
+        // BIBLIO
+        let bib = document.getElementById('lib-list'); if(!bib) return;
+        bib.innerHTML = "";
+        let gLib = {};
+        window.app.data.pvpLib
+          .slice()
+          .sort((a,b)=>window.app.common.cleanName(a.name).localeCompare(window.app.common.cleanName(b.name)))
+          .forEach(l => { let f = l.family||"DIVERS"; if(!gLib[f]) gLib[f]=[]; gLib[f].push(l); });
+
+        Object.keys(gLib).sort().forEach(f => {
+          let id = 'L-'+f; let c = window.app.closed.has(id);
+          bib.innerHTML += `<div class="group-header" onclick="app.toggleFam('${id}')"><span>${f}</span><i class="fas fa-chevron-${c?'right':'down'}"></i></div>`;
+          if(!c) gLib[f].forEach(l => {
+            let img = l.img ? `<img src="${l.img}" class="item-img">` : `<div class="item-img"><i class="fas fa-bread-slice"></i></div>`;
+            bib.innerHTML += `<div class="list-item" onclick="app.common.showBarcode('${l.ean}','${(l.name||"").replace(/'/g," ")}','${l.img||""}')">
+              <div style="display:flex;align-items:center;min-width:0;">${img}<div style="min-width:0;"><b>${l.name}</b><br><small>${l.days}h</small></div></div>
               <button class="qty-btn" style="background:var(--pvp);color:white;width:40px;height:40px;" onclick="event.stopPropagation(); app.pvp.openLib(${l.id})"><i class="fas fa-pen"></i></button>
               <button class="qty-btn" style="background:var(--pvp);color:white;width:40px;height:40px;margin-left:10px;" onclick="event.stopPropagation(); app.pvp.addStock(${l.id})">+</button>
             </div>`;
+          });
         });
-      });
 
-      // STOCK
-      let st = document.getElementById('pvp-stock'); st.innerHTML = "";
-      let gStock = {};
-      window.app.data.pvpStock.sort((a,b)=>a.end-b.end).forEach(s => {
-        let l = window.app.data.pvpLib.find(x=>x.id==s.libId);
-        let f = l ? l.family : "DIVERS";
-        if(!gStock[f]) gStock[f]=[];
-        gStock[f].push(s);
-      });
+        // STOCK
+        let st = document.getElementById('pvp-stock'); st.innerHTML = "";
+        let gStock = {};
+        window.app.data.pvpStock.slice().sort((a,b)=>(a.end||0)-(b.end||0)).forEach(s => {
+          let l = window.app.data.pvpLib.find(x=>x.id==s.libId);
+          let f = l ? l.family : "DIVERS";
+          if(!gStock[f]) gStock[f]=[];
+          gStock[f].push(s);
+        });
 
-      Object.keys(gStock).sort().forEach(f => {
-        let id = 'S-'+f; let c = window.app.closed.has(id);
-        st.innerHTML += `<div class="group-header" style="background:var(--pvp)" onclick="app.toggleFam('${id}')"><span>${escapeHtml(f)}</span><i class="fas fa-chevron-${c?'right':'down'}"></i></div>`;
-        if(!c) gStock[f].forEach(i => {
-          let dS = window.app.common.formatDate(i.out);
-          let dE = window.app.common.formatDate(i.end);
-          let isExp = new Date(i.end) < new Date();
-          let l = window.app.data.pvpLib.find(x=>x.id==i.libId);
-          let img = l?l.img:null;
-          let displayImg = img ? `<img src="${img}" class="item-img">` : `<div class="item-img"><i class="fas fa-bread-slice"></i></div>`;
-
-          st.innerHTML += `
-            <div class="swipe-wrapper">
-              <div class="swipe-content">
-                <div style="display:flex;align-items:center;flex:1;">
-                  ${displayImg}
-                  <div>
-                    <div class="item-title" onclick="app.pvp.openEditStock(${i.id})">${escapeHtml(i.name)}</div>
+        Object.keys(gStock).sort().forEach(f => {
+          let id = 'S-'+f; let c = window.app.closed.has(id);
+          st.innerHTML += `<div class="group-header" style="background:var(--pvp)" onclick="app.toggleFam('${id}')"><span>${f}</span><i class="fas fa-chevron-${c?'right':'down'}"></i></div>`;
+          if(!c) gStock[f].forEach(i => {
+            let dS = window.app.common.formatDate(i.out);
+            let dE = window.app.common.formatDate(i.end);
+            let isExp = new Date(i.end) < new Date();
+            let l = window.app.data.pvpLib.find(x=>x.id==i.libId), img = l?l.img:null;
+            let displayImg = img ? `<img src="${img}" class="item-img">` : `<div class="item-img"><i class="fas fa-bread-slice"></i></div>`;
+            st.innerHTML += `
+              <div class="swipe-wrapper"><div class="swipe-content">
+                <div style="display:flex;align-items:center;flex:1;min-width:0;">${displayImg}
+                  <div style="min-width:0;">
+                    <div class="item-title" onclick="app.pvp.openEditStock(${i.id})">${i.name}</div>
                     <div class="qty-ctrl">
                       <button class="qty-btn" onclick="app.pvp.changeQty(${i.id},-1)">-</button>
-                      <b>${escapeHtml(i.qty)}</b>
+                      <b>${i.qty}</b>
                       <button class="qty-btn" onclick="app.pvp.changeQty(${i.id},1)">+</button>
                     </div>
                   </div>
                 </div>
                 <div class="date-col">
-                  <div class="d-lbl">Sortie: ${escapeHtml(dS)}</div>
-                  <div class="d-val ${isExp?'expired':''}">FIN: ${escapeHtml(dE)}</div>
+                  <div class="d-lbl">Sortie: ${dS}</div>
+                  <div class="d-val ${isExp?'expired':''}">FIN: ${dE}</div>
                 </div>
-              </div>
-            </div>`;
+              </div></div>`;
+          });
         });
-      });
 
-      // BESOINS
-      let cl = document.getElementById('pvp-calc');
-      let tom = new Date(); tom.setDate(tom.getDate()+1);
-      let gTodo = {}; let doneH = ""; let hasNeeds = false;
+        // BESOINS
+        let cl = document.getElementById('pvp-calc');
+        let tom = new Date(); tom.setDate(tom.getDate()+1);
+        let gTodo = {}; let doneH = ""; let hasNeeds = false;
 
-      window.app.data.pvpLib.forEach(l => {
-        let target = (l.targets||{})[tom.getDay()] || 0;
-        if(target > 0) {
-          hasNeeds = true;
-          let isC = window.app.data.checkedNeeds.includes(l.id);
-          let img = l.img ? `<img src="${l.img}" class="item-img">` : `<div class="item-img"><i class="fas fa-bread-slice"></i></div>`;
-          let h = `
-            <div class="list-item ${isC?'item-done':''}" style="border-left:5px solid var(--pvp);">
-              <div style="display:flex;align-items:center;flex:1;">
-                ${img}
-                <div>
-                  <div class="item-title">${escapeHtml(l.name)}</div>
-                  <div style="color:var(--pvp);font-weight:bold;">A SORTIR : ${escapeHtml(target)}</div>
+        window.app.data.pvpLib.forEach(l => {
+          let target = (l.targets||{})[tom.getDay()] || 0;
+          if(target > 0) {
+            hasNeeds = true;
+            let isC = window.app.data.checkedNeeds.includes(l.id);
+            let img = l.img ? `<img src="${l.img}" class="item-img">` : `<div class="item-img"><i class="fas fa-bread-slice"></i></div>`;
+            let h = `
+              <div class="list-item ${isC?'item-done':''}" style="border-left:5px solid var(--pvp);">
+                <div style="display:flex;align-items:center;flex:1;min-width:0;">${img}
+                  <div style="min-width:0;">
+                    <div class="item-title">${l.name}</div>
+                    <div style="color:var(--pvp);font-weight:bold;">A SORTIR : ${target}</div>
+                  </div>
                 </div>
-              </div>
-              <div class="todo-check ${isC?'checked':''}" onclick="app.pvp.toggleNeed(${l.id})"><i class="fas fa-check"></i></div>
-            </div>`;
-          if(isC) doneH += h;
-          else {
-            let f = l.family||"DIVERS";
-            if(!gTodo[f]) gTodo[f]=[];
-            gTodo[f].push(h);
+                <div class="todo-check ${isC?'checked':''}" onclick="app.pvp.toggleNeed(${l.id})"><i class="fas fa-check"></i></div>
+              </div>`;
+            if(isC) doneH += h;
+            else { let f = l.family||"DIVERS"; if(!gTodo[f]) gTodo[f]=[]; gTodo[f].push(h); }
           }
-        }
+        });
+
+        let resH = `<h4 style="text-align:center;color:var(--primary);">À SORTIR DEMAIN</h4>`;
+        if(!hasNeeds) resH += "<p style='text-align:center;color:#999'>Rien de prévu</p>";
+        else Object.keys(gTodo).sort().forEach(f => {
+          let id = 'N-'+f; let c = window.app.closed.has(id);
+          resH += `<div class="group-header" style="background:var(--primary)" onclick="app.toggleFam('${id}')"><span>${f}</span><i class="fas fa-chevron-${c?'right':'down'}"></i></div>`;
+          if(!c) resH += gTodo[f].join('');
+        });
+        cl.innerHTML = resH + `<h4 style="text-align:center;color:#64748b;margin-top:20px;">TERMINÉ</h4>` + (doneH || "<p style='text-align:center;color:#ccc;'>Rien de fait</p>");
+      }
+    },
+
+    checkAlerts: function() {
+      let alert = window.app.data.frais.some(i => {
+        let d = new Date(i.date);
+        return !isNaN(d.getTime()) && (d - new Date())/(1000*60*60*24) < 1;
       });
-
-      let resH = `<h4 style="text-align:center;color:var(--primary);">À SORTIR DEMAIN</h4>`;
-      if(!hasNeeds) resH += "<p style='text-align:center;color:#999'>Rien de prévu</p>";
-      else Object.keys(gTodo).sort().forEach(f => {
-        let id = 'N-'+f; let c = window.app.closed.has(id);
-        resH += `<div class="group-header" style="background:var(--primary)" onclick="app.toggleFam('${id}')"><span>${escapeHtml(f)}</span><i class="fas fa-chevron-${c?'right':'down'}"></i></div>`;
-        if(!c) resH += gTodo[f].join('');
-      });
-
-      cl.innerHTML = resH + `<h4 style="text-align:center;color:#64748b;margin-top:20px;">TERMINÉ</h4>` + (doneH || "<p style='text-align:center;color:#ccc;'>Rien de fait</p>");
+      document.getElementById('alert-box').style.display = alert ? 'block' : 'none';
     }
-  },
+  };
 
-  // --- USERS / TEAM ---
-  saveUser: async function() {
-    if(this.session.profile?.role !== 'admin') return alert("Accès admin requis");
-
-    let n = document.getElementById('new-u-name').value.trim().toUpperCase();
-    let email = document.getElementById('new-u-mail').value.trim().toLowerCase();
-
-    if(!n || !email) return alert("Nom + email requis");
-    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return alert("Email invalide");
-
-    if((this.data.users||[]).some(u => u.name === n)) return alert("Nom déjà existant");
-    if((this.data.users||[]).some(u => (u.email||"").toLowerCase() === email)) return alert("Email déjà utilisé");
-
-    // 1) Ajout Firestore
-    this.data.users.push({ name:n, email, role:'staff' });
-    this.save('users');
-    this.updateUI();
-
-    // 2) Création Auth + mail de définition mot de passe
-    try {
-      const tempPass = "Tmp#" + Math.random().toString(36).slice(2,10) + "9!";
-      await createUserWithEmailAndPassword(adminAuth, email, tempPass);
-
-      await sendPasswordResetEmail(auth, email);
-
-      document.getElementById('new-u-name').value = "";
-      document.getElementById('new-u-mail').value = "";
-
-      alert("Staff créé + email envoyé (définition du mot de passe).");
-      await signOut(adminAuth);
-    } catch(e) {
-      alert("Création Auth impossible: " + (e?.code || e));
+  // Auth state
+  onAuthStateChanged(auth, async (user) => {
+    if(!user) {
+      // Show login
+      document.getElementById('login-overlay').classList.remove('hidden');
+      document.getElementById('app-header').classList.add('hidden');
+      document.getElementById('app-nav').classList.add('hidden');
+      window.app.me = null;
+      window.app.data = { frais: [], users: [], pvpLib: [], pvpStock: [], checkedNeeds: [] };
+      return;
     }
-  },
-
-  renderUsers: function() {
-    let l = document.getElementById('user-list');
-    l.innerHTML = (this.data.users || []).map(u =>
-      `<div style="padding:10px;border-bottom:1px solid #eee;">
-        <b>${escapeHtml(u.name)}</b> — <small>${escapeHtml(u.email || "(sans email)")}</small> ${u.role==='admin'?'(Admin)':''}
-      </div>`
-    ).join('');
-  },
-
-  checkAlerts: function() {
-    let alert = window.app.data.frais.some(i => {
-      let d = new Date(i.date);
-      return !isNaN(d.getTime()) && (d - new Date())/(1000*60*60*24) < 1;
-    });
-    document.getElementById('alert-box').style.display = alert ? 'block' : 'none';
-  }
-};
-
-window.app.init();
+    await window.app.afterLoginBootstrap();
+  });
 </script>
+
 </body>
 </html>
