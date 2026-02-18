@@ -46,23 +46,70 @@
   .tab.active { background: white; color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
   .tab.active-pvp { background: white; color: var(--pvp); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
 
+  /* HOME MENU (FIX) */
+  .home-grid{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap:12px;
+    margin-bottom: 12px;
+  }
+  .home-btn{
+    border-radius: 18px;
+    padding: 18px 12px;
+    min-height: 115px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    color:white;
+    font-weight: 900;
+    letter-spacing: .2px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    cursor:pointer;
+    user-select:none;
+  }
+  .home-btn i{ font-size: 28px; margin-bottom: 10px; }
+  @media (max-width: 360px){
+    .home-grid{ grid-template-columns: 1fr; }
+    .home-btn{ min-height: 95px; }
+  }
+
   /* LISTES */
   .group-header { background: #334155; color: white; padding: 12px 15px; border-radius: 10px; margin-top: 15px; font-weight: bold; text-transform: uppercase; font-size: 14px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
   .list-item { background: white; border-radius: 12px; padding: 12px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 1px 3px rgba(0,0,0,0.05); min-height: 80px; }
 
   /* Swipe Elements */
   .swipe-wrapper { background: #ef4444; border-radius: 12px; margin-bottom: 8px; overflow: hidden; position: relative; }
-  .swipe-content { background: white; position: relative; z-index: 2; transition: transform 0.2s; padding: 12px; display: flex; align-items: center; justify-content: space-between; min-height: 80px; width: 100%; }
+  .swipe-content { background: white; position: relative; z-index: 2; transition: transform 0.2s; padding: 12px; display: flex; align-items: center; justify-content: space-between; min-height: 80px; width: 100%; gap: 10px; }
 
   .item-img { width: 55px; height: 55px; border-radius: 10px; object-fit: cover; background: #f1f5f9; margin-right: 12px; flex-shrink: 0; display:flex; align-items:center; justify-content:center; color:#cbd5e1; font-size: 20px; cursor: pointer; }
-  .item-info { flex: 1; overflow: hidden; margin-right: 10px; }
-  .item-title { font-weight: bold; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; }
+  .item-info { flex: 1; overflow: hidden; margin-right: 10px; min-width: 0; }
+  .item-title {
+    font-weight: bold;
+    font-size: 15px;
+    white-space: normal;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    margin-bottom: 4px;
+  }
+  .item-meta{
+    font-size: 12px;
+    color: #64748b;
+    font-weight: 700;
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .item-meta .ean{ font-weight:900; color:#334155; }
 
   /* PVP Controls */
   .qty-ctrl { display: flex; align-items: center; gap: 10px; background: #f8fafc; width: fit-content; padding: 4px 8px; border-radius: 8px; border: 1px solid #e2e8f0; margin-top: 5px; }
   .qty-btn { width: 30px; height: 30px; border-radius: 6px; border: none; background: white; box-shadow: 0 2px 3px rgba(0,0,0,0.1); font-weight: bold; color: var(--primary); font-size: 18px; display:flex; align-items:center; justify-content:center; cursor: pointer; }
 
-  .date-col { text-align: right; width: 110px; flex-shrink: 0; display: flex; flex-direction: column; justify-content: center; }
+  .date-col { text-align: right; width: 110px; flex-shrink: 0; display: flex; flex-direction: column; justify-content: center; min-width: 0; }
   .d-lbl { font-size: 11px; color: #64748b; margin-bottom: 2px; }
   .d-val { font-size: 14px; font-weight: 800; color: var(--success); }
   .d-val.expired { color: var(--danger); }
@@ -262,7 +309,6 @@
   import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, sendPasswordResetEmail, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
   import { initializeAppCheck, ReCaptchaEnterpriseProvider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app-check.js";
 
-  // ---- Firebase config (le tien)
   const firebaseConfig = {
     apiKey: "AIzaSyA0ffa4Nfa7kGLyaEcAocU9YzIhzmx3SkA",
     authDomain: "araujo-exploitation.firebaseapp.com",
@@ -277,17 +323,14 @@
   const secondaryApp = initializeApp(firebaseConfig, "Secondary");
   const secondaryAuth = getAuth(secondaryApp);
 
-  // App Check (reCAPTCHA Enterprise) — nécessite activation dans la console App Check
+  // App Check (si activé dans console)
   try {
     initializeAppCheck(appFb, {
       provider: new ReCaptchaEnterpriseProvider("6LfhL3AsAAAAAOOeDxTiE1zqlhBgWff3pjhFsnax"),
       isTokenAutoRefreshEnabled: true
     });
-  } catch(e) {
-    // si déjà initialisé, ou si AppCheck non supporté ici
-  }
+  } catch(e) {}
 
-  // Firestore docs
   const docUsers = doc(db, "store_master", "DATA_USERS");
   const docFrais = doc(db, "store_master", "DATA_FRAIS");
   const docPVP   = doc(db, "store_master", "DATA_PVP");
@@ -414,7 +457,6 @@
       }
     },
 
-    // ---- Firestore load/save
     loadAll: async function() {
       const [uSnap, fSnap, pSnap] = await Promise.all([getDoc(docUsers), getDoc(docFrais), getDoc(docPVP)]);
       this.data.users = uSnap.exists() ? (uSnap.data().list || []) : [];
@@ -430,7 +472,6 @@
     },
 
     save: async function(sec) {
-      // NOTE : protège côté UI, MAIS mets aussi des Rules Firestore !
       if(!auth.currentUser) throw new Error("Not logged");
       if(sec==='users') await setDoc(docUsers, { list: this.data.users });
       if(sec==='frais') await setDoc(docFrais, { list: this.data.frais });
@@ -440,7 +481,6 @@
     afterLoginBootstrap: async function() {
       await this.loadAll();
 
-      // Si aucun user en base => on bootstrap l’admin avec le user connecté
       if(!this.data.users.length) {
         const email = auth.currentUser.email || "";
         const name = (email.split("@")[0] || "ADMIN").toUpperCase();
@@ -448,7 +488,6 @@
         await this.save("users");
       }
 
-      // Trouver profil
       this.me = this.data.users.find(u => u.uid === auth.currentUser.uid) || null;
       if(!this.me) {
         alert("Votre compte n’est pas autorisé (UID inconnu dans DATA_USERS).");
@@ -456,13 +495,11 @@
         return;
       }
 
-      // UI
       document.getElementById('login-overlay').classList.add('hidden');
       document.getElementById('app-header').classList.remove('hidden');
       document.getElementById('app-nav').classList.remove('hidden');
       document.getElementById('user-badge').innerText = this.me.name || (this.me.email || "USER");
 
-      // Admin UI
       if(this.me.role === 'admin') document.getElementById('btn-team').classList.remove('hidden');
       else document.getElementById('btn-team').classList.add('hidden');
 
@@ -486,7 +523,6 @@
     goBack: function() { if(this.viewHistory.length) this.nav(this.viewHistory.pop(), false); else this.nav('home', false); },
     toggleFam: function(id) { if(this.closed.has(id)) this.closed.delete(id); else this.closed.add(id); this.frais.render(); this.pvp.render(); },
 
-    // ---- TEAM (admin)
     team: {
       ensureAdmin: function() {
         if(!window.app.me || window.app.me.role !== "admin") {
@@ -503,7 +539,6 @@
         const role = document.getElementById("new-u-role").value || "staff";
         if(!name || !email) return alert("Nom + email requis.");
 
-        // éviter doublons dans Firestore
         if(window.app.data.users.some(u => (u.email||"").toLowerCase() === email)) {
           return alert("Email déjà présent dans la liste.");
         }
@@ -512,19 +547,11 @@
           const tmpPwd = window.app.common.randPwd();
           const cred = await createUserWithEmailAndPassword(secondaryAuth, email, tmpPwd);
 
-          // Ajout Firestore users
-          window.app.data.users.push({
-            uid: cred.user.uid,
-            email,
-            name,
-            role
-          });
+          window.app.data.users.push({ uid: cred.user.uid, email, name, role });
           await window.app.save("users");
 
-          // Envoi reset (permet au staff de définir son mot de passe)
           await sendPasswordResetEmail(secondaryAuth, email);
 
-          // Clean + UI
           try { await signOut(secondaryAuth); } catch(e) {}
           document.getElementById("new-u-name").value = "";
           document.getElementById("new-u-email").value = "";
@@ -532,7 +559,6 @@
           alert("Compte créé + email envoyé (reset mot de passe).");
           window.app.team.renderUsers();
         } catch(e) {
-          // erreurs classiques
           if(String(e?.code||"").includes("auth/email-already-in-use")) {
             alert("Email déjà utilisé dans Firebase Auth. Utilise un autre email ou supprime l’ancien compte via console.");
           } else if(String(e?.code||"").includes("auth/invalid-email")) {
@@ -618,7 +644,6 @@
       }
     },
 
-    // ---- FRAIS
     frais: {
       scanning: false,
       imgUrl: "",
@@ -676,7 +701,9 @@
       render: function() {
         let div = document.getElementById('frais-list'); div.innerHTML="";
         let grp = {};
-        window.app.data.frais.sort((a,b) => (a.fam||"").localeCompare(b.fam||"") || (a.date||0)-(b.date||0))
+        window.app.data.frais
+          .slice()
+          .sort((a,b) => (a.fam||"").localeCompare(b.fam||"") || (a.date||0)-(b.date||0))
           .forEach(i=>{ if(!grp[i.fam])grp[i.fam]=[]; grp[i.fam].push(i); });
 
         for(let f in grp) {
@@ -696,17 +723,25 @@
                 : `<div class="item-img" onclick="event.stopPropagation(); app.common.showBarcode('${i.ean}','${safeName}')"><i class="fas fa-barcode"></i></div>`;
 
               div.innerHTML += `
-                <div class="swipe-wrapper"><div class="swipe-content" onclick="app.frais.openEdit(${i.id})">
-                  <div style="display:flex;align-items:center;flex:1;">${img}
-                    <div class="item-info">
-                      <div class="item-title">${i.name||""}</div><span>x${i.qty||0}</span>
+                <div class="swipe-wrapper">
+                  <div class="swipe-content" onclick="app.frais.openEdit(${i.id})">
+                    <div style="display:flex;align-items:center;flex:1;min-width:0;">
+                      ${img}
+                      <div class="item-info">
+                        <div class="item-title">${i.name||""}</div>
+                        <div class="item-meta">
+                          <span>Qté: x${i.qty||0}</span>
+                          <span class="ean">EAN: ${i.ean||""}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="date-badge ${badge}">
+                      <span>${!isNaN(d.getTime())?d.getDate():'?'}</span>
+                      <span style="font-size:10px;">${!isNaN(d.getTime())?d.toLocaleString('fr',{month:'short'}):'Err'}</span>
                     </div>
                   </div>
-                  <div class="date-badge ${badge}">
-                    <span>${!isNaN(d.getTime())?d.getDate():'?'}</span>
-                    <span style="font-size:10px;">${!isNaN(d.getTime())?d.toLocaleString('fr',{month:'short'}):'Err'}</span>
-                  </div>
-                </div></div>`;
+                </div>`;
             });
           }
         }
@@ -746,7 +781,6 @@
       }
     },
 
-    // ---- PVP (identique à ton V2, gardé)
     pvp: {
       tab: function(t) {
         document.querySelectorAll('#view-pvp .tab').forEach(e => e.classList.remove('active-pvp'));
@@ -897,123 +931,4 @@
         let bib = document.getElementById('lib-list'); if(!bib) return;
         bib.innerHTML = "";
         let gLib = {};
-        window.app.data.pvpLib
-          .slice()
-          .sort((a,b)=>window.app.common.cleanName(a.name).localeCompare(window.app.common.cleanName(b.name)))
-          .forEach(l => { let f = l.family||"DIVERS"; if(!gLib[f]) gLib[f]=[]; gLib[f].push(l); });
-
-        Object.keys(gLib).sort().forEach(f => {
-          let id = 'L-'+f; let c = window.app.closed.has(id);
-          bib.innerHTML += `<div class="group-header" onclick="app.toggleFam('${id}')"><span>${f}</span><i class="fas fa-chevron-${c?'right':'down'}"></i></div>`;
-          if(!c) gLib[f].forEach(l => {
-            let img = l.img ? `<img src="${l.img}" class="item-img">` : `<div class="item-img"><i class="fas fa-bread-slice"></i></div>`;
-            bib.innerHTML += `<div class="list-item" onclick="app.common.showBarcode('${l.ean}','${(l.name||"").replace(/'/g," ")}','${l.img||""}')">
-              <div style="display:flex;align-items:center;min-width:0;">${img}<div style="min-width:0;"><b>${l.name}</b><br><small>${l.days}h</small></div></div>
-              <button class="qty-btn" style="background:var(--pvp);color:white;width:40px;height:40px;" onclick="event.stopPropagation(); app.pvp.openLib(${l.id})"><i class="fas fa-pen"></i></button>
-              <button class="qty-btn" style="background:var(--pvp);color:white;width:40px;height:40px;margin-left:10px;" onclick="event.stopPropagation(); app.pvp.addStock(${l.id})">+</button>
-            </div>`;
-          });
-        });
-
-        // STOCK
-        let st = document.getElementById('pvp-stock'); st.innerHTML = "";
-        let gStock = {};
-        window.app.data.pvpStock.slice().sort((a,b)=>(a.end||0)-(b.end||0)).forEach(s => {
-          let l = window.app.data.pvpLib.find(x=>x.id==s.libId);
-          let f = l ? l.family : "DIVERS";
-          if(!gStock[f]) gStock[f]=[];
-          gStock[f].push(s);
-        });
-
-        Object.keys(gStock).sort().forEach(f => {
-          let id = 'S-'+f; let c = window.app.closed.has(id);
-          st.innerHTML += `<div class="group-header" style="background:var(--pvp)" onclick="app.toggleFam('${id}')"><span>${f}</span><i class="fas fa-chevron-${c?'right':'down'}"></i></div>`;
-          if(!c) gStock[f].forEach(i => {
-            let dS = window.app.common.formatDate(i.out);
-            let dE = window.app.common.formatDate(i.end);
-            let isExp = new Date(i.end) < new Date();
-            let l = window.app.data.pvpLib.find(x=>x.id==i.libId), img = l?l.img:null;
-            let displayImg = img ? `<img src="${img}" class="item-img">` : `<div class="item-img"><i class="fas fa-bread-slice"></i></div>`;
-            st.innerHTML += `
-              <div class="swipe-wrapper"><div class="swipe-content">
-                <div style="display:flex;align-items:center;flex:1;min-width:0;">${displayImg}
-                  <div style="min-width:0;">
-                    <div class="item-title" onclick="app.pvp.openEditStock(${i.id})">${i.name}</div>
-                    <div class="qty-ctrl">
-                      <button class="qty-btn" onclick="app.pvp.changeQty(${i.id},-1)">-</button>
-                      <b>${i.qty}</b>
-                      <button class="qty-btn" onclick="app.pvp.changeQty(${i.id},1)">+</button>
-                    </div>
-                  </div>
-                </div>
-                <div class="date-col">
-                  <div class="d-lbl">Sortie: ${dS}</div>
-                  <div class="d-val ${isExp?'expired':''}">FIN: ${dE}</div>
-                </div>
-              </div></div>`;
-          });
-        });
-
-        // BESOINS
-        let cl = document.getElementById('pvp-calc');
-        let tom = new Date(); tom.setDate(tom.getDate()+1);
-        let gTodo = {}; let doneH = ""; let hasNeeds = false;
-
-        window.app.data.pvpLib.forEach(l => {
-          let target = (l.targets||{})[tom.getDay()] || 0;
-          if(target > 0) {
-            hasNeeds = true;
-            let isC = window.app.data.checkedNeeds.includes(l.id);
-            let img = l.img ? `<img src="${l.img}" class="item-img">` : `<div class="item-img"><i class="fas fa-bread-slice"></i></div>`;
-            let h = `
-              <div class="list-item ${isC?'item-done':''}" style="border-left:5px solid var(--pvp);">
-                <div style="display:flex;align-items:center;flex:1;min-width:0;">${img}
-                  <div style="min-width:0;">
-                    <div class="item-title">${l.name}</div>
-                    <div style="color:var(--pvp);font-weight:bold;">A SORTIR : ${target}</div>
-                  </div>
-                </div>
-                <div class="todo-check ${isC?'checked':''}" onclick="app.pvp.toggleNeed(${l.id})"><i class="fas fa-check"></i></div>
-              </div>`;
-            if(isC) doneH += h;
-            else { let f = l.family||"DIVERS"; if(!gTodo[f]) gTodo[f]=[]; gTodo[f].push(h); }
-          }
-        });
-
-        let resH = `<h4 style="text-align:center;color:var(--primary);">À SORTIR DEMAIN</h4>`;
-        if(!hasNeeds) resH += "<p style='text-align:center;color:#999'>Rien de prévu</p>";
-        else Object.keys(gTodo).sort().forEach(f => {
-          let id = 'N-'+f; let c = window.app.closed.has(id);
-          resH += `<div class="group-header" style="background:var(--primary)" onclick="app.toggleFam('${id}')"><span>${f}</span><i class="fas fa-chevron-${c?'right':'down'}"></i></div>`;
-          if(!c) resH += gTodo[f].join('');
-        });
-        cl.innerHTML = resH + `<h4 style="text-align:center;color:#64748b;margin-top:20px;">TERMINÉ</h4>` + (doneH || "<p style='text-align:center;color:#ccc;'>Rien de fait</p>");
-      }
-    },
-
-    checkAlerts: function() {
-      let alert = window.app.data.frais.some(i => {
-        let d = new Date(i.date);
-        return !isNaN(d.getTime()) && (d - new Date())/(1000*60*60*24) < 1;
-      });
-      document.getElementById('alert-box').style.display = alert ? 'block' : 'none';
-    }
-  };
-
-  // Auth state
-  onAuthStateChanged(auth, async (user) => {
-    if(!user) {
-      // Show login
-      document.getElementById('login-overlay').classList.remove('hidden');
-      document.getElementById('app-header').classList.add('hidden');
-      document.getElementById('app-nav').classList.add('hidden');
-      window.app.me = null;
-      window.app.data = { frais: [], users: [], pvpLib: [], pvpStock: [], checkedNeeds: [] };
-      return;
-    }
-    await window.app.afterLoginBootstrap();
-  });
-</script>
-
-</body>
-</html>
+        window.app.data.p
