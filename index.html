@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
 <meta name="theme-color" content="#ffffff" />
-<title>Araujo Exploitation v72</title>
+<title>Araujo Exploitation v73</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 <script src="https://unpkg.com/@zxing/library@latest"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
@@ -254,6 +254,11 @@ window.app = {
             if (h === 0) { end.setHours(22, 0, 0, 0); } 
             else { end.setHours(end.getHours() + h); }
             return end.getTime();
+        },
+        // TRI INTELLIGENT
+        cleanName: function(name) {
+            // Enlève chiffres, espaces, et unités (G, KG, ML...) au début
+            return name.toUpperCase().replace(/^[\d\s\.,xX]+(G|KG|ML|CL|L|P)?\s*/g, '');
         }
     },
 
@@ -349,7 +354,14 @@ window.app = {
         render: function() {
             let div = document.getElementById('frais-list'); div.innerHTML="";
             let grp = {};
-            window.app.data.frais.sort((a,b)=>a.fam.localeCompare(b.fam)).forEach(i=>{ if(!grp[i.fam])grp[i.fam]=[]; grp[i.fam].push(i); });
+            
+            // SORTING
+            window.app.data.frais.sort((a,b) => {
+                if(a.fam !== b.fam) return a.fam.localeCompare(b.fam);
+                return window.app.common.cleanName(a.name).localeCompare(window.app.common.cleanName(b.name));
+            });
+            
+            window.app.data.frais.forEach(i=>{ if(!grp[i.fam])grp[i.fam]=[]; grp[i.fam].push(i); });
             
             for(let f in grp) {
                 div.innerHTML += `<div class="group-header">${f}</div>`;
@@ -357,7 +369,9 @@ window.app = {
                     let d = new Date(i.date);
                     let diff = (d - new Date())/(1000*60*60*24);
                     let badge = diff<0?'badge-red':(diff<2?'badge-orange':'badge-green');
-                    let img = i.img ? `<img src="${i.img}" class="wek-img" onclick="event.stopPropagation(); window.app.common.showBarcode('${i.ean}','${i.name.replace(/'/g," ")}')">` : `<div class="wek-img" onclick="event.stopPropagation(); window.app.common.showBarcode('${i.ean}','${i.name.replace(/'/g," ")}')"><i class="fas fa-barcode"></i></div>`;
+                    
+                    let clickAction = `onclick="event.stopPropagation(); window.app.common.showBarcode('${i.ean}','${i.name.replace(/'/g," ")}')"`
+                    let img = i.img ? `<img src="${i.img}" class="wek-img" ${clickAction}>` : `<div class="wek-img" ${clickAction}><i class="fas fa-barcode"></i></div>`;
                     
                     div.innerHTML += `
                     <div class="swipe-wrapper">
@@ -554,6 +568,9 @@ window.app = {
             
             // GROUP BY FAMILY
             let grouped = {};
+            // SORT LIB SMART
+            window.app.data.pvpLib.sort((a,b) => window.app.common.cleanName(a.name).localeCompare(window.app.common.cleanName(b.name)));
+            
             window.app.data.pvpLib.forEach(l => {
                 let f = l.family || "DIVERS";
                 if(!grouped[f]) grouped[f] = [];
@@ -564,7 +581,9 @@ window.app = {
             Object.keys(grouped).sort().forEach(fam => {
                 bib.innerHTML += `<div class="group-header">${fam}</div>`;
                 grouped[fam].forEach(l => {
-                    let img = l.img ? `<img src="${l.img}" class="wek-img">` : `<div class="wek-img"><i class="fas fa-bread-slice"></i></div>`;
+                    let clickAction = `onclick="event.stopPropagation(); window.app.common.showBarcode('${l.ean}','${l.name.replace(/'/g," ")}')"`
+                    let img = l.img ? `<img src="${l.img}" class="wek-img" ${clickAction}>` : `<div class="wek-img" ${clickAction}><i class="fas fa-bread-slice"></i></div>`;
+                    
                     bib.innerHTML += `<div class="pvp-item" style="justify-content:space-between;"><div style="display:flex;align-items:center;" onclick="app.pvp.openLib(${l.id})">${img}<div><b>${l.name}</b><br><small>${l.days}h</small></div></div><button class="btn-orange" style="width:40px;height:40px;border-radius:50%;padding:0;" onclick="app.pvp.addStock(${l.id})">+</button></div>`;
                 });
             });
@@ -580,7 +599,8 @@ window.app = {
                 let isToday = dEnd.toDateString() === todayStr;
                 let dateColor = isToday ? '#ef4444' : '#10b981';
                 
-                let img = i.img ? `<img src="${i.img}" class="wek-img" onclick="event.stopPropagation(); window.app.common.showBarcode('${i.ean}','${i.name.replace(/'/g," ")}')">` : `<div class="wek-img" onclick="event.stopPropagation(); window.app.common.showBarcode('${i.ean}','${i.name.replace(/'/g," ")}')"><i class="fas fa-bread-slice"></i></div>`;
+                let clickAction = `onclick="event.stopPropagation(); window.app.common.showBarcode('${i.ean}','${i.name.replace(/'/g," ")}')"`
+                let img = i.img ? `<img src="${i.img}" class="wek-img" ${clickAction}>` : `<div class="wek-img" ${clickAction}><i class="fas fa-bread-slice"></i></div>`;
                 
                 let container = document.createElement('div');
                 container.className = 'pvp-row-container';
