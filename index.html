@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
 <meta name="theme-color" content="#ffffff" />
-<title>Araujo v83 (Fix ToDo & Dates)</title>
+<title>Araujo App V1.0</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 <script src="https://unpkg.com/@zxing/library@latest"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
@@ -15,62 +15,63 @@
   body { margin: 0; background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
   .hidden { display: none !important; }
 
-  /* --- LOGIN --- */
-  #login-overlay { position: fixed; inset: 0; z-index: 9999; background: white; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100vw; height: 100vh; }
+  /* LOGIN (Z-Index Haut pour ne jamais être caché) */
+  #login-overlay { position: fixed; inset: 0; z-index: 10000; background: white; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100vw; height: 100vh; }
   
-  /* --- LAYOUT --- */
-  main { flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 100px; }
-  header { background: var(--surface); padding: 10px; height: 90px; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); position: relative; }
-  .logo-header { height: 60px; object-fit: contain; }
-  .user-badge { position: absolute; right: 15px; top: 15px; font-size: 11px; background: #e0f2fe; color: var(--primary); padding: 6px 12px; border-radius: 20px; font-weight: bold; }
+  /* LAYOUT */
+  header { background: var(--surface); padding: 10px; height: 80px; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); position: relative; z-index: 50; }
+  .logo-header { height: 50px; object-fit: contain; }
+  .user-badge { position: absolute; right: 15px; top: 15px; font-size: 11px; background: #e0f2fe; color: var(--primary); padding: 4px 10px; border-radius: 20px; font-weight: bold; }
+  
+  main { flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 90px; }
+  
   nav { position: fixed; bottom: 0; width: 100%; background: white; height: 70px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); z-index: 100; padding: 0 30px; }
-  .nav-btn { text-align:center; color:#94a3b8; cursor: pointer; }
+  .nav-btn { text-align:center; color:#94a3b8; cursor: pointer; font-size: 12px; }
+  .nav-btn i { font-size: 24px; margin-bottom: 4px; }
 
-  /* --- ELEMENTS --- */
+  /* ELEMENTS COMMUNS */
   .card { background: var(--surface); border-radius: 16px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); margin-bottom: 15px; }
   input, select { width: 100%; padding: 14px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 16px; background: #fff; margin-bottom: 10px; outline: none; }
   .btn { width: 100%; padding: 16px; border-radius: 12px; border: none; font-weight: 700; font-size: 16px; background: var(--primary); color: white; cursor: pointer; margin-top: 5px; }
+  
   .tabs { display: flex; background: #e2e8f0; padding: 4px; border-radius: 12px; margin-bottom: 15px; }
   .tab { flex: 1; text-align: center; padding: 12px; font-weight: 700; font-size: 12px; color: #64748b; border-radius: 9px; cursor: pointer; }
   .tab.active { background: white; color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
   .tab.active-pvp { background: white; color: var(--pvp); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
 
-  /* --- LISTS --- */
+  /* LISTES & GROUPES */
   .group-header { background: #334155; color: white; padding: 12px 15px; border-radius: 10px; margin-top: 15px; font-weight: bold; text-transform: uppercase; font-size: 14px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
-  .group-content { display: block; }
-  .group-content.closed { display: none; }
-  
   .list-item { background: white; border-radius: 12px; padding: 12px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 1px 3px rgba(0,0,0,0.05); min-height: 80px; }
   
-  /* Swipe Wrapper */
-  .swipe-wrapper { background: #ef4444; border-radius: 12px; margin-bottom: 8px; overflow: hidden; }
+  /* Swipe Container */
+  .swipe-wrapper { background: #ef4444; border-radius: 12px; margin-bottom: 8px; overflow: hidden; position: relative; }
   .swipe-content { background: white; position: relative; z-index: 2; transition: transform 0.2s; padding: 12px; display: flex; align-items: center; justify-content: space-between; min-height: 80px; width: 100%; }
-
+  
   .item-img { width: 55px; height: 55px; border-radius: 10px; object-fit: cover; background: #f1f5f9; margin-right: 12px; flex-shrink: 0; display:flex; align-items:center; justify-content:center; color:#cbd5e1; font-size: 20px; }
   .item-info { flex: 1; overflow: hidden; margin-right: 10px; }
-  .item-title { font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 15px; margin-bottom: 4px; }
-  
-  /* Stock Controls & Dates */
-  .qty-ctrl { display: flex; align-items: center; gap: 10px; background: #f8fafc; width: fit-content; padding: 4px 8px; border-radius: 8px; border: 1px solid #e2e8f0; }
-  .qty-btn { width: 30px; height: 30px; border-radius: 6px; border: none; background: white; box-shadow: 0 2px 3px rgba(0,0,0,0.1); font-weight: bold; color: var(--primary); font-size: 16px; }
+  .item-title { font-weight: bold; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; }
+  .item-sub { font-size: 13px; color: #64748b; }
 
-  /* FIXED DATE DISPLAY */
+  /* PVP SPECIFIQUE */
+  .qty-ctrl { display: flex; align-items: center; gap: 10px; background: #f8fafc; width: fit-content; padding: 4px 8px; border-radius: 8px; border: 1px solid #e2e8f0; margin-top: 5px; }
+  .qty-btn { width: 30px; height: 30px; border-radius: 6px; border: none; background: white; box-shadow: 0 2px 3px rgba(0,0,0,0.1); font-weight: bold; color: var(--primary); font-size: 18px; display:flex; align-items:center; justify-content:center; cursor: pointer; }
+
   .date-col { text-align: right; width: 110px; flex-shrink: 0; display: flex; flex-direction: column; justify-content: center; }
   .d-lbl { font-size: 11px; color: #64748b; margin-bottom: 2px; }
-  .d-val { font-size: 13px; font-weight: 800; color: var(--success); }
+  .d-val { font-size: 14px; font-weight: 800; color: var(--success); }
   .d-val.expired { color: var(--danger); }
-  
-  /* Badges Frais */
+
+  /* FRAIS SPECIFIQUE */
   .date-badge { width: 50px; height: 50px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; font-weight: bold; flex-shrink: 0; margin-left: 10px; }
   .bg-red { background: #ef4444; } .bg-orange { background: #f59e0b; } .bg-green { background: #10b981; } .bg-grey { background: #94a3b8; }
 
-  /* To-Do List */
-  .todo-check { width: 36px; height: 36px; border: 2px solid #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; margin-left: 15px; cursor: pointer; transition: 0.2s; }
+  /* TO-DO CHECKBOX */
+  .todo-check { width: 32px; height: 32px; border: 2px solid #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; margin-left: 15px; cursor: pointer; transition: 0.2s; }
   .todo-check.checked { background: var(--success); border-color: var(--success); color: white; }
   .item-done { opacity: 0.6; background: #f8fafc; }
   .item-done .item-title { text-decoration: line-through; color: #94a3b8; }
 
-  /* Modals */
+  /* MODALS */
   .modal-bc { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
   .modal-card { background: white; padding: 25px; border-radius: 20px; width: 100%; max-width: 400px; max-height: 85vh; overflow-y: auto; }
 </style>
@@ -100,7 +101,7 @@
         <label>Famille</label><select id="lib-fam-select" onchange="app.pvp.toggleFamInput()"></select>
         <input type="text" id="lib-fam-new" placeholder="Nouvelle famille..." class="hidden">
         <label>Nom</label><input type="text" id="lib-name">
-        <label>EAN</label><input type="number" id="lib-ean">
+        <label>EAN</label><input type="text" inputmode="numeric" maxlength="13" id="lib-ean">
         <button class="btn" onclick="document.getElementById('cam-input').click()" style="background:#eee;color:#333;margin-bottom:10px;">Photo</button>
         <input type="file" id="cam-input" accept="image/*" capture="environment" class="hidden" onchange="app.pvp.handleImg(this)">
         <img id="img-preview" style="width:100px;height:100px;object-fit:cover;border-radius:10px;display:none;margin:0 auto 10px auto;">
@@ -164,7 +165,7 @@
             <div id="scanner-box" style="height:200px;background:black;margin-bottom:10px;display:none;"><video id="video" style="width:100%;height:100%;object-fit:cover;"></video></div>
             <button class="btn" onclick="app.frais.toggleScan()"><i class="fas fa-camera"></i> SCANNER</button>
             <div class="card">
-                <input id="frais-ean" placeholder="EAN" oninput="if(this.value.length>8) app.frais.api(this.value)">
+                <input id="frais-ean" type="text" inputmode="numeric" placeholder="EAN (Code Barre)" oninput="app.frais.handleInput(this.value)">
                 <select id="frais-fam"><option>SNACKING</option><option>TRAITEUR</option><option>ULTRA FRAIS</option><option>CHARCUTERIE</option><option>BOUCHERIE</option><option>VOLAILLE</option><option>FROMAGE</option><option>SAURISSERIE</option><option>DIVERS</option></select>
                 <input id="frais-name" placeholder="Nom">
                 <div style="display:flex;gap:10px;"><input type="date" id="frais-date"><input type="number" id="frais-qty" placeholder="Qté"></div>
@@ -216,7 +217,9 @@ window.app = {
     data: { frais: [], users: [], pvpLib: [], pvpStock: [], checkedNeeds: [] },
     viewHistory: [],
     closed: new Set(),
+    debounceTimer: null,
     
+    // --- HELPERS (Fix Dates & Images) ---
     common: {
         showBarcode: function(ean, name, imgUrl=null) { 
             document.getElementById('modal-barcode').classList.remove('hidden'); 
@@ -225,7 +228,18 @@ window.app = {
             if(imgUrl) { imgEl.src = imgUrl; imgEl.style.display='block'; } else { imgEl.style.display='none'; }
             if(ean) { try{JsBarcode("#barcode", ean, {format:"EAN13", height:80, displayValue:true});} catch(e){try{JsBarcode("#barcode", ean, {format:"CODE128", height:80, displayValue:true});}catch(e2){}} }
         },
-        tsToInput: function(ts) { let d = new Date(ts); return new Date(d.getTime() - (d.getTimezoneOffset() * 60000)).toISOString().slice(0, 16); },
+        // FIX DATE LOCAL: Force Midi pour éviter bugs UTC
+        parseDateLocal: function(dateStr) {
+            if(!dateStr) return null;
+            let parts = dateStr.split('-');
+            return new Date(parts[0], parts[1]-1, parts[2], 12, 0, 0).getTime();
+        },
+        tsToInput: function(ts) { 
+            let d = new Date(ts); 
+            // Retirer décalage timezone pour input datetime-local
+            let local = new Date(d.getTime() - (d.getTimezoneOffset() * 60000));
+            return local.toISOString().slice(0, 16); 
+        },
         calculateEnd: function(startTs, hours) {
             let start = new Date(startTs); let end = new Date(startTs); let h = parseInt(hours);
             if (h === 0) { end.setHours(22, 0, 0, 0); } else { end.setHours(end.getHours() + h); }
@@ -238,10 +252,10 @@ window.app = {
                 let img = new Image(); img.src = e.target.result;
                 img.onload = () => {
                     let canvas = document.createElement('canvas'); let ctx = canvas.getContext('2d');
-                    let max = 350; let w = img.width, h = img.height;
+                    let max = 300; let w = img.width, h = img.height; // Max 300px
                     if (w > h) { if (w > max) { h *= max/w; w = max; } } else { if (h > max) { w *= max/h; h = max; } }
                     canvas.width = w; canvas.height = h; ctx.drawImage(img, 0, 0, w, h);
-                    callback(canvas.toDataURL('image/jpeg', 0.5));
+                    callback(canvas.toDataURL('image/jpeg', 0.5)); // Qualité basse
                 };
             };
         },
@@ -291,6 +305,9 @@ window.app = {
     },
 
     nav: function(v, saveHistory = true) {
+        // Stop Camera si on quitte frais
+        if(this.frais.scanning) this.frais.toggleScan();
+
         let current = document.querySelector('main > div:not(.hidden)');
         if(saveHistory && current) this.viewHistory.push(current.id.replace('view-',''));
         document.querySelectorAll('main > div').forEach(e => e.classList.add('hidden'));
@@ -312,13 +329,22 @@ window.app = {
         },
         toggleScan: function() {
             if(this.scanning) { this.scanning=false; document.getElementById('scanner-box').style.display='none'; codeReader.reset(); }
-            else { this.scanning=true; document.getElementById('scanner-box').style.display='block'; codeReader.decodeFromVideoDevice(null, 'video', (r) => { if(r){ this.api(r.text); document.getElementById('frais-ean').value=r.text; this.toggleScan(); } }); }
+            else { this.scanning=true; document.getElementById('scanner-box').style.display='block'; codeReader.decodeFromVideoDevice(null, 'video', (r) => { if(r){ this.handleInput(r.text); document.getElementById('frais-ean').value=r.text; this.toggleScan(); } }); }
+        },
+        handleInput: function(val) {
+            if(window.app.debounceTimer) clearTimeout(window.app.debounceTimer);
+            window.app.debounceTimer = setTimeout(() => {
+                if(val.length >= 8) this.api(val);
+            }, 300); // Wait 300ms
         },
         api: async function(ean) {
             try { let r = await fetch(`https://world.openfoodfacts.org/api/v0/product/${ean}.json`); let d = await r.json(); if(d.status==1) { document.getElementById('frais-name').value = d.product.product_name_fr || ""; this.imgUrl = d.product.image_front_small_url || ""; } } catch(e){}
         },
         add: function() {
-            let o = { id: Date.now(), ean: document.getElementById('frais-ean').value, fam: document.getElementById('frais-fam').value, name: document.getElementById('frais-name').value, qty: document.getElementById('frais-qty').value, date: document.getElementById('frais-date').value, img: this.imgUrl };
+            let dateVal = document.getElementById('frais-date').value;
+            let finalDate = window.app.common.parseDateLocal(dateVal); // FIX DATE
+            
+            let o = { id: Date.now(), ean: document.getElementById('frais-ean').value, fam: document.getElementById('frais-fam').value, name: document.getElementById('frais-name').value, qty: document.getElementById('frais-qty').value, date: finalDate, img: this.imgUrl };
             if(!o.name || !o.date) return alert('Date requise');
             window.app.data.frais.push(o); window.app.save('frais'); alert('Ajouté');
             this.imgUrl=""; document.getElementById('frais-name').value=""; document.getElementById('frais-ean').value="";
@@ -328,12 +354,11 @@ window.app = {
             let grp = {};
             window.app.data.frais.sort((a,b) => {
                 if(a.fam !== b.fam) return a.fam.localeCompare(b.fam);
-                return new Date(a.date) - new Date(b.date);
+                return a.date - b.date;
             }).forEach(i=>{ if(!grp[i.fam])grp[i.fam]=[]; grp[i.fam].push(i); });
             
             for(let f in grp) {
-                let id = 'F-'+f;
-                let c = window.app.closed.has(id);
+                let id = 'F-'+f; let c = window.app.closed.has(id);
                 div.innerHTML += `<div class="group-header" onclick="app.toggleFam('${id}')"><span>${f}</span><i class="fas fa-chevron-${c?'right':'down'}"></i></div>`;
                 if(!c) {
                     grp[f].forEach(i => {
@@ -354,14 +379,15 @@ window.app = {
             let i = window.app.data.frais.find(x => x.id == id);
             document.getElementById('modal-edit-frais').classList.remove('hidden');
             document.getElementById('edit-id').value = id; document.getElementById('edit-famille').value = i.fam;
-            document.getElementById('edit-qty').value = i.qty; document.getElementById('edit-date').value = i.date;
+            document.getElementById('edit-qty').value = i.qty; 
+            if(i.date) document.getElementById('edit-date').value = new Date(i.date).toISOString().slice(0,10);
         },
         saveEdit: function() {
             let id = document.getElementById('edit-id').value; let idx = window.app.data.frais.findIndex(x => x.id == id);
             if(idx>-1) {
                 window.app.data.frais[idx].fam = document.getElementById('edit-famille').value;
                 window.app.data.frais[idx].qty = document.getElementById('edit-qty').value;
-                window.app.data.frais[idx].date = document.getElementById('edit-date').value;
+                window.app.data.frais[idx].date = window.app.common.parseDateLocal(document.getElementById('edit-date').value);
                 window.app.save('frais'); document.getElementById('modal-edit-frais').classList.add('hidden');
             }
         },
@@ -388,6 +414,7 @@ window.app = {
                 document.getElementById('lib-id').value=id; document.getElementById('lib-name').value=i.name; document.getElementById('lib-ean').value=i.ean||"";
                 document.getElementById('lib-days').value=i.days||0; document.getElementById('lib-img-data').value=i.img||"";
                 document.getElementById('img-preview').src=i.img||""; document.getElementById('img-preview').style.display=i.img?'block':'none';
+                document.getElementById('lib-fam-select').value = i.family || "DIVERS"; // FIX FAMILLE
                 for(let k=0;k<7;k++) document.getElementById('t-'+k).value = (i.targets||{})[k]||"";
             } else {
                 document.getElementById('lib-id').value=""; document.getElementById('lib-name').value=""; document.getElementById('img-preview').style.display='none';
@@ -440,10 +467,10 @@ window.app = {
         toggleNeed: function(libId) {
             let idx = window.app.data.checkedNeeds.indexOf(libId);
             if(idx > -1) window.app.data.checkedNeeds.splice(idx, 1); else window.app.data.checkedNeeds.push(libId);
-            window.app.save('pvp'); this.render(); /* Force update */
+            window.app.save('pvp'); this.render();
         },
         render: function() {
-            // BIBLIO
+            // BIBLIO (Click = CodeBarre)
             let bib = document.getElementById('lib-list'); bib.innerHTML = "";
             let gLib = {};
             window.app.data.pvpLib.sort((a,b)=>window.app.common.cleanName(a.name).localeCompare(window.app.common.cleanName(b.name)))
@@ -457,7 +484,7 @@ window.app = {
                 });
             });
 
-            // STOCK
+            // STOCK (Date Fix)
             let st = document.getElementById('pvp-stock'); st.innerHTML = "";
             let gStock = {};
             window.app.data.pvpStock.sort((a,b)=>a.end-b.end).forEach(s => {
@@ -483,7 +510,7 @@ window.app = {
                 });
             });
 
-            // BESOINS
+            // BESOINS (Fix Toggle)
             let cl = document.getElementById('pvp-calc');
             let tom = new Date(); tom.setDate(tom.getDate()+1); 
             let gTodo = {}; let doneH = ""; let hasNeeds = false;
@@ -499,7 +526,8 @@ window.app = {
                         <div style="display:flex;align-items:center;flex:1;">${img}<div><div class="item-title">${l.name}</div><div style="color:var(--pvp);font-weight:bold;">A SORTIR : ${target}</div></div></div>
                         <div class="todo-check ${isC?'checked':''}" onclick="app.pvp.toggleNeed(${l.id})"><i class="fas fa-check"></i></div>
                     </div>`;
-                    if(isC) doneH += h; else { let f = l.family||"DIVERS"; if(!gTodo[f]) gTodo[f]=[]; gTodo[f].push(h); }
+                    if(isC) doneH += h;
+                    else { let f = l.family||"DIVERS"; if(!gTodo[f]) gTodo[f]=[]; gTodo[f].push(h); }
                 }
             });
             
