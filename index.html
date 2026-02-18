@@ -931,4 +931,130 @@
         let bib = document.getElementById('lib-list'); if(!bib) return;
         bib.innerHTML = "";
         let gLib = {};
-        window.app.data.p
+        window.app.data.pvpLib
+          .slice()
+          .sort((a,b)=>window.app.common.cleanName(a.name).localeCompare(window.app.common.cleanName(b.name)))
+          .forEach(l => { let f = l.family||"DIVERS"; if(!gLib[f]) gLib[f]=[]; gLib[f].push(l); });
+
+        Object.keys(gLib).sort().forEach(f => {
+          let id = 'L-'+f; let c = window.app.closed.has(id);
+          bib.innerHTML += `<div class="group-header" onclick="app.toggleFam('${id}')"><span>${f}</span><i class="fas fa-chevron-${c?'right':'down'}"></i></div>`;
+          if(!c) gLib[f].forEach(l => {
+            let img = l.img ? `<img src="${l.img}" class="item-img">` : `<div class="item-img"><i class="fas fa-bread-slice"></i></div>`;
+            bib.innerHTML += `<div class="list-item" onclick="app.common.showBarcode('${l.ean}','${(l.name||"").replace(/'/g," ")}','${l.img||""}')">
+              <div style="display:flex;align-items:center;min-width:0;">${img}<div style="min-width:0;"><b>${l.name}</b><br><small>${l.days}h</small></div></div>
+              <button class="qty-btn" style="background:var(--pvp);color:white;width:40px;height:40px;" onclick="event.stopPropagation(); app.pvp.openLib(${l.id})"><i class="fas fa-pen"></i></button>
+              <button class="qty-btn" style="background:var(--pvp);color:white;width:40px;height:40px;margin-left:10px;" onclick="event.stopPropagation(); app.pvp.addStock(${l.id})">+</button>
+            </div>`;
+          });
+        });
+
+        // STOCK (RAYON) — FIX: clic image => barcode + image
+        let st = document.getElementById('pvp-stock'); st.innerHTML = "";
+        let gStock = {};
+        window.app.data.pvpStock.slice().sort((a,b)=>(a.end||0)-(b.end||0)).forEach(s => {
+          let l = window.app.data.pvpLib.find(x=>x.id==s.libId);
+          let f = l ? l.family : "DIVERS";
+          if(!gStock[f]) gStock[f]=[];
+          gStock[f].push(s);
+        });
+
+        Object.keys(gStock).sort().forEach(f => {
+          let id = 'S-'+f; let c = window.app.closed.has(id);
+          st.innerHTML += `<div class="group-header" style="background:var(--pvp)" onclick="app.toggleFam('${id}')"><span>${f}</span><i class="fas fa-chevron-${c?'right':'down'}"></i></div>`;
+          if(!c) gStock[f].forEach(i => {
+            let dS = window.app.common.formatDate(i.out);
+            let dE = window.app.common.formatDate(i.end);
+            let isExp = new Date(i.end) < new Date();
+            let l = window.app.data.pvpLib.find(x=>x.id==i.libId), img = l?l.img:null;
+
+            let safeName = (i.name||"").replace(/'/g," ");
+            let displayImg = img
+              ? `<img src="${img}" class="item-img"
+                    onclick="event.stopPropagation(); app.common.showBarcode('${i.ean||""}','${safeName}','${img}')">`
+              : `<div class="item-img"
+                    onclick="event.stopPropagation(); app.common.showBarcode('${i.ean||""}','${safeName}')">
+                    <i class="fas fa-bread-slice"></i>
+                 </div>`;
+
+            st.innerHTML += `
+              <div class="swipe-wrapper"><div class="swipe-content">
+                <div style="display:flex;align-items:center;flex:1;min-width:0;">${displayImg}
+                  <div style="min-width:0;">
+                    <div class="item-title" onclick="app.pvp.openEditStock(${i.id})">${i.name}</div>
+                    <div class="qty-ctrl">
+                      <button class="qty-btn" onclick="app.pvp.changeQty(${i.id},-1)">-</button>
+                      <b>${i.qty}</b>
+                      <button class="qty-btn" onclick="app.pvp.changeQty(${i.id},1)">+</button>
+                    </div>
+                  </div>
+                </div>
+                <div class="date-col">
+                  <div class="d-lbl">Sortie: ${dS}</div>
+                  <div class="d-val ${isExp?'expired':''}">FIN: ${dE}</div>
+                </div>
+              </div></div>`;
+          });
+        });
+
+        // BESOINS
+        let cl = document.getElementById('pvp-calc');
+        let tom = new Date(); tom.setDate(tom.getDate()+1);
+        let gTodo = {}; let doneH = ""; let hasNeeds = false;
+
+        window.app.data.pvpLib.forEach(l => {
+          let target = (l.targets||{})[tom.getDay()] || 0;
+          if(target > 0) {
+            hasNeeds = true;
+            let isC = window.app.data.checkedNeeds.includes(l.id);
+            let img = l.img ? `<img src="${l.img}" class="item-img">` : `<div class="item-img"><i class="fas fa-bread-slice"></i></div>`;
+            let h = `
+              <div class="list-item ${isC?'item-done':''}" style="border-left:5px solid var(--pvp);">
+                <div style="display:flex;align-items:center;flex:1;min-width:0;">${img}
+                  <div style="min-width:0;">
+                    <div class="item-title">${l.name}</div>
+                    <div style="color:var(--pvp);font-weight:bold;">A SORTIR : ${target}</div>
+                  </div>
+                </div>
+                <div class="todo-check ${isC?'checked':''}" onclick="app.pvp.toggleNeed(${l.id})"><i class="fas fa-check"></i></div>
+              </div>`;
+            if(isC) doneH += h;
+            else { let f = l.family||"DIVERS"; if(!gTodo[f]) gTodo[f]=[]; gTodo[f].push(h); }
+          }
+        });
+
+        let resH = `<h4 style="text-align:center;color:var(--primary);">À SORTIR DEMAIN</h4>`;
+        if(!hasNeeds) resH += "<p style='text-align:center;color:#999'>Rien de prévu</p>";
+        else Object.keys(gTodo).sort().forEach(f => {
+          let id = 'N-'+f; let c = window.app.closed.has(id);
+          resH += `<div class="group-header" style="background:var(--primary)" onclick="app.toggleFam('${id}')"><span>${f}</span><i class="fas fa-chevron-${c?'right':'down'}"></i></div>`;
+          if(!c) resH += gTodo[f].join('');
+        });
+        cl.innerHTML = resH + `<h4 style="text-align:center;color:#64748b;margin-top:20px;">TERMINÉ</h4>` + (doneH || "<p style='text-align:center;color:#ccc;'>Rien de fait</p>");
+      }
+    },
+
+    checkAlerts: function() {
+      let alert = window.app.data.frais.some(i => {
+        let d = new Date(i.date);
+        return !isNaN(d.getTime()) && (d - new Date())/(1000*60*60*24) < 1;
+      });
+      document.getElementById('alert-box').style.display = alert ? 'block' : 'none';
+    }
+  };
+
+  onAuthStateChanged(auth, async (user) => {
+    if(!user) {
+      document.getElementById('login-overlay').classList.remove('hidden');
+      document.getElementById('app-header').classList.add('hidden');
+      document.getElementById('app-nav').classList.add('hidden');
+      window.app.me = null;
+      window.app.data = { frais: [], users: [], pvpLib: [], pvpStock: [], checkedNeeds: [] };
+      return;
+    }
+    await window.app.afterLoginBootstrap();
+  });
+</script>
+
+</body>
+</html>
