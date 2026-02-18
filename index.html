@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
 <meta name="theme-color" content="#ffffff" />
-<title>Araujo Exploitation v60</title>
+<title>Araujo Exploitation v61</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 <script src="https://unpkg.com/@zxing/library@latest"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
@@ -27,8 +27,6 @@
   /* LOGIN */
   .overlay { position: fixed; inset: 0; z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: white; padding: 20px; }
   .login-logo { width: 80%; max-width: 300px; margin-bottom: 30px; object-fit: contain; }
-  
-  /* Nouveau style Login */
   #login-user-select { width: 220px; padding: 12px; margin-bottom: 15px; border-radius: 12px; border: 1px solid #cbd5e1; background: #f8fafc; font-size: 16px; font-weight: bold; text-align: center; }
   #login-pass { width: 220px; padding: 12px; font-size: 20px; letter-spacing: 5px; text-align: center; border: 1px solid #e2e8f0; border-radius: 50px; background: #fff; outline: none; margin-bottom: 20px; color: var(--text); font-weight: bold; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); }
 
@@ -37,11 +35,14 @@
   .logo-header { height: 70px; width: auto; object-fit: contain; }
   .user-badge { position: absolute; right: 15px; top: 15px; font-size: 11px; background: #e0f2fe; color: var(--primary); padding: 6px 12px; border-radius: 20px; font-weight: bold; border: 1px solid #bae6fd; }
 
-  /* TABS */
+  /* TABS (FRAIS) */
   .tabs { display: flex; background: #e2e8f0; padding: 4px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #cbd5e1; }
   .tab { flex: 1; text-align: center; padding: 12px; font-weight: 700; font-size: 12px; color: #64748b; border-radius: 9px; cursor: pointer; transition: 0.2s; white-space: nowrap; }
   .tab.active { background: white; color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-  .tab.active-pvp { background: white; color: var(--pvp); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+  
+  /* TABS (PVP) - CLASSE DISTINCTE */
+  .tab-pvp { flex: 1; text-align: center; padding: 12px; font-weight: 700; font-size: 12px; color: #64748b; border-radius: 9px; cursor: pointer; transition: 0.2s; white-space: nowrap; }
+  .tab-pvp.active-pvp { background: white; color: var(--pvp); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
 
   /* MAIN */
   main { flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 100px; }
@@ -55,7 +56,6 @@
   /* LIST ITEMS */
   .group-header { background: #334155; color: white; padding: 8px 15px; border-radius: 8px 8px 0 0; margin-top: 20px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: bold; text-transform: uppercase; }
   .swipe-wrapper { position: relative; background: var(--accent); overflow: hidden; border-bottom: 1px solid #f1f5f9; }
-  
   .wek-item { position: relative; z-index: 2; background: white; padding: 15px; display: flex; align-items: center; justify-content: space-between; transition: transform 0.2s ease-out; cursor: pointer; }
   .wek-img { width: 65px; height: 65px; border-radius: 8px; object-fit: contain; background: #fff; border: 1px solid #e2e8f0; margin-right: 15px; display: flex; align-items: center; justify-content: center; color: #cbd5e1; flex-shrink: 0; z-index: 10; font-size: 24px; }
   .wek-info { flex: 1; overflow: hidden; }
@@ -132,8 +132,7 @@
         <div class="input-group" style="text-align:left"><label>Code EAN (Optionnel)</label><input type="number" id="lib-ean" placeholder="Ex: 123456"></div><br>
         
         <div class="input-group" style="text-align:left"><label>Choisir Icône</label></div>
-        <div class="img-grid" id="img-picker">
-            </div><br>
+        <div class="img-grid" id="img-picker"></div><br>
 
         <div class="input-group" style="text-align:left"><label>Règle DLC</label>
         <select id="lib-days">
@@ -214,9 +213,9 @@
 
     <div id="view-pvp" class="hidden">
       <div class="tabs">
-        <div id="tp-stock" class="tab active-pvp" onclick="window.app.switchPvp('stock')">RAYON</div>
-        <div id="tp-bib" class="tab" onclick="window.app.switchPvp('bib')">BIBLIOTHÈQUE</div>
-        <div id="tp-calc" class="tab" onclick="window.app.switchPvp('calc')">BESOINS</div>
+        <div id="tab-pvp-stock" class="tab-pvp active-pvp" onclick="window.app.switchPvp('stock')">RAYON</div>
+        <div id="tab-pvp-bib" class="tab-pvp" onclick="window.app.switchPvp('bib')">BIBLIOTHÈQUE</div>
+        <div id="tab-pvp-calc" class="tab-pvp" onclick="window.app.switchPvp('calc')">BESOINS</div>
       </div>
 
       <div id="pvp-stock" class="hidden"><div id="list-pvp-stock"></div></div>
@@ -306,9 +305,7 @@
     login: function() {
       let selectedName = document.getElementById('login-user-select').value;
       let code = document.getElementById('login-pass').value.trim();
-      
       let user = this.data.users.find(u => u.name === selectedName && u.code === code);
-      
       if(user) {
         this.currentUser = user;
         document.getElementById('login-overlay').classList.add('hidden');
@@ -418,7 +415,18 @@
         try{JsBarcode("#barcode", ean, {format:"EAN13", height:80, displayValue:true});}catch(e){} 
     },
 
-    // --- PVP LOGIC (FIXED) ---
+    // --- PVP LOGIC ROBUSTE ---
+    switchPvp: function(t) {
+        // Enlève 'active-pvp' de tous les onglets PVP
+        document.querySelectorAll('.tab-pvp').forEach(e => e.classList.remove('active-pvp'));
+        // Ajoute 'active-pvp' au bon onglet
+        document.getElementById('tab-pvp-'+t).classList.add('active-pvp');
+        // Cache tout
+        ['pvp-stock','pvp-bib','pvp-calc'].forEach(id => document.getElementById(id).classList.add('hidden'));
+        // Affiche le bon contenu
+        document.getElementById('pvp-'+t).classList.remove('hidden');
+    },
+
     openPvpLib: function(id=null) {
         document.getElementById('modal-pvp-lib').classList.remove('hidden');
         if(id) {
@@ -448,7 +456,6 @@
         let target = document.getElementById('lib-target').value;
         
         if(!name) return;
-        
         if(id) {
              let idx = this.data.pvpLib.findIndex(x => x.id == id);
              if(idx > -1) { this.data.pvpLib[idx] = { ...this.data.pvpLib[idx], name, ean, icon, days:days, target }; }
@@ -515,6 +522,8 @@
 
     renderPvp: function() {
         const sDiv = document.getElementById('list-pvp-stock'); sDiv.innerHTML="";
+        if(this.data.pvpStock.length === 0) sDiv.innerHTML = "<div style='text-align:center;color:#999;margin-top:20px;'>Rayon vide</div>";
+        
         let now = Date.now();
         this.data.pvpStock.sort((a,b) => a.end - b.end).forEach(i => {
             let left = (i.end - now)/3600000;
@@ -525,17 +534,24 @@
         });
 
         const bDiv = document.getElementById('list-pvp-lib'); bDiv.innerHTML="";
+        if(this.data.pvpLib.length === 0) bDiv.innerHTML = "<div style='text-align:center;color:#999;margin-top:20px;'>Bibliothèque vide. Créez des produits !</div>";
+
         this.data.pvpLib.forEach(l => {
-            bDiv.innerHTML += `<div class="pvp-item"><div style="display:flex;align-items:center;" onclick="window.app.openPvpLib(${l.id})"><div class="wek-img"><i class="${l.icon}"></i></div><div><div style="font-weight:bold;">${l.name}</div><div style="font-size:10px; color:#666">${l.days}J • Obj: ${l.target}</div></div></div><button class="pvp-btn-icon" style="background:#e0f2fe; color:#003896; border:none; width:40px; height:40px; border-radius:50%; font-size:16px;" onclick="window.app.addPvpStock(${l.id})"><i class="fas fa-plus"></i></button></div>`;
+            bDiv.innerHTML += `<div class="pvp-item"><div style="display:flex;align-items:center;" onclick="window.app.openPvpLib(${l.id})"><div class="wek-img"><i class="${l.icon}"></i></div><div><div style="font-weight:bold;">${l.name}</div><div style="font-size:10px; color:#666">${l.days}J • Obj: ${l.target}</div></div></div><button class="btn-orange" style="border-radius:50%; width:40px; height:40px; padding:0; display:flex; align-items:center; justify-content:center;" onclick="window.app.addPvpStock(${l.id})"><i class="fas fa-plus"></i></button></div>`;
         });
 
         const cDiv = document.getElementById('list-pvp-calc'); cDiv.innerHTML="";
         let limitTs = new Date(); limitTs.setDate(limitTs.getDate()+1); limitTs.setHours(6,0,0,0);
+        let count = 0;
         this.data.pvpLib.forEach(l => {
             let valid = this.data.pvpStock.filter(s => s.libId == l.id && s.end > limitTs.getTime()).reduce((a,b)=>a+parseInt(b.qty),0);
             let need = l.target - valid;
-            if(need > 0) { cDiv.innerHTML += `<div class="pvp-item" style="border-left:5px solid var(--pvp);"><div style="font-weight:bold;">${l.name}</div><div style="font-weight:bold;color:var(--pvp);">A CUIRE: ${need}</div></div>`; }
+            if(need > 0) { 
+                count++;
+                cDiv.innerHTML += `<div class="pvp-item" style="border-left:5px solid var(--pvp);"><div style="font-weight:bold;">${l.name}</div><div style="font-weight:bold;color:var(--pvp);">A CUIRE: ${need}</div></div>`; 
+            }
         });
+        if(count === 0) cDiv.innerHTML = "<div style='text-align:center;color:#999;margin-top:20px;'>Rien à cuire. Stock OK.</div>";
     },
 
     // COMMON
