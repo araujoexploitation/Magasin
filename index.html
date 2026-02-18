@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
 <meta name="theme-color" content="#ffffff" />
-<title>Araujo Exploitation v70</title>
+<title>Araujo Exploitation v71</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 <script src="https://unpkg.com/@zxing/library@latest"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
@@ -105,7 +105,7 @@
         <input type="hidden" id="lib-id"> 
         <input type="hidden" id="lib-img-data">
         
-        <label>Nom du Produit (Requis)</label><input type="text" id="lib-name" placeholder="Ex: Donut Sucre">
+        <label>Nom du Produit (Requis)</label><input type="text" id="lib-name" placeholder="Ex: Baguette">
         <label>EAN (Code Barre)</label><input type="number" id="lib-ean">
         
         <label>Photo</label>
@@ -113,9 +113,9 @@
         <button class="btn" onclick="document.getElementById('cam-input').click()" style="background:#eee;color:#333;margin-bottom:10px;"><i class="fas fa-camera"></i> Prendre Photo</button>
         <img id="img-preview">
 
-        <label>Durée Timer (Heures)</label>
+        <label>Durée de vie</label>
         <select id="lib-days">
-            <option value="24">24 Heures</option>
+            <option value="0">JOURNÉE (Jetter Soir 22h)</option>
             <option value="48">48 Heures (Donuts, Muffins)</option>
             <option value="72">72 Heures</option>
         </select>
@@ -144,10 +144,10 @@
           <h4 id="stock-name"></h4>
           <label>Quantité</label><input type="number" id="stock-qty">
           
-          <label style="margin-top:15px;color:#000">Date Sortie (Début)</label>
+          <label style="margin-top:15px;color:#000">Date Sortie</label>
           <input type="datetime-local" id="stock-start">
           
-          <label style="color:#ef4444">Date Fin (Timer Strict)</label>
+          <label style="color:#ef4444">Date Fin (Calculée)</label>
           <input type="datetime-local" id="stock-end">
           
           <button class="btn" onclick="app.pvp.saveStock()" style="background:#d97706;">Valider</button>
@@ -241,9 +241,19 @@ window.app = {
             let d = new Date(ts);
             return new Date(d.getTime() - (d.getTimezoneOffset() * 60000)).toISOString().slice(0, 16);
         },
+        // LOGIQUE DATE DE FIN
         calculateEnd: function(startTs, hours) {
+            let start = new Date(startTs);
             let end = new Date(startTs);
-            end.setHours(end.getHours() + parseInt(hours));
+            let h = parseInt(hours);
+            
+            if (h === 0) {
+                // REGLE JOURNEE : MORT A 22H LE JOUR MEME
+                end.setHours(22, 0, 0, 0);
+            } else {
+                // REGLE STRICTE 48H/72H
+                end.setHours(end.getHours() + h);
+            }
             return end.getTime();
         }
     },
@@ -395,6 +405,7 @@ window.app = {
 
     // --- MODULE PVP ---
     pvp: {
+        touchStartX: 0,
         tab: function(t) {
             document.querySelectorAll('#view-pvp .tab').forEach(e => e.classList.remove('active-pvp'));
             document.getElementById(t=='stock'?'tp-1':(t=='bib'?'tp-2':'tp-3')).classList.add('active-pvp');
@@ -420,14 +431,14 @@ window.app = {
                 document.getElementById('lib-id').value=id;
                 document.getElementById('lib-name').value=i.name;
                 document.getElementById('lib-ean').value=i.ean||"";
-                document.getElementById('lib-days').value=i.days||24;
+                document.getElementById('lib-days').value=i.days||0;
                 document.getElementById('lib-img-data').value=i.img||"";
                 if(i.img){ document.getElementById('img-preview').src=i.img; document.getElementById('img-preview').style.display='block'; }
                 document.getElementById('btn-del-lib').classList.remove('hidden');
                 for(let k=0;k<7;k++) document.getElementById('t-'+k).value = (i.targets||{})[k]||"";
             } else {
                 document.getElementById('lib-id').value=""; document.getElementById('lib-name').value=""; document.getElementById('lib-ean').value="";
-                document.getElementById('lib-img-data').value=""; document.getElementById('lib-days').value=24;
+                document.getElementById('lib-img-data').value=""; document.getElementById('lib-days').value=0;
                 document.getElementById('btn-del-lib').classList.add('hidden');
                 for(let k=0;k<7;k++) document.getElementById('t-'+k).value = "";
             }
@@ -502,32 +513,20 @@ window.app = {
         },
         attachSwipe: function(el, id) {
             let startX = 0;
-            let currentX = 0;
-            
-            el.addEventListener('touchstart', e => {
-                startX = e.touches[0].clientX;
-                el.style.transition = 'none'; // Pas de latence
-            });
-            
+            el.addEventListener('touchstart', e => { startX = e.touches[0].clientX; el.style.transition = 'none'; });
             el.addEventListener('touchmove', e => {
-                currentX = e.touches[0].clientX;
-                let diff = currentX - startX;
-                if(diff > 0) el.style.transform = `translateX(${diff}px)`; // Suit le doigt
+                let diff = e.touches[0].clientX - startX;
+                if(diff > 0) el.style.transform = `translateX(${diff}px)`;
             });
-            
             el.addEventListener('touchend', e => {
-                el.style.transition = 'transform 0.3s ease'; // Animation retour
-                let diff = e.changedTouches[0].clientX - startX;
-                // Si on a tiré plus de 250px (environ 75% de l'écran mobile)
-                if(diff > 250) {
+                el.style.transition = 'transform 0.3s ease';
+                if(e.changedTouches[0].clientX - startX > 250) {
                      el.style.transform = `translateX(100%)`;
                      setTimeout(() => {
                          window.app.data.pvpStock = window.app.data.pvpStock.filter(x=>x.id!=id);
                          window.app.save();
                      }, 300);
-                } else {
-                     el.style.transform = `translateX(0)`; // Retour case départ
-                }
+                } else { el.style.transform = `translateX(0)`; }
             });
         },
         render: function() {
@@ -577,7 +576,7 @@ window.app = {
                 st.appendChild(container);
             });
 
-            // CALC BESOINS (LOGIQUE 10H DU MATIN)
+            // CALC BESOINS (LOGIQUE 10H)
             let cl = document.getElementById('pvp-calc'); cl.innerHTML = "";
             let tomorrow = new Date();
             tomorrow.setDate(tomorrow.getDate() + 1);
@@ -588,8 +587,6 @@ window.app = {
             cl.innerHTML = `<h4 style="text-align:center;color:#003896;margin:0 0 15px 0;">BESOINS POUR ${tomName}</h4>`;
             
             // LA REGLE DES 10H
-            // On considère comme valide tout stock qui expire APRES 10h00 demain.
-            // Si ça expire à 07h00 demain, ça ne compte pas dans le stock pour la journée de demain.
             let criticalTime = new Date(tomorrow);
             criticalTime.setHours(10, 0, 0, 0);
 
