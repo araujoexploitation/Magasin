@@ -4,7 +4,8 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
 <meta name="theme-color" content="#ffffff" />
-<title>Araujo App V2.0</title>
+<title>Araujo App V3.0</title>
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 <script src="https://unpkg.com/@zxing/library@latest"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
@@ -15,43 +16,41 @@
   body { margin: 0; background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
   .hidden { display: none !important; }
 
-  /* LOGIN (Z-Index Max) */
   #login-overlay { position: fixed; inset: 0; z-index: 10000; background: white; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100vw; height: 100vh; }
-  
-  /* HEADER & NAV */
+
   header { background: var(--surface); padding: 10px; height: 80px; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); position: relative; z-index: 50; }
   .logo-header { height: 50px; object-fit: contain; }
   .user-badge { position: absolute; right: 15px; top: 15px; font-size: 11px; background: #e0f2fe; color: var(--primary); padding: 4px 10px; border-radius: 20px; font-weight: bold; }
-  
+
   main { flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 90px; }
-  
+
   nav { position: fixed; bottom: 0; width: 100%; background: white; height: 70px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); z-index: 100; padding: 0 30px; }
   .nav-btn { text-align:center; color:#94a3b8; cursor: pointer; font-size: 12px; }
   .nav-btn i { font-size: 24px; margin-bottom: 4px; }
 
-  /* UI ELEMENTS */
   .card { background: var(--surface); border-radius: 16px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); margin-bottom: 15px; }
   input, select { width: 100%; padding: 14px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 16px; background: #fff; margin-bottom: 10px; outline: none; }
   .btn { width: 100%; padding: 16px; border-radius: 12px; border: none; font-weight: 700; font-size: 16px; background: var(--primary); color: white; cursor: pointer; margin-top: 5px; }
-  
+
   .tabs { display: flex; background: #e2e8f0; padding: 4px; border-radius: 12px; margin-bottom: 15px; }
   .tab { flex: 1; text-align: center; padding: 12px; font-weight: 700; font-size: 12px; color: #64748b; border-radius: 9px; cursor: pointer; }
   .tab.active { background: white; color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
   .tab.active-pvp { background: white; color: var(--pvp); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
 
-  /* LISTES */
+  .home-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  .home-btn { border-radius: 16px; padding: 18px; color: white; font-weight: 800; text-align: center; box-shadow: 0 6px 18px rgba(0,0,0,0.06); cursor: pointer; }
+  .home-btn i { font-size: 26px; margin-bottom: 8px; display:block; }
+
   .group-header { background: #334155; color: white; padding: 12px 15px; border-radius: 10px; margin-top: 15px; font-weight: bold; text-transform: uppercase; font-size: 14px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
   .list-item { background: white; border-radius: 12px; padding: 12px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 1px 3px rgba(0,0,0,0.05); min-height: 80px; }
-  
-  /* Swipe Elements */
+
   .swipe-wrapper { background: #ef4444; border-radius: 12px; margin-bottom: 8px; overflow: hidden; position: relative; }
   .swipe-content { background: white; position: relative; z-index: 2; transition: transform 0.2s; padding: 12px; display: flex; align-items: center; justify-content: space-between; min-height: 80px; width: 100%; }
-  
+
   .item-img { width: 55px; height: 55px; border-radius: 10px; object-fit: cover; background: #f1f5f9; margin-right: 12px; flex-shrink: 0; display:flex; align-items:center; justify-content:center; color:#cbd5e1; font-size: 20px; cursor: pointer; }
   .item-info { flex: 1; overflow: hidden; margin-right: 10px; }
   .item-title { font-weight: bold; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; }
 
-  /* PVP Controls */
   .qty-ctrl { display: flex; align-items: center; gap: 10px; background: #f8fafc; width: fit-content; padding: 4px 8px; border-radius: 8px; border: 1px solid #e2e8f0; margin-top: 5px; }
   .qty-btn { width: 30px; height: 30px; border-radius: 6px; border: none; background: white; box-shadow: 0 2px 3px rgba(0,0,0,0.1); font-weight: bold; color: var(--primary); font-size: 18px; display:flex; align-items:center; justify-content:center; cursor: pointer; }
 
@@ -60,511 +59,1266 @@
   .d-val { font-size: 14px; font-weight: 800; color: var(--success); }
   .d-val.expired { color: var(--danger); }
 
-  /* Frais Badges */
   .date-badge { width: 50px; height: 50px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; font-weight: bold; flex-shrink: 0; margin-left: 10px; }
   .bg-red { background: #ef4444; } .bg-orange { background: #f59e0b; } .bg-green { background: #10b981; } .bg-grey { background: #94a3b8; }
 
-  /* ToDo */
   .todo-check { width: 32px; height: 32px; border: 2px solid #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; margin-left: 15px; cursor: pointer; transition: 0.2s; }
   .todo-check.checked { background: var(--success); border-color: var(--success); color: white; }
   .item-done { opacity: 0.6; background: #f8fafc; }
   .item-done .item-title { text-decoration: line-through; color: #94a3b8; }
 
-  /* Modals */
   .modal-bc { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
   .modal-card { background: white; padding: 25px; border-radius: 20px; width: 100%; max-width: 400px; max-height: 85vh; overflow-y: auto; }
+
+  .muted { color: #64748b; font-size: 12px; text-align:center; margin-top: 10px; }
 </style>
 </head>
+
 <body>
 
+  <!-- LOGIN -->
   <div id="login-overlay">
     <img src="https://raw.githubusercontent.com/araujoexploitation/Magasin/main/LOGO.png" style="width:200px; margin-bottom:30px;">
     <select id="login-user-select" style="width:220px; margin-bottom:15px; text-align:center;"></select>
     <input type="password" id="login-pass" placeholder="CODE" style="width:220px; text-align:center; font-size:20px;">
-    <button class="btn" onclick="app.login()" style="width:220px; background:#00563f; border-radius:50px;">CONNEXION</button>
+    <button class="btn" id="btn-login" style="width:220px; background:#00563f; border-radius:50px;">CONNEXION</button>
+    <div class="muted" id="login-msg"></div>
   </div>
 
+  <!-- BARCODE MODAL -->
   <div id="modal-barcode" class="modal-bc hidden">
     <div class="modal-card" style="text-align:center;">
-        <h3 id="bc-name"></h3>
-        <img id="bc-img-display" style="width:100%;height:200px;object-fit:contain;margin-bottom:15px;display:none;background:#f8fafc;border-radius:10px;">
-        <svg id="barcode"></svg><br>
-        <button class="btn" style="background:#eee;color:#333;margin-top:20px;" onclick="document.getElementById('modal-barcode').classList.add('hidden')">Fermer</button>
+      <h3 id="bc-name"></h3>
+      <img id="bc-img-display" style="width:100%;height:200px;object-fit:contain;margin-bottom:15px;display:none;background:#f8fafc;border-radius:10px;">
+      <svg id="barcode"></svg><br>
+      <button class="btn" data-close="modal-barcode" style="background:#eee;color:#333;margin-top:20px;">Fermer</button>
     </div>
   </div>
 
+  <!-- EDIT FRAIS MODAL -->
   <div id="modal-edit-frais" class="modal-bc hidden">
     <div class="modal-card">
-        <h3>Modifier Frais</h3>
-        <input type="hidden" id="edit-id">
-        <label>EAN (Code Barre)</label><input type="text" id="edit-ean" inputmode="numeric">
-        <label>Nom Produit</label><input type="text" id="edit-name">
-        <label>Famille</label><select id="edit-famille"><option>SNACKING</option><option>TRAITEUR</option><option>ULTRA FRAIS</option><option>CHARCUTERIE</option><option>VOLAILLE</option><option>BOUCHERIE</option><option>FROMAGE</option><option>SAURISSERIE</option><option>DIVERS</option></select>
-        <label>Qté</label><input type="number" id="edit-qty">
-        <label>DLC</label><input type="date" id="edit-date">
-        <button class="btn" onclick="app.frais.saveEdit()" style="background:#00563f;">Enregistrer</button>
-        <button class="btn" onclick="app.frais.del()" style="background:#ef4444;">Supprimer</button>
-        <button class="btn" onclick="document.getElementById('modal-edit-frais').classList.add('hidden')" style="background:#eee;color:#333;">Annuler</button>
+      <h3>Modifier Frais</h3>
+      <input type="hidden" id="edit-id">
+      <label>EAN (Code Barre)</label><input type="text" id="edit-ean" inputmode="numeric" maxlength="13">
+      <label>Nom Produit</label><input type="text" id="edit-name">
+      <label>Famille</label>
+      <select id="edit-famille">
+        <option>SNACKING</option><option>TRAITEUR</option><option>ULTRA FRAIS</option><option>CHARCUTERIE</option>
+        <option>VOLAILLE</option><option>BOUCHERIE</option><option>FROMAGE</option><option>SAURISSERIE</option><option>DIVERS</option>
+      </select>
+      <label>Qté</label><input type="number" id="edit-qty" min="0">
+      <label>DLC</label><input type="date" id="edit-date">
+      <button class="btn" id="btn-save-edit-frais" style="background:#00563f;">Enregistrer</button>
+      <button class="btn" id="btn-del-frais" style="background:#ef4444;">Supprimer</button>
+      <button class="btn" data-close="modal-edit-frais" style="background:#eee;color:#333;">Annuler</button>
     </div>
   </div>
 
+  <!-- PVP LIB MODAL -->
   <div id="modal-pvp-lib" class="modal-bc hidden">
     <div class="modal-card">
-        <h3 style="color:#d97706">Produit PVP</h3>
-        <input type="hidden" id="lib-id"><input type="hidden" id="lib-img-data">
-        <label>Famille</label><select id="lib-fam-select" onchange="app.pvp.toggleFamInput()"></select>
-        <input type="text" id="lib-fam-new" placeholder="Nouvelle famille..." class="hidden">
-        <label>Nom</label><input type="text" id="lib-name">
-        <label>EAN</label><input type="text" id="lib-ean" inputmode="numeric" maxlength="13">
-        <button class="btn" onclick="document.getElementById('cam-input').click()" style="background:#eee;color:#333;margin-bottom:10px;">Photo</button>
-        <input type="file" id="cam-input" accept="image/*" capture="environment" class="hidden" onchange="app.pvp.handleImg(this)">
-        <img id="img-preview" style="width:100px;height:100px;object-fit:cover;border-radius:10px;display:none;margin:0 auto 10px auto;">
-        <label>Conservation</label><select id="lib-days"><option value="0">JOURNÉE</option><option value="48">48H</option><option value="72">72H</option></select>
-        <label>Objectifs (L->D)</label>
-        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;">
-            <input type="number" id="t-1" placeholder="L" style="text-align:center;padding:5px;"><input type="number" id="t-2" placeholder="M" style="text-align:center;padding:5px;"><input type="number" id="t-3" placeholder="M" style="text-align:center;padding:5px;"><input type="number" id="t-4" placeholder="J" style="text-align:center;padding:5px;"><input type="number" id="t-5" placeholder="V" style="text-align:center;padding:5px;"><input type="number" id="t-6" placeholder="S" style="text-align:center;padding:5px;"><input type="number" id="t-0" placeholder="D" style="text-align:center;padding:5px;">
-        </div>
-        <button class="btn" onclick="app.pvp.saveLib()" style="background:#d97706;">Enregistrer</button>
-        <button class="btn" onclick="app.pvp.delLib()" style="background:#ef4444;">Supprimer</button>
-        <button class="btn" onclick="document.getElementById('modal-pvp-lib').classList.add('hidden')" style="background:#eee;color:#333;">Fermer</button>
+      <h3 style="color:#d97706">Produit PVP</h3>
+      <input type="hidden" id="lib-id"><input type="hidden" id="lib-img-data">
+      <label>Famille</label><select id="lib-fam-select"></select>
+      <input type="text" id="lib-fam-new" placeholder="Nouvelle famille..." class="hidden">
+      <label>Nom</label><input type="text" id="lib-name">
+      <label>EAN</label><input type="text" id="lib-ean" inputmode="numeric" maxlength="13">
+
+      <button class="btn" id="btn-photo" style="background:#eee;color:#333;margin-bottom:10px;">Photo</button>
+      <input type="file" id="cam-input" accept="image/*" capture="environment" class="hidden">
+      <img id="img-preview" style="width:100px;height:100px;object-fit:cover;border-radius:10px;display:none;margin:0 auto 10px auto;">
+
+      <label>Conservation</label>
+      <select id="lib-days"><option value="0">JOURNÉE</option><option value="48">48H</option><option value="72">72H</option></select>
+
+      <label>Objectifs (L->D)</label>
+      <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;">
+        <input type="number" id="t-1" placeholder="L" style="text-align:center;padding:5px;">
+        <input type="number" id="t-2" placeholder="M" style="text-align:center;padding:5px;">
+        <input type="number" id="t-3" placeholder="M" style="text-align:center;padding:5px;">
+        <input type="number" id="t-4" placeholder="J" style="text-align:center;padding:5px;">
+        <input type="number" id="t-5" placeholder="V" style="text-align:center;padding:5px;">
+        <input type="number" id="t-6" placeholder="S" style="text-align:center;padding:5px;">
+        <input type="number" id="t-0" placeholder="D" style="text-align:center;padding:5px;">
+      </div>
+
+      <button class="btn" id="btn-save-pvp-lib" style="background:#d97706;">Enregistrer</button>
+      <button class="btn" id="btn-del-pvp-lib" style="background:#ef4444;">Supprimer</button>
+      <button class="btn" data-close="modal-pvp-lib" style="background:#eee;color:#333;">Fermer</button>
     </div>
   </div>
 
+  <!-- PVP STOCK MODAL -->
   <div id="modal-pvp-stock" class="modal-bc hidden">
-      <div class="modal-card">
-          <h3 style="color:#d97706">Correction Rayon</h3>
-          <input type="hidden" id="stock-id"><h4 id="stock-name" style="text-align:center;"></h4>
-          <label>Quantité</label><input type="number" id="stock-qty">
-          <label>Sortie</label><input type="datetime-local" id="stock-start">
-          <label>Fin</label><input type="datetime-local" id="stock-end">
-          <button class="btn" onclick="app.pvp.saveStock()" style="background:#d97706;">Valider</button>
-          <button class="btn" onclick="app.pvp.delStock()" style="background:#ef4444;">Retirer</button>
-          <button class="btn" onclick="document.getElementById('modal-pvp-stock').classList.add('hidden')" style="background:#eee;color:#333;">Annuler</button>
-      </div>
+    <div class="modal-card">
+      <h3 style="color:#d97706">Correction Rayon</h3>
+      <input type="hidden" id="stock-id"><h4 id="stock-name" style="text-align:center;"></h4>
+      <label>Quantité</label><input type="number" id="stock-qty" min="0">
+      <label>Sortie</label><input type="datetime-local" id="stock-start">
+      <label>Fin</label><input type="datetime-local" id="stock-end">
+      <button class="btn" id="btn-save-stock" style="background:#d97706;">Valider</button>
+      <button class="btn" id="btn-del-stock" style="background:#ef4444;">Retirer</button>
+      <button class="btn" data-close="modal-pvp-stock" style="background:#eee;color:#333;">Annuler</button>
+    </div>
   </div>
 
+  <!-- HEADER -->
   <header id="app-header" class="hidden">
     <img src="https://raw.githubusercontent.com/araujoexploitation/Magasin/main/LOGO.png" class="logo-header">
     <div id="user-badge" class="user-badge">...</div>
   </header>
 
+  <!-- VIEWS -->
   <main>
     <div id="view-home">
-        <div id="alert-box" style="display:none;background:#ef4444;color:white;padding:15px;border-radius:12px;margin-bottom:15px;text-align:center;font-weight:bold;">⚠️ Dates Courtes !</div>
-        <div class="home-grid">
-            <div class="home-btn" onclick="app.nav('frais')" style="background: linear-gradient(135deg, #003896 0%, #002366 100%);"><i class="fas fa-barcode"></i><br>DLC FRAIS</div>
-            <div class="home-btn" onclick="app.nav('pvp')" style="background: linear-gradient(135deg, #d97706 0%, #b45309 100%);"><i class="fas fa-bread-slice"></i><br>GESTION PVP</div>
+      <div id="alert-box" style="display:none;background:#ef4444;color:white;padding:15px;border-radius:12px;margin-bottom:15px;text-align:center;font-weight:bold;">⚠️ Dates Courtes !</div>
+      <div class="home-grid">
+        <div class="home-btn" id="btn-go-frais" style="background: linear-gradient(135deg, #003896 0%, #002366 100%);">
+          <i class="fas fa-barcode"></i>DLC FRAIS
         </div>
-        <div class="card hidden" id="btn-team" onclick="app.nav('team')" style="text-align:center;"><i class="fas fa-users"></i> Équipe</div>
+        <div class="home-btn" id="btn-go-pvp" style="background: linear-gradient(135deg, #d97706 0%, #b45309 100%);">
+          <i class="fas fa-bread-slice"></i>GESTION PVP
+        </div>
+      </div>
+      <div class="card hidden" id="btn-team" style="text-align:center;"><i class="fas fa-users"></i> Équipe</div>
     </div>
 
     <div id="view-frais" class="hidden">
-        <div class="tabs">
-            <div class="tab active" id="tf-1" onclick="app.frais.tab('scan')">SCAN</div>
-            <div class="tab" id="tf-2" onclick="app.frais.tab('list')">LISTE</div>
+      <div class="tabs" id="tabs-frais">
+        <div class="tab active" data-tab="scan">SCAN</div>
+        <div class="tab" data-tab="list">LISTE</div>
+      </div>
+
+      <div id="frais-scan">
+        <div id="scanner-box" style="height:200px;background:black;margin-bottom:10px;display:none;">
+          <video id="video" style="width:100%;height:100%;object-fit:cover;"></video>
         </div>
-        <div id="frais-scan">
-            <div id="scanner-box" style="height:200px;background:black;margin-bottom:10px;display:none;"><video id="video" style="width:100%;height:100%;object-fit:cover;"></video></div>
-            <button class="btn" onclick="app.frais.toggleScan()"><i class="fas fa-camera"></i> SCANNER</button>
-            <div class="card">
-                <input id="frais-ean" type="text" inputmode="numeric" placeholder="EAN" oninput="app.frais.handleInput(this.value)">
-                <select id="frais-fam"><option>SNACKING</option><option>TRAITEUR</option><option>ULTRA FRAIS</option><option>CHARCUTERIE</option><option>BOUCHERIE</option><option>VOLAILLE</option><option>FROMAGE</option><option>SAURISSERIE</option><option>DIVERS</option></select>
-                <input id="frais-name" placeholder="Nom">
-                <div style="display:flex;gap:10px;"><input type="date" id="frais-date"><input type="number" id="frais-qty" placeholder="Qté"></div>
-                <button class="btn" onclick="app.frais.add()">AJOUTER</button>
-            </div>
+        <button class="btn" id="btn-scan"><i class="fas fa-camera"></i> SCANNER</button>
+
+        <div class="card">
+          <input id="frais-ean" type="text" inputmode="numeric" placeholder="EAN" maxlength="13">
+          <select id="frais-fam">
+            <option>SNACKING</option><option>TRAITEUR</option><option>ULTRA FRAIS</option><option>CHARCUTERIE</option>
+            <option>BOUCHERIE</option><option>VOLAILLE</option><option>FROMAGE</option><option>SAURISSERIE</option><option>DIVERS</option>
+          </select>
+          <input id="frais-name" placeholder="Nom">
+          <div style="display:flex;gap:10px;">
+            <input type="date" id="frais-date">
+            <input type="number" id="frais-qty" placeholder="Qté" min="0">
+          </div>
+          <button class="btn" id="btn-add-frais">AJOUTER</button>
         </div>
-        <div id="frais-list" class="hidden"></div>
+      </div>
+
+      <div id="frais-list" class="hidden"></div>
     </div>
 
     <div id="view-pvp" class="hidden">
-        <div class="tabs">
-            <div class="tab active" id="tp-1" onclick="app.pvp.tab('stock')">RAYON</div>
-            <div class="tab" id="tp-2" onclick="app.pvp.tab('bib')">BIBLIO</div>
-            <div class="tab" id="tp-3" onclick="app.pvp.tab('calc')">BESOINS</div>
-        </div>
-        <div id="pvp-stock"></div>
-        <div id="pvp-bib" class="hidden">
-            <button class="btn" onclick="app.pvp.openLib()" style="background:#eee;color:#333;margin-bottom:15px;">+ Créer Produit</button>
-            <div id="lib-list"></div>
-        </div>
-        <div id="pvp-calc" class="hidden"></div>
+      <div class="tabs" id="tabs-pvp">
+        <div class="tab active-pvp" data-tab="stock">RAYON</div>
+        <div class="tab" data-tab="bib">BIBLIO</div>
+        <div class="tab" data-tab="calc">BESOINS</div>
+      </div>
+
+      <div id="pvp-stock"></div>
+
+      <div id="pvp-bib" class="hidden">
+        <button class="btn" id="btn-open-lib" style="background:#eee;color:#333;margin-bottom:15px;">+ Créer Produit</button>
+        <div id="lib-list"></div>
+      </div>
+
+      <div id="pvp-calc" class="hidden"></div>
     </div>
 
     <div id="view-team" class="hidden">
-        <div class="card">
-            <input id="new-u-name" placeholder="Nom"><input id="new-u-code" placeholder="Code">
-            <button class="btn" onclick="app.saveUser()">Créer Staff</button>
-        </div>
-        <div class="card" id="user-list"></div>
+      <div class="card">
+        <input id="new-u-name" placeholder="Nom">
+        <input id="new-u-code" placeholder="Code (PIN)" inputmode="numeric">
+        <button class="btn" id="btn-add-user">Créer Staff</button>
+        <div class="muted">V3: codes stockés en hash (pas en clair).</div>
+      </div>
+      <div class="card" id="user-list"></div>
     </div>
   </main>
 
+  <!-- NAV -->
   <nav id="app-nav" class="hidden">
-      <div class="nav-btn" onclick="app.goBack()"><i class="fas fa-arrow-left"></i><br>RETOUR</div>
-      <div class="nav-btn" onclick="app.nav('home')"><i class="fas fa-th-large"></i><br>MENU</div>
+    <div class="nav-btn" id="btn-back"><i class="fas fa-arrow-left"></i><br>RETOUR</div>
+    <div class="nav-btn" id="btn-home"><i class="fas fa-th-large"></i><br>MENU</div>
   </nav>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-const db = getFirestore(initializeApp({ apiKey: "AIzaSyA0ffa4Nfa7kGLyaEcAocU9YzIhzmx3SkA", authDomain: "araujo-exploitation.firebaseapp.com", projectId: "araujo-exploitation" }));
+/**
+ * ⚠️ Sécurité (important) :
+ * - Tout est côté client (pas Firebase Auth ici) => Firestore doit avoir des règles strictes, sinon tout le monde peut lire.
+ * - Le hash (SHA-256) évite les codes en clair, MAIS un PIN 4 chiffres reste brute-forçable.
+ *   -> solution propre: Firebase Auth + règles Firestore par utilisateur / rôle.
+ */
+
+const firebaseApp = initializeApp({
+  apiKey: "AIzaSyA0ffa4Nfa7kGLyaEcAocU9YzIhzmx3SkA",
+  authDomain: "araujo-exploitation.firebaseapp.com",
+  projectId: "araujo-exploitation",
+});
+const db = getFirestore(firebaseApp);
+
 const docUsers = doc(db, "store_master", "DATA_USERS");
 const docFrais = doc(db, "store_master", "DATA_FRAIS");
-const docPVP = doc(db, "store_master", "DATA_PVP");
+const docPVP   = doc(db, "store_master", "DATA_PVP");
+
 const codeReader = new ZXing.BrowserMultiFormatReader();
 
-window.app = {
+const $ = (id) => document.getElementById(id);
+
+function clear(node){ while(node.firstChild) node.removeChild(node.firstChild); }
+
+function el(tag, attrs = {}, ...children) {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (k === "class") n.className = v;
+    else if (k === "style") n.setAttribute("style", v);
+    else if (k === "dataset" && v && typeof v === "object") {
+      for (const [dk, dv] of Object.entries(v)) n.dataset[dk] = String(dv);
+    } else if (k.startsWith("on") && typeof v === "function") {
+      n.addEventListener(k.slice(2), v);
+    } else if (v !== null && v !== undefined) {
+      n.setAttribute(k, String(v));
+    }
+  }
+  for (const c of children) {
+    if (c === null || c === undefined) continue;
+    n.appendChild(typeof c === "string" ? document.createTextNode(c) : c);
+  }
+  return n;
+}
+
+function clampInt(v, def=0) {
+  const n = Number.parseInt(String(v), 10);
+  return Number.isFinite(n) ? n : def;
+}
+
+function sanitizeEan(v) {
+  return String(v || "").replace(/\D/g, "").slice(0, 13);
+}
+
+async function sha256Hex(str) {
+  const data = new TextEncoder().encode(str);
+  const hash = await crypto.subtle.digest("SHA-256", data);
+  const bytes = Array.from(new Uint8Array(hash));
+  return bytes.map(b => b.toString(16).padStart(2, "0")).join("");
+}
+
+const app = {
+  state: {
     data: { frais: [], users: [], pvpLib: [], pvpStock: [], checkedNeeds: [] },
     viewHistory: [],
-    closed: new Set(),
-    debounceTimer: null,
-    
-    // UTILS
-    common: {
-        showBarcode: function(ean, name, imgUrl=null) { 
-            document.getElementById('modal-barcode').classList.remove('hidden'); 
-            document.getElementById('bc-name').innerText=name; 
-            let imgEl = document.getElementById('bc-img-display');
-            if(imgUrl) { imgEl.src = imgUrl; imgEl.style.display='block'; } else { imgEl.style.display='none'; }
-            if(ean) { try{JsBarcode("#barcode", ean, {format:"EAN13", height:80, displayValue:true});} catch(e){try{JsBarcode("#barcode", ean, {format:"CODE128", height:80, displayValue:true});}catch(e2){}} }
-        },
-        // DATE HELPERS
-        parseDateLocal: function(dateStr) {
-            if(!dateStr) return null;
-            let parts = dateStr.split('-');
-            return new Date(parts[0], parts[1]-1, parts[2], 12, 0, 0).getTime();
-        },
-        dateToInputLocal: function(ts) {
-            if(!ts) return "";
-            let d = new Date(ts);
-            let y = d.getFullYear();
-            let m = String(d.getMonth()+1).padStart(2,'0');
-            let day = String(d.getDate()).padStart(2,'0');
-            return `${y}-${m}-${day}`;
-        },
-        tsToInput: function(ts) { let d = new Date(ts); let local = new Date(d.getTime() - (d.getTimezoneOffset() * 60000)); return local.toISOString().slice(0, 16); },
-        calculateEnd: function(startTs, hours) {
-            let start = new Date(startTs); let end = new Date(startTs); let h = parseInt(hours);
-            if (h === 0) { end.setHours(22, 0, 0, 0); } else { end.setHours(end.getHours() + h); }
-            return end.getTime();
-        },
-        cleanName: function(name) { return name.toUpperCase().replace(/^[\d\s\.,xX]+(G|KG|ML|CL|L|P)?\s*/g, ''); },
-        compressImg: function(file, callback) {
-            let reader = new FileReader(); reader.readAsDataURL(file);
-            reader.onload = (e) => {
-                let img = new Image(); img.src = e.target.result;
-                img.onload = () => {
-                    let canvas = document.createElement('canvas'); let ctx = canvas.getContext('2d');
-                    let max = 300; let w = img.width, h = img.height; 
-                    if (w > h) { if (w > max) { h *= max/w; w = max; } } else { if (h > max) { w *= max/h; h = max; } }
-                    canvas.width = w; canvas.height = h; ctx.drawImage(img, 0, 0, w, h);
-                    callback(canvas.toDataURL('image/jpeg', 0.5)); 
-                };
-            };
-        },
-        formatDate: function(ts) {
-            let d = new Date(ts);
-            if(isNaN(d.getTime())) return "--/--";
-            let h = d.getHours(); let m = d.getMinutes();
-            return `${d.getDate()}/${d.getMonth()+1} ${h<10?'0'+h:h}:${m<10?'0'+m:m}`;
-        }
-    },
-
-    init: async function() {
-        try {
-            const [uSnap, fSnap, pSnap] = await Promise.all([getDoc(docUsers), getDoc(docFrais), getDoc(docPVP)]);
-            if(uSnap.exists()) this.data.users = uSnap.data().list || [];
-            if(fSnap.exists()) this.data.frais = fSnap.data().list || [];
-            if(pSnap.exists()) { let d = pSnap.data(); this.data.pvpLib = d.lib || []; this.data.pvpStock = d.stock || []; this.data.checkedNeeds = d.needs || []; }
-            if(!this.data.users.length) { this.data.users = [{name:"MANAGER", code:"2008", role:"admin"}]; this.save('users'); }
-            this.updateUI();
-        } catch(e) { this.data.users = [{name:"MANAGER", code:"2008", role:"admin"}]; this.updateUI(); }
-    },
-
-    save: function(sec) {
-        if(sec==='users') setDoc(docUsers, { list: this.data.users });
-        if(sec==='frais') setDoc(docFrais, { list: this.data.frais });
-        if(sec==='pvp') setDoc(docPVP, { lib: this.data.pvpLib, stock: this.data.pvpStock, needs: this.data.checkedNeeds });
-    },
-    
-    updateUI: function() {
-        let sel = document.getElementById('login-user-select');
-        sel.innerHTML = (this.data.users || []).map(u => `<option value="${u.name}">${u.name}</option>`).join('');
-        this.frais.render(); this.pvp.render(); this.renderUsers(); this.checkAlerts();
-    },
-
-    login: function() {
-        let name = document.getElementById('login-user-select').value;
-        let code = document.getElementById('login-pass').value;
-        let u = (this.data.users || []).find(x => x.name == name && x.code == code);
-        if(u) {
-            document.getElementById('login-overlay').classList.add('hidden');
-            document.getElementById('user-badge').innerText = u.name;
-            document.getElementById('app-header').classList.remove('hidden');
-            document.getElementById('app-nav').classList.remove('hidden');
-            if(u.role=='admin') document.getElementById('btn-team').classList.remove('hidden');
-        } else alert('Erreur Code');
-    },
-
-    nav: function(v, saveHistory = true) {
-        if(this.frais.scanning) this.frais.toggleScan();
-        let current = document.querySelector('main > div:not(.hidden)');
-        if(saveHistory && current) this.viewHistory.push(current.id.replace('view-',''));
-        document.querySelectorAll('main > div').forEach(e => e.classList.add('hidden'));
-        document.getElementById('view-'+v).classList.remove('hidden');
-    },
-    goBack: function() { if(this.viewHistory.length) this.nav(this.viewHistory.pop(), false); else this.nav('home', false); },
-    toggleFam: function(id) { if(this.closed.has(id)) this.closed.delete(id); else this.closed.add(id); this.frais.render(); this.pvp.render(); },
-
-    // --- FRAIS ---
-    frais: {
-        scanning: false,
-        imgUrl: "",
-        tab: function(t) {
-            document.querySelectorAll('#view-frais .tab').forEach(e => e.classList.remove('active'));
-            document.getElementById(t=='scan'?'tf-1':'tf-2').classList.add('active');
-            document.getElementById('frais-scan').classList.add('hidden');
-            document.getElementById('frais-list').classList.add('hidden');
-            document.getElementById('frais-'+t).classList.remove('hidden');
-        },
-        toggleScan: function() {
-            if(this.scanning) { this.scanning=false; document.getElementById('scanner-box').style.display='none'; codeReader.reset(); }
-            else { this.scanning=true; document.getElementById('scanner-box').style.display='block'; codeReader.decodeFromVideoDevice(null, 'video', (r) => { if(r){ this.handleInput(r.text); this.toggleScan(); } }); }
-        },
-        handleInput: function(val) {
-            let clean = val.replace(/\D/g, '').slice(0, 13);
-            document.getElementById('frais-ean').value = clean;
-            if(window.app.debounceTimer) clearTimeout(window.app.debounceTimer);
-            window.app.debounceTimer = setTimeout(() => {
-                if(clean.length === 13) this.api(clean);
-            }, 250);
-        },
-        api: async function(ean) {
-            try { let r = await fetch(`https://world.openfoodfacts.org/api/v0/product/${ean}.json`); let d = await r.json(); if(d.status==1) { document.getElementById('frais-name').value = d.product.product_name_fr || ""; this.imgUrl = d.product.image_front_small_url || ""; } } catch(e){}
-        },
-        add: function() {
-            let dateVal = document.getElementById('frais-date').value;
-            let finalDate = window.app.common.parseDateLocal(dateVal);
-            let o = { id: Date.now(), ean: document.getElementById('frais-ean').value, fam: document.getElementById('frais-fam').value, name: document.getElementById('frais-name').value, qty: document.getElementById('frais-qty').value, date: finalDate, img: this.imgUrl };
-            if(!o.name || !o.date) return alert('Date requise');
-            window.app.data.frais.push(o); window.app.save('frais'); alert('Ajouté');
-            this.imgUrl=""; document.getElementById('frais-name').value=""; document.getElementById('frais-ean').value="";
-        },
-        render: function() {
-            let div = document.getElementById('frais-list'); div.innerHTML="";
-            let grp = {};
-            window.app.data.frais.sort((a,b) => {
-                if(a.fam !== b.fam) return a.fam.localeCompare(b.fam);
-                return a.date - b.date;
-            }).forEach(i=>{ if(!grp[i.fam])grp[i.fam]=[]; grp[i.fam].push(i); });
-            
-            for(let f in grp) {
-                let id = 'F-'+f; let c = window.app.closed.has(id);
-                div.innerHTML += `<div class="group-header" onclick="app.toggleFam('${id}')"><span>${f}</span><i class="fas fa-chevron-${c?'right':'down'}"></i></div>`;
-                if(!c) {
-                    grp[f].forEach(i => {
-                        let d = new Date(i.date);
-                        let badge = 'bg-grey';
-                        if(!isNaN(d.getTime())) { let diff = (d - new Date())/(1000*60*60*24); badge = diff<0?'bg-red':(diff<2?'bg-orange':'bg-green'); }
-                        // FIX: Barcode Click
-                        let img = i.img ? `<img src="${i.img}" class="item-img" onclick="event.stopPropagation(); app.common.showBarcode('${i.ean}','${i.name.replace(/'/g," ")}','${i.img}')">` 
-                                        : `<div class="item-img" onclick="event.stopPropagation(); app.common.showBarcode('${i.ean}','${i.name.replace(/'/g," ")}')"><i class="fas fa-barcode"></i></div>`;
-                        
-                        div.innerHTML += `
-                        <div class="swipe-wrapper"><div class="swipe-content" onclick="app.frais.openEdit(${i.id})">
-                            <div style="display:flex;align-items:center;flex:1;">${img}<div class="item-info"><div class="item-title">${i.name}</div><span>x${i.qty}</span></div></div>
-                            <div class="date-badge ${badge}"><span>${!isNaN(d.getTime())?d.getDate():'?'}</span><span style="font-size:10px;">${!isNaN(d.getTime())?d.toLocaleString('fr',{month:'short'}):'Err'}</span></div>
-                        </div></div>`;
-                    });
-                }
-            }
-        },
-        openEdit: function(id) {
-            let i = window.app.data.frais.find(x => x.id == id);
-            document.getElementById('modal-edit-frais').classList.remove('hidden');
-            document.getElementById('edit-id').value = id; 
-            document.getElementById('edit-famille').value = i.fam;
-            document.getElementById('edit-qty').value = i.qty; 
-            document.getElementById('edit-name').value = i.name; // NEW: Name
-            document.getElementById('edit-ean').value = i.ean;   // NEW: EAN
-            document.getElementById('edit-date').value = window.app.common.dateToInputLocal(i.date); // FIX DATE
-        },
-        saveEdit: function() {
-            let id = document.getElementById('edit-id').value; let idx = window.app.data.frais.findIndex(x => x.id == id);
-            if(idx>-1) {
-                window.app.data.frais[idx].fam = document.getElementById('edit-famille').value;
-                window.app.data.frais[idx].qty = document.getElementById('edit-qty').value;
-                window.app.data.frais[idx].name = document.getElementById('edit-name').value; // SAVE NAME
-                window.app.data.frais[idx].ean = document.getElementById('edit-ean').value;   // SAVE EAN
-                window.app.data.frais[idx].date = window.app.common.parseDateLocal(document.getElementById('edit-date').value);
-                window.app.save('frais'); document.getElementById('modal-edit-frais').classList.add('hidden');
-            }
-        },
-        del: function() { window.app.data.frais = window.app.data.frais.filter(x => x.id != document.getElementById('edit-id').value); window.app.save('frais'); document.getElementById('modal-edit-frais').classList.add('hidden'); }
-    },
-
-    // --- PVP ---
-    pvp: {
-        tab: function(t) {
-            document.querySelectorAll('#view-pvp .tab').forEach(e => e.classList.remove('active-pvp'));
-            document.getElementById(t=='stock'?'tp-1':(t=='bib'?'tp-2':'tp-3')).classList.add('active-pvp');
-            ['pvp-stock','pvp-bib','pvp-calc'].forEach(id => document.getElementById(id).classList.add('hidden'));
-            document.getElementById('pvp-'+t).classList.remove('hidden');
-        },
-        handleImg: function(input) { if(input.files[0]) window.app.common.compressImg(input.files[0], (b64) => { document.getElementById('img-preview').src = b64; document.getElementById('img-preview').style.display='block'; document.getElementById('lib-img-data').value = b64; }); },
-        toggleFamInput: function() { let val = document.getElementById('lib-fam-select').value; document.getElementById('lib-fam-new').classList.toggle('hidden', val !== 'new'); },
-        
-        openLib: function(id=null) {
-            document.getElementById('modal-pvp-lib').classList.remove('hidden');
-            let uniqueFams = [...new Set(window.app.data.pvpLib.map(i => i.family || "DIVERS"))].sort();
-            document.getElementById('lib-fam-select').innerHTML = uniqueFams.map(f => `<option value="${f}">${f}</option>`).join('') + `<option value="new">+ Créer...</option>`;
-            if(id) {
-                let i = window.app.data.pvpLib.find(x=>x.id==id);
-                document.getElementById('lib-id').value=id; document.getElementById('lib-name').value=i.name; document.getElementById('lib-ean').value=i.ean||"";
-                document.getElementById('lib-days').value=i.days||0; document.getElementById('lib-img-data').value=i.img||"";
-                document.getElementById('img-preview').src=i.img||""; document.getElementById('img-preview').style.display=i.img?'block':'none';
-                document.getElementById('lib-fam-select').value = i.family || "DIVERS"; 
-                for(let k=0;k<7;k++) document.getElementById('t-'+k).value = (i.targets||{})[k]||"";
-            } else {
-                document.getElementById('lib-id').value=""; document.getElementById('lib-name').value=""; document.getElementById('img-preview').style.display='none';
-                for(let k=0;k<7;k++) document.getElementById('t-'+k).value = "";
-            }
-        },
-        saveLib: function() {
-            let id = document.getElementById('lib-id').value;
-            let fam = document.getElementById('lib-fam-select').value === 'new' ? document.getElementById('lib-fam-new').value.toUpperCase() : document.getElementById('lib-fam-select').value;
-            let o = { id: id ? Number(id) : Date.now(), family: fam, name: document.getElementById('lib-name').value, ean: document.getElementById('lib-ean').value, img: document.getElementById('lib-img-data').value, days: document.getElementById('lib-days').value, targets: {} };
-            for(let k=0;k<7;k++) o.targets[k] = document.getElementById('t-'+k).value;
-            if(!o.name) return alert("Nom requis");
-            if(id) { let idx = window.app.data.pvpLib.findIndex(x=>x.id==id); window.app.data.pvpLib[idx] = o; } else { window.app.data.pvpLib.push(o); }
-            window.app.save('pvp'); document.getElementById('modal-pvp-lib').classList.add('hidden');
-        },
-        delLib: function() { window.app.data.pvpLib = window.app.data.pvpLib.filter(x=>x.id!=document.getElementById('lib-id').value); window.app.save('pvp'); document.getElementById('modal-pvp-lib').classList.add('hidden'); },
-        
-        addStock: function(libId) {
-            let l = window.app.data.pvpLib.find(x=>x.id==libId); let q = prompt('Quantité ?', "1");
-            if(q > 0) {
-                let now = new Date(); let endTs = window.app.common.calculateEnd(now.getTime(), l.days);
-                window.app.data.pvpStock.push({ id:Date.now(), libId:libId, name:l.name, ean:l.ean, qty:q, out:now.getTime(), end:endTs, days:l.days });
-                window.app.save('pvp');
-            }
-        },
-        openEditStock: function(id) {
-            let i = window.app.data.pvpStock.find(x=>x.id==id);
-            document.getElementById('modal-pvp-stock').classList.remove('hidden');
-            document.getElementById('stock-id').value=id; document.getElementById('stock-name').innerText=i.name;
-            document.getElementById('stock-qty').value=i.qty; document.getElementById('stock-start').value = window.app.common.tsToInput(i.out);
-            document.getElementById('stock-end').value = window.app.common.tsToInput(i.end);
-        },
-        saveStock: function() {
-            let idx = window.app.data.pvpStock.findIndex(x=>x.id==document.getElementById('stock-id').value);
-            window.app.data.pvpStock[idx].qty = document.getElementById('stock-qty').value;
-            window.app.data.pvpStock[idx].out = new Date(document.getElementById('stock-start').value).getTime();
-            window.app.data.pvpStock[idx].end = new Date(document.getElementById('stock-end').value).getTime();
-            window.app.save('pvp'); document.getElementById('modal-pvp-stock').classList.add('hidden');
-        },
-        delStock: function() { window.app.data.pvpStock = window.app.data.pvpStock.filter(x=>x.id!=document.getElementById('stock-id').value); window.app.save('pvp'); document.getElementById('modal-pvp-stock').classList.add('hidden'); },
-        
-        changeQty: function(id, delta) {
-            let idx = window.app.data.pvpStock.findIndex(x => x.id == id);
-            if(idx > -1) {
-                let n = parseInt(window.app.data.pvpStock[idx].qty) + delta;
-                if(n <= 0) window.app.data.pvpStock.splice(idx, 1); else window.app.data.pvpStock[idx].qty = n;
-                window.app.save('pvp'); this.render();
-            }
-        },
-        toggleNeed: function(libId) {
-            let idx = window.app.data.checkedNeeds.indexOf(libId);
-            if(idx > -1) window.app.data.checkedNeeds.splice(idx, 1); else window.app.data.checkedNeeds.push(libId);
-            window.app.save('pvp'); this.render();
-        },
-        render: function() {
-            // BIBLIO
-            let bib = document.getElementById('lib-list'); bib.innerHTML = "";
-            let gLib = {};
-            window.app.data.pvpLib.sort((a,b)=>window.app.common.cleanName(a.name).localeCompare(window.app.common.cleanName(b.name)))
-                          .forEach(l => { let f = l.family||"DIVERS"; if(!gLib[f]) gLib[f]=[]; gLib[f].push(l); });
-            Object.keys(gLib).sort().forEach(f => {
-                let id = 'L-'+f; let c = window.app.closed.has(id);
-                bib.innerHTML += `<div class="group-header" onclick="app.toggleFam('${id}')"><span>${f}</span><i class="fas fa-chevron-${c?'right':'down'}"></i></div>`;
-                if(!c) gLib[f].forEach(l => {
-                    let img = l.img ? `<img src="${l.img}" class="item-img">` : `<div class="item-img"><i class="fas fa-bread-slice"></i></div>`;
-                    bib.innerHTML += `<div class="list-item" onclick="app.common.showBarcode('${l.ean}','${l.name}','${l.img}')"><div style="display:flex;align-items:center;">${img}<div><b>${l.name}</b><br><small>${l.days}h</small></div></div><button class="qty-btn" style="background:var(--pvp);color:white;width:40px;height:40px;" onclick="event.stopPropagation(); app.pvp.openLib(${l.id})"><i class="fas fa-pen"></i></button><button class="qty-btn" style="background:var(--pvp);color:white;width:40px;height:40px;margin-left:10px;" onclick="event.stopPropagation(); app.pvp.addStock(${l.id})">+</button></div>`;
-                });
-            });
-
-            // STOCK
-            let st = document.getElementById('pvp-stock'); st.innerHTML = "";
-            let gStock = {};
-            window.app.data.pvpStock.sort((a,b)=>a.end-b.end).forEach(s => {
-                let l = window.app.data.pvpLib.find(x=>x.id==s.libId); let f = l ? l.family : "DIVERS";
-                if(!gStock[f]) gStock[f]=[]; gStock[f].push(s);
-            });
-            Object.keys(gStock).sort().forEach(f => {
-                let id = 'S-'+f; let c = window.app.closed.has(id);
-                st.innerHTML += `<div class="group-header" style="background:var(--pvp)" onclick="app.toggleFam('${id}')"><span>${f}</span><i class="fas fa-chevron-${c?'right':'down'}"></i></div>`;
-                if(!c) gStock[f].forEach(i => {
-                    let dS = window.app.common.formatDate(i.out);
-                    let dE = window.app.common.formatDate(i.end);
-                    let isExp = new Date(i.end) < new Date();
-                    let l = window.app.data.pvpLib.find(x=>x.id==i.libId), img = l?l.img:null;
-                    let displayImg = img ? `<img src="${img}" class="item-img">` : `<div class="item-img"><i class="fas fa-bread-slice"></i></div>`;
-                    st.innerHTML += `
-                    <div class="swipe-wrapper"><div class="swipe-content">
-                        <div style="display:flex;align-items:center;flex:1;">${displayImg}
-                        <div><div class="item-title" onclick="app.pvp.openEditStock(${i.id})">${i.name}</div>
-                        <div class="qty-ctrl"><button class="qty-btn" onclick="app.pvp.changeQty(${i.id},-1)">-</button><b>${i.qty}</b><button class="qty-btn" onclick="app.pvp.changeQty(${i.id},1)">+</button></div></div></div>
-                        <div class="date-col"><div class="d-lbl">Sortie: ${dS}</div><div class="d-val ${isExp?'expired':''}">FIN: ${dE}</div></div>
-                    </div></div>`;
-                });
-            });
-
-            // BESOINS
-            let cl = document.getElementById('pvp-calc');
-            let tom = new Date(); tom.setDate(tom.getDate()+1); 
-            let gTodo = {}; let doneH = ""; let hasNeeds = false;
-            
-            window.app.data.pvpLib.forEach(l => {
-                let target = (l.targets||{})[tom.getDay()] || 0;
-                if(target > 0) {
-                    hasNeeds = true;
-                    let isC = window.app.data.checkedNeeds.includes(l.id);
-                    let img = l.img ? `<img src="${l.img}" class="item-img">` : `<div class="item-img"><i class="fas fa-bread-slice"></i></div>`;
-                    let h = `
-                    <div class="list-item ${isC?'item-done':''}" style="border-left:5px solid var(--pvp);">
-                        <div style="display:flex;align-items:center;flex:1;">${img}<div><div class="item-title">${l.name}</div><div style="color:var(--pvp);font-weight:bold;">A SORTIR : ${target}</div></div></div>
-                        <div class="todo-check ${isC?'checked':''}" onclick="app.pvp.toggleNeed(${l.id})"><i class="fas fa-check"></i></div>
-                    </div>`;
-                    if(isC) doneH += h; else { let f = l.family||"DIVERS"; if(!gTodo[f]) gTodo[f]=[]; gTodo[f].push(h); }
-                }
-            });
-            
-            let resH = `<h4 style="text-align:center;color:var(--primary);">À SORTIR DEMAIN</h4>`;
-            if(!hasNeeds) resH += "<p style='text-align:center;color:#999'>Rien de prévu</p>";
-            else Object.keys(gTodo).sort().forEach(f => {
-                let id = 'N-'+f; let c = window.app.closed.has(id);
-                resH += `<div class="group-header" style="background:var(--primary)" onclick="app.toggleFam('${id}')"><span>${f}</span><i class="fas fa-chevron-${c?'right':'down'}"></i></div>`;
-                if(!c) resH += gTodo[f].join('');
-            });
-            cl.innerHTML = resH + `<h4 style="text-align:center;color:#64748b;margin-top:20px;">TERMINÉ</h4>` + (doneH || "<p style='text-align:center;color:#ccc;'>Rien de fait</p>");
-        }
-    },
-    saveUser: function() { 
-        let n = document.getElementById('new-u-name').value.toUpperCase(), c = document.getElementById('new-u-code').value;
-        if(n && c) { this.data.users.push({name:n, code:c, role:'staff'}); this.save('users'); document.getElementById('new-u-name').value=""; document.getElementById('new-u-code').value=""; }
-    },
-    renderUsers: function() {
-        let l = document.getElementById('user-list'); l.innerHTML = this.data.users.map(u => `<div style="padding:10px;border-bottom:1px solid #eee;"><b>${u.name}</b> (Code: ****) ${u.role==='admin'?'(Admin)':''}</div>`).join('');
-    },
-    checkAlerts: function() {
-        let alert = window.app.data.frais.some(i => { let d = new Date(i.date); return !isNaN(d.getTime()) && (d - new Date())/(1000*60*60*24) < 1; });
-        document.getElementById('alert-box').style.display = alert ? 'block' : 'none';
+    closed: new Set(JSON.parse(localStorage.getItem("closedGroups") || "[]")),
+    session: null, // {name, role}
+    saveTimers: { users: null, frais: null, pvp: null },
+    scan: { active: false },
+    off: { cache: new Map(), ctrl: null, timer: null },
+    login: {
+      fails: clampInt(localStorage.getItem("loginFails"), 0),
+      lockUntil: clampInt(localStorage.getItem("loginLockUntil"), 0),
     }
+  },
+
+  // ---------- UI / NAV ----------
+  showModal(id){ $(id).classList.remove("hidden"); },
+  hideModal(id){ $(id).classList.add("hidden"); },
+
+  nav(view, pushHistory=true) {
+    // stop scan if leaving frais
+    if (this.state.scan.active) this.frais.stopScan();
+
+    const current = document.querySelector("main > div:not(.hidden)");
+    if (pushHistory && current) this.state.viewHistory.push(current.id.replace("view-",""));
+
+    document.querySelectorAll("main > div").forEach(v => v.classList.add("hidden"));
+    $("view-"+view).classList.remove("hidden");
+
+    // tabs default visibility
+    if(view === "frais") this.frais.setTab("scan");
+    if(view === "pvp")   this.pvp.setTab("stock");
+  },
+
+  goBack() {
+    if (this.state.viewHistory.length) this.nav(this.state.viewHistory.pop(), false);
+    else this.nav("home", false);
+  },
+
+  toggleGroup(id) {
+    if (this.state.closed.has(id)) this.state.closed.delete(id);
+    else this.state.closed.add(id);
+    localStorage.setItem("closedGroups", JSON.stringify([...this.state.closed]));
+    this.frais.renderList();
+    this.pvp.renderAll();
+  },
+
+  // ---------- FIRESTORE SAVE (debounced) ----------
+  save(section) {
+    const timers = this.state.saveTimers;
+    if (timers[section]) clearTimeout(timers[section]);
+
+    timers[section] = setTimeout(async () => {
+      try {
+        if (section === "users") {
+          await setDoc(docUsers, { list: this.state.data.users }, { merge: true });
+        } else if (section === "frais") {
+          await setDoc(docFrais, { list: this.state.data.frais }, { merge: true });
+        } else if (section === "pvp") {
+          await setDoc(docPVP, { lib: this.state.data.pvpLib, stock: this.state.data.pvpStock, needs: this.state.data.checkedNeeds }, { merge: true });
+        }
+      } catch (e) {
+        console.warn("Save error:", e);
+      }
+    }, 350);
+  },
+
+  // ---------- INIT ----------
+  async init() {
+    // restore session
+    const sess = sessionStorage.getItem("sessionUser");
+    if (sess) {
+      try { this.state.session = JSON.parse(sess); } catch {}
+    }
+
+    await this.load();
+    await this.users.migrateCodesToHashIfNeeded(); // V3 security migration
+    this.bindUI();
+    this.updateUI();
+
+    // auto-login if session ok
+    if (this.state.session?.name) {
+      this.login.finish(this.state.session);
+    }
+  },
+
+  async load() {
+    try {
+      const [uSnap, fSnap, pSnap] = await Promise.all([getDoc(docUsers), getDoc(docFrais), getDoc(docPVP)]);
+
+      if (uSnap.exists()) this.state.data.users = Array.isArray(uSnap.data().list) ? uSnap.data().list : [];
+      if (fSnap.exists()) this.state.data.frais = Array.isArray(fSnap.data().list) ? uSnap.data().list : []; // <-- fixed below after parse
+      if (fSnap.exists()) this.state.data.frais = Array.isArray(fSnap.data().list) ? fSnap.data().list : [];
+      if (pSnap.exists()) {
+        const d = pSnap.data();
+        this.state.data.pvpLib = Array.isArray(d.lib) ? d.lib : [];
+        this.state.data.pvpStock = Array.isArray(d.stock) ? d.stock : [];
+        this.state.data.checkedNeeds = Array.isArray(d.needs) ? d.needs : [];
+      }
+
+      if (!this.state.data.users.length) {
+        // V3: admin par défaut (code migré en hash ensuite)
+        this.state.data.users = [{ name:"MANAGER", code:"2008", role:"admin" }];
+        this.save("users");
+      }
+    } catch (e) {
+      console.warn("Load error:", e);
+      this.state.data.users = [{ name:"MANAGER", code:"2008", role:"admin" }];
+    }
+  },
+
+  // ---------- LOGIN ----------
+  login: {
+    async attempt() {
+      const msg = $("login-msg");
+      msg.textContent = "";
+
+      const st = app.state.login;
+      const now = Date.now();
+      if (st.lockUntil && now < st.lockUntil) {
+        const sec = Math.ceil((st.lockUntil - now)/1000);
+        msg.textContent = `Trop d'essais. Réessaie dans ${sec}s.`;
+        return;
+      }
+
+      const name = $("login-user-select").value;
+      const code = $("login-pass").value || "";
+      const u = app.state.data.users.find(x => x.name === name);
+
+      if (!u) {
+        msg.textContent = "Utilisateur introuvable.";
+        return;
+      }
+
+      // V3: compare hash
+      const inputHash = await sha256Hex(code);
+      const ok = (u.codeHash && u.codeHash === inputHash);
+
+      if (!ok) {
+        st.fails = clampInt(st.fails, 0) + 1;
+        localStorage.setItem("loginFails", String(st.fails));
+
+        if (st.fails >= 5) {
+          st.lockUntil = Date.now() + 30_000; // 30s
+          localStorage.setItem("loginLockUntil", String(st.lockUntil));
+          msg.textContent = "Trop d'erreurs. Verrouillé 30 secondes.";
+        } else {
+          msg.textContent = "Erreur Code.";
+        }
+        return;
+      }
+
+      // success
+      st.fails = 0;
+      st.lockUntil = 0;
+      localStorage.setItem("loginFails", "0");
+      localStorage.setItem("loginLockUntil", "0");
+
+      app.finishLogin({ name: u.name, role: u.role || "staff" });
+    }
+  },
+
+  finishLogin(session) {
+    this.state.session = session;
+    sessionStorage.setItem("sessionUser", JSON.stringify(session));
+    $("login-overlay").classList.add("hidden");
+    $("user-badge").innerText = session.name;
+    $("app-header").classList.remove("hidden");
+    $("app-nav").classList.remove("hidden");
+    if (session.role === "admin") $("btn-team").classList.remove("hidden");
+    this.nav("home", false);
+  },
+
+  logout() {
+    sessionStorage.removeItem("sessionUser");
+    this.state.session = null;
+    $("login-overlay").classList.remove("hidden");
+    $("app-header").classList.add("hidden");
+    $("app-nav").classList.add("hidden");
+    $("btn-team").classList.add("hidden");
+  },
+
+  // ---------- BIND UI ----------
+  bindUI() {
+    // login
+    $("btn-login").addEventListener("click", () => this.login.attempt());
+
+    // nav
+    $("btn-back").addEventListener("click", () => this.goBack());
+    $("btn-home").addEventListener("click", () => this.nav("home", false));
+    $("btn-go-frais").addEventListener("click", () => this.nav("frais"));
+    $("btn-go-pvp").addEventListener("click", () => this.nav("pvp"));
+    $("btn-team").addEventListener("click", () => this.nav("team"));
+
+    // tabs
+    $("tabs-frais").addEventListener("click", (e) => {
+      const t = e.target.closest("[data-tab]")?.dataset?.tab;
+      if (t) this.frais.setTab(t);
+    });
+    $("tabs-pvp").addEventListener("click", (e) => {
+      const t = e.target.closest("[data-tab]")?.dataset?.tab;
+      if (t) this.pvp.setTab(t);
+    });
+
+    // modals close
+    document.body.addEventListener("click", (e) => {
+      const closeId = e.target.closest("[data-close]")?.dataset?.close;
+      if (closeId) this.hideModal(closeId);
+    });
+
+    // frais
+    $("btn-scan").addEventListener("click", () => this.frais.toggleScan());
+    $("frais-ean").addEventListener("input", (e) => this.frais.handleInput(e.target.value));
+    $("btn-add-frais").addEventListener("click", () => this.frais.add());
+
+    $("btn-save-edit-frais").addEventListener("click", () => this.frais.saveEdit());
+    $("btn-del-frais").addEventListener("click", () => this.frais.del());
+
+    // frais list delegation
+    $("frais-list").addEventListener("click", (e) => {
+      const tg = e.target.closest("[data-toggle]");
+      if (tg) return this.toggleGroup(tg.dataset.toggle);
+
+      const bc = e.target.closest("[data-barcode]");
+      if (bc) {
+        const id = Number(bc.dataset.barcode);
+        const i = this.state.data.frais.find(x => x.id === id);
+        if (i) this.common.showBarcode(i.ean, i.name, i.img || null);
+        e.stopPropagation();
+        return;
+      }
+
+      const edit = e.target.closest("[data-edit-frais]");
+      if (edit) {
+        const id = Number(edit.dataset.editFrais);
+        this.frais.openEdit(id);
+      }
+    });
+
+    // users
+    $("btn-add-user").addEventListener("click", () => this.users.add());
+
+    // pvp
+    $("btn-open-lib").addEventListener("click", () => this.pvp.openLib());
+
+    $("btn-photo").addEventListener("click", () => $("cam-input").click());
+    $("cam-input").addEventListener("change", (e) => this.common.compressImg(e.target.files?.[0], (b64) => {
+      $("img-preview").src = b64;
+      $("img-preview").style.display = "block";
+      $("lib-img-data").value = b64;
+    }));
+
+    $("lib-fam-select").addEventListener("change", () => this.pvp.toggleFamInput());
+    $("btn-save-pvp-lib").addEventListener("click", () => this.pvp.saveLib());
+    $("btn-del-pvp-lib").addEventListener("click", () => this.pvp.delLib());
+
+    $("btn-save-stock").addEventListener("click", () => this.pvp.saveStock());
+    $("btn-del-stock").addEventListener("click", () => this.pvp.delStock());
+
+    // pvp lists delegation
+    $("lib-list").addEventListener("click", (e) => {
+      const tg = e.target.closest("[data-toggle]");
+      if (tg) return this.toggleGroup(tg.dataset.toggle);
+
+      const show = e.target.closest("[data-show-barcode-lib]");
+      if (show) {
+        const id = Number(show.dataset.showBarcodeLib);
+        const l = this.state.data.pvpLib.find(x => x.id === id);
+        if (l) this.common.showBarcode(l.ean, l.name, l.img || null);
+        return;
+      }
+      const edit = e.target.closest("[data-edit-lib]");
+      if (edit) return this.pvp.openLib(Number(edit.dataset.editLib));
+      const add = e.target.closest("[data-add-stock]");
+      if (add) return this.pvp.addStock(Number(add.dataset.addStock));
+    });
+
+    $("pvp-stock").addEventListener("click", (e) => {
+      const tg = e.target.closest("[data-toggle]");
+      if (tg) return this.toggleGroup(tg.dataset.toggle);
+
+      const edit = e.target.closest("[data-edit-stock]");
+      if (edit) return this.pvp.openEditStock(Number(edit.dataset.editStock));
+
+      const chg = e.target.closest("[data-change-qty]");
+      if (chg) {
+        const id = Number(chg.dataset.changeQty);
+        const delta = Number(chg.dataset.delta);
+        return this.pvp.changeQty(id, delta);
+      }
+    });
+
+    $("pvp-calc").addEventListener("click", (e) => {
+      const tg = e.target.closest("[data-toggle]");
+      if (tg) return this.toggleGroup(tg.dataset.toggle);
+
+      const need = e.target.closest("[data-toggle-need]");
+      if (need) return this.pvp.toggleNeed(Number(need.dataset.toggleNeed));
+    });
+  },
+
+  updateUI() {
+    // login select
+    const sel = $("login-user-select");
+    clear(sel);
+    for (const u of this.state.data.users) {
+      sel.appendChild(el("option", { value: u.name }, u.name));
+    }
+
+    this.frais.renderList();
+    this.pvp.renderAll();
+    this.users.render();
+    this.checkAlerts();
+  },
+
+  // ---------- COMMON ----------
+  common: {
+    showBarcode(ean, name, imgUrl=null) {
+      $("modal-barcode").classList.remove("hidden");
+      $("bc-name").innerText = name || "";
+      const imgEl = $("bc-img-display");
+      if (imgUrl) { imgEl.src = imgUrl; imgEl.style.display="block"; }
+      else { imgEl.style.display="none"; }
+
+      if (ean) {
+        try { JsBarcode("#barcode", ean, { format:"EAN13", height:80, displayValue:true }); }
+        catch {
+          try { JsBarcode("#barcode", ean, { format:"CODE128", height:80, displayValue:true }); }
+          catch {}
+        }
+      }
+    },
+    parseDateLocal(dateStr) {
+      if(!dateStr) return null;
+      const [y,m,d] = dateStr.split("-").map(Number);
+      return new Date(y, (m-1), d, 12, 0, 0).getTime(); // midi local
+    },
+    dateToInputLocal(ts) {
+      if(!ts) return "";
+      const d = new Date(ts);
+      const y = d.getFullYear();
+      const m = String(d.getMonth()+1).padStart(2,'0');
+      const day = String(d.getDate()).padStart(2,'0');
+      return `${y}-${m}-${day}`;
+    },
+    tsToInput(ts) {
+      const d = new Date(ts);
+      const local = new Date(d.getTime() - (d.getTimezoneOffset() * 60000));
+      return local.toISOString().slice(0,16);
+    },
+    calculateEnd(startTs, hours) {
+      const end = new Date(startTs);
+      const h = Number.parseInt(String(hours), 10);
+      if (h === 0) end.setHours(22, 0, 0, 0);
+      else end.setHours(end.getHours() + h);
+      return end.getTime();
+    },
+    cleanName(name) {
+      return String(name || "").toUpperCase().replace(/^[\d\s\.,xX]+(G|KG|ML|CL|L|P)?\s*/g, "");
+    },
+    compressImg(file, callback) {
+      if (!file) return;
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (e) => {
+        const img = new Image();
+        img.src = e.target.result;
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          const ctx = canvas.getContext("2d");
+          const max = 300;
+          let w = img.width, h = img.height;
+          if (w > h) { if (w > max) { h *= max/w; w = max; } }
+          else { if (h > max) { w *= max/h; h = max; } }
+          canvas.width = w; canvas.height = h;
+          ctx.drawImage(img, 0, 0, w, h);
+          callback(canvas.toDataURL("image/jpeg", 0.5));
+        };
+      };
+    },
+    formatDate(ts) {
+      const d = new Date(ts);
+      if (isNaN(d.getTime())) return "--/--";
+      const h = d.getHours(); const m = d.getMinutes();
+      return `${d.getDate()}/${d.getMonth()+1} ${h<10?'0'+h:h}:${m<10?'0'+m:m}`;
+    }
+  },
+
+  // ---------- FRAIS ----------
+  frais: {
+    setTab(t) {
+      document.querySelectorAll("#tabs-frais .tab").forEach(x => x.classList.remove("active"));
+      document.querySelector(`#tabs-frais .tab[data-tab="${t}"]`)?.classList.add("active");
+
+      $("frais-scan").classList.toggle("hidden", t !== "scan");
+      $("frais-list").classList.toggle("hidden", t !== "list");
+    },
+
+    toggleScan() {
+      if (app.state.scan.active) this.stopScan();
+      else this.startScan();
+    },
+
+    startScan() {
+      app.state.scan.active = true;
+      $("scanner-box").style.display = "block";
+      try {
+        codeReader.decodeFromVideoDevice(null, "video", (result, err) => {
+          if (result) {
+            this.handleInput(result.text);
+            this.stopScan();
+          }
+        });
+      } catch (e) {
+        alert("Caméra indisponible.");
+        this.stopScan();
+      }
+    },
+
+    stopScan() {
+      app.state.scan.active = false;
+      $("scanner-box").style.display = "none";
+      try { codeReader.reset(); } catch {}
+    },
+
+    handleInput(val) {
+      const clean = sanitizeEan(val);
+      $("frais-ean").value = clean;
+
+      // debounce + fetch only when 13 digits
+      if (app.state.off.timer) clearTimeout(app.state.off.timer);
+      app.state.off.timer = setTimeout(() => {
+        if (clean.length === 13) this.api(clean);
+      }, 250);
+    },
+
+    async api(ean) {
+      const cache = app.state.off.cache;
+      if (cache.has(ean)) {
+        const d = cache.get(ean);
+        $("frais-name").value = d.name || "";
+        this.imgUrl = d.img || "";
+        return;
+      }
+
+      if (app.state.off.ctrl) app.state.off.ctrl.abort();
+      app.state.off.ctrl = new AbortController();
+
+      try {
+        const r = await fetch(`https://world.openfoodfacts.org/api/v0/product/${ean}.json`, { signal: app.state.off.ctrl.signal });
+        const d = await r.json();
+        if (d?.status === 1) {
+          const name = d.product?.product_name_fr || "";
+          const img  = d.product?.image_front_small_url || "";
+          $("frais-name").value = name;
+          this.imgUrl = img;
+          cache.set(ean, { name, img });
+        }
+      } catch {}
+    },
+
+    imgUrl: "",
+
+    add() {
+      const ean = sanitizeEan($("frais-ean").value);
+      const fam = $("frais-fam").value;
+      const name = String($("frais-name").value || "").trim();
+      const qty = clampInt($("frais-qty").value, 0);
+      const date = app.common.parseDateLocal($("frais-date").value);
+
+      if (!name || !date) return alert("Nom + Date requis");
+
+      const o = { id: Date.now(), ean, fam, name, qty, date, img: this.imgUrl || "" };
+      app.state.data.frais.push(o);
+      app.save("frais");
+      app.checkAlerts();
+      alert("Ajouté");
+
+      this.imgUrl = "";
+      $("frais-name").value = "";
+      $("frais-ean").value = "";
+      $("frais-qty").value = "";
+    },
+
+    renderList() {
+      const div = $("frais-list");
+      clear(div);
+
+      const items = [...app.state.data.frais].sort((a,b) => {
+        if ((a.fam||"") !== (b.fam||"")) return String(a.fam||"").localeCompare(String(b.fam||""));
+        return (a.date||0) - (b.date||0);
+      });
+
+      const grp = new Map();
+      for (const i of items) {
+        const f = i.fam || "DIVERS";
+        if (!grp.has(f)) grp.set(f, []);
+        grp.get(f).push(i);
+      }
+
+      for (const [fam, list] of grp.entries()) {
+        const gid = `F-${fam}`;
+        const closed = app.state.closed.has(gid);
+
+        div.appendChild(
+          el("div", { class:"group-header", dataset:{ toggle: gid } },
+            el("span", {}, fam),
+            el("i", { class: `fas fa-chevron-${closed ? "right":"down"}` })
+          )
+        );
+
+        if (closed) continue;
+
+        for (const i of list) {
+          const d = new Date(i.date);
+          let badge = "bg-grey";
+          if (!isNaN(d.getTime())) {
+            const diff = (d - new Date())/(1000*60*60*24);
+            badge = diff < 0 ? "bg-red" : (diff < 2 ? "bg-orange" : "bg-green");
+          }
+
+          const imgNode = i.img
+            ? el("img", { class:"item-img", src:i.img, alt:"", dataset:{ barcode: i.id } })
+            : el("div", { class:"item-img", dataset:{ barcode: i.id } }, el("i", { class:"fas fa-barcode" }));
+
+          const line = el("div", { class:"swipe-wrapper" },
+            el("div", { class:"swipe-content", dataset:{ editFrais: i.id } },
+              el("div", { style:"display:flex;align-items:center;flex:1;" },
+                imgNode,
+                el("div", { class:"item-info" },
+                  el("div", { class:"item-title" }, i.name || ""),
+                  el("span", {}, `x${i.qty ?? ""}`)
+                )
+              ),
+              el("div", { class:`date-badge ${badge}` },
+                el("span", {}, !isNaN(d.getTime()) ? String(d.getDate()) : "?"),
+                el("span", { style:"font-size:10px;" }, !isNaN(d.getTime()) ? d.toLocaleString("fr",{month:"short"}) : "Err")
+              )
+            )
+          );
+
+          div.appendChild(line);
+        }
+      }
+    },
+
+    openEdit(id) {
+      const i = app.state.data.frais.find(x => x.id === id);
+      if (!i) return;
+
+      $("edit-id").value = String(id);
+      $("edit-famille").value = i.fam || "DIVERS";
+      $("edit-qty").value = String(i.qty ?? 0);
+      $("edit-name").value = i.name || "";
+      $("edit-ean").value = sanitizeEan(i.ean);
+      $("edit-date").value = app.common.dateToInputLocal(i.date);
+
+      app.showModal("modal-edit-frais");
+    },
+
+    saveEdit() {
+      const id = Number($("edit-id").value);
+      const idx = app.state.data.frais.findIndex(x => x.id === id);
+      if (idx < 0) return;
+
+      app.state.data.frais[idx].fam  = $("edit-famille").value;
+      app.state.data.frais[idx].qty  = clampInt($("edit-qty").value, 0);
+      app.state.data.frais[idx].name = String($("edit-name").value || "").trim();
+      app.state.data.frais[idx].ean  = sanitizeEan($("edit-ean").value);
+      app.state.data.frais[idx].date = app.common.parseDateLocal($("edit-date").value);
+
+      app.save("frais");
+      app.checkAlerts();
+      app.hideModal("modal-edit-frais");
+      this.renderList();
+    },
+
+    del() {
+      const id = Number($("edit-id").value);
+      app.state.data.frais = app.state.data.frais.filter(x => x.id !== id);
+      app.save("frais");
+      app.checkAlerts();
+      app.hideModal("modal-edit-frais");
+      this.renderList();
+    }
+  },
+
+  // ---------- PVP ----------
+  pvp: {
+    setTab(t) {
+      document.querySelectorAll("#tabs-pvp .tab").forEach(x => x.classList.remove("active-pvp"));
+      document.querySelector(`#tabs-pvp .tab[data-tab="${t}"]`)?.classList.add("active-pvp");
+
+      $("pvp-stock").classList.toggle("hidden", t !== "stock");
+      $("pvp-bib").classList.toggle("hidden", t !== "bib");
+      $("pvp-calc").classList.toggle("hidden", t !== "calc");
+      this.renderAll();
+    },
+
+    toggleFamInput() {
+      const val = $("lib-fam-select").value;
+      $("lib-fam-new").classList.toggle("hidden", val !== "new");
+    },
+
+    renderAll() {
+      this.renderBib();
+      this.renderStock();
+      this.renderNeeds();
+    },
+
+    openLib(id=null) {
+      // fill familles
+      const fams = [...new Set(app.state.data.pvpLib.map(i => i.family || "DIVERS"))].sort();
+      const sel = $("lib-fam-select");
+      clear(sel);
+      for (const f of fams) sel.appendChild(el("option", { value:f }, f));
+      sel.appendChild(el("option", { value:"new" }, "+ Créer..."));
+
+      if (id) {
+        const i = app.state.data.pvpLib.find(x => x.id === id);
+        if (!i) return;
+        $("lib-id").value = String(i.id);
+        $("lib-name").value = i.name || "";
+        $("lib-ean").value = sanitizeEan(i.ean);
+        $("lib-days").value = String(i.days ?? 0);
+        $("lib-img-data").value = i.img || "";
+        if (i.img) { $("img-preview").src = i.img; $("img-preview").style.display = "block"; }
+        else { $("img-preview").style.display = "none"; }
+        sel.value = i.family || "DIVERS";
+        for (let k=0;k<7;k++) $("t-"+k).value = (i.targets||{})[k] ?? "";
+      } else {
+        $("lib-id").value = "";
+        $("lib-name").value = "";
+        $("lib-ean").value = "";
+        $("lib-days").value = "0";
+        $("lib-img-data").value = "";
+        $("img-preview").style.display = "none";
+        sel.value = fams[0] || "DIVERS";
+        for (let k=0;k<7;k++) $("t-"+k).value = "";
+      }
+
+      this.toggleFamInput();
+      app.showModal("modal-pvp-lib");
+    },
+
+    saveLib() {
+      const rawId = $("lib-id").value;
+      const id = rawId ? Number(rawId) : Date.now();
+
+      const famSel = $("lib-fam-select").value;
+      const fam = (famSel === "new" ? $("lib-fam-new").value : famSel).toUpperCase().trim() || "DIVERS";
+
+      const o = {
+        id,
+        family: fam,
+        name: String($("lib-name").value || "").trim(),
+        ean: sanitizeEan($("lib-ean").value),
+        img: $("lib-img-data").value || "",
+        days: clampInt($("lib-days").value, 0),
+        targets: {}
+      };
+
+      for (let k=0;k<7;k++) o.targets[k] = clampInt($("t-"+k).value, 0);
+
+      if (!o.name) return alert("Nom requis");
+
+      const idx = app.state.data.pvpLib.findIndex(x => x.id === id);
+      if (idx >= 0) app.state.data.pvpLib[idx] = o;
+      else app.state.data.pvpLib.push(o);
+
+      app.save("pvp");
+      app.hideModal("modal-pvp-lib");
+      this.renderAll();
+    },
+
+    delLib() {
+      const id = Number($("lib-id").value);
+      app.state.data.pvpLib = app.state.data.pvpLib.filter(x => x.id !== id);
+      // remove stock entries referencing lib
+      app.state.data.pvpStock = app.state.data.pvpStock.filter(s => s.libId !== id);
+      app.state.data.checkedNeeds = app.state.data.checkedNeeds.filter(x => x !== id);
+
+      app.save("pvp");
+      app.hideModal("modal-pvp-lib");
+      this.renderAll();
+    },
+
+    addStock(libId) {
+      const l = app.state.data.pvpLib.find(x => x.id === libId);
+      if (!l) return;
+      const q = clampInt(prompt("Quantité ?", "1"), 0);
+      if (q <= 0) return;
+
+      const now = Date.now();
+      const endTs = app.common.calculateEnd(now, l.days);
+
+      app.state.data.pvpStock.push({
+        id: Date.now(),
+        libId,
+        name: l.name,
+        ean: l.ean,
+        qty: q,
+        out: now,
+        end: endTs,
+        days: l.days
+      });
+
+      app.save("pvp");
+      this.renderStock();
+    },
+
+    openEditStock(id) {
+      const i = app.state.data.pvpStock.find(x => x.id === id);
+      if (!i) return;
+
+      $("stock-id").value = String(i.id);
+      $("stock-name").innerText = i.name || "";
+      $("stock-qty").value = String(i.qty ?? 0);
+      $("stock-start").value = app.common.tsToInput(i.out);
+      $("stock-end").value = app.common.tsToInput(i.end);
+
+      app.showModal("modal-pvp-stock");
+    },
+
+    saveStock() {
+      const id = Number($("stock-id").value);
+      const idx = app.state.data.pvpStock.findIndex(x => x.id === id);
+      if (idx < 0) return;
+
+      app.state.data.pvpStock[idx].qty = clampInt($("stock-qty").value, 0);
+      app.state.data.pvpStock[idx].out = new Date($("stock-start").value).getTime();
+      app.state.data.pvpStock[idx].end = new Date($("stock-end").value).getTime();
+
+      app.save("pvp");
+      app.hideModal("modal-pvp-stock");
+      this.renderStock();
+    },
+
+    delStock() {
+      const id = Number($("stock-id").value);
+      app.state.data.pvpStock = app.state.data.pvpStock.filter(x => x.id !== id);
+      app.save("pvp");
+      app.hideModal("modal-pvp-stock");
+      this.renderStock();
+    },
+
+    changeQty(id, delta) {
+      const idx = app.state.data.pvpStock.findIndex(x => x.id === id);
+      if (idx < 0) return;
+      const n = clampInt(app.state.data.pvpStock[idx].qty, 0) + delta;
+      if (n <= 0) app.state.data.pvpStock.splice(idx, 1);
+      else app.state.data.pvpStock[idx].qty = n;
+      app.save("pvp");
+      this.renderStock();
+    },
+
+    toggleNeed(libId) {
+      const arr = app.state.data.checkedNeeds;
+      const idx = arr.indexOf(libId);
+      if (idx >= 0) arr.splice(idx, 1);
+      else arr.push(libId);
+      app.save("pvp");
+      this.renderNeeds();
+    },
+
+    renderBib() {
+      const bib = $("lib-list");
+      clear(bib);
+
+      const sorted = [...app.state.data.pvpLib].sort((a,b) =>
+        app.common.cleanName(a.name).localeCompare(app.common.cleanName(b.name))
+      );
+
+      const g = new Map();
+      for (const l of sorted) {
+        const f = l.family || "DIVERS";
+        if (!g.has(f)) g.set(f, []);
+        g.get(f).push(l);
+      }
+
+      for (const [fam, list] of [...g.entries()].sort((a,b)=>a[0].localeCompare(b[0]))) {
+        const gid = `L-${fam}`;
+        const closed = app.state.closed.has(gid);
+
+        bib.appendChild(
+          el("div", { class:"group-header", dataset:{ toggle: gid } },
+            el("span", {}, fam),
+            el("i", { class:`fas fa-chevron-${closed?"right":"down"}` })
+          )
+        );
+        if (closed) continue;
+
+        for (const l of list) {
+          const imgNode = l.img
+            ? el("img", { class:"item-img", src:l.img, alt:"", dataset:{ showBarcodeLib: l.id } })
+            : el("div", { class:"item-img", dataset:{ showBarcodeLib: l.id } }, el("i", { class:"fas fa-bread-slice" }));
+
+          const row = el("div", { class:"list-item" },
+            el("div", { style:"display:flex;align-items:center;" },
+              imgNode,
+              el("div", {},
+                el("b", {}, l.name || ""),
+                el("br"),
+                el("small", {}, `${clampInt(l.days,0)}h`)
+              )
+            ),
+            el("div", { style:"display:flex;gap:10px;" },
+              el("button", { class:"qty-btn", style:"background:var(--pvp);color:white;width:40px;height:40px;", dataset:{ editLib: l.id } }, el("i",{class:"fas fa-pen"})),
+              el("button", { class:"qty-btn", style:"background:var(--pvp);color:white;width:40px;height:40px;", dataset:{ addStock: l.id } }, "+")
+            )
+          );
+          bib.appendChild(row);
+        }
+      }
+    },
+
+    renderStock() {
+      const st = $("pvp-stock");
+      clear(st);
+
+      const stock = [...app.state.data.pvpStock].sort((a,b) => (a.end||0)-(b.end||0));
+      const g = new Map();
+
+      for (const s of stock) {
+        const lib = app.state.data.pvpLib.find(x => x.id === s.libId);
+        const fam = lib?.family || "DIVERS";
+        if (!g.has(fam)) g.set(fam, []);
+        g.get(fam).push(s);
+      }
+
+      for (const [fam, list] of [...g.entries()].sort((a,b)=>a[0].localeCompare(b[0]))) {
+        const gid = `S-${fam}`;
+        const closed = app.state.closed.has(gid);
+
+        st.appendChild(
+          el("div", { class:"group-header", style:"background:var(--pvp)", dataset:{ toggle: gid } },
+            el("span", {}, fam),
+            el("i", { class:`fas fa-chevron-${closed?"right":"down"}` })
+          )
+        );
+        if (closed) continue;
+
+        for (const i of list) {
+          const dS = app.common.formatDate(i.out);
+          const dE = app.common.formatDate(i.end);
+          const isExp = new Date(i.end) < new Date();
+
+          const lib = app.state.data.pvpLib.find(x => x.id === i.libId);
+          const img = lib?.img || "";
+
+          const imgNode = img
+            ? el("img", { class:"item-img", src:img, alt:"" })
+            : el("div", { class:"item-img" }, el("i",{class:"fas fa-bread-slice"}));
+
+          const row = el("div", { class:"swipe-wrapper" },
+            el("div", { class:"swipe-content" },
+              el("div", { style:"display:flex;align-items:center;flex:1;" },
+                imgNode,
+                el("div", {},
+                  el("div", { class:"item-title", dataset:{ editStock: i.id } }, i.name || ""),
+                  el("div", { class:"qty-ctrl" },
+                    el("button", { class:"qty-btn", dataset:{ changeQty: i.id, delta: -1 } }, "-"),
+                    el("b", {}, String(i.qty ?? 0)),
+                    el("button", { class:"qty-btn", dataset:{ changeQty: i.id, delta: 1 } }, "+")
+                  )
+                )
+              ),
+              el("div", { class:"date-col" },
+                el("div", { class:"d-lbl" }, `Sortie: ${dS}`),
+                el("div", { class:`d-val ${isExp?"expired":""}` }, `FIN: ${dE}`)
+              )
+            )
+          );
+
+          st.appendChild(row);
+        }
+      }
+    },
+
+    renderNeeds() {
+      const cl = $("pvp-calc");
+      clear(cl);
+
+      const tom = new Date(); tom.setDate(tom.getDate()+1);
+      const gTodo = new Map();
+      let doneFrag = document.createDocumentFragment();
+      let hasNeeds = false;
+
+      for (const l of app.state.data.pvpLib) {
+        const target = clampInt((l.targets||{})[tom.getDay()] || 0, 0);
+        if (target <= 0) continue;
+
+        hasNeeds = true;
+        const isC = app.state.data.checkedNeeds.includes(l.id);
+
+        const imgNode = l.img
+          ? el("img", { class:"item-img", src:l.img, alt:"" })
+          : el("div", { class:"item-img" }, el("i",{class:"fas fa-bread-slice"}));
+
+        const row = el("div", { class:`list-item ${isC?"item-done":""}`, style:"border-left:5px solid var(--pvp);" },
+          el("div", { style:"display:flex;align-items:center;flex:1;" },
+            imgNode,
+            el("div", {},
+              el("div", { class:"item-title" }, l.name || ""),
+              el("div", { style:"color:var(--pvp);font-weight:bold;" }, `A SORTIR : ${target}`)
+            )
+          ),
+          el("div", { class:`todo-check ${isC?"checked":""}`, dataset:{ toggleNeed: l.id } }, el("i",{class:"fas fa-check"}))
+        );
+
+        if (isC) doneFrag.appendChild(row);
+        else {
+          const fam = l.family || "DIVERS";
+          if (!gTodo.has(fam)) gTodo.set(fam, []);
+          gTodo.get(fam).push(row);
+        }
+      }
+
+      cl.appendChild(el("h4", { style:"text-align:center;color:var(--primary);" }, "À SORTIR DEMAIN"));
+
+      if (!hasNeeds) {
+        cl.appendChild(el("p", { style:"text-align:center;color:#999" }, "Rien de prévu"));
+      } else {
+        for (const [fam, rows] of [...gTodo.entries()].sort((a,b)=>a[0].localeCompare(b[0]))) {
+          const gid = `N-${fam}`;
+          const closed = app.state.closed.has(gid);
+
+          cl.appendChild(
+            el("div", { class:"group-header", style:"background:var(--primary)", dataset:{ toggle: gid } },
+              el("span", {}, fam),
+              el("i", { class:`fas fa-chevron-${closed?"right":"down"}` })
+            )
+          );
+
+          if (!closed) {
+            for (const r of rows) cl.appendChild(r);
+          }
+        }
+      }
+
+      cl.appendChild(el("h4", { style:"text-align:center;color:#64748b;margin-top:20px;" }, "TERMINÉ"));
+      if (doneFrag.childNodes.length) cl.appendChild(doneFrag);
+      else cl.appendChild(el("p", { style:"text-align:center;color:#ccc;" }, "Rien de fait"));
+    }
+  },
+
+  // ---------- USERS (admin) ----------
+  users: {
+    async migrateCodesToHashIfNeeded() {
+      let changed = false;
+      for (const u of app.state.data.users) {
+        if (!u.codeHash && u.code) {
+          u.codeHash = await sha256Hex(String(u.code));
+          delete u.code;
+          changed = true;
+        }
+      }
+      if (changed) app.save("users");
+    },
+
+    async add() {
+      const n = String($("new-u-name").value || "").toUpperCase().trim();
+      const code = String($("new-u-code").value || "").trim();
+      if (!n || !code) return;
+
+      // avoid duplicates
+      if (app.state.data.users.some(u => u.name === n)) return alert("Nom déjà existant");
+
+      const codeHash = await sha256Hex(code);
+      app.state.data.users.push({ name: n, codeHash, role: "staff" });
+      app.save("users");
+
+      $("new-u-name").value = "";
+      $("new-u-code").value = "";
+      this.render();
+    },
+
+    render() {
+      const l = $("user-list");
+      clear(l);
+      for (const u of app.state.data.users) {
+        l.appendChild(
+          el("div", { style:"padding:10px;border-bottom:1px solid #eee;" },
+            el("b", {}, u.name),
+            document.createTextNode(" (Code: ****) "),
+            u.role === "admin" ? el("span", { style:"color:#00563f;font-weight:bold;" }, "(Admin)") : el("span", { style:"color:#64748b;" }, "(Staff)")
+          )
+        );
+      }
+    }
+  },
+
+  // ---------- ALERTS ----------
+  checkAlerts() {
+    const alert = app.state.data.frais.some(i => {
+      const d = new Date(i.date);
+      return !isNaN(d.getTime()) && ((d - new Date())/(1000*60*60*24) < 1);
+    });
+    $("alert-box").style.display = alert ? "block" : "none";
+  }
 };
 
-window.app.init();
+// expose for debug
+window.app = app;
+
+app.init();
 </script>
+
 </body>
 </html>
