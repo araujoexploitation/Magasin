@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
 <meta name="theme-color" content="#ffffff" />
-<title>Araujo v82 Clean</title>
+<title>Araujo v83 (Fix ToDo & Dates)</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 <script src="https://unpkg.com/@zxing/library@latest"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
@@ -35,28 +35,28 @@
   .tab.active { background: white; color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
   .tab.active-pvp { background: white; color: var(--pvp); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
 
-  /* --- LISTS & GROUPS --- */
+  /* --- LISTS --- */
   .group-header { background: #334155; color: white; padding: 12px 15px; border-radius: 10px; margin-top: 15px; font-weight: bold; text-transform: uppercase; font-size: 14px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
   .group-content { display: block; }
   .group-content.closed { display: none; }
   
-  .list-item { background: white; border-radius: 12px; padding: 12px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 1px 3px rgba(0,0,0,0.05); position: relative; overflow: hidden; min-height: 80px; }
+  .list-item { background: white; border-radius: 12px; padding: 12px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 1px 3px rgba(0,0,0,0.05); min-height: 80px; }
   
-  /* Swipe Container (Frais/Stock) */
+  /* Swipe Wrapper */
   .swipe-wrapper { background: #ef4444; border-radius: 12px; margin-bottom: 8px; overflow: hidden; }
   .swipe-content { background: white; position: relative; z-index: 2; transition: transform 0.2s; padding: 12px; display: flex; align-items: center; justify-content: space-between; min-height: 80px; width: 100%; }
 
   .item-img { width: 55px; height: 55px; border-radius: 10px; object-fit: cover; background: #f1f5f9; margin-right: 12px; flex-shrink: 0; display:flex; align-items:center; justify-content:center; color:#cbd5e1; font-size: 20px; }
-  .item-info { flex: 1; overflow: hidden; }
-  .item-title { font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .item-info { flex: 1; overflow: hidden; margin-right: 10px; }
+  .item-title { font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 15px; margin-bottom: 4px; }
   
-  /* PVP Stock Controls */
-  .qty-ctrl { display: flex; align-items: center; gap: 10px; margin-top: 5px; background: #f8fafc; width: fit-content; padding: 4px 8px; border-radius: 8px; border: 1px solid #e2e8f0; }
+  /* Stock Controls & Dates */
+  .qty-ctrl { display: flex; align-items: center; gap: 10px; background: #f8fafc; width: fit-content; padding: 4px 8px; border-radius: 8px; border: 1px solid #e2e8f0; }
   .qty-btn { width: 30px; height: 30px; border-radius: 6px; border: none; background: white; box-shadow: 0 2px 3px rgba(0,0,0,0.1); font-weight: bold; color: var(--primary); font-size: 16px; }
 
-  /* Dates */
-  .date-col { text-align: right; min-width: 85px; display: flex; flex-direction: column; justify-content: center; }
-  .d-lbl { font-size: 10px; color: #94a3b8; }
+  /* FIXED DATE DISPLAY */
+  .date-col { text-align: right; width: 110px; flex-shrink: 0; display: flex; flex-direction: column; justify-content: center; }
+  .d-lbl { font-size: 11px; color: #64748b; margin-bottom: 2px; }
   .d-val { font-size: 13px; font-weight: 800; color: var(--success); }
   .d-val.expired { color: var(--danger); }
   
@@ -65,10 +65,10 @@
   .bg-red { background: #ef4444; } .bg-orange { background: #f59e0b; } .bg-green { background: #10b981; } .bg-grey { background: #94a3b8; }
 
   /* To-Do List */
-  .todo-check { width: 32px; height: 32px; border: 2px solid #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; margin-left: 15px; transition:0.2s; }
+  .todo-check { width: 36px; height: 36px; border: 2px solid #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; margin-left: 15px; cursor: pointer; transition: 0.2s; }
   .todo-check.checked { background: var(--success); border-color: var(--success); color: white; }
-  .item-done { opacity: 0.5; filter: grayscale(1); background: #f8fafc; }
-  .item-done .item-title { text-decoration: line-through; }
+  .item-done { opacity: 0.6; background: #f8fafc; }
+  .item-done .item-title { text-decoration: line-through; color: #94a3b8; }
 
   /* Modals */
   .modal-bc { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
@@ -244,6 +244,12 @@ window.app = {
                     callback(canvas.toDataURL('image/jpeg', 0.5));
                 };
             };
+        },
+        formatDate: function(ts) {
+            let d = new Date(ts);
+            if(isNaN(d.getTime())) return "--/--";
+            let h = d.getHours(); let m = d.getMinutes();
+            return `${d.getDate()}/${d.getMonth()+1} ${h<10?'0'+h:h}:${m<10?'0'+m:m}`;
         }
     },
 
@@ -434,7 +440,7 @@ window.app = {
         toggleNeed: function(libId) {
             let idx = window.app.data.checkedNeeds.indexOf(libId);
             if(idx > -1) window.app.data.checkedNeeds.splice(idx, 1); else window.app.data.checkedNeeds.push(libId);
-            window.app.save('pvp');
+            window.app.save('pvp'); this.render(); /* Force update */
         },
         render: function() {
             // BIBLIO
@@ -462,20 +468,22 @@ window.app = {
                 let id = 'S-'+f; let c = window.app.closed.has(id);
                 st.innerHTML += `<div class="group-header" style="background:var(--pvp)" onclick="app.toggleFam('${id}')"><span>${f}</span><i class="fas fa-chevron-${c?'right':'down'}"></i></div>`;
                 if(!c) gStock[f].forEach(i => {
-                    let dS = new Date(i.out), dE = new Date(i.end), isExp = dE < new Date();
+                    let dS = window.app.common.formatDate(i.out);
+                    let dE = window.app.common.formatDate(i.end);
+                    let isExp = new Date(i.end) < new Date();
                     let l = window.app.data.pvpLib.find(x=>x.id==i.libId), img = l?l.img:null;
                     let displayImg = img ? `<img src="${img}" class="item-img">` : `<div class="item-img"><i class="fas fa-bread-slice"></i></div>`;
                     st.innerHTML += `
                     <div class="swipe-wrapper"><div class="swipe-content">
                         <div style="display:flex;align-items:center;flex:1;">${displayImg}
-                        <div><div style="font-weight:bold;" onclick="app.pvp.openEditStock(${i.id})">${i.name}</div>
+                        <div><div class="item-title" onclick="app.pvp.openEditStock(${i.id})">${i.name}</div>
                         <div class="qty-ctrl"><button class="qty-btn" onclick="app.pvp.changeQty(${i.id},-1)">-</button><b>${i.qty}</b><button class="qty-btn" onclick="app.pvp.changeQty(${i.id},1)">+</button></div></div></div>
-                        <div class="date-col"><div class="d-lbl">Sortie: ${dS.getDate()}/${dS.getMonth()+1}</div><div class="d-val ${isExp?'expired':''}">FIN: ${dE.getHours()}H${dE.getMinutes()||'00'}</div></div>
+                        <div class="date-col"><div class="d-lbl">Sortie: ${dS}</div><div class="d-val ${isExp?'expired':''}">FIN: ${dE}</div></div>
                     </div></div>`;
                 });
             });
 
-            // BESOINS (Simple Target)
+            // BESOINS
             let cl = document.getElementById('pvp-calc');
             let tom = new Date(); tom.setDate(tom.getDate()+1); 
             let gTodo = {}; let doneH = ""; let hasNeeds = false;
@@ -491,9 +499,7 @@ window.app = {
                         <div style="display:flex;align-items:center;flex:1;">${img}<div><div class="item-title">${l.name}</div><div style="color:var(--pvp);font-weight:bold;">A SORTIR : ${target}</div></div></div>
                         <div class="todo-check ${isC?'checked':''}" onclick="app.pvp.toggleNeed(${l.id})"><i class="fas fa-check"></i></div>
                     </div>`;
-                    
-                    if(isC) doneH += h;
-                    else { let f = l.family||"DIVERS"; if(!gTodo[f]) gTodo[f]=[]; gTodo[f].push(h); }
+                    if(isC) doneH += h; else { let f = l.family||"DIVERS"; if(!gTodo[f]) gTodo[f]=[]; gTodo[f].push(h); }
                 }
             });
             
