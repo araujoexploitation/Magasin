@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
 <meta name="theme-color" content="#ffffff" />
-<title>Araujo Exploitation v71</title>
+<title>Araujo Exploitation v72</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 <script src="https://unpkg.com/@zxing/library@latest"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
@@ -47,15 +47,17 @@
   .btn { width: 100%; padding: 16px; border-radius: 12px; border: none; font-weight: 700; font-size: 16px; background: var(--primary); color: white; cursor: pointer; margin-top: 5px; }
   .btn-orange { background: var(--pvp); } .btn-red { background: #ef4444; }
 
-  /* PVP SPECIFIC */
+  /* LIST ITEMS */
+  .group-header { background: #334155; color: white; padding: 8px 15px; border-radius: 8px 8px 0 0; margin-top: 20px; font-weight: bold; text-transform: uppercase; font-size: 12px; }
+  .swipe-wrapper { background: #ef4444; overflow: hidden; margin-bottom: 1px; }
+  
+  /* PVP STYLES */
   .pvp-row-container { position: relative; overflow: hidden; margin-bottom: 10px; background: #fee2e2; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
   .pvp-row-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; padding-left: 20px; color: #ef4444; font-weight: bold; font-size: 14px; z-index: 1; }
   .pvp-item { position: relative; z-index: 2; background: white; display: flex; justify-content: space-between; align-items: center; padding: 15px; width: 100%; border-radius: 12px; will-change: transform; }
-  .wek-img { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; background: #f1f5f9; margin-right: 15px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #cbd5e1; flex-shrink: 0; }
+  .wek-img { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; background: #f1f5f9; margin-right: 15px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #cbd5e1; flex-shrink: 0; cursor: pointer; }
   
-  /* FRAIS LIST */
-  .group-header { background: #334155; color: white; padding: 8px 15px; border-radius: 8px 8px 0 0; margin-top: 20px; font-weight: bold; text-transform: uppercase; font-size: 12px; }
-  .swipe-wrapper { background: #ef4444; overflow: hidden; margin-bottom: 1px; }
+  /* FRAIS STYLES */
   .wek-item-frais { background: white; padding: 15px; display: flex; align-items: center; justify-content: space-between; position: relative; z-index: 2; transition: transform 0.2s; }
   .date-badge { width: 50px; height: 50px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; font-weight: bold; flex-shrink: 0; margin-left: 10px; }
   .badge-red { background: #ef4444; } .badge-orange { background: #f59e0b; } .badge-green { background: #10b981; }
@@ -64,7 +66,7 @@
   .home-btn { padding: 30px 10px; text-align: center; border-radius: 16px; color: white; cursor: pointer; font-weight: bold; }
 
   /* MODALS */
-  .modal-bc { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 3000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+  .modal-bc { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 4000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
   .modal-card { background: white; padding: 25px; border-radius: 20px; width: 100%; max-width: 400px; max-height: 85vh; overflow-y: auto; }
   #img-preview { width: 100px; height: 100px; object-fit: cover; border-radius: 10px; margin: 10px auto; display: none; border: 2px solid #ddd; }
 </style>
@@ -101,11 +103,15 @@
 
   <div id="modal-pvp-lib" class="modal-bc hidden">
     <div class="modal-card">
-        <h3 style="color:#d97706">Créer Produit PVP</h3>
+        <h3 style="color:#d97706">Produit PVP</h3>
         <input type="hidden" id="lib-id"> 
         <input type="hidden" id="lib-img-data">
         
-        <label>Nom du Produit (Requis)</label><input type="text" id="lib-name" placeholder="Ex: Baguette">
+        <label>Famille</label>
+        <select id="lib-fam-select" onchange="app.pvp.toggleFamInput()"></select>
+        <input type="text" id="lib-fam-new" placeholder="Nom de la nouvelle famille..." class="hidden">
+
+        <label>Nom du Produit (Requis)</label><input type="text" id="lib-name" placeholder="Ex: Donut Sucre">
         <label>EAN (Code Barre)</label><input type="number" id="lib-ean">
         
         <label>Photo</label>
@@ -120,7 +126,7 @@
             <option value="72">72 Heures</option>
         </select>
         
-        <label>Objectif (Lundi -> Dimanche)</label>
+        <label>Objectif (Lun -> Dim)</label>
         <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;">
             <input type="number" id="t-1" placeholder="L" style="padding:5px;font-size:12px;text-align:center;">
             <input type="number" id="t-2" placeholder="M" style="padding:5px;font-size:12px;text-align:center;">
@@ -147,7 +153,7 @@
           <label style="margin-top:15px;color:#000">Date Sortie</label>
           <input type="datetime-local" id="stock-start">
           
-          <label style="color:#ef4444">Date Fin (Calculée)</label>
+          <label style="color:#ef4444">Date Fin</label>
           <input type="datetime-local" id="stock-end">
           
           <button class="btn" onclick="app.pvp.saveStock()" style="background:#d97706;">Valider</button>
@@ -232,7 +238,7 @@ window.app = {
     // UTILS
     common: {
         showBarcode: function(ean, name) { 
-            if(!ean) return alert("Pas d'EAN");
+            if(!ean) return alert("Pas d'EAN enregistré");
             document.getElementById('modal-barcode').classList.remove('hidden'); 
             document.getElementById('bc-name').innerText=name; 
             try{JsBarcode("#barcode", ean, {format:"EAN13", height:80, displayValue:true});}catch(e){try{JsBarcode("#barcode", ean, {format:"CODE128", height:80, displayValue:true});}catch(e2){}}
@@ -241,19 +247,12 @@ window.app = {
             let d = new Date(ts);
             return new Date(d.getTime() - (d.getTimezoneOffset() * 60000)).toISOString().slice(0, 16);
         },
-        // LOGIQUE DATE DE FIN
         calculateEnd: function(startTs, hours) {
             let start = new Date(startTs);
             let end = new Date(startTs);
             let h = parseInt(hours);
-            
-            if (h === 0) {
-                // REGLE JOURNEE : MORT A 22H LE JOUR MEME
-                end.setHours(22, 0, 0, 0);
-            } else {
-                // REGLE STRICTE 48H/72H
-                end.setHours(end.getHours() + h);
-            }
+            if (h === 0) { end.setHours(22, 0, 0, 0); } 
+            else { end.setHours(end.getHours() + h); }
             return end.getTime();
         }
     },
@@ -356,9 +355,7 @@ window.app = {
                 div.innerHTML += `<div class="group-header">${f}</div>`;
                 grp[f].forEach(i => {
                     let d = new Date(i.date);
-                    let today = new Date(); today.setHours(0,0,0,0);
-                    let target = new Date(i.date); target.setHours(0,0,0,0);
-                    let diff = (target - today)/(1000*60*60*24);
+                    let diff = (d - new Date())/(1000*60*60*24);
                     let badge = diff<0?'badge-red':(diff<2?'badge-orange':'badge-green');
                     let img = i.img ? `<img src="${i.img}" class="wek-img" onclick="event.stopPropagation(); window.app.common.showBarcode('${i.ean}','${i.name.replace(/'/g," ")}')">` : `<div class="wek-img" onclick="event.stopPropagation(); window.app.common.showBarcode('${i.ean}','${i.name.replace(/'/g," ")}')"><i class="fas fa-barcode"></i></div>`;
                     
@@ -423,9 +420,20 @@ window.app = {
                 r.readAsDataURL(input.files[0]);
             }
         },
+        toggleFamInput: function() {
+            let val = document.getElementById('lib-fam-select').value;
+            if(val === 'new') document.getElementById('lib-fam-new').classList.remove('hidden');
+            else document.getElementById('lib-fam-new').classList.add('hidden');
+        },
         openLib: function(id=null) {
             document.getElementById('modal-pvp-lib').classList.remove('hidden');
             document.getElementById('img-preview').style.display='none';
+            
+            // Generate Family Options
+            let uniqueFams = [...new Set(window.app.data.pvpLib.map(i => i.family || "DIVERS"))].sort();
+            let sel = document.getElementById('lib-fam-select');
+            sel.innerHTML = uniqueFams.map(f => `<option value="${f}">${f}</option>`).join('') + `<option value="new">Créer une nouvelle...</option>`;
+            
             if(id) {
                 let i = window.app.data.pvpLib.find(x=>x.id==id);
                 document.getElementById('lib-id').value=id;
@@ -433,6 +441,9 @@ window.app = {
                 document.getElementById('lib-ean').value=i.ean||"";
                 document.getElementById('lib-days').value=i.days||0;
                 document.getElementById('lib-img-data').value=i.img||"";
+                document.getElementById('lib-fam-select').value = i.family || "DIVERS";
+                document.getElementById('lib-fam-new').classList.add('hidden');
+                
                 if(i.img){ document.getElementById('img-preview').src=i.img; document.getElementById('img-preview').style.display='block'; }
                 document.getElementById('btn-del-lib').classList.remove('hidden');
                 for(let k=0;k<7;k++) document.getElementById('t-'+k).value = (i.targets||{})[k]||"";
@@ -440,13 +451,21 @@ window.app = {
                 document.getElementById('lib-id').value=""; document.getElementById('lib-name').value=""; document.getElementById('lib-ean').value="";
                 document.getElementById('lib-img-data').value=""; document.getElementById('lib-days').value=0;
                 document.getElementById('btn-del-lib').classList.add('hidden');
+                document.getElementById('lib-fam-new').classList.add('hidden');
                 for(let k=0;k<7;k++) document.getElementById('t-'+k).value = "";
             }
         },
         saveLib: function() {
             let id = document.getElementById('lib-id').value;
+            
+            // Handle Family
+            let famSelect = document.getElementById('lib-fam-select').value;
+            let famNew = document.getElementById('lib-fam-new').value;
+            let finalFam = (famSelect === 'new' && famNew) ? famNew.toUpperCase() : famSelect;
+
             let o = {
                 id: id ? Number(id) : Date.now(),
+                family: finalFam,
                 name: document.getElementById('lib-name').value,
                 ean: document.getElementById('lib-ean').value,
                 img: document.getElementById('lib-img-data').value,
@@ -532,10 +551,24 @@ window.app = {
         render: function() {
             // BIB
             let bib = document.getElementById('lib-list'); bib.innerHTML = window.app.data.pvpLib.length ? "" : "Vide";
+            
+            // GROUP BY FAMILY
+            let grouped = {};
             window.app.data.pvpLib.forEach(l => {
-                let img = l.img ? `<img src="${l.img}" class="wek-img">` : `<div class="wek-img"><i class="fas fa-bread-slice"></i></div>`;
-                bib.innerHTML += `<div class="pvp-item" style="justify-content:space-between;"><div style="display:flex;align-items:center;" onclick="app.pvp.openLib(${l.id})">${img}<div><b>${l.name}</b><br><small>${l.days}h</small></div></div><button class="btn-orange" style="width:40px;height:40px;border-radius:50%;padding:0;" onclick="app.pvp.addStock(${l.id})">+</button></div>`;
+                let f = l.family || "DIVERS";
+                if(!grouped[f]) grouped[f] = [];
+                grouped[f].push(l);
             });
+            
+            // SORT KEYS
+            Object.keys(grouped).sort().forEach(fam => {
+                bib.innerHTML += `<div class="group-header">${fam}</div>`;
+                grouped[fam].forEach(l => {
+                    let img = l.img ? `<img src="${l.img}" class="wek-img">` : `<div class="wek-img"><i class="fas fa-bread-slice"></i></div>`;
+                    bib.innerHTML += `<div class="pvp-item" style="justify-content:space-between;"><div style="display:flex;align-items:center;" onclick="app.pvp.openLib(${l.id})">${img}<div><b>${l.name}</b><br><small>${l.days}h</small></div></div><button class="btn-orange" style="width:40px;height:40px;border-radius:50%;padding:0;" onclick="app.pvp.addStock(${l.id})">+</button></div>`;
+                });
+            });
+
             // STOCK
             let st = document.getElementById('pvp-stock'); st.innerHTML = window.app.data.pvpStock.length ? "" : "<div style='text-align:center;margin-top:20px;color:#999'>Rayon Vide</div>";
             let now = new Date();
@@ -544,8 +577,6 @@ window.app = {
             window.app.data.pvpStock.sort((a,b)=>a.end-b.end).forEach(i => {
                 let dStart = new Date(i.out);
                 let dEnd = new Date(i.end);
-                
-                // COULEUR ROUGE SI AUJOURD'HUI
                 let isToday = dEnd.toDateString() === todayStr;
                 let dateColor = isToday ? '#ef4444' : '#10b981';
                 
@@ -576,32 +607,24 @@ window.app = {
                 st.appendChild(container);
             });
 
-            // CALC BESOINS (LOGIQUE 10H)
+            // CALC BESOINS
             let cl = document.getElementById('pvp-calc'); cl.innerHTML = "";
-            let tomorrow = new Date();
-            tomorrow.setDate(tomorrow.getDate() + 1);
+            let tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
             let tomDayIndex = tomorrow.getDay(); 
             let dayNames = ['DIMANCHE','LUNDI','MARDI','MERCREDI','JEUDI','VENDREDI','SAMEDI'];
-            let tomName = dayNames[tomDayIndex];
             
-            cl.innerHTML = `<h4 style="text-align:center;color:#003896;margin:0 0 15px 0;">BESOINS POUR ${tomName}</h4>`;
+            cl.innerHTML = `<h4 style="text-align:center;color:#003896;margin:0 0 15px 0;">BESOINS POUR ${dayNames[tomDayIndex]}</h4>`;
             
-            // LA REGLE DES 10H
-            let criticalTime = new Date(tomorrow);
-            criticalTime.setHours(10, 0, 0, 0);
+            let criticalTime = new Date(tomorrow); criticalTime.setHours(10, 0, 0, 0);
 
             window.app.data.pvpLib.forEach(l => {
                 let valid = window.app.data.pvpStock.filter(s => s.libId == l.id && s.end > criticalTime.getTime()).reduce((a,b)=>a+parseInt(b.qty),0);
                 let target = (l.targets && l.targets[tomDayIndex]) ? parseInt(l.targets[tomDayIndex]) : 0;
                 let need = target - valid;
-                
                 if(need > 0) {
                     cl.innerHTML += `
                     <div class="pvp-item" style="border-left:5px solid #d97706; margin-bottom:10px;">
-                        <div>
-                            <b>${l.name}</b><br>
-                            <small style="color:#666">Obj: ${target} - Stock Valide: ${valid}</small>
-                        </div>
+                        <div><b>${l.name}</b><br><small style="color:#666">Obj: ${target} - Stock Valide: ${valid}</small></div>
                         <div style="color:#d97706;font-weight:bold;font-size:18px;">A CUIRE: ${need}</div>
                     </div>`;
                 }
@@ -612,10 +635,7 @@ window.app = {
 
     saveUser: function() { window.app.common.saveUser(); },
     checkAlerts: function() {
-        let alert = window.app.data.frais.some(i => {
-            let diff = (new Date(i.date) - new Date())/(1000*60*60*24);
-            return diff < 1; 
-        });
+        let alert = window.app.data.frais.some(i => { return (new Date(i.date) - new Date())/(1000*60*60*24) < 1; });
         document.getElementById('alert-box').style.display = alert ? 'block' : 'none';
     },
     renderUsers: function() { window.app.common.renderUsers(); }
