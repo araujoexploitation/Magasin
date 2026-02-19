@@ -163,7 +163,8 @@
       </h3>
       <div class="small" id="trace-title" style="margin-bottom:10px;"></div>
 
-      <button class="btn salad" onclick="document.getElementById('trace-file').click()">
+      <!-- ✅ IMPORTANT: on passe par pickPhoto() pour flush avant d'ouvrir la caméra -->
+      <button class="btn salad" onclick="app.salad.trace.pickPhoto()">
         <i class="fas fa-image"></i> Prendre / choisir une photo
       </button>
       <input type="file" id="trace-file" accept="image/*" capture="environment" class="hidden">
@@ -427,13 +428,11 @@
   const codeReader = new ZXing.BrowserMultiFormatReader();
 
   const SALAD_DEFAULTS = [
-    // SALADE
     { family:"SALADE", name:"Batavia", hours:48 },
     { family:"SALADE", name:"Mâche", hours:48 },
     { family:"SALADE", name:"Melange Gourmand", hours:48 },
     { family:"SALADE", name:"Iceberg", hours:48 },
 
-    // BASE
     { family:"BASE", name:"Penne au basilic", hours:48 },
     { family:"BASE", name:"Rdiatori au tomates Mi-Séchées", hours:48 },
     { family:"BASE", name:"Garganelli et graines de lin", hours:48 },
@@ -445,7 +444,6 @@
     { family:"BASE", name:"Trio de quinoa lentilles corali", hours:48 },
     { family:"BASE", name:"Féta,blé légumes", hours:48 },
 
-    // LEGUMES ET FRUITS
     { family:"LEGUMES ET FRUITS", name:"Tomates cerise marinées", hours:48 },
     { family:"LEGUMES ET FRUITS", name:"Légumes Grillées", hours:48 },
     { family:"LEGUMES ET FRUITS", name:"Duo de carrotes", hours:48 },
@@ -458,7 +456,6 @@
     { family:"LEGUMES ET FRUITS", name:"Tartares de Tomates", hours:48 },
     { family:"LEGUMES ET FRUITS", name:"Colaslaw Pommes cramberry", hours:48 },
 
-    // PROTEINE
     { family:"PROTEINE", name:"Œufs durs", hours:48 },
     { family:"PROTEINE", name:"Pates Saumon fumé à l'aneth", hours:48 },
     { family:"PROTEINE", name:"Poulet émincé", hours:48 },
@@ -469,21 +466,18 @@
     { family:"PROTEINE", name:"Poulet mariné", hours:48 },
     { family:"PROTEINE", name:"Ditali chorizo", hours:48 },
 
-    // FROMAGES
     { family:"FROMAGES", name:"Billes mozzarella", hours:48 },
     { family:"FROMAGES", name:"Emmental", hours:48 },
     { family:"FROMAGES", name:"Fromages Italien", hours:48 },
 
-    // FECULENTS
     { family:"FECULENTS", name:"Radiatori Tomate mi séchée", hours:48 },
     { family:"FECULENTS", name:"Pates penne au basilic", hours:48 },
     { family:"FECULENTS", name:"Boulgour", hours:48 },
     { family:"FECULENTS", name:"Riz sauvage", hours:48 },
 
-    // TOPPING
-    { family:"TOPPING", name:"Noix/Amandes/Noix de cajou/Graines de courge/Raisin", hours:168 }, // 7j
-    { family:"TOPPING", name:"Crumble Salé", hours:168 }, // 7j
-    { family:"TOPPING", name:"Sauce Balsamique", hours:1920 }, // 80j
+    { family:"TOPPING", name:"Noix/Amandes/Noix de cajou/Graines de courge/Raisin", hours:168 },
+    { family:"TOPPING", name:"Crumble Salé", hours:168 },
+    { family:"TOPPING", name:"Sauce Balsamique", hours:1920 },
     { family:"TOPPING", name:"Sauce Caesar", hours:1920 },
     { family:"TOPPING", name:"Sauce Soja Citron Vert", hours:1920 }
   ].map(x => ({ ...x, id: null }));
@@ -503,6 +497,17 @@
     closed: new Set(),
     debounceTimer: null,
     saveTimers: {},
+
+    // ✅ NEW: suivi des saves en attente + flush (évite disparition après caméra)
+    pendingSaves: new Set(),
+    flushSaves: async function() {
+      const secs = Array.from(this.pendingSaves);
+      this.pendingSaves.clear();
+      for (const s of secs) {
+        if (this.saveTimers[s]) clearTimeout(this.saveTimers[s]);
+        try { await this.save(s); } catch(e) {}
+      }
+    },
 
     ui: {
       err: (msg) => {
@@ -592,7 +597,6 @@
         if(!dlcTs) return false;
         const dlc = new Date(dlcTs);
         if(isNaN(dlc.getTime())) return false;
-        const dlcDayStart = new Date(dlc.getFullYear(), dlc.getMonth(), dlc.getDate(), 0,0,0,0).getTime();
         const threshold = new Date(dlc.getFullYear(), dlc.getMonth(), dlc.getDate()-1, 18,0,0,0).getTime();
         const endOfDay = new Date(dlc.getFullYear(), dlc.getMonth(), dlc.getDate(), 23,59,59,999).getTime();
         const now = Date.now();
@@ -629,9 +633,11 @@
 
     // Debounced saving => réduit la latence (+/-)
     saveDebounced: function(sec, delay=350) {
+      this.pendingSaves.add(sec);
       if(this.saveTimers[sec]) clearTimeout(this.saveTimers[sec]);
       this.saveTimers[sec] = setTimeout(async () => {
         try { await this.save(sec); } catch(e) {}
+        this.pendingSaves.delete(sec);
       }, delay);
     },
 
@@ -1089,8 +1095,8 @@
           const n = Number(window.app.data.pvpStock[idx].qty || 0) + delta;
           if(n <= 0) window.app.data.pvpStock.splice(idx, 1);
           else window.app.data.pvpStock[idx].qty = n;
-          window.app.pvp.render();              // UI immédiate
-          window.app.saveDebounced('pvp', 350); // save groupé
+          window.app.pvp.render();
+          window.app.saveDebounced('pvp', 350);
         }
       },
       toggleNeed: function(libId) {
@@ -1102,6 +1108,8 @@
       },
 
       render: function() {
+        /* ... (inchangé, identique à ton code) ... */
+
         // BIBLIOTHÈQUE
         const bib = document.getElementById('lib-list');
         if(bib) {
@@ -1203,7 +1211,6 @@
           let doneH = "";
           let hasNeeds = false;
 
-          // calc "available" pour demain : stock dont end >= demain 12:00
           const availableByLib = {};
           window.app.data.pvpStock.forEach(s => {
             if((s.end||0) >= tomorrowNoon) {
@@ -1362,6 +1369,13 @@
       trace: {
         ctx: null, // { productId, productName }
         imgData: "",
+
+        // ✅ NEW: flush avant d'ouvrir l'appareil photo
+        pickPhoto: async function() {
+          await window.app.flushSaves();
+          document.getElementById('trace-file').click();
+        },
+
         open: async function(productId, productName) {
           window.app.salad.trace.ctx = { productId, productName };
           window.app.salad.trace.imgData = "";
@@ -1376,6 +1390,8 @@
           window.app.salad.trace.ctx = null;
           window.app.salad.trace.imgData = "";
         },
+
+        // ✅ FIX: historique sans orderBy (évite index), tri côté app, garde 6 mois
         loadHistory: async function() {
           const wrap = document.getElementById("trace-history");
           wrap.textContent = "Chargement…";
@@ -1383,13 +1399,14 @@
           if(!ctx) return (wrap.textContent = "—");
 
           const cutoff = Date.now() - (180 * 24 * 60 * 60 * 1000);
+
           try {
             const qy = query(
               colSaladTrace,
               where("productId", "==", ctx.productId),
-              orderBy("createdAt", "desc"),
-              limit(10)
+              limit(50)
             );
+
             const snap = await getDocs(qy);
             const rows = [];
             snap.forEach(docu => {
@@ -1397,9 +1414,12 @@
               if((d.createdAt||0) >= cutoff) rows.push({ id: docu.id, ...d });
             });
 
-            if(!rows.length) { wrap.innerHTML = "<div class='small'>Aucune photo récente.</div>"; return; }
+            rows.sort((a,b) => (b.createdAt||0) - (a.createdAt||0));
+            const top = rows.slice(0, 10);
 
-            wrap.innerHTML = rows.map(r => {
+            if(!top.length) { wrap.innerHTML = "<div class='small'>Aucune photo récente.</div>"; return; }
+
+            wrap.innerHTML = top.map(r => {
               const when = window.app.common.formatDate(r.createdAt);
               return `
                 <div style="padding:10px;border:1px solid #e2e8f0;border-radius:12px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:10px;">
@@ -1412,9 +1432,10 @@
               `;
             }).join("");
           } catch(e) {
-            wrap.innerHTML = "<div class='small'>Impossible de charger l’historique (rules/index).</div>";
+            wrap.innerHTML = "<div class='small'>Impossible de charger l’historique (rules).</div>";
           }
         },
+
         view: async function(path) {
           if(!path) return;
           try {
@@ -1424,6 +1445,7 @@
             alert("Impossible d’ouvrir la photo.");
           }
         },
+
         save: async function() {
           const ctx = window.app.salad.trace.ctx;
           if(!ctx) return;
@@ -1436,10 +1458,8 @@
           const path = `salad_traca/${safeId}/${ym}/${ts}.jpg`;
 
           try {
-            // upload storage
             await uploadString(sRef(storage, path), window.app.salad.trace.imgData, "data_url");
 
-            // write firestore trace doc
             await addDoc(colSaladTrace, {
               productId: ctx.productId,
               productName: ctx.productName,
@@ -1578,6 +1598,11 @@
       document.getElementById('trace-preview').src = b64;
       document.getElementById('trace-preview').style.display = "block";
     });
+  });
+
+  // ✅ Bonus: flush quand l'app passe en arrière-plan (mobile)
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden") window.app.flushSaves();
   });
 
   // Auth state
