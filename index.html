@@ -149,9 +149,10 @@
   <div id="modal-barcode" class="modal-bc hidden">
     <div class="modal-card" style="text-align:center;">
       <h3 id="bc-name" style="margin-top:0;"></h3>
-      <img id="bc-img-display" style="width:100%;height:200px;object-fit:contain;margin-bottom:15px;display:none;background:#f8fafc;border-radius:10px;">
+      <img id="bc-img-display" style="width:100%;height:200px;object-fit:contain;margin-bottom:15px;display:none;background:#f8fafc;border-radius:10px;" onerror="this.style.display='none'">
       <svg id="barcode"></svg><br>
-      <button class="btn secondary" style="margin-top:20px;" onclick="document.getElementById('modal-barcode').classList.add('hidden')">Fermer</button>
+      <!-- ✅ PATCH: ferme proprement (et ré-ouvre la modale tracabilité si on vient de l’œil) -->
+      <button class="btn secondary" style="margin-top:20px;" onclick="app.common.closeBarcode()">Fermer</button>
     </div>
   </div>
 
@@ -385,13 +386,15 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import {
     getFirestore, doc, setDoc, getDoc,
-    collection, addDoc, getDocs, query, where, orderBy, limit
+    collection, addDoc, getDocs, query, where, orderBy, limit,
+    deleteDoc
   } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
   import {
     getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, sendPasswordResetEmail, createUserWithEmailAndPassword
   } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
   import {
-    getStorage, ref as sRef, uploadString, getDownloadURL
+    getStorage, ref as sRef, uploadString, getDownloadURL,
+    deleteObject
   } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
   // ✅ TON firebaseConfig (intégré)
@@ -422,9 +425,8 @@
   // Salad bar (nouveau doc)
   const docSalad = doc(db, "store_master", "DATA_SALAD");
 
-  // ✅ PATCH TRACABILITÉ:
-  // - Nouveau stockage Firestore: sous-collection par produit => /salad_traca/{productId}/items/{doc}
-  // - Plus besoin d'index composite
+  // ✅ TRACABILITÉ:
+  // - Firestore: /salad_traca/{productId}/items/{doc}
   const colSaladTraceFor = (productId) =>
     collection(db, "salad_traca", String(productId), "items");
 
@@ -518,6 +520,15 @@
     },
 
     common: {
+      // ✅ PATCH: fermeture propre de la modale barcode (re-open trace si on vient de l’œil)
+      closeBarcode: function() {
+        document.getElementById('modal-barcode')?.classList.add('hidden');
+        if(window.app?.salad?.trace?._returnToTrace && window.app?.salad?.trace?.ctx) {
+          document.getElementById('modal-trace')?.classList.remove('hidden');
+        }
+        if(window.app?.salad?.trace) window.app.salad.trace._returnToTrace = false;
+      },
+
       showBarcode: function(ean, name, imgUrl=null) {
         document.getElementById('modal-barcode').classList.remove('hidden');
         document.getElementById('bc-name').innerText = name || "";
@@ -972,7 +983,7 @@
       }
     },
 
-    // PVP (inchangé sauf images rayon + besoins)
+    // PVP (inchangé)
     pvp: {
       tab: function(t) {
         document.querySelectorAll('#view-pvp .tab').forEach(e => e.classList.remove('active-pvp'));
@@ -1194,7 +1205,7 @@
           });
         }
 
-        // BESOINS (avec règle "avant midi non compté")
+        // BESOINS
         const cl = document.getElementById('pvp-calc');
         if(cl) {
           const tom = new Date(); tom.setDate(tom.getDate()+1);
@@ -1358,14 +1369,14 @@
         window.app.saveDebounced('salad', 350);
       },
 
-      // TRACEABILITY
+      // ✅ TRACEABILITY (FIX complet)
       trace: {
-        ctx: null, // { productId, productName }
+        ctx: null,               // { productId, productName }
         imgData: "",
-        open: async function(productId, productName) {
-          // ✅ PATCH: reset input pour pouvoir reprendre la même photo / et éviter l'état "bloqué"
-          document.getElementById('trace-file').value = "";
+        _returnToTrace: false,   // pour ré-ouvrir la modale trace après fermeture image
 
+        open: async function(productId, productName) {
+          document.getElementById('trace-file').value = "";
           window.app.salad.trace.ctx = { productId: String(productId), productName };
           window.app.salad.trace.imgData = "";
           document.getElementById('trace-preview').style.display = "none";
@@ -1374,86 +1385,193 @@
           document.getElementById('modal-trace').classList.remove('hidden');
           await window.app.salad.trace.loadHistory();
         },
+
         close: function() {
           document.getElementById('modal-trace').classList.add('hidden');
           window.app.salad.trace.ctx = null;
           window.app.salad.trace.imgData = "";
+          window.app.salad.trace._returnToTrace = false;
           document.getElementById('trace-file').value = "";
         },
 
-        // ✅ PATCH: lecture depuis /salad_traca/{productId}/items (sans index composite)
-        // + fallback legacy /salad_traca (where seul, pas d'index composite)
+        resolveUrl: async function(path) {
+          const p = String(path || "").trim();
+          if(!p) throw new Error("empty");
+          if(/^https?:\/\//i.test(p)) return p;
+          return await getDownloadURL(sRef(storage, p));
+        },
+
+        view: async function(path) {
+          if(!path) return;
+          try {
+            // ✅ évite l’affichage “en dessous”
+            window.app.salad.trace._returnToTrace = true;
+            document.getElementById('modal-trace')?.classList.add('hidden');
+
+            const url = await window.app.salad.trace.resolveUrl(path);
+            window.app.common.showBarcode("", "Tracabilité", url);
+          } catch(e) {
+            console.error(e);
+            alert("Impossible d’ouvrir la photo.");
+            document.getElementById('modal-trace')?.classList.remove('hidden');
+            window.app.salad.trace._returnToTrace = false;
+          }
+        },
+
+        del: async function(docId, path, isLegacy) {
+          const ctx = window.app.salad.trace.ctx;
+          if(!ctx || !docId) return;
+          if(!confirm("Supprimer cette tracabilité ?")) return;
+
+          // Storage
+          try {
+            if(path && !/^https?:\/\//i.test(path)) {
+              await deleteObject(sRef(storage, path));
+            }
+          } catch(e) { console.warn("delete storage:", e?.code || e); }
+
+          // Firestore
+          try {
+            if(isLegacy) await deleteDoc(doc(db, "salad_traca", String(docId)));
+            else await deleteDoc(doc(db, "salad_traca", String(ctx.productId), "items", String(docId)));
+          } catch(e) { console.warn("delete firestore:", e?.code || e); }
+
+          await window.app.salad.trace.loadHistory();
+        },
+
+        purgeOld6Months: async function(ctx, cutoff) {
+          // NEW subcollection: purge sans index composite
+          try {
+            let loops = 0;
+            while(loops++ < 10) { // max ~250 docs
+              const qOld = query(
+                colSaladTraceFor(ctx.productId),
+                where("createdAt", "<", cutoff),
+                orderBy("createdAt", "asc"),
+                limit(25)
+              );
+              const snap = await getDocs(qOld);
+              if(snap.empty) break;
+
+              for(const docu of snap.docs) {
+                const d = docu.data() || {};
+                const p = d.path || "";
+                if(p && !/^https?:\/\//i.test(p)) {
+                  try { await deleteObject(sRef(storage, p)); } catch(_) {}
+                }
+                try { await deleteDoc(doc(db, "salad_traca", String(ctx.productId), "items", docu.id)); } catch(_) {}
+              }
+            }
+          } catch(e) { console.warn("purge new:", e?.code || e); }
+
+          // LEGACY: on charge productId== puis filtre local (pas d’index composite)
+          try {
+            const qLegacy = query(colSaladTraceLegacy, where("productId", "==", String(ctx.productId)), limit(200));
+            const snap2 = await getDocs(qLegacy);
+            for(const docu of snap2.docs) {
+              const d = docu.data() || {};
+              if((d.createdAt||0) >= cutoff) continue;
+              const p = d.path || "";
+              if(p && !/^https?:\/\//i.test(p)) {
+                try { await deleteObject(sRef(storage, p)); } catch(_) {}
+              }
+              try { await deleteDoc(doc(db, "salad_traca", docu.id)); } catch(_) {}
+            }
+          } catch(e) { console.warn("purge legacy:", e?.code || e); }
+        },
+
+        validateRow: async function(row, ctx) {
+          try {
+            await window.app.salad.trace.resolveUrl(row.path);
+            return true;
+          } catch(e) {
+            const code = String(e?.code || "");
+            // ✅ pas de fichier => pas de ligne (on supprime le doc fantôme)
+            if(code.includes("storage/object-not-found")) {
+              try {
+                if(row.isLegacy) await deleteDoc(doc(db, "salad_traca", String(row.id)));
+                else await deleteDoc(doc(db, "salad_traca", String(ctx.productId), "items", String(row.id)));
+              } catch(_) {}
+            }
+            return false;
+          }
+        },
+
         loadHistory: async function() {
           const wrap = document.getElementById("trace-history");
-          wrap.textContent = "Chargement…";
+          if(wrap) wrap.textContent = "Chargement…";
           const ctx = window.app.salad.trace.ctx;
-          if(!ctx) return (wrap.textContent = "—");
+          if(!ctx) { if(wrap) wrap.textContent = "—"; return; }
 
           const cutoff = Date.now() - (180 * 24 * 60 * 60 * 1000);
 
+          const escAttr = (s) => String(s || "")
+            .replace(/\\/g, "\\\\")
+            .replace(/'/g, "\\'");
+
           const renderRows = (rows) => {
+            if(!wrap) return;
             if(!rows.length) {
               wrap.innerHTML = "<div class='small'>Aucune photo récente.</div>";
               return;
             }
             wrap.innerHTML = rows.map(r => {
               const when = window.app.common.formatDate(r.createdAt);
+              const p = escAttr(r.path || "");
               return `
                 <div style="padding:10px;border:1px solid #e2e8f0;border-radius:12px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:10px;">
                   <div style="min-width:0;">
                     <div style="font-weight:900;">${when}</div>
                     <div class="small" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${r.path || ""}</div>
                   </div>
-                  <button class="icon-btn salad" onclick="app.salad.trace.view('${r.path||""}')"><i class="fas fa-eye"></i></button>
+                  <div style="display:flex;gap:8px;flex-shrink:0;">
+                    <button class="icon-btn salad" title="Voir" onclick="app.salad.trace.view('${p}')"><i class="fas fa-eye"></i></button>
+                    <button class="icon-btn red" title="Supprimer" onclick="app.salad.trace.del('${escAttr(r.id)}','${p}',${r.isLegacy?1:0})"><i class="fas fa-trash"></i></button>
+                  </div>
                 </div>
               `;
             }).join("");
           };
 
           try {
+            // ✅ purge auto > 6 mois (au moment où on ouvre l’historique)
+            await window.app.salad.trace.purgeOld6Months(ctx, cutoff);
+
             // NEW
-            const qy = query(
-              colSaladTraceFor(ctx.productId),
-              orderBy("createdAt", "desc"),
-              limit(10)
-            );
-            const snap = await getDocs(qy);
+            const qNew = query(colSaladTraceFor(ctx.productId), orderBy("createdAt", "desc"), limit(50));
+            const snap = await getDocs(qNew);
             const rows = [];
             snap.forEach(docu => {
               const d = docu.data();
-              if((d.createdAt||0) >= cutoff) rows.push({ id: docu.id, ...d });
+              if((d.createdAt||0) >= cutoff) rows.push({ id: docu.id, ...d, isLegacy:false });
             });
 
-            if(rows.length) return renderRows(rows);
+            // ✅ pas de fichier => pas de ligne
+            const sample = rows.slice(0, 10);
+            const oks = await Promise.all(sample.map(r => window.app.salad.trace.validateRow(r, ctx)));
+            const keep = sample.filter((_, i) => oks[i]);
 
-            // LEGACY fallback (sans orderBy)
-            const qLegacy = query(
-              colSaladTraceLegacy,
-              where("productId", "==", String(ctx.productId)),
-              limit(50)
-            );
+            if(keep.length) { renderRows(keep); return; }
+
+            // LEGACY fallback
+            const qLegacy = query(colSaladTraceLegacy, where("productId","==",String(ctx.productId)), limit(50));
             const snap2 = await getDocs(qLegacy);
             const rows2 = [];
             snap2.forEach(docu => {
               const d = docu.data();
-              if((d.createdAt||0) >= cutoff) rows2.push({ id: docu.id, ...d });
+              if((d.createdAt||0) >= cutoff) rows2.push({ id: docu.id, ...d, isLegacy:true });
             });
             rows2.sort((a,b)=> (b.createdAt||0) - (a.createdAt||0));
-            renderRows(rows2.slice(0,10));
+
+            const sample2 = rows2.slice(0, 10);
+            const oks2 = await Promise.all(sample2.map(r => window.app.salad.trace.validateRow(r, ctx)));
+            const keep2 = sample2.filter((_, i) => oks2[i]);
+
+            renderRows(keep2);
 
           } catch(e) {
             console.error(e);
-            wrap.innerHTML = "<div class='small'>Impossible de charger l’historique (Firestore rules).</div>";
-          }
-        },
-
-        view: async function(path) {
-          if(!path) return;
-          try {
-            const url = await getDownloadURL(sRef(storage, path));
-            window.app.common.showBarcode("", "Tracabilité", url);
-          } catch(e) {
-            alert("Impossible d’ouvrir la photo.");
+            if(wrap) wrap.innerHTML = "<div class='small'>Impossible de charger l’historique (Firestore/Rules).</div>";
           }
         },
 
@@ -1469,10 +1587,8 @@
           const path = `salad_traca/${safeId}/${ym}/${ts}.jpg`;
 
           try {
-            // upload storage
             await uploadString(sRef(storage, path), window.app.salad.trace.imgData, "data_url");
 
-            // ✅ PATCH: write firestore dans sous-collection du produit
             await addDoc(colSaladTraceFor(ctx.productId), {
               productId: String(ctx.productId),
               productName: ctx.productName,
@@ -1555,7 +1671,6 @@
               const dE = window.app.common.formatDate(i.end);
               const isExp = new Date(i.end) < new Date();
 
-              // ✅ PATCH: HTML corrigé (plus de </div> en trop)
               st.innerHTML += `
                 <div class="swipe-wrapper" style="background:#0b4f4a;"><div class="swipe-content">
                   <div style="display:flex;align-items:center;flex:1;min-width:0;gap:12px;">
