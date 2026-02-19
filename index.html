@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
 <meta name="theme-color" content="#ffffff" />
-<title>Araujo App V4.1</title>
+<title>Araujo App V4.2</title>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 <script src="https://unpkg.com/@zxing/library@latest"></script>
@@ -20,13 +20,6 @@
   body { margin:0; background:var(--bg); color:var(--text); height:100vh; display:flex; flex-direction:column; overflow:hidden; }
   .hidden { display:none !important; }
 
-  /* LOGIN */
-  #login-overlay { position:fixed; inset:0; z-index:10000; background:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:18px; }
-  .login-card { width:min(380px, 92vw); }
-  .login-help { font-size:12px; color:var(--muted); text-align:center; margin-top:10px; cursor:pointer; }
-  .login-error { display:none; background:#fee2e2; color:#991b1b; padding:10px 12px; border-radius:10px; font-weight:800; font-size:13px; margin-top:10px; }
-
-  /* HEADER & NAV */
   header { background:var(--surface); padding:10px; height:80px; display:flex; justify-content:center; align-items:center; box-shadow:0 4px 15px rgba(0,0,0,0.05); position:relative; z-index:50; }
   .logo-header { height:50px; object-fit:contain; }
   .user-badge { position:absolute; right:15px; top:15px; font-size:11px; background:#e0f2fe; color:var(--primary); padding:4px 10px; border-radius:20px; font-weight:900; max-width:48vw; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -37,9 +30,8 @@
   .nav-btn { text-align:center; color:#94a3b8; cursor:pointer; font-size:12px; }
   .nav-btn i { font-size:24px; margin-bottom:4px; }
 
-  /* UI */
   .card { background:var(--surface); border-radius:16px; padding:20px; box-shadow:0 4px 10px rgba(0,0,0,0.03); margin-bottom:15px; }
-  input, select { width:100%; padding:14px; border:1px solid #cbd5e1; border-radius:10px; font-size:16px; background:#fff; margin-bottom:10px; outline:none; }
+  input, select { width:100%; padding:14px; border:1px solid #cbd5e1; border-radius:10px; font-size:16px; background:#fff; margin-bottom:10px; outline:none; user-select:text; }
   .btn { width:100%; padding:16px; border-radius:12px; border:none; font-weight:900; font-size:16px; background:var(--primary); color:#fff; cursor:pointer; margin-top:5px; }
   .btn.secondary { background:#eee; color:#333; }
   .btn.danger { background:var(--danger); }
@@ -53,7 +45,6 @@
   .tab.active-pvp { background:#fff; color:var(--pvp); box-shadow:0 2px 4px rgba(0,0,0,0.1); }
   .tab.active-salad { background:#fff; color:var(--salad); box-shadow:0 2px 4px rgba(0,0,0,0.1); }
 
-  /* HOME */
   .home-grid { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:12px; }
   .home-btn {
     border-radius:18px; padding:18px 10px; color:#fff;
@@ -63,7 +54,6 @@
   .home-btn i { font-size:26px; margin-bottom:8px; }
   .home-btn.wide { grid-column:1 / -1; }
 
-  /* LISTES */
   .group-header {
     background:#334155; color:#fff; padding:12px 15px; border-radius:10px; margin-top:15px;
     font-weight:950; text-transform:uppercase; font-size:14px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;
@@ -84,7 +74,6 @@
   .item-sub { font-size:12px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .right-col { flex-shrink:0; display:flex; align-items:center; gap:8px; }
 
-  /* PVP / SALAD Controls */
   .qty-ctrl { display:flex; align-items:center; gap:10px; background:#f8fafc; width:fit-content; padding:4px 8px; border-radius:8px; border:1px solid #e2e8f0; margin-top:5px; }
   .qty-btn {
     width:30px; height:30px; border-radius:8px; border:none; background:#fff; box-shadow:0 2px 3px rgba(0,0,0,0.10);
@@ -99,12 +88,11 @@
   .icon-btn.gray { background:#94a3b8; }
   .icon-btn.red { background:var(--danger); }
 
-  .date-col { text-align:right; width:150px; flex-shrink:0; display:flex; flex-direction:column; justify-content:center; }
+  .date-col { text-align:right; width:135px; flex-shrink:0; display:flex; flex-direction:column; justify-content:center; }
   .d-lbl { font-size:11px; color:#64748b; margin-bottom:2px; }
   .d-val { font-size:13px; font-weight:950; color:var(--success); white-space:nowrap; }
   .d-val.expired { color:var(--danger); }
 
-  /* Frais badges */
   .date-badge { width:52px; height:52px; border-radius:10px; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#fff; font-weight:950; flex-shrink:0; }
   .bg-red { background:#ef4444; } .bg-orange { background:#f59e0b; } .bg-green { background:#10b981; } .bg-grey { background:#94a3b8; }
   .chip { font-size:11px; padding:3px 8px; border-radius:999px; font-weight:950; display:inline-flex; align-items:center; gap:6px; }
@@ -113,16 +101,20 @@
   .chip.staff { background:#e0f2fe; color:#075985; }
   .small { font-size:12px; color:var(--muted); }
 
-  /* ToDo */
   .todo-check { width:32px; height:32px; border:2px solid #cbd5e1; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; cursor:pointer; transition:0.15s; }
   .todo-check.checked { background:var(--success); border-color:var(--success); color:#fff; }
   .item-done { opacity:0.62; background:#f8fafc; }
   .item-done .item-title { text-decoration:line-through; color:#94a3b8; }
 
-  /* Modals */
   .modal-bc { position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:5000; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:20px; }
   .modal-card { background:#fff; padding:25px; border-radius:20px; width:100%; max-width:460px; max-height:85vh; overflow-y:auto; }
   .row { display:flex; gap:10px; }
+
+  /* LOGIN */
+  #login-overlay { position:fixed; inset:0; z-index:10000; background:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:18px; }
+  .login-card { width:min(380px, 92vw); }
+  .login-help { font-size:12px; color:var(--muted); text-align:center; margin-top:10px; cursor:pointer; }
+  .login-error { display:none; background:#fee2e2; color:#991b1b; padding:10px 12px; border-radius:10px; font-weight:800; font-size:13px; margin-top:10px; }
 </style>
 </head>
 
@@ -145,7 +137,7 @@
     </div>
   </div>
 
-  <!-- BARCODE / IMAGE MODAL -->
+  <!-- BARCODE MODAL -->
   <div id="modal-barcode" class="modal-bc hidden">
     <div class="modal-card" style="text-align:center;">
       <h3 id="bc-name" style="margin-top:0;"></h3>
@@ -156,19 +148,24 @@
   </div>
 
   <!-- TRACE MODAL (SALAD) -->
-  <div id="modal-trace" class="modal-bc hidden">
+  <div id="modal-trace-salad" class="modal-bc hidden">
     <div class="modal-card">
       <h3 style="margin-top:0;color:var(--salad);display:flex;align-items:center;gap:10px;">
-        <i class="fas fa-camera"></i> Tracabilité
+        <i class="fas fa-camera"></i> Tracabilité (Salad Bar)
       </h3>
-      <div class="small" id="trace-title" style="margin-bottom:10px;"></div>
+      <div class="small" id="trace-salad-title" style="margin-bottom:10px;"></div>
 
-      <button class="btn salad" onclick="document.getElementById('trace-file').click()">
+      <button class="btn salad" onclick="document.getElementById('trace-salad-file').click()">
         <i class="fas fa-image"></i> Prendre / choisir une photo
       </button>
-      <input type="file" id="trace-file" accept="image/*" capture="environment" class="hidden">
+      <input type="file" id="trace-salad-file" accept="image/*" capture="environment" class="hidden">
 
-      <img id="trace-preview" style="width:100%;height:220px;object-fit:contain;background:#f8fafc;border-radius:12px;display:none;margin-top:12px;">
+      <img id="trace-salad-preview" style="width:100%;height:220px;object-fit:contain;background:#f8fafc;border-radius:12px;display:none;margin-top:12px;">
+
+      <div id="trace-salad-viewer-wrap" class="hidden" style="margin-top:12px;">
+        <img id="trace-salad-viewer" style="width:100%;height:240px;object-fit:contain;background:#0b1220;border-radius:12px;">
+        <button class="btn secondary" style="margin-top:10px;" onclick="app.salad.trace.hideViewer()">Fermer la photo</button>
+      </div>
 
       <div class="row" style="margin-top:12px;">
         <button class="btn salad" style="margin-top:0;" onclick="app.salad.trace.save()"><i class="fas fa-floppy-disk"></i> Enregistrer</button>
@@ -177,7 +174,38 @@
 
       <hr style="border:none;border-top:1px solid #e2e8f0;margin:18px 0;">
       <h4 style="margin:0 0 10px 0;">Historique (6 mois)</h4>
-      <div id="trace-history" class="small">Chargement…</div>
+      <div id="trace-salad-history" class="small">Chargement…</div>
+    </div>
+  </div>
+
+  <!-- TRACE MODAL (PVP) -->
+  <div id="modal-trace-pvp" class="modal-bc hidden">
+    <div class="modal-card">
+      <h3 style="margin-top:0;color:var(--pvp);display:flex;align-items:center;gap:10px;">
+        <i class="fas fa-camera"></i> Tracabilité (PVP)
+      </h3>
+      <div class="small" id="trace-pvp-title" style="margin-bottom:10px;"></div>
+
+      <button class="btn pvp" onclick="document.getElementById('trace-pvp-file').click()">
+        <i class="fas fa-image"></i> Prendre / choisir une photo
+      </button>
+      <input type="file" id="trace-pvp-file" accept="image/*" capture="environment" class="hidden">
+
+      <img id="trace-pvp-preview" style="width:100%;height:220px;object-fit:contain;background:#f8fafc;border-radius:12px;display:none;margin-top:12px;">
+
+      <div id="trace-pvp-viewer-wrap" class="hidden" style="margin-top:12px;">
+        <img id="trace-pvp-viewer" style="width:100%;height:240px;object-fit:contain;background:#0b1220;border-radius:12px;">
+        <button class="btn secondary" style="margin-top:10px;" onclick="app.pvp.trace.hideViewer()">Fermer la photo</button>
+      </div>
+
+      <div class="row" style="margin-top:12px;">
+        <button class="btn pvp" style="margin-top:0;" onclick="app.pvp.trace.save()"><i class="fas fa-floppy-disk"></i> Enregistrer</button>
+        <button class="btn secondary" style="margin-top:0;" onclick="app.pvp.trace.close()">Fermer</button>
+      </div>
+
+      <hr style="border:none;border-top:1px solid #e2e8f0;margin:18px 0;">
+      <h4 style="margin:0 0 10px 0;">Historique (6 mois)</h4>
+      <div id="trace-pvp-history" class="small">Chargement…</div>
     </div>
   </div>
 
@@ -210,9 +238,20 @@
       <input type="text" id="lib-fam-new" placeholder="Nouvelle famille..." class="hidden">
       <label>Nom</label><input type="text" id="lib-name">
       <label>EAN</label><input type="text" id="lib-ean" inputmode="numeric" maxlength="13">
+
       <button class="btn secondary" onclick="document.getElementById('cam-input').click()" style="margin-bottom:10px;">Photo</button>
       <input type="file" id="cam-input" accept="image/*" capture="environment" class="hidden">
       <img id="img-preview" style="width:110px;height:110px;object-fit:cover;border-radius:12px;display:none;margin:0 auto 10px auto;">
+
+      <!-- ✅ Tracabilité PVP DANS LE POPUP -->
+      <button class="btn pvp" type="button" onclick="
+        const id = document.getElementById('lib-id').value;
+        const name = document.getElementById('lib-name').value;
+        if(!id) return alert('Enregistre le produit d’abord.');
+        document.getElementById('modal-pvp-lib').classList.add('hidden');
+        app.pvp.trace.open(String(id), (name||''));
+      "><i class='fas fa-camera'></i> Traçabilité</button>
+
       <label>Conservation</label><select id="lib-days"><option value="0">JOURNÉE</option><option value="48">48H</option><option value="72">72H</option></select>
       <label>Objectifs (L->D)</label>
       <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;">
@@ -230,25 +269,22 @@
     </div>
   </div>
 
-  <!-- ✅ PATCH V4.1 : correction date/heure modifiable partout (date + heure séparées) -->
   <div id="modal-pvp-stock" class="modal-bc hidden">
     <div class="modal-card">
       <h3 style="color:var(--pvp);margin-top:0;">Correction Rayon</h3>
       <input type="hidden" id="stock-id"><h4 id="stock-name" style="text-align:center;margin:0 0 10px 0;"></h4>
-
       <label>Quantité</label><input type="number" id="stock-qty">
+      <label>Sortie</label><input type="datetime-local" id="stock-start">
+      <label>Fin</label><input type="datetime-local" id="stock-end">
 
-      <label>Sortie</label>
-      <div class="row">
-        <input type="date" id="stock-start-date">
-        <input type="time" id="stock-start-time" step="60">
-      </div>
-
-      <label>Fin</label>
-      <div class="row">
-        <input type="date" id="stock-end-date">
-        <input type="time" id="stock-end-time" step="60">
-      </div>
+      <!-- ✅ Tracabilité PVP DANS LE POPUP RAYON -->
+      <button class="btn pvp" type="button" onclick="
+        const sid = document.getElementById('stock-id').value;
+        const s = app.data.pvpStock.find(x=>String(x.id)===String(sid));
+        if(!s) return alert('Produit introuvable.');
+        document.getElementById('modal-pvp-stock').classList.add('hidden');
+        app.pvp.trace.open(String(s.libId), (s.name||''));
+      "><i class="fas fa-camera"></i> Traçabilité</button>
 
       <button class="btn pvp" onclick="app.pvp.saveStock()">Valider</button>
       <button class="btn danger" onclick="app.pvp.delStock()">Retirer</button>
@@ -275,6 +311,17 @@
         <option value="168">7J</option>
         <option value="1920">80J</option>
       </select>
+
+      <button class="btn salad" type="button" onclick="
+        const id = document.getElementById('sal-lib-id').value;
+        const name = document.getElementById('sal-lib-name').value;
+        if(!id) return alert('Enregistre le produit d’abord.');
+        document.getElementById('modal-salad-lib').classList.add('hidden');
+        app.salad.trace.open(String(id), (name||''));
+      ">
+        <i class='fas fa-camera'></i> Traçabilité
+      </button>
+
       <button class="btn salad" onclick="app.salad.saveLib()">Enregistrer</button>
       <button class="btn danger" onclick="app.salad.delLib()">Supprimer</button>
       <button class="btn secondary" onclick="document.getElementById('modal-salad-lib').classList.add('hidden')">Fermer</button>
@@ -398,16 +445,15 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import {
     getFirestore, doc, setDoc, getDoc,
-    collection, addDoc, getDocs, query, where, orderBy, limit
+    collection, addDoc, getDocs, query, where, orderBy, limit, deleteDoc
   } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
   import {
     getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, sendPasswordResetEmail, createUserWithEmailAndPassword
   } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
   import {
-    getStorage, ref as sRef, uploadString, getDownloadURL
+    getStorage, ref as sRef, uploadString, getDownloadURL, deleteObject
   } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
-  // ✅ TON firebaseConfig
   const firebaseConfig = {
     apiKey: "AIzaSyA0ffa4Nfa7kGLyaEcAocU9YzIhzmx3SkA",
     authDomain: "araujo-exploitation.firebaseapp.com",
@@ -423,20 +469,21 @@
   const auth = getAuth(appFb);
   const storage = getStorage(appFb);
 
-  // Secondary auth => créer des comptes sans déconnecter l’admin
   const secondaryApp = initializeApp(firebaseConfig, "Secondary");
   const secondaryAuth = getAuth(secondaryApp);
 
-  // Firestore docs
   const docUsers = doc(db, "store_master", "DATA_USERS");
   const docFrais = doc(db, "store_master", "DATA_FRAIS");
   const docPVP   = doc(db, "store_master", "DATA_PVP");
   const docSalad = doc(db, "store_master", "DATA_SALAD");
 
-  // Salad traces
-  const colSaladTraceFor = (productId) =>
-    collection(db, "salad_traca", String(productId), "items");
+  // Salad trace collections
+  const colSaladTraceFor = (productId) => collection(db, "salad_traca", String(productId), "items");
   const colSaladTraceLegacy = collection(db, "salad_traca");
+
+  // ✅ PVP trace collections
+  const colPvpTraceFor = (productId) => collection(db, "pvp_traca", String(productId), "items");
+  const colPvpTraceLegacy = collection(db, "pvp_traca");
 
   const codeReader = new ZXing.BrowserMultiFormatReader();
 
@@ -544,25 +591,11 @@
         const day = String(d.getDate()).padStart(2,'0');
         return `${y}-${m}-${day}`;
       },
-
-      // ✅ PATCH V4.1 : conversions stables (local) pour édition PVP
-      dtPartsFromTs: function(ts){
-        if(!ts) return {date:"", time:""};
+      tsToInput: function(ts) {
         const d = new Date(ts);
-        const y = d.getFullYear();
-        const m = String(d.getMonth()+1).padStart(2,'0');
-        const da = String(d.getDate()).padStart(2,'0');
-        const h = String(d.getHours()).padStart(2,'0');
-        const mi = String(d.getMinutes()).padStart(2,'0');
-        return { date:`${y}-${m}-${da}`, time:`${h}:${mi}` };
+        const local = new Date(d.getTime() - (d.getTimezoneOffset() * 60000));
+        return local.toISOString().slice(0, 16);
       },
-      tsFromParts: function(dateStr, timeStr){
-        if(!dateStr) return NaN;
-        const [y,m,d] = dateStr.split("-").map(Number);
-        const [hh,mm] = (timeStr || "00:00").split(":").map(Number);
-        return new Date(y, (m-1), d, hh||0, mm||0, 0, 0).getTime();
-      },
-
       formatDate: function(ts) {
         const d = new Date(ts);
         if(isNaN(d.getTime())) return "--/--";
@@ -604,7 +637,6 @@
           };
         };
       },
-      // "À SAISIR" => apparaît la veille à 18h (J-1 18:00) jusqu'à fin du jour DLC
       isASaisir: function(dlcTs) {
         if(!dlcTs) return false;
         const dlc = new Date(dlcTs);
@@ -643,7 +675,6 @@
       logout: async function() { try { await signOut(auth); } catch(e){} }
     },
 
-    // Debounced saving
     saveDebounced: function(sec, delay=350) {
       if(this.saveTimers[sec]) clearTimeout(this.saveTimers[sec]);
       this.saveTimers[sec] = setTimeout(async () => {
@@ -686,7 +717,6 @@
     afterLoginBootstrap: async function() {
       await this.loadAll();
 
-      // bootstrap users si vide
       if(!this.data.users.length) {
         const email = auth.currentUser.email || "";
         const name = (email.split("@")[0] || "ADMIN").toUpperCase();
@@ -694,7 +724,6 @@
         await this.save("users");
       }
 
-      // bootstrap salad lib si vide
       if(!this.data.saladLib.length) {
         this.data.saladLib = SALAD_DEFAULTS.map(x => ({
           id: Date.now() + Math.floor(Math.random()*1000000),
@@ -705,7 +734,6 @@
         await this.save("salad");
       }
 
-      // profil
       this.me = this.data.users.find(u => u.uid === auth.currentUser.uid) || null;
       if(!this.me) {
         alert("Votre compte n’est pas autorisé (UID inconnu dans DATA_USERS).");
@@ -713,7 +741,6 @@
         return;
       }
 
-      // UI
       document.getElementById('login-overlay').classList.add('hidden');
       document.getElementById('app-header').classList.remove('hidden');
       document.getElementById('app-nav').classList.remove('hidden');
@@ -751,24 +778,18 @@
       },
       createStaff: async function() {
         if(!this.ensureAdmin()) return;
-
         const name = (document.getElementById("new-u-name").value || "").trim().toUpperCase();
         const email = (document.getElementById("new-u-email").value || "").trim().toLowerCase();
         const role = document.getElementById("new-u-role").value || "staff";
         if(!name || !email) return alert("Nom + email requis.");
-
         if(window.app.data.users.some(u => (u.email||"").toLowerCase() === email)) return alert("Email déjà présent.");
-
         try {
           const tmpPwd = window.app.common.randPwd();
           const cred = await createUserWithEmailAndPassword(secondaryAuth, email, tmpPwd);
-
           window.app.data.users.push({ uid: cred.user.uid, email, name, role });
           await window.app.save("users");
-
           await sendPasswordResetEmail(secondaryAuth, email);
           try { await signOut(secondaryAuth); } catch(e) {}
-
           document.getElementById("new-u-name").value = "";
           document.getElementById("new-u-email").value = "";
           document.getElementById("new-u-role").value = "staff";
@@ -810,12 +831,10 @@
         if(!wrap) return;
         const users = (window.app.data.users || []).slice()
           .sort((a,b) => (a.role||"").localeCompare(b.role||"") || (a.name||"").localeCompare(b.name||""));
-
         wrap.innerHTML = users.map(u => {
           const chip = u.role === "admin"
             ? `<span class="chip admin">ADMIN</span>`
             : `<span class="chip staff">STAFF</span>`;
-
           return `
             <div style="padding:12px;border-bottom:1px solid #eee;">
               <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
@@ -828,13 +847,11 @@
                     <span class="small">uid: ${(u.uid||"").slice(0,10)}...</span>
                   </div>
                 </div>
-
                 <div style="display:flex;gap:8px;flex-shrink:0;">
                   <button class="qty-btn" title="Renommer" onclick="app.team.setName('${u.uid}')"><i class="fas fa-pen"></i></button>
                   <button class="qty-btn" title="Reset MDP" onclick="app.team.resetPwd('${u.email||""}')"><i class="fas fa-unlock-keyhole"></i></button>
                 </div>
               </div>
-
               <div style="margin-top:10px;display:flex;gap:10px;">
                 <select onchange="app.team.setRole('${u.uid}', this.value)" style="margin:0; padding:10px; font-size:14px;">
                   <option value="staff" ${u.role==="staff"?"selected":""}>staff</option>
@@ -987,7 +1004,7 @@
       }
     },
 
-    // ✅ PVP : patch édition date/heure toujours possible
+    // PVP
     pvp: {
       tab: function(t) {
         document.querySelectorAll('#view-pvp .tab').forEach(e => e.classList.remove('active-pvp'));
@@ -995,6 +1012,180 @@
         ['pvp-stock','pvp-bib','pvp-calc'].forEach(id => document.getElementById(id).classList.add('hidden'));
         document.getElementById('pvp-'+t).classList.remove('hidden');
       },
+
+      // ✅ TRACE PVP
+      trace: {
+        ctx: null, // { productId, productName }
+        imgData: "",
+
+        showViewer: function(url) {
+          document.getElementById("trace-pvp-viewer").src = url;
+          document.getElementById("trace-pvp-viewer-wrap").classList.remove("hidden");
+        },
+        hideViewer: function() {
+          document.getElementById("trace-pvp-viewer").src = "";
+          document.getElementById("trace-pvp-viewer-wrap").classList.add("hidden");
+        },
+
+        open: async function(productId, productName) {
+          document.getElementById('trace-pvp-file').value = "";
+          window.app.pvp.trace.ctx = { productId: String(productId), productName };
+          window.app.pvp.trace.imgData = "";
+          document.getElementById('trace-pvp-preview').style.display = "none";
+          document.getElementById('trace-pvp-preview').src = "";
+          document.getElementById('trace-pvp-title').textContent = productName || "";
+          window.app.pvp.trace.hideViewer();
+          document.getElementById('modal-trace-pvp').classList.remove('hidden');
+          await window.app.pvp.trace.loadHistory(true);
+        },
+        close: function() {
+          document.getElementById('modal-trace-pvp').classList.add('hidden');
+          window.app.pvp.trace.ctx = null;
+          window.app.pvp.trace.imgData = "";
+          document.getElementById('trace-pvp-file').value = "";
+          window.app.pvp.trace.hideViewer();
+        },
+
+        delOne: async function(docId, path) {
+          const ctx = window.app.pvp.trace.ctx;
+          if(!ctx || !docId) return;
+          if(!confirm("Supprimer cette tracabilité ?")) return;
+          try {
+            if(path) { try { await deleteObject(sRef(storage, path)); } catch(e) {} }
+            await deleteDoc(doc(db, "pvp_traca", String(ctx.productId), "items", String(docId)));
+          } catch(e) {
+            console.error(e);
+            alert("Suppression impossible (rules).");
+          }
+          await window.app.pvp.trace.loadHistory(false);
+        },
+
+        loadHistory: async function(doCleanup=true) {
+          const wrap = document.getElementById("trace-pvp-history");
+          wrap.textContent = "Chargement…";
+          const ctx = window.app.pvp.trace.ctx;
+          if(!ctx) return (wrap.textContent = "—");
+
+          const cutoff = Date.now() - (180 * 24 * 60 * 60 * 1000);
+
+          const renderRows = (rows) => {
+            if(!rows.length) {
+              wrap.innerHTML = "<div class='small'>Aucune photo récente.</div>";
+              return;
+            }
+            wrap.innerHTML = rows.map(r => {
+              const when = window.app.common.formatDate(r.createdAt);
+              return `
+                <div style="padding:10px;border:1px solid #e2e8f0;border-radius:12px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:10px;">
+                  <div style="min-width:0;">
+                    <div style="font-weight:900;">${when}</div>
+                    <div class="small" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${r.path || ""}</div>
+                  </div>
+                  <div style="display:flex;gap:8px;">
+                    <button class="icon-btn pvp" title="Voir" onclick="app.pvp.trace.view('${r.path||""}')"><i class="fas fa-eye"></i></button>
+                    <button class="icon-btn red" title="Supprimer" onclick="app.pvp.trace.delOne('${r.id}','${r.path||""}')"><i class="fas fa-trash"></i></button>
+                  </div>
+                </div>
+              `;
+            }).join("");
+          };
+
+          const validateExisting = async (rows) => {
+            const out = [];
+            for(const r of rows) {
+              if(!r || !r.path || !String(r.path).trim()) continue;
+              try { await getDownloadURL(sRef(storage, r.path)); out.push(r); }
+              catch(e) { /* file missing => skip */ }
+            }
+            return out;
+          };
+
+          const cleanupOld = async (rows) => {
+            if(!doCleanup) return;
+            const old = rows.filter(r => (r.createdAt||0) < cutoff);
+            if(!old.length) return;
+            for(const r of old) {
+              try {
+                if(r.path) { try { await deleteObject(sRef(storage, r.path)); } catch(e) {} }
+                await deleteDoc(doc(db, "pvp_traca", String(ctx.productId), "items", String(r.id)));
+              } catch(e) {}
+            }
+          };
+
+          try {
+            const qy = query(colPvpTraceFor(ctx.productId), orderBy("createdAt", "desc"), limit(50));
+            const snap = await getDocs(qy);
+            const rows = [];
+            snap.forEach(docu => rows.push({ id: docu.id, ...docu.data() }));
+
+            await cleanupOld(rows);
+
+            const recent = rows.filter(r => (r.createdAt||0) >= cutoff).slice(0, 20);
+            const valid = await validateExisting(recent);
+            const top10 = valid.slice(0, 10);
+            if(top10.length) return renderRows(top10);
+
+            // fallback legacy (au cas où)
+            const qLegacy = query(colPvpTraceLegacy, where("productId", "==", String(ctx.productId)), limit(50));
+            const snap2 = await getDocs(qLegacy);
+            const rows2 = [];
+            snap2.forEach(docu => rows2.push({ id: docu.id, ...docu.data() }));
+            const legacyRecent = rows2
+              .filter(r => (r.createdAt||0) >= cutoff && r.path && String(r.path).trim())
+              .sort((a,b)=> (b.createdAt||0) - (a.createdAt||0))
+              .slice(0, 20);
+
+            const valid2 = await validateExisting(legacyRecent);
+            renderRows(valid2.slice(0, 10));
+          } catch(e) {
+            console.error(e);
+            wrap.innerHTML = "<div class='small'>Impossible de charger l’historique (Firestore rules).</div>";
+          }
+        },
+
+        view: async function(path) {
+          if(!path) return;
+          try {
+            const url = await getDownloadURL(sRef(storage, path));
+            window.app.pvp.trace.showViewer(url);
+          } catch(e) {
+            alert("Impossible d’ouvrir la photo.");
+          }
+        },
+
+        save: async function() {
+          const ctx = window.app.pvp.trace.ctx;
+          if(!ctx) return;
+          if(!window.app.pvp.trace.imgData) return alert("Aucune photo.");
+
+          const ts = Date.now();
+          const d = new Date(ts);
+          const ym = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+          const safeId = String(ctx.productId).replace(/[^a-zA-Z0-9_-]/g, "_");
+          const path = `pvp_traca/${safeId}/${ym}/${ts}.jpg`;
+
+          try {
+            await uploadString(sRef(storage, path), window.app.pvp.trace.imgData, "data_url");
+            await addDoc(colPvpTraceFor(ctx.productId), {
+              productId: String(ctx.productId),
+              productName: ctx.productName,
+              createdAt: ts,
+              path
+            });
+
+            alert("Tracabilité enregistrée.");
+            window.app.pvp.trace.imgData = "";
+            document.getElementById('trace-pvp-preview').style.display = "none";
+            document.getElementById('trace-pvp-preview').src = "";
+            document.getElementById('trace-pvp-file').value = "";
+            await window.app.pvp.trace.loadHistory(false);
+          } catch(e) {
+            console.error(e);
+            alert("Erreur tracabilité (Storage/Firestore rules).");
+          }
+        }
+      },
+
       toggleFamInput: function() {
         const val = document.getElementById('lib-fam-select').value;
         document.getElementById('lib-fam-new').classList.toggle('hidden', val !== 'new');
@@ -1041,15 +1232,12 @@
           targets: {}
         };
         for(let k=0;k<7;k++) o.targets[k] = document.getElementById('t-'+k).value;
-
         if(!o.name) return alert("Nom requis");
 
         if(id) {
           const idx = window.app.data.pvpLib.findIndex(x=>String(x.id)===String(id));
           if(idx>-1) window.app.data.pvpLib[idx] = o;
-        } else {
-          window.app.data.pvpLib.push(o);
-        }
+        } else window.app.data.pvpLib.push(o);
 
         await window.app.save('pvp');
         document.getElementById('modal-pvp-lib').classList.add('hidden');
@@ -1073,49 +1261,25 @@
           window.app.saveDebounced('pvp', 350);
         }
       },
-
-      // ✅ PATCH V4.1 : modale éditable et stable partout
       openEditStock: function(id) {
         const i = window.app.data.pvpStock.find(x=>x.id==id);
-        if(!i) return;
         document.getElementById('modal-pvp-stock').classList.remove('hidden');
         document.getElementById('stock-id').value=id;
         document.getElementById('stock-name').innerText=i.name;
         document.getElementById('stock-qty').value=i.qty;
-
-        const s = window.app.common.dtPartsFromTs(i.out);
-        const e = window.app.common.dtPartsFromTs(i.end);
-        document.getElementById('stock-start-date').value = s.date;
-        document.getElementById('stock-start-time').value = s.time;
-        document.getElementById('stock-end-date').value = e.date;
-        document.getElementById('stock-end-time').value = e.time;
+        document.getElementById('stock-start').value = window.app.common.tsToInput(i.out);
+        document.getElementById('stock-end').value = window.app.common.tsToInput(i.end);
       },
-
       saveStock: function() {
         const idx = window.app.data.pvpStock.findIndex(x=>String(x.id)===String(document.getElementById('stock-id').value));
         if(idx<0) return;
-
-        const outTs = window.app.common.tsFromParts(
-          document.getElementById('stock-start-date').value,
-          document.getElementById('stock-start-time').value
-        );
-        const endTs = window.app.common.tsFromParts(
-          document.getElementById('stock-end-date').value,
-          document.getElementById('stock-end-time').value
-        );
-
-        if(isNaN(outTs) || isNaN(endTs)) return alert("Date/heure invalide.");
-        if(endTs < outTs) return alert("La fin ne peut pas être avant la sortie.");
-
         window.app.data.pvpStock[idx].qty = Number(document.getElementById('stock-qty').value || 0);
-        window.app.data.pvpStock[idx].out = outTs;
-        window.app.data.pvpStock[idx].end = endTs;
-
+        window.app.data.pvpStock[idx].out = new Date(document.getElementById('stock-start').value).getTime();
+        window.app.data.pvpStock[idx].end = new Date(document.getElementById('stock-end').value).getTime();
         document.getElementById('modal-pvp-stock').classList.add('hidden');
         window.app.pvp.render();
         window.app.saveDebounced('pvp', 350);
       },
-
       delStock: function() {
         const id = document.getElementById('stock-id').value;
         window.app.data.pvpStock = window.app.data.pvpStock.filter(x=>String(x.id)!==String(id));
@@ -1123,7 +1287,6 @@
         window.app.pvp.render();
         window.app.saveDebounced('pvp', 350);
       },
-
       changeQty: function(id, delta) {
         const idx = window.app.data.pvpStock.findIndex(x => x.id == id);
         if(idx > -1) {
@@ -1134,7 +1297,6 @@
           window.app.saveDebounced('pvp', 350);
         }
       },
-
       toggleNeed: function(libId) {
         const idx = window.app.data.checkedNeeds.indexOf(libId);
         if(idx > -1) window.app.data.checkedNeeds.splice(idx, 1);
@@ -1144,7 +1306,7 @@
       },
 
       render: function() {
-        // BIBLIOTHÈQUE
+        // BIB
         const bib = document.getElementById('lib-list');
         if(bib) {
           bib.innerHTML = "";
@@ -1173,6 +1335,8 @@
                   </div>
 
                   <div class="right-col">
+                    <!-- ✅ bouton tracabilité dédié à coté du crayon -->
+                    <button class="icon-btn pvp" title="Traçabilité" onclick="event.stopPropagation(); app.pvp.trace.open('${l.id}','${(l.name||"").replace(/'/g," ")}')"><i class="fas fa-camera"></i></button>
                     <button class="icon-btn pvp" title="Modifier" onclick="event.stopPropagation(); app.pvp.openLib(${l.id})"><i class="fas fa-pen"></i></button>
                     <button class="icon-btn pvp" title="Ajouter au rayon" onclick="event.stopPropagation(); app.pvp.addStock(${l.id})"><i class="fas fa-plus"></i></button>
                   </div>
@@ -1181,7 +1345,7 @@
           });
         }
 
-        // STOCK (✅ ligne cliquable pour éditer la date/heure)
+        // STOCK
         const st = document.getElementById('pvp-stock');
         if(st) {
           st.innerHTML = "";
@@ -1214,24 +1378,27 @@
                 : `<div class="item-img" onclick="event.stopPropagation(); app.common.showBarcode('${i.ean||""}','${(i.name||"").replace(/'/g," ")}')"><i class="fas fa-bread-slice"></i></div>`;
 
               st.innerHTML += `
-                <div class="swipe-wrapper"><div class="swipe-content" onclick="app.pvp.openEditStock(${i.id})">
+                <div class="swipe-wrapper"><div class="swipe-content">
                   <div style="display:flex;align-items:center;flex:1;min-width:0;gap:12px;">
                     ${displayImg}
                     <div style="min-width:0;">
                       <div class="item-title">${i.name}</div>
                       <div class="qty-ctrl">
-                        <button class="qty-btn" onclick="event.stopPropagation(); app.pvp.changeQty(${i.id},-1)">-</button>
+                        <button class="qty-btn" onclick="app.pvp.changeQty(${i.id},-1)">-</button>
                         <b>${i.qty}</b>
-                        <button class="qty-btn" onclick="event.stopPropagation(); app.pvp.changeQty(${i.id},1)">+</button>
-                      </div>
-                      <div class="small" style="margin-top:6px;color:#94a3b8;">
-                        (tape la ligne pour modifier les dates)
+                        <button class="qty-btn" onclick="app.pvp.changeQty(${i.id},1)">+</button>
                       </div>
                     </div>
                   </div>
-                  <div class="date-col">
-                    <div class="d-lbl">Sortie: ${dS}</div>
-                    <div class="d-val ${isExp?'expired':''}">FIN: ${dE}</div>
+                  <div class="right-col">
+                    <!-- ✅ bouton tracabilité direct -->
+                    <button class="icon-btn pvp" title="Traçabilité" onclick="app.pvp.trace.open('${i.libId}','${(i.name||"").replace(/'/g," ")}')"><i class="fas fa-camera"></i></button>
+                    <!-- ✅ bouton éditer dates -->
+                    <button class="icon-btn pvp" title="Modifier dates" onclick="app.pvp.openEditStock(${i.id})"><i class="fas fa-pen"></i></button>
+                    <div class="date-col">
+                      <div class="d-lbl">Sortie: ${dS}</div>
+                      <div class="d-val ${isExp?'expired':''}">FIN: ${dE}</div>
+                    </div>
                   </div>
                 </div></div>`;
             });
@@ -1304,7 +1471,7 @@
       }
     },
 
-    // SALAD (inchangé côté stock/date)
+    // SALAD
     salad: {
       tab: function(t) {
         document.querySelectorAll('#view-salad .tab').forEach(e => e.classList.remove('active-salad'));
@@ -1312,6 +1479,178 @@
         document.getElementById('salad-stock').classList.add('hidden');
         document.getElementById('salad-bib').classList.add('hidden');
         document.getElementById('salad-'+t).classList.remove('hidden');
+      },
+
+      trace: {
+        ctx: null,
+        imgData: "",
+
+        showViewer: function(url) {
+          document.getElementById("trace-salad-viewer").src = url;
+          document.getElementById("trace-salad-viewer-wrap").classList.remove("hidden");
+        },
+        hideViewer: function() {
+          document.getElementById("trace-salad-viewer").src = "";
+          document.getElementById("trace-salad-viewer-wrap").classList.add("hidden");
+        },
+
+        open: async function(productId, productName) {
+          document.getElementById('trace-salad-file').value = "";
+          window.app.salad.trace.ctx = { productId: String(productId), productName };
+          window.app.salad.trace.imgData = "";
+          document.getElementById('trace-salad-preview').style.display = "none";
+          document.getElementById('trace-salad-preview').src = "";
+          document.getElementById('trace-salad-title').textContent = productName || "";
+          window.app.salad.trace.hideViewer();
+          document.getElementById('modal-trace-salad').classList.remove('hidden');
+          await window.app.salad.trace.loadHistory(true);
+        },
+        close: function() {
+          document.getElementById('modal-trace-salad').classList.add('hidden');
+          window.app.salad.trace.ctx = null;
+          window.app.salad.trace.imgData = "";
+          document.getElementById('trace-salad-file').value = "";
+          window.app.salad.trace.hideViewer();
+        },
+
+        delOne: async function(docId, path) {
+          const ctx = window.app.salad.trace.ctx;
+          if(!ctx || !docId) return;
+          if(!confirm("Supprimer cette tracabilité ?")) return;
+          try {
+            if(path) { try { await deleteObject(sRef(storage, path)); } catch(e) {} }
+            await deleteDoc(doc(db, "salad_traca", String(ctx.productId), "items", String(docId)));
+          } catch(e) {
+            console.error(e);
+            alert("Suppression impossible (rules).");
+          }
+          await window.app.salad.trace.loadHistory(false);
+        },
+
+        loadHistory: async function(doCleanup=true) {
+          const wrap = document.getElementById("trace-salad-history");
+          wrap.textContent = "Chargement…";
+          const ctx = window.app.salad.trace.ctx;
+          if(!ctx) return (wrap.textContent = "—");
+
+          const cutoff = Date.now() - (180 * 24 * 60 * 60 * 1000);
+
+          const renderRows = (rows) => {
+            if(!rows.length) {
+              wrap.innerHTML = "<div class='small'>Aucune photo récente.</div>";
+              return;
+            }
+            wrap.innerHTML = rows.map(r => {
+              const when = window.app.common.formatDate(r.createdAt);
+              return `
+                <div style="padding:10px;border:1px solid #e2e8f0;border-radius:12px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:10px;">
+                  <div style="min-width:0;">
+                    <div style="font-weight:900;">${when}</div>
+                    <div class="small" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${r.path || ""}</div>
+                  </div>
+                  <div style="display:flex;gap:8px;">
+                    <button class="icon-btn salad" title="Voir" onclick="app.salad.trace.view('${r.path||""}')"><i class="fas fa-eye"></i></button>
+                    <button class="icon-btn red" title="Supprimer" onclick="app.salad.trace.delOne('${r.id}','${r.path||""}')"><i class="fas fa-trash"></i></button>
+                  </div>
+                </div>
+              `;
+            }).join("");
+          };
+
+          const validateExisting = async (rows) => {
+            const out = [];
+            for(const r of rows) {
+              if(!r || !r.path || !String(r.path).trim()) continue;
+              try { await getDownloadURL(sRef(storage, r.path)); out.push(r); }
+              catch(e) {}
+            }
+            return out;
+          };
+
+          const cleanupOld = async (rows) => {
+            if(!doCleanup) return;
+            const old = rows.filter(r => (r.createdAt||0) < cutoff);
+            if(!old.length) return;
+            for(const r of old) {
+              try {
+                if(r.path) { try { await deleteObject(sRef(storage, r.path)); } catch(e) {} }
+                await deleteDoc(doc(db, "salad_traca", String(ctx.productId), "items", String(r.id)));
+              } catch(e) {}
+            }
+          };
+
+          try {
+            const qy = query(colSaladTraceFor(ctx.productId), orderBy("createdAt", "desc"), limit(50));
+            const snap = await getDocs(qy);
+            const rows = [];
+            snap.forEach(docu => rows.push({ id: docu.id, ...docu.data() }));
+
+            await cleanupOld(rows);
+
+            const recent = rows.filter(r => (r.createdAt||0) >= cutoff).slice(0, 20);
+            const valid = await validateExisting(recent);
+            const top10 = valid.slice(0, 10);
+            if(top10.length) return renderRows(top10);
+
+            // fallback legacy
+            const qLegacy = query(colSaladTraceLegacy, where("productId", "==", String(ctx.productId)), limit(50));
+            const snap2 = await getDocs(qLegacy);
+            const rows2 = [];
+            snap2.forEach(docu => rows2.push({ id: docu.id, ...docu.data() }));
+            const legacyRecent = rows2
+              .filter(r => (r.createdAt||0) >= cutoff && r.path && String(r.path).trim())
+              .sort((a,b)=> (b.createdAt||0) - (a.createdAt||0))
+              .slice(0, 20);
+
+            const valid2 = await validateExisting(legacyRecent);
+            renderRows(valid2.slice(0, 10));
+          } catch(e) {
+            console.error(e);
+            wrap.innerHTML = "<div class='small'>Impossible de charger l’historique (Firestore rules).</div>";
+          }
+        },
+
+        view: async function(path) {
+          if(!path) return;
+          try {
+            const url = await getDownloadURL(sRef(storage, path));
+            window.app.salad.trace.showViewer(url);
+          } catch(e) {
+            alert("Impossible d’ouvrir la photo.");
+          }
+        },
+
+        save: async function() {
+          const ctx = window.app.salad.trace.ctx;
+          if(!ctx) return;
+          if(!window.app.salad.trace.imgData) return alert("Aucune photo.");
+
+          const ts = Date.now();
+          const d = new Date(ts);
+          const ym = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+          const safeId = String(ctx.productId).replace(/[^a-zA-Z0-9_-]/g, "_");
+          const path = `salad_traca/${safeId}/${ym}/${ts}.jpg`;
+
+          try {
+            await uploadString(sRef(storage, path), window.app.salad.trace.imgData, "data_url");
+            await addDoc(colSaladTraceFor(ctx.productId), {
+              productId: String(ctx.productId),
+              productName: ctx.productName,
+              createdAt: ts,
+              path
+            });
+
+            alert("Tracabilité enregistrée.");
+            window.app.salad.trace.imgData = "";
+            document.getElementById('trace-salad-preview').style.display = "none";
+            document.getElementById('trace-salad-preview').src = "";
+            document.getElementById('trace-salad-file').value = "";
+            await window.app.salad.trace.loadHistory(false);
+          } catch(e) {
+            console.error(e);
+            alert("Erreur tracabilité (Storage/Firestore rules).");
+          }
+        }
       },
 
       openLib: function(id=null) {
@@ -1341,9 +1680,8 @@
         if(id) {
           const idx = window.app.data.saladLib.findIndex(x => String(x.id)===String(id));
           if(idx>-1) window.app.data.saladLib[idx] = o;
-        } else {
-          window.app.data.saladLib.push(o);
-        }
+        } else window.app.data.saladLib.push(o);
+
         document.getElementById('modal-salad-lib').classList.add('hidden');
         window.app.salad.render();
         window.app.saveDebounced('salad', 350);
@@ -1393,134 +1731,11 @@
         const q = prompt("Quantité :", String(i.qty||0));
         if(q === null) return;
         const n = Number(q||0);
-        if(n <= 0) {
-          window.app.data.saladStock = window.app.data.saladStock.filter(x=>x.id!==id);
-        } else {
-          i.qty = n;
-        }
+        if(n <= 0) window.app.data.saladStock = window.app.data.saladStock.filter(x=>x.id!==id);
+        else i.qty = n;
+
         window.app.salad.render();
         window.app.saveDebounced('salad', 350);
-      },
-
-      // TRACE (inchangé ici)
-      trace: {
-        ctx: null,
-        imgData: "",
-        open: async function(productId, productName) {
-          document.getElementById('trace-file').value = "";
-          window.app.salad.trace.ctx = { productId: String(productId), productName };
-          window.app.salad.trace.imgData = "";
-          document.getElementById('trace-preview').style.display = "none";
-          document.getElementById('trace-preview').src = "";
-          document.getElementById('trace-title').textContent = productName || "";
-          document.getElementById('modal-trace').classList.remove('hidden');
-          await window.app.salad.trace.loadHistory();
-        },
-        close: function() {
-          document.getElementById('modal-trace').classList.add('hidden');
-          window.app.salad.trace.ctx = null;
-          window.app.salad.trace.imgData = "";
-          document.getElementById('trace-file').value = "";
-        },
-        loadHistory: async function() {
-          const wrap = document.getElementById("trace-history");
-          wrap.textContent = "Chargement…";
-          const ctx = window.app.salad.trace.ctx;
-          if(!ctx) return (wrap.textContent = "—");
-
-          const cutoff = Date.now() - (180 * 24 * 60 * 60 * 1000);
-
-          const renderRows = (rows) => {
-            if(!rows.length) {
-              wrap.innerHTML = "<div class='small'>Aucune photo récente.</div>";
-              return;
-            }
-            wrap.innerHTML = rows.map(r => {
-              const when = window.app.common.formatDate(r.createdAt);
-              return `
-                <div style="padding:10px;border:1px solid #e2e8f0;border-radius:12px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:10px;">
-                  <div style="min-width:0;">
-                    <div style="font-weight:900;">${when}</div>
-                    <div class="small" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${r.path || ""}</div>
-                  </div>
-                  <button class="icon-btn salad" onclick="app.salad.trace.view('${r.path||""}')"><i class="fas fa-eye"></i></button>
-                </div>
-              `;
-            }).join("");
-          };
-
-          try {
-            const qy = query(
-              colSaladTraceFor(ctx.productId),
-              orderBy("createdAt", "desc"),
-              limit(10)
-            );
-            const snap = await getDocs(qy);
-            const rows = [];
-            snap.forEach(docu => {
-              const d = docu.data();
-              if((d.createdAt||0) >= cutoff) rows.push({ id: docu.id, ...d });
-            });
-            if(rows.length) return renderRows(rows);
-
-            const qLegacy = query(
-              colSaladTraceLegacy,
-              where("productId", "==", String(ctx.productId)),
-              limit(50)
-            );
-            const snap2 = await getDocs(qLegacy);
-            const rows2 = [];
-            snap2.forEach(docu => {
-              const d = docu.data();
-              if((d.createdAt||0) >= cutoff) rows2.push({ id: docu.id, ...d });
-            });
-            rows2.sort((a,b)=> (b.createdAt||0) - (a.createdAt||0));
-            renderRows(rows2.slice(0,10));
-          } catch(e) {
-            console.error(e);
-            wrap.innerHTML = "<div class='small'>Impossible de charger l’historique (Firestore rules).</div>";
-          }
-        },
-        view: async function(path) {
-          if(!path) return;
-          try {
-            const url = await getDownloadURL(sRef(storage, path));
-            window.app.common.showBarcode("", "Tracabilité", url);
-          } catch(e) {
-            alert("Impossible d’ouvrir la photo.");
-          }
-        },
-        save: async function() {
-          const ctx = window.app.salad.trace.ctx;
-          if(!ctx) return;
-          if(!window.app.salad.trace.imgData) return alert("Aucune photo.");
-
-          const ts = Date.now();
-          const d = new Date(ts);
-          const ym = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
-          const safeId = String(ctx.productId).replace(/[^a-zA-Z0-9_-]/g, "_");
-          const path = `salad_traca/${safeId}/${ym}/${ts}.jpg`;
-
-          try {
-            await uploadString(sRef(storage, path), window.app.salad.trace.imgData, "data_url");
-            await addDoc(colSaladTraceFor(ctx.productId), {
-              productId: String(ctx.productId),
-              productName: ctx.productName,
-              createdAt: ts,
-              path
-            });
-
-            alert("Tracabilité enregistrée.");
-            window.app.salad.trace.imgData = "";
-            document.getElementById('trace-preview').style.display = "none";
-            document.getElementById('trace-preview').src = "";
-            document.getElementById('trace-file').value = "";
-            await window.app.salad.trace.loadHistory();
-          } catch(e) {
-            console.error(e);
-            alert("Erreur tracabilité (Storage/Firestore rules).");
-          }
-        }
       },
 
       render: function() {
@@ -1551,6 +1766,7 @@
                     </div>
                   </div>
                   <div class="right-col">
+                    <button class="icon-btn salad" title="Traçabilité" onclick="app.salad.trace.open('${l.id}','${(l.name||"").replace(/'/g," ")}')"><i class="fas fa-camera"></i></button>
                     <button class="icon-btn salad" title="Modifier" onclick="app.salad.openLib(${l.id})"><i class="fas fa-pen"></i></button>
                     <button class="icon-btn salad" title="Ajouter au rayon" onclick="app.salad.addStock(${l.id})"><i class="fas fa-plus"></i></button>
                   </div>
@@ -1590,7 +1806,7 @@
                   <div style="display:flex;align-items:center;flex:1;min-width:0;gap:12px;">
                     <div class="item-img"><i class="fas fa-bowl-food"></i></div>
                     <div style="min-width:0;">
-                      <div class="item-title" onclick="app.salad.openEditStock(${i.id})">${i.name}</div>
+                      <div class="item-title">${i.name}</div>
                       <div class="qty-ctrl">
                         <button class="qty-btn" onclick="app.salad.changeQty(${i.id},-1)">-</button>
                         <b>${i.qty}</b>
@@ -1600,8 +1816,11 @@
                   </div>
 
                   <div class="right-col">
-                    <button class="icon-btn salad" title="Tracabilité (photo)" onclick="app.salad.trace.open('${i.libId}','${(i.name||"").replace(/'/g," ")}')">
+                    <button class="icon-btn salad" title="Tracabilité" onclick="app.salad.trace.open('${i.libId}','${(i.name||"").replace(/'/g," ")}')">
                       <i class="fas fa-camera"></i>
+                    </button>
+                    <button class="icon-btn gray" title="Modifier quantité" onclick="app.salad.openEditStock(${i.id})">
+                      <i class="fas fa-pen"></i>
                     </button>
                     <div class="date-col">
                       <div class="d-lbl">Sortie: ${dS}</div>
@@ -1635,13 +1854,27 @@
     });
   });
 
-  document.getElementById("trace-file").addEventListener("change", (e) => {
+  // salad trace file
+  document.getElementById("trace-salad-file").addEventListener("change", (e) => {
     const f = e.target.files?.[0];
     if(!f) return;
     window.app.common.compressImgFileToDataUrl(f, (b64) => {
       window.app.salad.trace.imgData = b64;
-      document.getElementById('trace-preview').src = b64;
-      document.getElementById('trace-preview').style.display = "block";
+      document.getElementById('trace-salad-preview').src = b64;
+      document.getElementById('trace-salad-preview').style.display = "block";
+      window.app.salad.trace.hideViewer();
+    });
+  });
+
+  // ✅ pvp trace file
+  document.getElementById("trace-pvp-file").addEventListener("change", (e) => {
+    const f = e.target.files?.[0];
+    if(!f) return;
+    window.app.common.compressImgFileToDataUrl(f, (b64) => {
+      window.app.pvp.trace.imgData = b64;
+      document.getElementById('trace-pvp-preview').src = b64;
+      document.getElementById('trace-pvp-preview').style.display = "block";
+      window.app.pvp.trace.hideViewer();
     });
   });
 
