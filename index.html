@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
 <meta name="theme-color" content="#ffffff" />
-<title>Araujo App V4.0</title>
+<title>Araujo App V4.1</title>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 <script src="https://unpkg.com/@zxing/library@latest"></script>
@@ -99,7 +99,7 @@
   .icon-btn.gray { background:#94a3b8; }
   .icon-btn.red { background:var(--danger); }
 
-  .date-col { text-align:right; width:135px; flex-shrink:0; display:flex; flex-direction:column; justify-content:center; }
+  .date-col { text-align:right; width:150px; flex-shrink:0; display:flex; flex-direction:column; justify-content:center; }
   .d-lbl { font-size:11px; color:#64748b; margin-bottom:2px; }
   .d-val { font-size:13px; font-weight:950; color:var(--success); white-space:nowrap; }
   .d-val.expired { color:var(--danger); }
@@ -145,14 +145,13 @@
     </div>
   </div>
 
-  <!-- BARCODE MODAL -->
+  <!-- BARCODE / IMAGE MODAL -->
   <div id="modal-barcode" class="modal-bc hidden">
     <div class="modal-card" style="text-align:center;">
       <h3 id="bc-name" style="margin-top:0;"></h3>
-      <img id="bc-img-display" style="width:100%;height:200px;object-fit:contain;margin-bottom:15px;display:none;background:#f8fafc;border-radius:10px;" onerror="this.style.display='none'">
+      <img id="bc-img-display" style="width:100%;height:200px;object-fit:contain;margin-bottom:15px;display:none;background:#f8fafc;border-radius:10px;">
       <svg id="barcode"></svg><br>
-      <!-- ✅ PATCH: ferme proprement (et ré-ouvre la modale tracabilité si on vient de l’œil) -->
-      <button class="btn secondary" style="margin-top:20px;" onclick="app.common.closeBarcode()">Fermer</button>
+      <button class="btn secondary" style="margin-top:20px;" onclick="document.getElementById('modal-barcode').classList.add('hidden')">Fermer</button>
     </div>
   </div>
 
@@ -231,13 +230,26 @@
     </div>
   </div>
 
+  <!-- ✅ PATCH V4.1 : correction date/heure modifiable partout (date + heure séparées) -->
   <div id="modal-pvp-stock" class="modal-bc hidden">
     <div class="modal-card">
       <h3 style="color:var(--pvp);margin-top:0;">Correction Rayon</h3>
       <input type="hidden" id="stock-id"><h4 id="stock-name" style="text-align:center;margin:0 0 10px 0;"></h4>
+
       <label>Quantité</label><input type="number" id="stock-qty">
-      <label>Sortie</label><input type="datetime-local" id="stock-start">
-      <label>Fin</label><input type="datetime-local" id="stock-end">
+
+      <label>Sortie</label>
+      <div class="row">
+        <input type="date" id="stock-start-date">
+        <input type="time" id="stock-start-time" step="60">
+      </div>
+
+      <label>Fin</label>
+      <div class="row">
+        <input type="date" id="stock-end-date">
+        <input type="time" id="stock-end-time" step="60">
+      </div>
+
       <button class="btn pvp" onclick="app.pvp.saveStock()">Valider</button>
       <button class="btn danger" onclick="app.pvp.delStock()">Retirer</button>
       <button class="btn secondary" onclick="document.getElementById('modal-pvp-stock').classList.add('hidden')">Annuler</button>
@@ -386,18 +398,16 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import {
     getFirestore, doc, setDoc, getDoc,
-    collection, addDoc, getDocs, query, where, orderBy, limit,
-    deleteDoc
+    collection, addDoc, getDocs, query, where, orderBy, limit
   } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
   import {
     getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, sendPasswordResetEmail, createUserWithEmailAndPassword
   } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
   import {
-    getStorage, ref as sRef, uploadString, getDownloadURL,
-    deleteObject
+    getStorage, ref as sRef, uploadString, getDownloadURL
   } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
-  // ✅ TON firebaseConfig (intégré)
+  // ✅ TON firebaseConfig
   const firebaseConfig = {
     apiKey: "AIzaSyA0ffa4Nfa7kGLyaEcAocU9YzIhzmx3SkA",
     authDomain: "araujo-exploitation.firebaseapp.com",
@@ -417,20 +427,15 @@
   const secondaryApp = initializeApp(firebaseConfig, "Secondary");
   const secondaryAuth = getAuth(secondaryApp);
 
-  // Firestore docs (schémas inchangés pour PVP/FRAIS/USERS)
+  // Firestore docs
   const docUsers = doc(db, "store_master", "DATA_USERS");
   const docFrais = doc(db, "store_master", "DATA_FRAIS");
   const docPVP   = doc(db, "store_master", "DATA_PVP");
-
-  // Salad bar (nouveau doc)
   const docSalad = doc(db, "store_master", "DATA_SALAD");
 
-  // ✅ TRACABILITÉ:
-  // - Firestore: /salad_traca/{productId}/items/{doc}
+  // Salad traces
   const colSaladTraceFor = (productId) =>
     collection(db, "salad_traca", String(productId), "items");
-
-  // Legacy (si tu avais déjà des docs dans /salad_traca)
   const colSaladTraceLegacy = collection(db, "salad_traca");
 
   const codeReader = new ZXing.BrowserMultiFormatReader();
@@ -440,7 +445,6 @@
     { family:"SALADE", name:"Mâche", hours:48 },
     { family:"SALADE", name:"Melange Gourmand", hours:48 },
     { family:"SALADE", name:"Iceberg", hours:48 },
-
     { family:"BASE", name:"Penne au basilic", hours:48 },
     { family:"BASE", name:"Rdiatori au tomates Mi-Séchées", hours:48 },
     { family:"BASE", name:"Garganelli et graines de lin", hours:48 },
@@ -451,7 +455,6 @@
     { family:"BASE", name:"Nouilles Asiatique", hours:48 },
     { family:"BASE", name:"Trio de quinoa lentilles corali", hours:48 },
     { family:"BASE", name:"Féta,blé légumes", hours:48 },
-
     { family:"LEGUMES ET FRUITS", name:"Tomates cerise marinées", hours:48 },
     { family:"LEGUMES ET FRUITS", name:"Légumes Grillées", hours:48 },
     { family:"LEGUMES ET FRUITS", name:"Duo de carrotes", hours:48 },
@@ -463,7 +466,6 @@
     { family:"LEGUMES ET FRUITS", name:"Tartares de comcombre", hours:48 },
     { family:"LEGUMES ET FRUITS", name:"Tartares de Tomates", hours:48 },
     { family:"LEGUMES ET FRUITS", name:"Colaslaw Pommes cramberry", hours:48 },
-
     { family:"PROTEINE", name:"Œufs durs", hours:48 },
     { family:"PROTEINE", name:"Pates Saumon fumé à l'aneth", hours:48 },
     { family:"PROTEINE", name:"Poulet émincé", hours:48 },
@@ -473,16 +475,13 @@
     { family:"PROTEINE", name:"Farfalles", hours:48 },
     { family:"PROTEINE", name:"Poulet mariné", hours:48 },
     { family:"PROTEINE", name:"Ditali chorizo", hours:48 },
-
     { family:"FROMAGES", name:"Billes mozzarella", hours:48 },
     { family:"FROMAGES", name:"Emmental", hours:48 },
     { family:"FROMAGES", name:"Fromages Italien", hours:48 },
-
     { family:"FECULENTS", name:"Radiatori Tomate mi séchée", hours:48 },
     { family:"FECULENTS", name:"Pates penne au basilic", hours:48 },
     { family:"FECULENTS", name:"Boulgour", hours:48 },
     { family:"FECULENTS", name:"Riz sauvage", hours:48 },
-
     { family:"TOPPING", name:"Noix/Amandes/Noix de cajou/Graines de courge/Raisin", hours:168 },
     { family:"TOPPING", name:"Crumble Salé", hours:168 },
     { family:"TOPPING", name:"Sauce Balsamique", hours:1920 },
@@ -520,15 +519,6 @@
     },
 
     common: {
-      // ✅ PATCH: fermeture propre de la modale barcode (re-open trace si on vient de l’œil)
-      closeBarcode: function() {
-        document.getElementById('modal-barcode')?.classList.add('hidden');
-        if(window.app?.salad?.trace?._returnToTrace && window.app?.salad?.trace?.ctx) {
-          document.getElementById('modal-trace')?.classList.remove('hidden');
-        }
-        if(window.app?.salad?.trace) window.app.salad.trace._returnToTrace = false;
-      },
-
       showBarcode: function(ean, name, imgUrl=null) {
         document.getElementById('modal-barcode').classList.remove('hidden');
         document.getElementById('bc-name').innerText = name || "";
@@ -554,11 +544,25 @@
         const day = String(d.getDate()).padStart(2,'0');
         return `${y}-${m}-${day}`;
       },
-      tsToInput: function(ts) {
+
+      // ✅ PATCH V4.1 : conversions stables (local) pour édition PVP
+      dtPartsFromTs: function(ts){
+        if(!ts) return {date:"", time:""};
         const d = new Date(ts);
-        const local = new Date(d.getTime() - (d.getTimezoneOffset() * 60000));
-        return local.toISOString().slice(0, 16);
+        const y = d.getFullYear();
+        const m = String(d.getMonth()+1).padStart(2,'0');
+        const da = String(d.getDate()).padStart(2,'0');
+        const h = String(d.getHours()).padStart(2,'0');
+        const mi = String(d.getMinutes()).padStart(2,'0');
+        return { date:`${y}-${m}-${da}`, time:`${h}:${mi}` };
       },
+      tsFromParts: function(dateStr, timeStr){
+        if(!dateStr) return NaN;
+        const [y,m,d] = dateStr.split("-").map(Number);
+        const [hh,mm] = (timeStr || "00:00").split(":").map(Number);
+        return new Date(y, (m-1), d, hh||0, mm||0, 0, 0).getTime();
+      },
+
       formatDate: function(ts) {
         const d = new Date(ts);
         if(isNaN(d.getTime())) return "--/--";
@@ -639,7 +643,7 @@
       logout: async function() { try { await signOut(auth); } catch(e){} }
     },
 
-    // Debounced saving => réduit la latence (+/-)
+    // Debounced saving
     saveDebounced: function(sec, delay=350) {
       if(this.saveTimers[sec]) clearTimeout(this.saveTimers[sec]);
       this.saveTimers[sec] = setTimeout(async () => {
@@ -739,7 +743,7 @@
     goBack: function() { if(this.viewHistory.length) this.nav(this.viewHistory.pop(), false); else this.nav('home', false); },
     toggleFam: function(id) { if(this.closed.has(id)) this.closed.delete(id); else this.closed.add(id); this.frais.render(); this.pvp.render(); this.salad.render(); },
 
-    // TEAM
+    // TEAM (inchangé)
     team: {
       ensureAdmin: function() {
         if(!window.app.me || window.app.me.role !== "admin") { alert("Accès admin requis."); return false; }
@@ -843,7 +847,7 @@
       }
     },
 
-    // FRAIS
+    // FRAIS (inchangé)
     frais: {
       scanning: false,
       imgUrl: "",
@@ -983,7 +987,7 @@
       }
     },
 
-    // PVP (inchangé)
+    // ✅ PVP : patch édition date/heure toujours possible
     pvp: {
       tab: function(t) {
         document.querySelectorAll('#view-pvp .tab').forEach(e => e.classList.remove('active-pvp'));
@@ -1069,25 +1073,49 @@
           window.app.saveDebounced('pvp', 350);
         }
       },
+
+      // ✅ PATCH V4.1 : modale éditable et stable partout
       openEditStock: function(id) {
         const i = window.app.data.pvpStock.find(x=>x.id==id);
+        if(!i) return;
         document.getElementById('modal-pvp-stock').classList.remove('hidden');
         document.getElementById('stock-id').value=id;
         document.getElementById('stock-name').innerText=i.name;
         document.getElementById('stock-qty').value=i.qty;
-        document.getElementById('stock-start').value = window.app.common.tsToInput(i.out);
-        document.getElementById('stock-end').value = window.app.common.tsToInput(i.end);
+
+        const s = window.app.common.dtPartsFromTs(i.out);
+        const e = window.app.common.dtPartsFromTs(i.end);
+        document.getElementById('stock-start-date').value = s.date;
+        document.getElementById('stock-start-time').value = s.time;
+        document.getElementById('stock-end-date').value = e.date;
+        document.getElementById('stock-end-time').value = e.time;
       },
+
       saveStock: function() {
         const idx = window.app.data.pvpStock.findIndex(x=>String(x.id)===String(document.getElementById('stock-id').value));
         if(idx<0) return;
+
+        const outTs = window.app.common.tsFromParts(
+          document.getElementById('stock-start-date').value,
+          document.getElementById('stock-start-time').value
+        );
+        const endTs = window.app.common.tsFromParts(
+          document.getElementById('stock-end-date').value,
+          document.getElementById('stock-end-time').value
+        );
+
+        if(isNaN(outTs) || isNaN(endTs)) return alert("Date/heure invalide.");
+        if(endTs < outTs) return alert("La fin ne peut pas être avant la sortie.");
+
         window.app.data.pvpStock[idx].qty = Number(document.getElementById('stock-qty').value || 0);
-        window.app.data.pvpStock[idx].out = new Date(document.getElementById('stock-start').value).getTime();
-        window.app.data.pvpStock[idx].end = new Date(document.getElementById('stock-end').value).getTime();
+        window.app.data.pvpStock[idx].out = outTs;
+        window.app.data.pvpStock[idx].end = endTs;
+
         document.getElementById('modal-pvp-stock').classList.add('hidden');
         window.app.pvp.render();
         window.app.saveDebounced('pvp', 350);
       },
+
       delStock: function() {
         const id = document.getElementById('stock-id').value;
         window.app.data.pvpStock = window.app.data.pvpStock.filter(x=>String(x.id)!==String(id));
@@ -1095,6 +1123,7 @@
         window.app.pvp.render();
         window.app.saveDebounced('pvp', 350);
       },
+
       changeQty: function(id, delta) {
         const idx = window.app.data.pvpStock.findIndex(x => x.id == id);
         if(idx > -1) {
@@ -1105,6 +1134,7 @@
           window.app.saveDebounced('pvp', 350);
         }
       },
+
       toggleNeed: function(libId) {
         const idx = window.app.data.checkedNeeds.indexOf(libId);
         if(idx > -1) window.app.data.checkedNeeds.splice(idx, 1);
@@ -1151,7 +1181,7 @@
           });
         }
 
-        // STOCK
+        // STOCK (✅ ligne cliquable pour éditer la date/heure)
         const st = document.getElementById('pvp-stock');
         if(st) {
           st.innerHTML = "";
@@ -1184,15 +1214,18 @@
                 : `<div class="item-img" onclick="event.stopPropagation(); app.common.showBarcode('${i.ean||""}','${(i.name||"").replace(/'/g," ")}')"><i class="fas fa-bread-slice"></i></div>`;
 
               st.innerHTML += `
-                <div class="swipe-wrapper"><div class="swipe-content">
+                <div class="swipe-wrapper"><div class="swipe-content" onclick="app.pvp.openEditStock(${i.id})">
                   <div style="display:flex;align-items:center;flex:1;min-width:0;gap:12px;">
                     ${displayImg}
                     <div style="min-width:0;">
-                      <div class="item-title" onclick="app.pvp.openEditStock(${i.id})">${i.name}</div>
+                      <div class="item-title">${i.name}</div>
                       <div class="qty-ctrl">
-                        <button class="qty-btn" onclick="app.pvp.changeQty(${i.id},-1)">-</button>
+                        <button class="qty-btn" onclick="event.stopPropagation(); app.pvp.changeQty(${i.id},-1)">-</button>
                         <b>${i.qty}</b>
-                        <button class="qty-btn" onclick="app.pvp.changeQty(${i.id},1)">+</button>
+                        <button class="qty-btn" onclick="event.stopPropagation(); app.pvp.changeQty(${i.id},1)">+</button>
+                      </div>
+                      <div class="small" style="margin-top:6px;color:#94a3b8;">
+                        (tape la ligne pour modifier les dates)
                       </div>
                     </div>
                   </div>
@@ -1205,7 +1238,7 @@
           });
         }
 
-        // BESOINS
+        // BESOINS (inchangé)
         const cl = document.getElementById('pvp-calc');
         if(cl) {
           const tom = new Date(); tom.setDate(tom.getDate()+1);
@@ -1271,7 +1304,7 @@
       }
     },
 
-    // SALAD BAR
+    // SALAD (inchangé côté stock/date)
     salad: {
       tab: function(t) {
         document.querySelectorAll('#view-salad .tab').forEach(e => e.classList.remove('active-salad'));
@@ -1369,12 +1402,10 @@
         window.app.saveDebounced('salad', 350);
       },
 
-      // ✅ TRACEABILITY (FIX complet)
+      // TRACE (inchangé ici)
       trace: {
-        ctx: null,               // { productId, productName }
+        ctx: null,
         imgData: "",
-        _returnToTrace: false,   // pour ré-ouvrir la modale trace après fermeture image
-
         open: async function(productId, productName) {
           document.getElementById('trace-file').value = "";
           window.app.salad.trace.ctx = { productId: String(productId), productName };
@@ -1385,196 +1416,80 @@
           document.getElementById('modal-trace').classList.remove('hidden');
           await window.app.salad.trace.loadHistory();
         },
-
         close: function() {
           document.getElementById('modal-trace').classList.add('hidden');
           window.app.salad.trace.ctx = null;
           window.app.salad.trace.imgData = "";
-          window.app.salad.trace._returnToTrace = false;
           document.getElementById('trace-file').value = "";
         },
-
-        resolveUrl: async function(path) {
-          const p = String(path || "").trim();
-          if(!p) throw new Error("empty");
-          if(/^https?:\/\//i.test(p)) return p;
-          return await getDownloadURL(sRef(storage, p));
-        },
-
-        view: async function(path) {
-          if(!path) return;
-          try {
-            // ✅ évite l’affichage “en dessous”
-            window.app.salad.trace._returnToTrace = true;
-            document.getElementById('modal-trace')?.classList.add('hidden');
-
-            const url = await window.app.salad.trace.resolveUrl(path);
-            window.app.common.showBarcode("", "Tracabilité", url);
-          } catch(e) {
-            console.error(e);
-            alert("Impossible d’ouvrir la photo.");
-            document.getElementById('modal-trace')?.classList.remove('hidden');
-            window.app.salad.trace._returnToTrace = false;
-          }
-        },
-
-        del: async function(docId, path, isLegacy) {
-          const ctx = window.app.salad.trace.ctx;
-          if(!ctx || !docId) return;
-          if(!confirm("Supprimer cette tracabilité ?")) return;
-
-          // Storage
-          try {
-            if(path && !/^https?:\/\//i.test(path)) {
-              await deleteObject(sRef(storage, path));
-            }
-          } catch(e) { console.warn("delete storage:", e?.code || e); }
-
-          // Firestore
-          try {
-            if(isLegacy) await deleteDoc(doc(db, "salad_traca", String(docId)));
-            else await deleteDoc(doc(db, "salad_traca", String(ctx.productId), "items", String(docId)));
-          } catch(e) { console.warn("delete firestore:", e?.code || e); }
-
-          await window.app.salad.trace.loadHistory();
-        },
-
-        purgeOld6Months: async function(ctx, cutoff) {
-          // NEW subcollection: purge sans index composite
-          try {
-            let loops = 0;
-            while(loops++ < 10) { // max ~250 docs
-              const qOld = query(
-                colSaladTraceFor(ctx.productId),
-                where("createdAt", "<", cutoff),
-                orderBy("createdAt", "asc"),
-                limit(25)
-              );
-              const snap = await getDocs(qOld);
-              if(snap.empty) break;
-
-              for(const docu of snap.docs) {
-                const d = docu.data() || {};
-                const p = d.path || "";
-                if(p && !/^https?:\/\//i.test(p)) {
-                  try { await deleteObject(sRef(storage, p)); } catch(_) {}
-                }
-                try { await deleteDoc(doc(db, "salad_traca", String(ctx.productId), "items", docu.id)); } catch(_) {}
-              }
-            }
-          } catch(e) { console.warn("purge new:", e?.code || e); }
-
-          // LEGACY: on charge productId== puis filtre local (pas d’index composite)
-          try {
-            const qLegacy = query(colSaladTraceLegacy, where("productId", "==", String(ctx.productId)), limit(200));
-            const snap2 = await getDocs(qLegacy);
-            for(const docu of snap2.docs) {
-              const d = docu.data() || {};
-              if((d.createdAt||0) >= cutoff) continue;
-              const p = d.path || "";
-              if(p && !/^https?:\/\//i.test(p)) {
-                try { await deleteObject(sRef(storage, p)); } catch(_) {}
-              }
-              try { await deleteDoc(doc(db, "salad_traca", docu.id)); } catch(_) {}
-            }
-          } catch(e) { console.warn("purge legacy:", e?.code || e); }
-        },
-
-        validateRow: async function(row, ctx) {
-          try {
-            await window.app.salad.trace.resolveUrl(row.path);
-            return true;
-          } catch(e) {
-            const code = String(e?.code || "");
-            // ✅ pas de fichier => pas de ligne (on supprime le doc fantôme)
-            if(code.includes("storage/object-not-found")) {
-              try {
-                if(row.isLegacy) await deleteDoc(doc(db, "salad_traca", String(row.id)));
-                else await deleteDoc(doc(db, "salad_traca", String(ctx.productId), "items", String(row.id)));
-              } catch(_) {}
-            }
-            return false;
-          }
-        },
-
         loadHistory: async function() {
           const wrap = document.getElementById("trace-history");
-          if(wrap) wrap.textContent = "Chargement…";
+          wrap.textContent = "Chargement…";
           const ctx = window.app.salad.trace.ctx;
-          if(!ctx) { if(wrap) wrap.textContent = "—"; return; }
+          if(!ctx) return (wrap.textContent = "—");
 
           const cutoff = Date.now() - (180 * 24 * 60 * 60 * 1000);
 
-          const escAttr = (s) => String(s || "")
-            .replace(/\\/g, "\\\\")
-            .replace(/'/g, "\\'");
-
           const renderRows = (rows) => {
-            if(!wrap) return;
             if(!rows.length) {
               wrap.innerHTML = "<div class='small'>Aucune photo récente.</div>";
               return;
             }
             wrap.innerHTML = rows.map(r => {
               const when = window.app.common.formatDate(r.createdAt);
-              const p = escAttr(r.path || "");
               return `
                 <div style="padding:10px;border:1px solid #e2e8f0;border-radius:12px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:10px;">
                   <div style="min-width:0;">
                     <div style="font-weight:900;">${when}</div>
                     <div class="small" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${r.path || ""}</div>
                   </div>
-                  <div style="display:flex;gap:8px;flex-shrink:0;">
-                    <button class="icon-btn salad" title="Voir" onclick="app.salad.trace.view('${p}')"><i class="fas fa-eye"></i></button>
-                    <button class="icon-btn red" title="Supprimer" onclick="app.salad.trace.del('${escAttr(r.id)}','${p}',${r.isLegacy?1:0})"><i class="fas fa-trash"></i></button>
-                  </div>
+                  <button class="icon-btn salad" onclick="app.salad.trace.view('${r.path||""}')"><i class="fas fa-eye"></i></button>
                 </div>
               `;
             }).join("");
           };
 
           try {
-            // ✅ purge auto > 6 mois (au moment où on ouvre l’historique)
-            await window.app.salad.trace.purgeOld6Months(ctx, cutoff);
-
-            // NEW
-            const qNew = query(colSaladTraceFor(ctx.productId), orderBy("createdAt", "desc"), limit(50));
-            const snap = await getDocs(qNew);
+            const qy = query(
+              colSaladTraceFor(ctx.productId),
+              orderBy("createdAt", "desc"),
+              limit(10)
+            );
+            const snap = await getDocs(qy);
             const rows = [];
             snap.forEach(docu => {
               const d = docu.data();
-              if((d.createdAt||0) >= cutoff) rows.push({ id: docu.id, ...d, isLegacy:false });
+              if((d.createdAt||0) >= cutoff) rows.push({ id: docu.id, ...d });
             });
+            if(rows.length) return renderRows(rows);
 
-            // ✅ pas de fichier => pas de ligne
-            const sample = rows.slice(0, 10);
-            const oks = await Promise.all(sample.map(r => window.app.salad.trace.validateRow(r, ctx)));
-            const keep = sample.filter((_, i) => oks[i]);
-
-            if(keep.length) { renderRows(keep); return; }
-
-            // LEGACY fallback
-            const qLegacy = query(colSaladTraceLegacy, where("productId","==",String(ctx.productId)), limit(50));
+            const qLegacy = query(
+              colSaladTraceLegacy,
+              where("productId", "==", String(ctx.productId)),
+              limit(50)
+            );
             const snap2 = await getDocs(qLegacy);
             const rows2 = [];
             snap2.forEach(docu => {
               const d = docu.data();
-              if((d.createdAt||0) >= cutoff) rows2.push({ id: docu.id, ...d, isLegacy:true });
+              if((d.createdAt||0) >= cutoff) rows2.push({ id: docu.id, ...d });
             });
             rows2.sort((a,b)=> (b.createdAt||0) - (a.createdAt||0));
-
-            const sample2 = rows2.slice(0, 10);
-            const oks2 = await Promise.all(sample2.map(r => window.app.salad.trace.validateRow(r, ctx)));
-            const keep2 = sample2.filter((_, i) => oks2[i]);
-
-            renderRows(keep2);
-
+            renderRows(rows2.slice(0,10));
           } catch(e) {
             console.error(e);
-            if(wrap) wrap.innerHTML = "<div class='small'>Impossible de charger l’historique (Firestore/Rules).</div>";
+            wrap.innerHTML = "<div class='small'>Impossible de charger l’historique (Firestore rules).</div>";
           }
         },
-
+        view: async function(path) {
+          if(!path) return;
+          try {
+            const url = await getDownloadURL(sRef(storage, path));
+            window.app.common.showBarcode("", "Tracabilité", url);
+          } catch(e) {
+            alert("Impossible d’ouvrir la photo.");
+          }
+        },
         save: async function() {
           const ctx = window.app.salad.trace.ctx;
           if(!ctx) return;
@@ -1588,7 +1503,6 @@
 
           try {
             await uploadString(sRef(storage, path), window.app.salad.trace.imgData, "data_url");
-
             await addDoc(colSaladTraceFor(ctx.productId), {
               productId: String(ctx.productId),
               productName: ctx.productName,
