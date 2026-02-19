@@ -4,104 +4,129 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
 <meta name="theme-color" content="#ffffff" />
-<title>Araujo App V3.1</title>
+<title>Araujo App V4.0</title>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 <script src="https://unpkg.com/@zxing/library@latest"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
 
 <style>
-  :root { --primary: #003896; --accent: #E2001A; --pvp: #d97706; --salad:#16a34a; --bg: #f3f4f6; --surface: #ffffff; --text: #1e293b; --success: #10b981; --danger: #ef4444; }
-  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: system-ui, sans-serif; user-select: none; }
-  body { margin: 0; background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
-  .hidden { display: none !important; }
+  :root {
+    --primary:#003896; --accent:#E2001A; --pvp:#d97706; --salad:#0f766e;
+    --bg:#f3f4f6; --surface:#ffffff; --text:#1e293b; --success:#10b981; --danger:#ef4444;
+    --muted:#64748b;
+  }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; font-family:system-ui,sans-serif; user-select:none; }
+  body { margin:0; background:var(--bg); color:var(--text); height:100vh; display:flex; flex-direction:column; overflow:hidden; }
+  .hidden { display:none !important; }
 
   /* LOGIN */
-  #login-overlay { position: fixed; inset: 0; z-index: 10000; background: white; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100vw; height: 100vh; padding: 18px; }
-  .login-card { width: min(380px, 92vw); }
-  .login-help { font-size: 12px; color:#64748b; text-align:center; margin-top:10px; cursor:pointer; }
-  .login-error { display:none; background:#fee2e2; color:#991b1b; padding:10px 12px; border-radius:10px; font-weight:700; font-size:13px; margin-top:10px; }
+  #login-overlay { position:fixed; inset:0; z-index:10000; background:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:18px; }
+  .login-card { width:min(380px, 92vw); }
+  .login-help { font-size:12px; color:var(--muted); text-align:center; margin-top:10px; cursor:pointer; }
+  .login-error { display:none; background:#fee2e2; color:#991b1b; padding:10px 12px; border-radius:10px; font-weight:800; font-size:13px; margin-top:10px; }
 
   /* HEADER & NAV */
-  header { background: var(--surface); padding: 10px; height: 80px; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); position: relative; z-index: 50; }
-  .logo-header { height: 50px; object-fit: contain; }
-  .user-badge { position: absolute; right: 15px; top: 15px; font-size: 11px; background: #e0f2fe; color: var(--primary); padding: 4px 10px; border-radius: 20px; font-weight: bold; max-width: 52vw; white-space: nowrap; overflow:hidden; text-overflow: ellipsis; }
-  .logout-btn { position:absolute; left:15px; top:18px; border:none; background:#f1f5f9; color:#334155; padding:10px 12px; border-radius:12px; cursor:pointer; font-weight:800; }
+  header { background:var(--surface); padding:10px; height:80px; display:flex; justify-content:center; align-items:center; box-shadow:0 4px 15px rgba(0,0,0,0.05); position:relative; z-index:50; }
+  .logo-header { height:50px; object-fit:contain; }
+  .user-badge { position:absolute; right:15px; top:15px; font-size:11px; background:#e0f2fe; color:var(--primary); padding:4px 10px; border-radius:20px; font-weight:900; max-width:48vw; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .logout-btn { position:absolute; left:15px; top:18px; border:none; background:#f1f5f9; color:#334155; padding:10px 12px; border-radius:12px; cursor:pointer; font-weight:900; }
 
-  main { flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 90px; }
+  main { flex:1; overflow-y:auto; padding:15px; padding-bottom:92px; }
+  nav { position:fixed; bottom:0; width:100%; background:#fff; height:70px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 -4px 20px rgba(0,0,0,0.05); z-index:100; padding:0 30px; }
+  .nav-btn { text-align:center; color:#94a3b8; cursor:pointer; font-size:12px; }
+  .nav-btn i { font-size:24px; margin-bottom:4px; }
 
-  nav { position: fixed; bottom: 0; width: 100%; background: white; height: 70px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); z-index: 100; padding: 0 30px; }
-  .nav-btn { text-align:center; color:#94a3b8; cursor: pointer; font-size: 12px; }
-  .nav-btn i { font-size: 24px; margin-bottom: 4px; }
-
-  /* UI ELEMENTS */
-  .card { background: var(--surface); border-radius: 16px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); margin-bottom: 15px; }
-  input, select { width: 100%; padding: 14px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 16px; background: #fff; margin-bottom: 10px; outline: none; }
-  .btn { width: 100%; padding: 16px; border-radius: 12px; border: none; font-weight: 700; font-size: 16px; background: var(--primary); color: white; cursor: pointer; margin-top: 5px; }
+  /* UI */
+  .card { background:var(--surface); border-radius:16px; padding:20px; box-shadow:0 4px 10px rgba(0,0,0,0.03); margin-bottom:15px; }
+  input, select { width:100%; padding:14px; border:1px solid #cbd5e1; border-radius:10px; font-size:16px; background:#fff; margin-bottom:10px; outline:none; }
+  .btn { width:100%; padding:16px; border-radius:12px; border:none; font-weight:900; font-size:16px; background:var(--primary); color:#fff; cursor:pointer; margin-top:5px; }
   .btn.secondary { background:#eee; color:#333; }
-  .btn.danger { background:#ef4444; }
+  .btn.danger { background:var(--danger); }
   .btn.success { background:#00563f; }
-  .btn.salad { background: var(--salad); }
+  .btn.pvp { background:var(--pvp); }
+  .btn.salad { background:var(--salad); }
 
-  .tabs { display: flex; background: #e2e8f0; padding: 4px; border-radius: 12px; margin-bottom: 15px; gap:4px; }
-  .tab { flex: 1; text-align: center; padding: 12px; font-weight: 800; font-size: 12px; color: #64748b; border-radius: 9px; cursor: pointer; }
-  .tab.active { background: white; color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-  .tab.active-pvp { background: white; color: var(--pvp); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-  .tab.active-salad { background: white; color: var(--salad); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+  .tabs { display:flex; background:#e2e8f0; padding:4px; border-radius:12px; margin-bottom:15px; gap:4px; }
+  .tab { flex:1; text-align:center; padding:12px; font-weight:900; font-size:12px; color:#64748b; border-radius:9px; cursor:pointer; }
+  .tab.active { background:#fff; color:var(--primary); box-shadow:0 2px 4px rgba(0,0,0,0.1); }
+  .tab.active-pvp { background:#fff; color:var(--pvp); box-shadow:0 2px 4px rgba(0,0,0,0.1); }
+  .tab.active-salad { background:#fff; color:var(--salad); box-shadow:0 2px 4px rgba(0,0,0,0.1); }
 
-  /* HOME GRID */
-  .home-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:15px;}
-  .home-btn{background:var(--surface);border-radius:18px;padding:18px;box-shadow:0 4px 10px rgba(0,0,0,0.03);text-align:center;font-weight:900;cursor:pointer}
-  .home-btn i{font-size:28px;margin-bottom:8px}
+  /* HOME */
+  .home-grid { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:12px; }
+  .home-btn {
+    border-radius:18px; padding:18px 10px; color:#fff;
+    text-align:center; font-weight:950; box-shadow:0 10px 25px rgba(0,0,0,0.08);
+    cursor:pointer; line-height:1.2;
+  }
+  .home-btn i { font-size:26px; margin-bottom:8px; }
+  .home-btn.wide { grid-column:1 / -1; }
 
   /* LISTES */
-  .group-header { background: #334155; color: white; padding: 12px 15px; border-radius: 10px; margin-top: 15px; font-weight: bold; text-transform: uppercase; font-size: 14px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
-  .list-item { background: white; border-radius: 12px; padding: 12px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 1px 3px rgba(0,0,0,0.05); min-height: 80px; }
+  .group-header {
+    background:#334155; color:#fff; padding:12px 15px; border-radius:10px; margin-top:15px;
+    font-weight:950; text-transform:uppercase; font-size:14px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;
+  }
+  .list-item {
+    background:#fff; border-radius:12px; padding:12px; margin-bottom:8px; display:flex; align-items:center; justify-content:space-between;
+    box-shadow:0 1px 3px rgba(0,0,0,0.05); min-height:80px; gap:10px;
+  }
+  .swipe-wrapper { background:var(--danger); border-radius:12px; margin-bottom:8px; overflow:hidden; position:relative; }
+  .swipe-content { background:#fff; position:relative; z-index:2; transition:transform 0.12s; padding:12px; display:flex; align-items:center; justify-content:space-between; min-height:80px; width:100%; gap:10px; }
 
-  /* Swipe Elements */
-  .swipe-wrapper { background: #ef4444; border-radius: 12px; margin-bottom: 8px; overflow: hidden; position: relative; }
-  .swipe-content { background: white; position: relative; z-index: 2; transition: transform 0.2s; padding: 12px; display: flex; align-items: center; justify-content: space-between; min-height: 80px; width: 100%; }
+  .item-img {
+    width:55px; height:55px; border-radius:10px; object-fit:cover; background:#f1f5f9; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center; color:#cbd5e1; font-size:20px; cursor:pointer;
+  }
+  .item-info { flex:1; min-width:0; overflow:hidden; }
+  .item-title { font-weight:950; font-size:15px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:4px; }
+  .item-sub { font-size:12px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .right-col { flex-shrink:0; display:flex; align-items:center; gap:8px; }
 
-  .item-img { width: 55px; height: 55px; border-radius: 10px; object-fit: cover; background: #f1f5f9; margin-right: 12px; flex-shrink: 0; display:flex; align-items:center; justify-content:center; color:#cbd5e1; font-size: 20px; cursor: pointer; }
-  .item-info { flex: 1; overflow: hidden; margin-right: 10px; min-width:0; }
-  .item-title { font-weight: 900; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; max-width: 48vw; }
-  .line2 { font-size:12px; color:#64748b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  /* PVP / SALAD Controls */
+  .qty-ctrl { display:flex; align-items:center; gap:10px; background:#f8fafc; width:fit-content; padding:4px 8px; border-radius:8px; border:1px solid #e2e8f0; margin-top:5px; }
+  .qty-btn {
+    width:30px; height:30px; border-radius:8px; border:none; background:#fff; box-shadow:0 2px 3px rgba(0,0,0,0.10);
+    font-weight:950; color:var(--primary); font-size:18px; display:flex; align-items:center; justify-content:center; cursor:pointer;
+  }
+  .icon-btn {
+    width:40px; height:40px; border-radius:12px; border:none; cursor:pointer;
+    display:flex; align-items:center; justify-content:center; color:#fff; font-size:16px; font-weight:950;
+  }
+  .icon-btn.pvp { background:var(--pvp); }
+  .icon-btn.salad { background:var(--salad); }
+  .icon-btn.gray { background:#94a3b8; }
+  .icon-btn.red { background:var(--danger); }
 
-  /* PVP Controls */
-  .qty-ctrl { display: flex; align-items: center; gap: 10px; background: #f8fafc; width: fit-content; padding: 4px 8px; border-radius: 8px; border: 1px solid #e2e8f0; margin-top: 5px; }
-  .qty-btn { width: 30px; height: 30px; border-radius: 6px; border: none; background: white; box-shadow: 0 2px 3px rgba(0,0,0,0.1); font-weight: bold; color: var(--primary); font-size: 18px; display:flex; align-items:center; justify-content:center; cursor: pointer; }
-  .qty-btn:active{transform:scale(.96)}
-  .qty-btn.pvp { color: var(--pvp); }
-  .qty-btn.salad { color: var(--salad); }
+  .date-col { text-align:right; width:135px; flex-shrink:0; display:flex; flex-direction:column; justify-content:center; }
+  .d-lbl { font-size:11px; color:#64748b; margin-bottom:2px; }
+  .d-val { font-size:13px; font-weight:950; color:var(--success); white-space:nowrap; }
+  .d-val.expired { color:var(--danger); }
 
-  .date-col { text-align: right; width: 125px; flex-shrink: 0; display: flex; flex-direction: column; justify-content: center; }
-  .d-lbl { font-size: 11px; color: #64748b; margin-bottom: 2px; }
-  .d-val { font-size: 13px; font-weight: 900; color: var(--success); }
-  .d-val.expired { color: var(--danger); }
-  .d-val.tosaisir{ color:#b45309; }
-
-  /* Frais Badges */
-  .date-badge { width: 50px; height: 50px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; font-weight: bold; flex-shrink: 0; margin-left: 10px; }
-  .bg-red { background: #ef4444; } .bg-orange { background: #f59e0b; } .bg-green { background: #10b981; } .bg-grey { background: #94a3b8; }
-  .badge-saisir{background:#fde68a;color:#92400e;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:900;margin-top:6px;display:inline-block}
-
-  /* Modals */
-  .modal-bc { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
-  .modal-card { background: white; padding: 25px; border-radius: 20px; width: 100%; max-width: 420px; max-height: 85vh; overflow-y: auto; }
-  .row { display:flex; gap:10px; }
-  .chip { font-size:11px; padding:3px 8px; border-radius:999px; font-weight:800; }
+  /* Frais badges */
+  .date-badge { width:52px; height:52px; border-radius:10px; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#fff; font-weight:950; flex-shrink:0; }
+  .bg-red { background:#ef4444; } .bg-orange { background:#f59e0b; } .bg-green { background:#10b981; } .bg-grey { background:#94a3b8; }
+  .chip { font-size:11px; padding:3px 8px; border-radius:999px; font-weight:950; display:inline-flex; align-items:center; gap:6px; }
+  .chip.warn { background:#ffedd5; color:#9a3412; }
   .chip.admin { background:#fee2e2; color:#991b1b; }
   .chip.staff { background:#e0f2fe; color:#075985; }
-  .small { font-size:12px; color:#64748b; }
+  .small { font-size:12px; color:var(--muted); }
 
-  /* Toast */
-  #toast { position:fixed; left:50%; bottom:88px; transform:translateX(-50%); background:#111827; color:#fff; padding:10px 12px; border-radius:999px; font-size:12px; font-weight:800; z-index:99999; display:none; max-width:92vw; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  /* ToDo */
+  .todo-check { width:32px; height:32px; border:2px solid #cbd5e1; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; cursor:pointer; transition:0.15s; }
+  .todo-check.checked { background:var(--success); border-color:var(--success); color:#fff; }
+  .item-done { opacity:0.62; background:#f8fafc; }
+  .item-done .item-title { text-decoration:line-through; color:#94a3b8; }
+
+  /* Modals */
+  .modal-bc { position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:5000; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:20px; }
+  .modal-card { background:#fff; padding:25px; border-radius:20px; width:100%; max-width:460px; max-height:85vh; overflow-y:auto; }
+  .row { display:flex; gap:10px; }
 </style>
 </head>
 
 <body>
-
-  <div id="toast"></div>
 
   <!-- LOGIN -->
   <div id="login-overlay">
@@ -109,16 +134,13 @@
       <div style="text-align:center;">
         <img src="https://raw.githubusercontent.com/araujoexploitation/Magasin/main/LOGO.png" style="width:200px; margin-bottom:20px;">
       </div>
-
       <input type="email" id="login-email" placeholder="Email" autocomplete="username" inputmode="email">
       <input type="password" id="login-pass" placeholder="Mot de passe" autocomplete="current-password">
       <button class="btn success" onclick="app.auth.login()"><i class="fas fa-right-to-bracket"></i> CONNEXION</button>
-
       <div class="login-help" onclick="app.auth.forgot()"><i class="fas fa-unlock-keyhole"></i> Mot de passe oublié ?</div>
       <div id="login-error" class="login-error"></div>
-
       <div class="small" style="text-align:center;margin-top:14px;">
-        Astuce : si tu viens de créer un compte staff, utilise “Mot de passe oublié” pour définir son mot de passe.
+        Astuce : après création d’un compte staff, “Mot de passe oublié” permet de définir le mot de passe.
       </div>
     </div>
   </div>
@@ -126,126 +148,123 @@
   <!-- BARCODE MODAL -->
   <div id="modal-barcode" class="modal-bc hidden">
     <div class="modal-card" style="text-align:center;">
-        <h3 id="bc-name"></h3>
-        <img id="bc-img-display" style="width:100%;height:200px;object-fit:contain;margin-bottom:15px;display:none;background:#f8fafc;border-radius:10px;">
-        <svg id="barcode"></svg><br>
-        <button class="btn secondary" style="margin-top:20px;" onclick="document.getElementById('modal-barcode').classList.add('hidden')">Fermer</button>
+      <h3 id="bc-name" style="margin-top:0;"></h3>
+      <img id="bc-img-display" style="width:100%;height:200px;object-fit:contain;margin-bottom:15px;display:none;background:#f8fafc;border-radius:10px;">
+      <svg id="barcode"></svg><br>
+      <button class="btn secondary" style="margin-top:20px;" onclick="document.getElementById('modal-barcode').classList.add('hidden')">Fermer</button>
+    </div>
+  </div>
+
+  <!-- TRACE MODAL (SALAD) -->
+  <div id="modal-trace" class="modal-bc hidden">
+    <div class="modal-card">
+      <h3 style="margin-top:0;color:var(--salad);display:flex;align-items:center;gap:10px;">
+        <i class="fas fa-camera"></i> Tracabilité
+      </h3>
+      <div class="small" id="trace-title" style="margin-bottom:10px;"></div>
+
+      <button class="btn salad" onclick="document.getElementById('trace-file').click()">
+        <i class="fas fa-image"></i> Prendre / choisir une photo
+      </button>
+      <input type="file" id="trace-file" accept="image/*" capture="environment" class="hidden">
+
+      <img id="trace-preview" style="width:100%;height:220px;object-fit:contain;background:#f8fafc;border-radius:12px;display:none;margin-top:12px;">
+
+      <div class="row" style="margin-top:12px;">
+        <button class="btn salad" style="margin-top:0;" onclick="app.salad.trace.save()"><i class="fas fa-floppy-disk"></i> Enregistrer</button>
+        <button class="btn secondary" style="margin-top:0;" onclick="app.salad.trace.close()">Fermer</button>
+      </div>
+
+      <hr style="border:none;border-top:1px solid #e2e8f0;margin:18px 0;">
+      <h4 style="margin:0 0 10px 0;">Historique (6 mois)</h4>
+      <div id="trace-history" class="small">Chargement…</div>
     </div>
   </div>
 
   <!-- EDIT FRAIS MODAL -->
   <div id="modal-edit-frais" class="modal-bc hidden">
     <div class="modal-card">
-        <h3>Modifier Frais</h3>
-        <input type="hidden" id="edit-id">
-        <label>EAN (Code Barre)</label><input type="text" id="edit-ean" inputmode="numeric">
-        <label>Nom Produit</label><input type="text" id="edit-name">
-        <label>Famille</label>
-        <select id="edit-famille">
-          <option>SNACKING</option><option>TRAITEUR</option><option>ULTRA FRAIS</option><option>CHARCUTERIE</option>
-          <option>VOLAILLE</option><option>BOUCHERIE</option><option>FROMAGE</option><option>SAURISSERIE</option><option>DIVERS</option>
-        </select>
-        <label>Qté</label><input type="number" id="edit-qty">
-        <label>DLC</label><input type="date" id="edit-date">
-        <button class="btn success" onclick="app.frais.saveEdit()">Enregistrer</button>
-        <button class="btn danger" onclick="app.frais.del()">Supprimer</button>
-        <button class="btn secondary" onclick="document.getElementById('modal-edit-frais').classList.add('hidden')">Annuler</button>
+      <h3 style="margin-top:0;">Modifier Frais</h3>
+      <input type="hidden" id="edit-id">
+      <label>EAN (Code Barre)</label><input type="text" id="edit-ean" inputmode="numeric">
+      <label>Nom Produit</label><input type="text" id="edit-name">
+      <label>Famille</label>
+      <select id="edit-famille">
+        <option>SNACKING</option><option>TRAITEUR</option><option>ULTRA FRAIS</option><option>CHARCUTERIE</option>
+        <option>VOLAILLE</option><option>BOUCHERIE</option><option>FROMAGE</option><option>SAURISSERIE</option><option>DIVERS</option>
+      </select>
+      <label>Qté</label><input type="number" id="edit-qty">
+      <label>DLC</label><input type="date" id="edit-date">
+      <button class="btn success" onclick="app.frais.saveEdit()">Enregistrer</button>
+      <button class="btn danger" onclick="app.frais.del()">Supprimer</button>
+      <button class="btn secondary" onclick="document.getElementById('modal-edit-frais').classList.add('hidden')">Annuler</button>
     </div>
   </div>
 
   <!-- PVP MODALS -->
   <div id="modal-pvp-lib" class="modal-bc hidden">
     <div class="modal-card">
-        <h3 style="color:#d97706">Produit PVP</h3>
-        <input type="hidden" id="lib-id"><input type="hidden" id="lib-img-data">
-        <label>Famille</label><select id="lib-fam-select" onchange="app.pvp.toggleFamInput()"></select>
-        <input type="text" id="lib-fam-new" placeholder="Nouvelle famille..." class="hidden">
-        <label>Nom</label><input type="text" id="lib-name">
-        <label>EAN</label><input type="text" id="lib-ean" inputmode="numeric" maxlength="13">
-        <button class="btn secondary" onclick="document.getElementById('cam-input').click()" style="margin-bottom:10px;">Photo</button>
-        <input type="file" id="cam-input" accept="image/*" capture="environment" class="hidden" onchange="app.pvp.handleImg(this)">
-        <img id="img-preview" style="width:100px;height:100px;object-fit:cover;border-radius:10px;display:none;margin:0 auto 10px auto;">
-        <label>Conservation</label><select id="lib-days"><option value="0">JOURNÉE</option><option value="48">48H</option><option value="72">72H</option></select>
-        <label>Objectifs (L->D)</label>
-        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;">
-            <input type="number" id="t-1" placeholder="L" style="text-align:center;padding:5px;">
-            <input type="number" id="t-2" placeholder="M" style="text-align:center;padding:5px;">
-            <input type="number" id="t-3" placeholder="M" style="text-align:center;padding:5px;">
-            <input type="number" id="t-4" placeholder="J" style="text-align:center;padding:5px;">
-            <input type="number" id="t-5" placeholder="V" style="text-align:center;padding:5px;">
-            <input type="number" id="t-6" placeholder="S" style="text-align:center;padding:5px;">
-            <input type="number" id="t-0" placeholder="D" style="text-align:center;padding:5px;">
-        </div>
-        <button class="btn" onclick="app.pvp.saveLib()" style="background:#d97706;">Enregistrer</button>
-        <button class="btn danger" onclick="app.pvp.delLib()">Supprimer</button>
-        <button class="btn secondary" onclick="document.getElementById('modal-pvp-lib').classList.add('hidden')">Fermer</button>
+      <h3 style="color:var(--pvp);margin-top:0;">Produit PVP</h3>
+      <input type="hidden" id="lib-id"><input type="hidden" id="lib-img-data">
+      <label>Famille</label><select id="lib-fam-select" onchange="app.pvp.toggleFamInput()"></select>
+      <input type="text" id="lib-fam-new" placeholder="Nouvelle famille..." class="hidden">
+      <label>Nom</label><input type="text" id="lib-name">
+      <label>EAN</label><input type="text" id="lib-ean" inputmode="numeric" maxlength="13">
+      <button class="btn secondary" onclick="document.getElementById('cam-input').click()" style="margin-bottom:10px;">Photo</button>
+      <input type="file" id="cam-input" accept="image/*" capture="environment" class="hidden">
+      <img id="img-preview" style="width:110px;height:110px;object-fit:cover;border-radius:12px;display:none;margin:0 auto 10px auto;">
+      <label>Conservation</label><select id="lib-days"><option value="0">JOURNÉE</option><option value="48">48H</option><option value="72">72H</option></select>
+      <label>Objectifs (L->D)</label>
+      <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;">
+        <input type="number" id="t-1" placeholder="L" style="text-align:center;padding:6px;">
+        <input type="number" id="t-2" placeholder="M" style="text-align:center;padding:6px;">
+        <input type="number" id="t-3" placeholder="M" style="text-align:center;padding:6px;">
+        <input type="number" id="t-4" placeholder="J" style="text-align:center;padding:6px;">
+        <input type="number" id="t-5" placeholder="V" style="text-align:center;padding:6px;">
+        <input type="number" id="t-6" placeholder="S" style="text-align:center;padding:6px;">
+        <input type="number" id="t-0" placeholder="D" style="text-align:center;padding:6px;">
+      </div>
+      <button class="btn pvp" onclick="app.pvp.saveLib()">Enregistrer</button>
+      <button class="btn danger" onclick="app.pvp.delLib()">Supprimer</button>
+      <button class="btn secondary" onclick="document.getElementById('modal-pvp-lib').classList.add('hidden')">Fermer</button>
     </div>
   </div>
 
   <div id="modal-pvp-stock" class="modal-bc hidden">
     <div class="modal-card">
-      <h3 style="color:#d97706">Correction Rayon</h3>
-      <input type="hidden" id="stock-id"><h4 id="stock-name" style="text-align:center;"></h4>
+      <h3 style="color:var(--pvp);margin-top:0;">Correction Rayon</h3>
+      <input type="hidden" id="stock-id"><h4 id="stock-name" style="text-align:center;margin:0 0 10px 0;"></h4>
       <label>Quantité</label><input type="number" id="stock-qty">
       <label>Sortie</label><input type="datetime-local" id="stock-start">
       <label>Fin</label><input type="datetime-local" id="stock-end">
-      <button class="btn" onclick="app.pvp.saveStock()" style="background:#d97706;">Valider</button>
+      <button class="btn pvp" onclick="app.pvp.saveStock()">Valider</button>
       <button class="btn danger" onclick="app.pvp.delStock()">Retirer</button>
       <button class="btn secondary" onclick="document.getElementById('modal-pvp-stock').classList.add('hidden')">Annuler</button>
     </div>
   </div>
 
-  <!-- SALAD MODALS -->
+  <!-- SALAD MODAL (LIB) -->
   <div id="modal-salad-lib" class="modal-bc hidden">
     <div class="modal-card">
-        <h3 style="color:var(--salad)">Ingrédient Salad Bar</h3>
-        <input type="hidden" id="slib-id">
-        <label>Groupe</label>
-        <select id="slib-group"></select>
-        <input type="text" id="slib-group-new" placeholder="Nouveau groupe..." class="hidden">
-        <label>Nom</label><input type="text" id="slib-name">
-        <label>Conservation</label>
-        <select id="slib-hours">
-          <option value="24">24H</option>
-          <option value="48">48H</option>
-          <option value="168">7J</option>
-          <option value="1920">80J</option>
-        </select>
-        <button class="btn salad" onclick="app.salad.saveLib()">Enregistrer</button>
-        <button class="btn danger" onclick="app.salad.delLib()">Supprimer</button>
-        <button class="btn secondary" onclick="document.getElementById('modal-salad-lib').classList.add('hidden')">Fermer</button>
-    </div>
-  </div>
-
-  <div id="modal-salad-stock" class="modal-bc hidden">
-    <div class="modal-card">
-      <h3 style="color:var(--salad)">Correction Rayon (Salad Bar)</h3>
-      <input type="hidden" id="sstock-id"><h4 id="sstock-name" style="text-align:center;"></h4>
-      <label>Quantité</label><input type="number" id="sstock-qty">
-      <label>Sortie</label><input type="datetime-local" id="sstock-start">
-      <label>Fin</label><input type="datetime-local" id="sstock-end">
-      <button class="btn salad" onclick="app.salad.saveStock()">Valider</button>
-      <button class="btn danger" onclick="app.salad.delStock()">Retirer</button>
-      <button class="btn secondary" onclick="document.getElementById('modal-salad-stock').classList.add('hidden')">Annuler</button>
-    </div>
-  </div>
-
-  <!-- Tracabilité modal -->
-  <div id="modal-traca" class="modal-bc hidden">
-    <div class="modal-card">
-      <h3 style="color:var(--salad)">Tracabilité</h3>
-      <div class="small" id="traca-title" style="margin-bottom:10px;"></div>
-      <button class="btn secondary" onclick="document.getElementById('traca-input').click()"><i class="fas fa-camera"></i> Prendre une photo</button>
-      <input type="file" id="traca-input" accept="image/*" capture="environment" class="hidden" onchange="app.salad.traca.handleFile(this)">
-      <div id="traca-preview" class="hidden" style="margin-top:10px;text-align:center;">
-        <img id="traca-img-preview" style="width:100%;max-height:220px;object-fit:contain;background:#f8fafc;border-radius:12px;">
-        <button class="btn salad" onclick="app.salad.traca.saveCurrent()" style="margin-top:10px;"><i class="fas fa-floppy-disk"></i> Enregistrer la tracabilité</button>
-      </div>
-
-      <h4 style="margin:18px 0 10px 0;">Historique (6 mois)</h4>
-      <div id="traca-history" class="small">Aucune photo.</div>
-
-      <button class="btn secondary" onclick="document.getElementById('modal-traca').classList.add('hidden')">Fermer</button>
+      <h3 style="color:var(--salad);margin-top:0;">Produit Salad Bar</h3>
+      <input type="hidden" id="sal-lib-id">
+      <label>Groupe</label>
+      <select id="sal-lib-fam">
+        <option>SALADE</option><option>BASE</option><option>LEGUMES ET FRUITS</option><option>PROTEINE</option>
+        <option>FROMAGES</option><option>FECULENTS</option><option>TOPPING</option><option>DIVERS</option>
+      </select>
+      <label>Nom</label><input type="text" id="sal-lib-name">
+      <label>Durée (heures)</label>
+      <select id="sal-lib-hours">
+        <option value="24">24H</option>
+        <option value="48">48H</option>
+        <option value="72">72H</option>
+        <option value="168">7J</option>
+        <option value="1920">80J</option>
+      </select>
+      <button class="btn salad" onclick="app.salad.saveLib()">Enregistrer</button>
+      <button class="btn danger" onclick="app.salad.delLib()">Supprimer</button>
+      <button class="btn secondary" onclick="document.getElementById('modal-salad-lib').classList.add('hidden')">Fermer</button>
     </div>
   </div>
 
@@ -257,23 +276,34 @@
   </header>
 
   <main>
+    <!-- HOME -->
     <div id="view-home">
-      <div id="alert-box" style="display:none;background:#ef4444;color:white;padding:15px;border-radius:12px;margin-bottom:15px;text-align:center;font-weight:bold;">⚠️ Dates Courtes !</div>
+      <div id="alert-box" style="display:none;background:#ef4444;color:white;padding:15px;border-radius:12px;margin-bottom:15px;text-align:center;font-weight:950;">⚠️ Dates Courtes !</div>
       <div class="home-grid">
-        <div class="home-btn" onclick="app.nav('frais')" style="background: linear-gradient(135deg, #003896 0%, #002366 100%); color:white;"><i class="fas fa-barcode"></i><br>DLC FRAIS</div>
-        <div class="home-btn" onclick="app.nav('pvp')" style="background: linear-gradient(135deg, #d97706 0%, #b45309 100%); color:white;"><i class="fas fa-bread-slice"></i><br>GESTION PVP</div>
-        <div class="home-btn" onclick="app.nav('salad')" style="background: linear-gradient(135deg, #16a34a 0%, #0f766e 100%); color:white;"><i class="fas fa-leaf"></i><br>SALAD BAR</div>
+        <div class="home-btn" onclick="app.nav('frais')" style="background:linear-gradient(135deg,#003896 0%,#002366 100%);">
+          <i class="fas fa-barcode"></i><br>DLC FRAIS
+        </div>
+        <div class="home-btn" onclick="app.nav('pvp')" style="background:linear-gradient(135deg,#d97706 0%,#b45309 100%);">
+          <i class="fas fa-bread-slice"></i><br>GESTION PVP
+        </div>
+        <div class="home-btn wide" onclick="app.nav('salad')" style="background:linear-gradient(135deg,#0f766e 0%,#115e59 100%);">
+          <i class="fas fa-bowl-food"></i><br>SALAD BAR (DLC + TRACABILITÉ)
+        </div>
       </div>
       <div class="card hidden" id="btn-team" onclick="app.nav('team')" style="text-align:center;"><i class="fas fa-users"></i> Équipe</div>
     </div>
 
+    <!-- FRAIS -->
     <div id="view-frais" class="hidden">
       <div class="tabs">
         <div class="tab active" id="tf-1" onclick="app.frais.tab('scan')">SCAN</div>
         <div class="tab" id="tf-2" onclick="app.frais.tab('list')">LISTE</div>
       </div>
+
       <div id="frais-scan">
-        <div id="scanner-box" style="height:200px;background:black;margin-bottom:10px;display:none;"><video id="video" style="width:100%;height:100%;object-fit:cover;"></video></div>
+        <div id="scanner-box" style="height:200px;background:black;margin-bottom:10px;display:none;">
+          <video id="video" style="width:100%;height:100%;object-fit:cover;"></video>
+        </div>
         <button class="btn" onclick="app.frais.toggleScan()"><i class="fas fa-camera"></i> SCANNER</button>
         <div class="card">
           <input id="frais-ean" type="text" inputmode="numeric" placeholder="EAN" oninput="app.frais.handleInput(this.value)">
@@ -282,13 +312,18 @@
             <option>BOUCHERIE</option><option>VOLAILLE</option><option>FROMAGE</option><option>SAURISSERIE</option><option>DIVERS</option>
           </select>
           <input id="frais-name" placeholder="Nom">
-          <div class="row"><input type="date" id="frais-date"><input type="number" id="frais-qty" placeholder="Qté"></div>
+          <div class="row">
+            <input type="date" id="frais-date">
+            <input type="number" id="frais-qty" placeholder="Qté">
+          </div>
           <button class="btn" onclick="app.frais.add()">AJOUTER</button>
         </div>
       </div>
+
       <div id="frais-list" class="hidden"></div>
     </div>
 
+    <!-- PVP -->
     <div id="view-pvp" class="hidden">
       <div class="tabs">
         <div class="tab active-pvp" id="tp-1" onclick="app.pvp.tab('stock')">RAYON</div>
@@ -296,13 +331,16 @@
         <div class="tab" id="tp-3" onclick="app.pvp.tab('calc')">BESOINS</div>
       </div>
       <div id="pvp-stock"></div>
+
       <div id="pvp-bib" class="hidden">
         <button class="btn secondary" onclick="app.pvp.openLib()" style="margin-bottom:15px;">+ Créer Produit</button>
         <div id="lib-list"></div>
       </div>
+
       <div id="pvp-calc" class="hidden"></div>
     </div>
 
+    <!-- SALAD BAR -->
     <div id="view-salad" class="hidden">
       <div class="tabs">
         <div class="tab active-salad" id="ts-1" onclick="app.salad.tab('stock')">RAYON</div>
@@ -312,7 +350,7 @@
       <div id="salad-stock"></div>
 
       <div id="salad-bib" class="hidden">
-        <button class="btn secondary" onclick="app.salad.openLib()" style="margin-bottom:15px;">+ Créer Ingrédient</button>
+        <button class="btn secondary" onclick="app.salad.openLib()" style="margin-bottom:15px;">+ Créer Produit</button>
         <div id="salad-lib-list"></div>
       </div>
     </div>
@@ -328,7 +366,7 @@
           <option value="admin">admin</option>
         </select>
         <button class="btn" onclick="app.team.createStaff()">Créer + envoyer lien “mot de passe oublié”</button>
-        <div class="small">Le staff clique ensuite “Mot de passe oublié” sur l’écran de login, ou reçoit le mail si ton template est configuré.</div>
+        <div class="small">Le staff clique ensuite “Mot de passe oublié” sur l’écran de login.</div>
       </div>
 
       <div class="card">
@@ -336,7 +374,6 @@
         <div id="user-list"></div>
       </div>
     </div>
-
   </main>
 
   <nav id="app-nav" class="hidden">
@@ -346,15 +383,26 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore, doc, setDoc, getDoc, collection, addDoc, query, where, getDocs, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-  import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, sendPasswordResetEmail, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-  import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app-check.js";
-  import { getStorage, ref, uploadString, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+  import {
+    getFirestore, doc, setDoc, getDoc,
+    collection, addDoc, getDocs, query, where, orderBy, limit
+  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import {
+    getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, sendPasswordResetEmail, createUserWithEmailAndPassword
+  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+  import {
+    getStorage, ref as sRef, uploadString, getDownloadURL
+  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
+  // ✅ TON firebaseConfig (intégré)
   const firebaseConfig = {
     apiKey: "AIzaSyA0ffa4Nfa7kGLyaEcAocU9YzIhzmx3SkA",
     authDomain: "araujo-exploitation.firebaseapp.com",
-    projectId: "araujo-exploitation"
+    databaseURL: "https://araujo-exploitation-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "araujo-exploitation",
+    storageBucket: "araujo-exploitation.firebasestorage.app",
+    messagingSenderId: "292878114487",
+    appId: "1:292878114487:web:2a450227310e970ce1b732"
   };
 
   const appFb = initializeApp(firebaseConfig);
@@ -362,69 +410,99 @@
   const auth = getAuth(appFb);
   const storage = getStorage(appFb);
 
-  // Secondary app/auth => créer des comptes sans déconnecter l’admin
+  // Secondary auth => créer des comptes sans déconnecter l’admin
   const secondaryApp = initializeApp(firebaseConfig, "Secondary");
   const secondaryAuth = getAuth(secondaryApp);
 
-  // ---- App Check (reCAPTCHA v3)
-  // IMPORTANT : en local, tu peux activer le debug token (décommente) :
-  // self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
-  self.FIREBASE_APPCHECK_DEBUG_TOKEN = false;
-
-  try {
-    initializeAppCheck(appFb, {
-      // ✅ COLLE TA CLÉ ICI :
-      provider: new ReCaptchaV3Provider("6LfmVXAsAAAAAKDTlkBqoKB-zSkgd5FrSk5dCylf"),
-      isTokenAutoRefreshEnabled: true
-    });
-  } catch(e) {
-    // si déjà initialisé
-  }
-
-  // Firestore docs
+  // Firestore docs (schémas inchangés pour PVP/FRAIS/USERS)
   const docUsers = doc(db, "store_master", "DATA_USERS");
   const docFrais = doc(db, "store_master", "DATA_FRAIS");
   const docPVP   = doc(db, "store_master", "DATA_PVP");
-  const docSalad = doc(db, "store_master", "DATA_SALAD");
 
-  // Tracabilité Salad Bar (historique 6 mois)
-  const colSaladTraca = collection(db, "store_master", "DATA_SALAD_TRACA", "items");
+  // Salad bar (nouveau doc)
+  const docSalad = doc(db, "store_master", "DATA_SALAD");
+  // Tracabilité (nouvelle collection)
+  const colSaladTrace = collection(db, "salad_traca");
 
   const codeReader = new ZXing.BrowserMultiFormatReader();
 
+  const SALAD_DEFAULTS = [
+    // SALADE
+    { family:"SALADE", name:"Batavia", hours:48 },
+    { family:"SALADE", name:"Mâche", hours:48 },
+    { family:"SALADE", name:"Melange Gourmand", hours:48 },
+    { family:"SALADE", name:"Iceberg", hours:48 },
+
+    // BASE
+    { family:"BASE", name:"Penne au basilic", hours:48 },
+    { family:"BASE", name:"Rdiatori au tomates Mi-Séchées", hours:48 },
+    { family:"BASE", name:"Garganelli et graines de lin", hours:48 },
+    { family:"BASE", name:"Quinoa Boulgour,Tomates mi-séches,feves de soja", hours:48 },
+    { family:"BASE", name:"Boulgour et lentilles", hours:48 },
+    { family:"BASE", name:"Farfalles au pesto", hours:48 },
+    { family:"BASE", name:"Duo de riz a l'algue wakamé", hours:48 },
+    { family:"BASE", name:"Nouilles Asiatique", hours:48 },
+    { family:"BASE", name:"Trio de quinoa lentilles corali", hours:48 },
+    { family:"BASE", name:"Féta,blé légumes", hours:48 },
+
+    // LEGUMES ET FRUITS
+    { family:"LEGUMES ET FRUITS", name:"Tomates cerise marinées", hours:48 },
+    { family:"LEGUMES ET FRUITS", name:"Légumes Grillées", hours:48 },
+    { family:"LEGUMES ET FRUITS", name:"Duo de carrotes", hours:48 },
+    { family:"LEGUMES ET FRUITS", name:"Betrave", hours:48 },
+    { family:"LEGUMES ET FRUITS", name:"Féves de soja", hours:48 },
+    { family:"LEGUMES ET FRUITS", name:"Pois Chiches", hours:48 },
+    { family:"LEGUMES ET FRUITS", name:"Avocat", hours:24 },
+    { family:"LEGUMES ET FRUITS", name:"Dés de Mangue", hours:48 },
+    { family:"LEGUMES ET FRUITS", name:"Tartares de comcombre", hours:48 },
+    { family:"LEGUMES ET FRUITS", name:"Tartares de Tomates", hours:48 },
+    { family:"LEGUMES ET FRUITS", name:"Colaslaw Pommes cramberry", hours:48 },
+
+    // PROTEINE
+    { family:"PROTEINE", name:"Œufs durs", hours:48 },
+    { family:"PROTEINE", name:"Pates Saumon fumé à l'aneth", hours:48 },
+    { family:"PROTEINE", name:"Poulet émincé", hours:48 },
+    { family:"PROTEINE", name:"Poulet Pané", hours:48 },
+    { family:"PROTEINE", name:"Jambon Cuit", hours:48 },
+    { family:"PROTEINE", name:"Thon", hours:48 },
+    { family:"PROTEINE", name:"Farfalles", hours:48 },
+    { family:"PROTEINE", name:"Poulet mariné", hours:48 },
+    { family:"PROTEINE", name:"Ditali chorizo", hours:48 },
+
+    // FROMAGES
+    { family:"FROMAGES", name:"Billes mozzarella", hours:48 },
+    { family:"FROMAGES", name:"Emmental", hours:48 },
+    { family:"FROMAGES", name:"Fromages Italien", hours:48 },
+
+    // FECULENTS
+    { family:"FECULENTS", name:"Radiatori Tomate mi séchée", hours:48 },
+    { family:"FECULENTS", name:"Pates penne au basilic", hours:48 },
+    { family:"FECULENTS", name:"Boulgour", hours:48 },
+    { family:"FECULENTS", name:"Riz sauvage", hours:48 },
+
+    // TOPPING
+    { family:"TOPPING", name:"Noix/Amandes/Noix de cajou/Graines de courge/Raisin", hours:168 }, // 7j
+    { family:"TOPPING", name:"Crumble Salé", hours:168 }, // 7j
+    { family:"TOPPING", name:"Sauce Balsamique", hours:1920 }, // 80j
+    { family:"TOPPING", name:"Sauce Caesar", hours:1920 },
+    { family:"TOPPING", name:"Sauce Soja Citron Vert", hours:1920 }
+  ].map(x => ({ ...x, id: null }));
+
   window.app = {
     me: null,
-    data: { frais: [], users: [], pvpLib: [], pvpStock: [], checkedNeeds: [], saladLib: [], saladStock: [] },
+    data: {
+      frais: [],
+      users: [],
+      pvpLib: [],
+      pvpStock: [],
+      checkedNeeds: [],
+      saladLib: [],
+      saladStock: []
+    },
     viewHistory: [],
     closed: new Set(),
     debounceTimer: null,
-
-    _saveTimers: {},
-    _saving: new Set(),
-
-    toast: function(msg) {
-      const t = document.getElementById('toast');
-      t.textContent = msg;
-      t.style.display = 'block';
-      clearTimeout(this._toastTimer);
-      this._toastTimer = setTimeout(()=>{ t.style.display='none'; }, 1600);
-    },
-
-    queueSave: function(sec, delay=220) {
-      clearTimeout(this._saveTimers[sec]);
-      this._saveTimers[sec] = setTimeout(async () => {
-        if(this._saving.has(sec)) return;
-        this._saving.add(sec);
-        try {
-          await this._saveNow(sec);
-        } catch(e) {
-          console.warn(e);
-          this.toast("⚠️ Sauvegarde échouée (réseau / App Check / rules).");
-        } finally {
-          this._saving.delete(sec);
-        }
-      }, delay);
-    },
+    saveTimers: {},
 
     ui: {
       err: (msg) => {
@@ -443,7 +521,7 @@
       showBarcode: function(ean, name, imgUrl=null) {
         document.getElementById('modal-barcode').classList.remove('hidden');
         document.getElementById('bc-name').innerText = name || "";
-        let imgEl = document.getElementById('bc-img-display');
+        const imgEl = document.getElementById('bc-img-display');
         if(imgUrl) { imgEl.src = imgUrl; imgEl.style.display='block'; } else { imgEl.style.display='none'; }
         if(ean) {
           try { JsBarcode("#barcode", ean, {format:"EAN13", height:80, displayValue:true}); }
@@ -452,25 +530,31 @@
       },
       parseDateLocal: function(dateStr) {
         if(!dateStr) return null;
-        let parts = dateStr.split('-');
+        const parts = dateStr.split('-');
         return new Date(parts[0], parts[1]-1, parts[2], 12, 0, 0).getTime();
       },
       dateToInputLocal: function(ts) {
         if(!ts) return "";
-        let d = new Date(ts);
-        let y = d.getFullYear();
-        let m = String(d.getMonth()+1).padStart(2,'0');
-        let day = String(d.getDate()).padStart(2,'0');
+        const d = new Date(ts);
+        const y = d.getFullYear();
+        const m = String(d.getMonth()+1).padStart(2,'0');
+        const day = String(d.getDate()).padStart(2,'0');
         return `${y}-${m}-${day}`;
       },
       tsToInput: function(ts) {
-        let d = new Date(ts);
-        let local = new Date(d.getTime() - (d.getTimezoneOffset() * 60000));
+        const d = new Date(ts);
+        const local = new Date(d.getTime() - (d.getTimezoneOffset() * 60000));
         return local.toISOString().slice(0, 16);
       },
+      formatDate: function(ts) {
+        const d = new Date(ts);
+        if(isNaN(d.getTime())) return "--/--";
+        const h = d.getHours(), m = d.getMinutes();
+        return `${d.getDate()}/${d.getMonth()+1} ${h<10?'0'+h:h}:${m<10?'0'+m:m}`;
+      },
       calculateEnd: function(startTs, hours) {
-        let end = new Date(startTs);
-        let h = parseInt(hours);
+        const end = new Date(startTs);
+        const h = parseInt(hours || 0, 10);
         if (h === 0) end.setHours(22, 0, 0, 0);
         else end.setHours(end.getHours() + h);
         return end.getTime();
@@ -478,39 +562,41 @@
       cleanName: function(name) {
         return (name||"").toUpperCase().replace(/^[\d\s\.,xX]+(G|KG|ML|CL|L|P)?\s*/g, '');
       },
-      compressImg: function(file, callback) {
-        let reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = (e) => {
-          let img = new Image();
-          img.src = e.target.result;
-          img.onload = () => {
-            let canvas = document.createElement('canvas');
-            let ctx = canvas.getContext('2d');
-            let max = 300; let w = img.width, h = img.height;
-            if (w > h) { if (w > max) { h *= max/w; w = max; } }
-            else { if (h > max) { w *= max/h; h = max; } }
-            canvas.width = w; canvas.height = h;
-            ctx.drawImage(img, 0, 0, w, h);
-            callback(canvas.toDataURL('image/jpeg', 0.5));
-          };
-        };
-      },
-      formatDate: function(ts) {
-        let d = new Date(ts);
-        if(isNaN(d.getTime())) return "--/--";
-        let h = d.getHours(); let m = d.getMinutes();
-        return `${d.getDate()}/${String(d.getMonth()+1).padStart(2,'0')} ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
-      },
       randPwd: function(len=14) {
         const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%";
         let out = "";
         for(let i=0;i<len;i++) out += chars[Math.floor(Math.random()*chars.length)];
         return out;
       },
-      startOfDay: function(ts) {
-        const d = new Date(ts);
-        return new Date(d.getFullYear(), d.getMonth(), d.getDate(), 0, 0, 0, 0).getTime();
+      compressImgFileToDataUrl: function(file, callback) {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (e) => {
+          const img = new Image();
+          img.src = e.target.result;
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const max = 450;
+            let w = img.width, h = img.height;
+            if (w > h) { if (w > max) { h *= max/w; w = max; } }
+            else { if (h > max) { w *= max/h; h = max; } }
+            canvas.width = w; canvas.height = h;
+            ctx.drawImage(img, 0, 0, w, h);
+            callback(canvas.toDataURL('image/jpeg', 0.6));
+          };
+        };
+      },
+      // "À SAISIR" => apparaît la veille à 18h (J-1 18:00) jusqu'à fin du jour DLC
+      isASaisir: function(dlcTs) {
+        if(!dlcTs) return false;
+        const dlc = new Date(dlcTs);
+        if(isNaN(dlc.getTime())) return false;
+        const dlcDayStart = new Date(dlc.getFullYear(), dlc.getMonth(), dlc.getDate(), 0,0,0,0).getTime();
+        const threshold = new Date(dlc.getFullYear(), dlc.getMonth(), dlc.getDate()-1, 18,0,0,0).getTime();
+        const endOfDay = new Date(dlc.getFullYear(), dlc.getMonth(), dlc.getDate(), 23,59,59,999).getTime();
+        const now = Date.now();
+        return now >= threshold && now <= endOfDay;
       }
     },
 
@@ -541,14 +627,21 @@
       logout: async function() { try { await signOut(auth); } catch(e){} }
     },
 
-    // ---- Firestore load/save
+    // Debounced saving => réduit la latence (+/-)
+    saveDebounced: function(sec, delay=350) {
+      if(this.saveTimers[sec]) clearTimeout(this.saveTimers[sec]);
+      this.saveTimers[sec] = setTimeout(async () => {
+        try { await this.save(sec); } catch(e) {}
+      }, delay);
+    },
+
     loadAll: async function() {
       const [uSnap, fSnap, pSnap, sSnap] = await Promise.all([getDoc(docUsers), getDoc(docFrais), getDoc(docPVP), getDoc(docSalad)]);
       this.data.users = uSnap.exists() ? (uSnap.data().list || []) : [];
       this.data.frais = fSnap.exists() ? (fSnap.data().list || []) : [];
 
       if(pSnap.exists()) {
-        let d = pSnap.data();
+        const d = pSnap.data();
         this.data.pvpLib = d.lib || [];
         this.data.pvpStock = d.stock || [];
         this.data.checkedNeeds = d.needs || [];
@@ -557,41 +650,46 @@
       }
 
       if(sSnap.exists()) {
-        let d = sSnap.data() || {};
+        const d = sSnap.data();
         this.data.saladLib = d.lib || [];
         this.data.saladStock = d.stock || [];
       } else {
         this.data.saladLib = [];
         this.data.saladStock = [];
       }
-
-      // Seed Salad lib si vide
-      if(!this.data.saladLib.length) {
-        this.data.saladLib = this.salad.seedLib();
-        this.queueSave('salad', 0);
-      }
     },
 
-    _saveNow: async function(sec) {
+    save: async function(sec) {
       if(!auth.currentUser) throw new Error("Not logged");
-      if(sec==='users') await setDoc(docUsers, { list: this.data.users }, { merge: true });
-      if(sec==='frais') await setDoc(docFrais, { list: this.data.frais }, { merge: true });
-      if(sec==='pvp')   await setDoc(docPVP,   { lib: this.data.pvpLib, stock: this.data.pvpStock, needs: this.data.checkedNeeds }, { merge: true });
-      if(sec==='salad') await setDoc(docSalad, { lib: this.data.saladLib, stock: this.data.saladStock }, { merge: true });
+      if(sec==='users') await setDoc(docUsers, { list: this.data.users });
+      if(sec==='frais') await setDoc(docFrais, { list: this.data.frais });
+      if(sec==='pvp')   await setDoc(docPVP,   { lib: this.data.pvpLib, stock: this.data.pvpStock, needs: this.data.checkedNeeds });
+      if(sec==='salad') await setDoc(docSalad, { lib: this.data.saladLib, stock: this.data.saladStock });
     },
 
     afterLoginBootstrap: async function() {
       await this.loadAll();
 
-      // Si aucun user en base => on bootstrap l’admin avec le user connecté
+      // bootstrap users si vide
       if(!this.data.users.length) {
         const email = auth.currentUser.email || "";
         const name = (email.split("@")[0] || "ADMIN").toUpperCase();
         this.data.users = [{ uid: auth.currentUser.uid, email, name, role:"admin" }];
-        this.queueSave("users", 0);
+        await this.save("users");
       }
 
-      // Trouver profil
+      // bootstrap salad lib si vide
+      if(!this.data.saladLib.length) {
+        this.data.saladLib = SALAD_DEFAULTS.map(x => ({
+          id: Date.now() + Math.floor(Math.random()*1000000),
+          family: x.family,
+          name: x.name,
+          hours: x.hours
+        }));
+        await this.save("salad");
+      }
+
+      // profil
       this.me = this.data.users.find(u => u.uid === auth.currentUser.uid) || null;
       if(!this.me) {
         alert("Votre compte n’est pas autorisé (UID inconnu dans DATA_USERS).");
@@ -605,12 +703,8 @@
       document.getElementById('app-nav').classList.remove('hidden');
       document.getElementById('user-badge').innerText = this.me.name || (this.me.email || "USER");
 
-      // Admin UI
       if(this.me.role === 'admin') document.getElementById('btn-team').classList.remove('hidden');
       else document.getElementById('btn-team').classList.add('hidden');
-
-      // prune traca old
-      try { await this.salad.traca.pruneOld(); } catch(e){}
 
       this.updateUI();
     },
@@ -625,7 +719,7 @@
 
     nav: function(v, saveHistory = true) {
       if(this.frais.scanning) this.frais.toggleScan();
-      let current = document.querySelector('main > div:not(.hidden)');
+      const current = document.querySelector('main > div:not(.hidden)');
       if(saveHistory && current) this.viewHistory.push(current.id.replace('view-',''));
       document.querySelectorAll('main > div').forEach(e => e.classList.add('hidden'));
       document.getElementById('view-'+v).classList.remove('hidden');
@@ -633,13 +727,10 @@
     goBack: function() { if(this.viewHistory.length) this.nav(this.viewHistory.pop(), false); else this.nav('home', false); },
     toggleFam: function(id) { if(this.closed.has(id)) this.closed.delete(id); else this.closed.add(id); this.frais.render(); this.pvp.render(); this.salad.render(); },
 
-    // ---- TEAM (admin)
+    // TEAM
     team: {
       ensureAdmin: function() {
-        if(!window.app.me || window.app.me.role !== "admin") {
-          alert("Accès admin requis.");
-          return false;
-        }
+        if(!window.app.me || window.app.me.role !== "admin") { alert("Accès admin requis."); return false; }
         return true;
       },
       createStaff: async function() {
@@ -650,62 +741,44 @@
         const role = document.getElementById("new-u-role").value || "staff";
         if(!name || !email) return alert("Nom + email requis.");
 
-        if(window.app.data.users.some(u => (u.email||"").toLowerCase() === email)) {
-          return alert("Email déjà présent dans la liste.");
-        }
+        if(window.app.data.users.some(u => (u.email||"").toLowerCase() === email)) return alert("Email déjà présent.");
 
         try {
           const tmpPwd = window.app.common.randPwd();
           const cred = await createUserWithEmailAndPassword(secondaryAuth, email, tmpPwd);
 
-          window.app.data.users.push({
-            uid: cred.user.uid,
-            email,
-            name,
-            role
-          });
-          window.app.queueSave("users", 0);
+          window.app.data.users.push({ uid: cred.user.uid, email, name, role });
+          await window.app.save("users");
 
           await sendPasswordResetEmail(secondaryAuth, email);
-
           try { await signOut(secondaryAuth); } catch(e) {}
+
           document.getElementById("new-u-name").value = "";
           document.getElementById("new-u-email").value = "";
           document.getElementById("new-u-role").value = "staff";
-          alert("Compte créé + email envoyé (reset mot de passe).");
+          alert("Compte créé + email reset envoyé.");
           window.app.team.renderUsers();
         } catch(e) {
-          if(String(e?.code||"").includes("auth/email-already-in-use")) {
-            alert("Email déjà utilisé dans Firebase Auth. Utilise un autre email ou supprime l’ancien compte via console.");
-          } else if(String(e?.code||"").includes("auth/invalid-email")) {
-            alert("Email invalide.");
-          } else {
-            alert("Erreur création compte. Vérifie Auth activé + domain autorisé.");
-          }
+          if(String(e?.code||"").includes("auth/email-already-in-use")) alert("Email déjà utilisé dans Firebase Auth.");
+          else if(String(e?.code||"").includes("auth/invalid-email")) alert("Email invalide.");
+          else alert("Erreur création compte (Auth / domaine autorisé).");
           try { await signOut(secondaryAuth); } catch(err) {}
         }
       },
-
       resetPwd: async function(email) {
         if(!this.ensureAdmin()) return;
         if(!email) return alert("Pas d’email.");
-        try {
-          await sendPasswordResetEmail(auth, email);
-          alert("Reset envoyé.");
-        } catch(e) {
-          alert("Impossible d’envoyer le reset.");
-        }
+        try { await sendPasswordResetEmail(auth, email); alert("Reset envoyé."); }
+        catch(e) { alert("Impossible d’envoyer le reset."); }
       },
-
       setRole: async function(uid, role) {
         if(!this.ensureAdmin()) return;
         const u = window.app.data.users.find(x => x.uid === uid);
         if(!u) return;
         u.role = role;
-        window.app.queueSave("users", 0);
+        await window.app.save("users");
         this.renderUsers();
       },
-
       setName: async function(uid) {
         if(!this.ensureAdmin()) return;
         const u = window.app.data.users.find(x => x.uid === uid);
@@ -713,14 +786,12 @@
         const n = prompt("Nom :", u.name || "");
         if(!n) return;
         u.name = n.trim().toUpperCase();
-        window.app.queueSave("users", 0);
+        await window.app.save("users");
         this.renderUsers();
       },
-
       renderUsers: function() {
         const wrap = document.getElementById("user-list");
         if(!wrap) return;
-
         const users = (window.app.data.users || []).slice()
           .sort((a,b) => (a.role||"").localeCompare(b.role||"") || (a.name||"").localeCompare(b.name||""));
 
@@ -733,7 +804,7 @@
             <div style="padding:12px;border-bottom:1px solid #eee;">
               <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
                 <div style="min-width:0;">
-                  <div style="font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                  <div style="font-weight:950;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
                     ${u.name || "(Sans nom)"} ${chip}
                   </div>
                   <div class="small" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
@@ -760,7 +831,7 @@
       }
     },
 
-    // ---- FRAIS
+    // FRAIS
     frais: {
       scanning: false,
       imgUrl: "",
@@ -780,15 +851,15 @@
         }
       },
       handleInput: function(val) {
-        let clean = String(val||"").replace(/\D/g, '').slice(0, 13);
+        const clean = String(val||"").replace(/\D/g, '').slice(0, 13);
         document.getElementById('frais-ean').value = clean;
         if(window.app.debounceTimer) clearTimeout(window.app.debounceTimer);
         window.app.debounceTimer = setTimeout(() => { if(clean.length === 13) this.api(clean); }, 250);
       },
       api: async function(ean) {
         try {
-          let r = await fetch(`https://world.openfoodfacts.org/api/v0/product/${ean}.json`);
-          let d = await r.json();
+          const r = await fetch(`https://world.openfoodfacts.org/api/v0/product/${ean}.json`);
+          const d = await r.json();
           if(d.status==1) {
             document.getElementById('frais-name').value = d.product.product_name_fr || "";
             this.imgUrl = d.product.image_front_small_url || "";
@@ -796,9 +867,9 @@
         } catch(e){}
       },
       add: async function() {
-        let dateVal = document.getElementById('frais-date').value;
-        let finalDate = window.app.common.parseDateLocal(dateVal);
-        let o = {
+        const dateVal = document.getElementById('frais-date').value;
+        const finalDate = window.app.common.parseDateLocal(dateVal);
+        const o = {
           id: Date.now(),
           ean: document.getElementById('frais-ean').value,
           fam: document.getElementById('frais-fam').value,
@@ -809,64 +880,64 @@
         };
         if(!o.name || !o.date) return alert('Date requise');
         window.app.data.frais.push(o);
-        window.app.queueSave('frais', 0);
-        window.app.toast("✅ Ajouté");
+        await window.app.save('frais');
+        alert('Ajouté');
         this.imgUrl="";
         document.getElementById('frais-name').value="";
         document.getElementById('frais-ean').value="";
-        this.render();
-        window.app.checkAlerts();
       },
       render: function() {
-        let div = document.getElementById('frais-list'); div.innerHTML="";
-        let grp = {};
-        window.app.data.frais.sort((a,b) => (a.fam||"").localeCompare(b.fam||"") || (a.date||0)-(b.date||0))
-          .forEach(i=>{ if(!grp[i.fam])grp[i.fam]=[]; grp[i.fam].push(i); });
+        const div = document.getElementById('frais-list'); if(!div) return;
+        div.innerHTML="";
+        const grp = {};
+        window.app.data.frais
+          .slice()
+          .sort((a,b) => (a.fam||"").localeCompare(b.fam||"") || (a.date||0)-(b.date||0))
+          .forEach(i=>{ if(!grp[i.fam]) grp[i.fam]=[]; grp[i.fam].push(i); });
 
-        const now = Date.now();
-
-        for(let f in grp) {
-          let id = 'F-'+f; let c = window.app.closed.has(id);
+        for(const f in grp) {
+          const id = 'F-'+f;
+          const c = window.app.closed.has(id);
           div.innerHTML += `<div class="group-header" onclick="app.toggleFam('${id}')"><span>${f}</span><i class="fas fa-chevron-${c?'right':'down'}"></i></div>`;
-          if(!c) {
-            grp[f].forEach(i => {
-              let d = new Date(i.date);
-              let badge = 'bg-grey';
-              if(!isNaN(d.getTime())) {
-                let diff = (d - new Date())/(1000*60*60*24);
-                badge = diff<0?'bg-red':(diff<2?'bg-orange':'bg-green');
-              }
+          if(c) continue;
 
-              // À SAISIR : la veille à 18h (si DLC le 18 => à saisir dès 17 à 18h)
-              const dlcDayStart = window.app.common.startOfDay(i.date);
-              const saisieStart = dlcDayStart - (6*60*60*1000); // veille 18:00
-              const showSaisir = now >= saisieStart && now < dlcDayStart;
+          grp[f].forEach(i => {
+            const d = new Date(i.date);
+            let badge = 'bg-grey';
+            if(!isNaN(d.getTime())) {
+              const diff = (d - new Date())/(1000*60*60*24);
+              badge = diff<0?'bg-red':(diff<2?'bg-orange':'bg-green');
+            }
 
-              let safeName = (i.name||"").replace(/'/g," ");
-              let img = i.img
-                ? `<img src="${i.img}" class="item-img" onclick="event.stopPropagation(); app.common.showBarcode('${i.ean}','${safeName}','${i.img}')">`
-                : `<div class="item-img" onclick="event.stopPropagation(); app.common.showBarcode('${i.ean}','${safeName}')"><i class="fas fa-barcode"></i></div>`;
+            const safeName = (i.name||"").replace(/'/g," ");
+            const img = i.img
+              ? `<img src="${i.img}" class="item-img" onclick="event.stopPropagation(); app.common.showBarcode('${i.ean||""}','${safeName}','${i.img}')">`
+              : `<div class="item-img" onclick="event.stopPropagation(); app.common.showBarcode('${i.ean||""}','${safeName}')"><i class="fas fa-barcode"></i></div>`;
 
-              div.innerHTML += `
-                <div class="swipe-wrapper"><div class="swipe-content" onclick="app.frais.openEdit(${i.id})">
-                  <div style="display:flex;align-items:center;flex:1;min-width:0;">${img}
-                    <div class="item-info">
-                      <div class="item-title">${i.name||""}</div>
-                      <div class="line2"><b>Qté:</b> ${i.qty||0} &nbsp; • &nbsp; <b>EAN:</b> ${i.ean||"-"}</div>
-                      ${showSaisir ? `<span class="badge-saisir">À SAISIR</span>` : ``}
-                    </div>
+            const showSaisir = window.app.common.isASaisir(i.date);
+            const saisirChip = showSaisir ? `<span class="chip warn"><i class="fas fa-triangle-exclamation"></i> À SAISIR</span>` : "";
+
+            div.innerHTML += `
+              <div class="swipe-wrapper"><div class="swipe-content" onclick="app.frais.openEdit(${i.id})">
+                <div style="display:flex;align-items:center;flex:1;min-width:0;gap:12px;">
+                  ${img}
+                  <div class="item-info">
+                    <div class="item-title">${i.name||""}</div>
+                    <div class="item-sub">x${i.qty||0} • ${i.ean||"EAN ?"} ${saisirChip}</div>
                   </div>
+                </div>
+                <div class="right-col">
                   <div class="date-badge ${badge}">
                     <span>${!isNaN(d.getTime())?d.getDate():'?'}</span>
                     <span style="font-size:10px;">${!isNaN(d.getTime())?d.toLocaleString('fr',{month:'short'}):'Err'}</span>
                   </div>
-                </div></div>`;
-            });
-          }
+                </div>
+              </div></div>`;
+          });
         }
       },
       openEdit: function(id) {
-        let i = window.app.data.frais.find(x => x.id == id);
+        const i = window.app.data.frais.find(x => x.id == id);
         document.getElementById('modal-edit-frais').classList.remove('hidden');
         document.getElementById('edit-id').value = id;
         document.getElementById('edit-famille').value = i.fam;
@@ -876,33 +947,31 @@
         document.getElementById('edit-date').value = window.app.common.dateToInputLocal(i.date);
       },
       saveEdit: async function() {
-        let id = document.getElementById('edit-id').value;
-        let idx = window.app.data.frais.findIndex(x => String(x.id) === String(id));
+        const id = document.getElementById('edit-id').value;
+        const idx = window.app.data.frais.findIndex(x => String(x.id) === String(id));
         if(idx>-1) {
           window.app.data.frais[idx].fam  = document.getElementById('edit-famille').value;
           window.app.data.frais[idx].qty  = document.getElementById('edit-qty').value;
           window.app.data.frais[idx].name = document.getElementById('edit-name').value;
           window.app.data.frais[idx].ean  = document.getElementById('edit-ean').value;
           window.app.data.frais[idx].date = window.app.common.parseDateLocal(document.getElementById('edit-date').value);
-          window.app.queueSave('frais', 0);
+          await window.app.save('frais');
           document.getElementById('modal-edit-frais').classList.add('hidden');
           window.app.frais.render();
           window.app.checkAlerts();
-          window.app.toast("✅ Modifié");
         }
       },
       del: async function() {
-        let id = document.getElementById('edit-id').value;
+        const id = document.getElementById('edit-id').value;
         window.app.data.frais = window.app.data.frais.filter(x => String(x.id) !== String(id));
-        window.app.queueSave('frais', 0);
+        await window.app.save('frais');
         document.getElementById('modal-edit-frais').classList.add('hidden');
         window.app.frais.render();
         window.app.checkAlerts();
-        window.app.toast("🗑️ Supprimé");
       }
     },
 
-    // ---- PVP
+    // PVP
     pvp: {
       tab: function(t) {
         document.querySelectorAll('#view-pvp .tab').forEach(e => e.classList.remove('active-pvp'));
@@ -910,26 +979,18 @@
         ['pvp-stock','pvp-bib','pvp-calc'].forEach(id => document.getElementById(id).classList.add('hidden'));
         document.getElementById('pvp-'+t).classList.remove('hidden');
       },
-      handleImg: function(input) {
-        if(input.files[0]) window.app.common.compressImg(input.files[0], (b64) => {
-          document.getElementById('img-preview').src = b64;
-          document.getElementById('img-preview').style.display='block';
-          document.getElementById('lib-img-data').value = b64;
-        });
-      },
       toggleFamInput: function() {
-        let val = document.getElementById('lib-fam-select').value;
+        const val = document.getElementById('lib-fam-select').value;
         document.getElementById('lib-fam-new').classList.toggle('hidden', val !== 'new');
       },
-
       openLib: function(id=null) {
         document.getElementById('modal-pvp-lib').classList.remove('hidden');
-        let uniqueFams = [...new Set(window.app.data.pvpLib.map(i => i.family || "DIVERS"))].sort();
+        const uniqueFams = [...new Set(window.app.data.pvpLib.map(i => i.family || "DIVERS"))].sort();
         document.getElementById('lib-fam-select').innerHTML =
           uniqueFams.map(f => `<option value="${f}">${f}</option>`).join('') + `<option value="new">+ Créer...</option>`;
 
         if(id) {
-          let i = window.app.data.pvpLib.find(x=>x.id==id);
+          const i = window.app.data.pvpLib.find(x=>x.id==id);
           document.getElementById('lib-id').value=id;
           document.getElementById('lib-name').value=i.name;
           document.getElementById('lib-ean').value=i.ean||"";
@@ -948,14 +1009,13 @@
           for(let k=0;k<7;k++) document.getElementById('t-'+k).value = "";
         }
       },
-
-      saveLib: function() {
-        let id = document.getElementById('lib-id').value;
-        let fam = document.getElementById('lib-fam-select').value === 'new'
+      saveLib: async function() {
+        const id = document.getElementById('lib-id').value;
+        const fam = document.getElementById('lib-fam-select').value === 'new'
           ? (document.getElementById('lib-fam-new').value || "DIVERS").toUpperCase()
           : document.getElementById('lib-fam-select').value;
 
-        let o = {
+        const o = {
           id: id ? Number(id) : Date.now(),
           family: fam,
           name: document.getElementById('lib-name').value,
@@ -969,41 +1029,36 @@
         if(!o.name) return alert("Nom requis");
 
         if(id) {
-          let idx = window.app.data.pvpLib.findIndex(x=>String(x.id)===String(id));
+          const idx = window.app.data.pvpLib.findIndex(x=>String(x.id)===String(id));
           if(idx>-1) window.app.data.pvpLib[idx] = o;
         } else {
           window.app.data.pvpLib.push(o);
         }
 
-        window.app.queueSave('pvp', 0);
+        await window.app.save('pvp');
         document.getElementById('modal-pvp-lib').classList.add('hidden');
         window.app.pvp.render();
-        window.app.toast("✅ Bibliothèque enregistrée");
       },
-
-      delLib: function() {
-        let id = document.getElementById('lib-id').value;
+      delLib: async function() {
+        const id = document.getElementById('lib-id').value;
         window.app.data.pvpLib = window.app.data.pvpLib.filter(x=>String(x.id)!==String(id));
-        window.app.queueSave('pvp', 0);
+        await window.app.save('pvp');
         document.getElementById('modal-pvp-lib').classList.add('hidden');
         window.app.pvp.render();
-        window.app.toast("🗑️ Supprimé");
       },
-
-      addStock: async function(libId) {
-        let l = window.app.data.pvpLib.find(x=>x.id==libId);
-        let q = prompt('Quantité ?', "1");
+      addStock: function(libId) {
+        const l = window.app.data.pvpLib.find(x=>x.id==libId);
+        const q = Number(prompt('Quantité ?', "1") || 0);
         if(q > 0) {
-          let now = new Date();
-          let endTs = window.app.common.calculateEnd(now.getTime(), l.days);
-          window.app.data.pvpStock.push({ id:Date.now(), libId:libId, name:l.name, ean:l.ean, qty:Number(q), out:now.getTime(), end:endTs, days:l.days });
-          window.app.queueSave('pvp', 0);
+          const now = new Date();
+          const endTs = window.app.common.calculateEnd(now.getTime(), l.days);
+          window.app.data.pvpStock.push({ id:Date.now(), libId:libId, name:l.name, ean:l.ean, qty:q, out:now.getTime(), end:endTs, days:l.days });
           window.app.pvp.render();
+          window.app.saveDebounced('pvp', 350);
         }
       },
-
       openEditStock: function(id) {
-        let i = window.app.data.pvpStock.find(x=>x.id==id);
+        const i = window.app.data.pvpStock.find(x=>x.id==id);
         document.getElementById('modal-pvp-stock').classList.remove('hidden');
         document.getElementById('stock-id').value=id;
         document.getElementById('stock-name').innerText=i.name;
@@ -1011,602 +1066,519 @@
         document.getElementById('stock-start').value = window.app.common.tsToInput(i.out);
         document.getElementById('stock-end').value = window.app.common.tsToInput(i.end);
       },
-
       saveStock: function() {
-        let idx = window.app.data.pvpStock.findIndex(x=>String(x.id)===String(document.getElementById('stock-id').value));
+        const idx = window.app.data.pvpStock.findIndex(x=>String(x.id)===String(document.getElementById('stock-id').value));
         if(idx<0) return;
         window.app.data.pvpStock[idx].qty = Number(document.getElementById('stock-qty').value || 0);
         window.app.data.pvpStock[idx].out = new Date(document.getElementById('stock-start').value).getTime();
         window.app.data.pvpStock[idx].end = new Date(document.getElementById('stock-end').value).getTime();
-        window.app.queueSave('pvp', 0);
         document.getElementById('modal-pvp-stock').classList.add('hidden');
         window.app.pvp.render();
-        window.app.toast("✅ Rayon modifié");
+        window.app.saveDebounced('pvp', 350);
       },
-
       delStock: function() {
-        let id = document.getElementById('stock-id').value;
+        const id = document.getElementById('stock-id').value;
         window.app.data.pvpStock = window.app.data.pvpStock.filter(x=>String(x.id)!==String(id));
-        window.app.queueSave('pvp', 0);
         document.getElementById('modal-pvp-stock').classList.add('hidden');
         window.app.pvp.render();
-        window.app.toast("🗑️ Retiré du rayon");
+        window.app.saveDebounced('pvp', 350);
       },
-
       changeQty: function(id, delta) {
-        let idx = window.app.data.pvpStock.findIndex(x => x.id == id);
+        const idx = window.app.data.pvpStock.findIndex(x => x.id == id);
         if(idx > -1) {
-          let n = parseInt(window.app.data.pvpStock[idx].qty) + delta;
+          const n = Number(window.app.data.pvpStock[idx].qty || 0) + delta;
           if(n <= 0) window.app.data.pvpStock.splice(idx, 1);
           else window.app.data.pvpStock[idx].qty = n;
-
-          // Ultra responsive : render immédiat + save debounced
-          window.app.pvp.render();
-          window.app.queueSave('pvp', 260);
+          window.app.pvp.render();              // UI immédiate
+          window.app.saveDebounced('pvp', 350); // save groupé
         }
       },
-
       toggleNeed: function(libId) {
-        let idx = window.app.data.checkedNeeds.indexOf(libId);
+        const idx = window.app.data.checkedNeeds.indexOf(libId);
         if(idx > -1) window.app.data.checkedNeeds.splice(idx, 1);
         else window.app.data.checkedNeeds.push(libId);
         window.app.pvp.render();
-        window.app.queueSave('pvp', 260);
+        window.app.saveDebounced('pvp', 350);
       },
 
       render: function() {
-        // BIBLIO
-        let bib = document.getElementById('lib-list'); if(!bib) return;
-        bib.innerHTML = "";
-        let gLib = {};
-        window.app.data.pvpLib
-          .slice()
-          .sort((a,b)=>window.app.common.cleanName(a.name).localeCompare(window.app.common.cleanName(b.name)))
-          .forEach(l => { let f = l.family||"DIVERS"; if(!gLib[f]) gLib[f]=[]; gLib[f].push(l); });
+        // BIBLIOTHÈQUE
+        const bib = document.getElementById('lib-list');
+        if(bib) {
+          bib.innerHTML = "";
+          const gLib = {};
+          window.app.data.pvpLib
+            .slice()
+            .sort((a,b)=>window.app.common.cleanName(a.name).localeCompare(window.app.common.cleanName(b.name)))
+            .forEach(l => { const f = l.family||"DIVERS"; if(!gLib[f]) gLib[f]=[]; gLib[f].push(l); });
 
-        Object.keys(gLib).sort().forEach(f => {
-          let id = 'L-'+f; let c = window.app.closed.has(id);
-          bib.innerHTML += `<div class="group-header" onclick="app.toggleFam('${id}')"><span>${f}</span><i class="fas fa-chevron-${c?'right':'down'}"></i></div>`;
-          if(!c) gLib[f].forEach(l => {
-            let img = l.img ? `<img src="${l.img}" class="item-img">` : `<div class="item-img"><i class="fas fa-bread-slice"></i></div>`;
-            bib.innerHTML += `<div class="list-item" onclick="app.common.showBarcode('${l.ean}','${(l.name||"").replace(/'/g," ")}','${l.img||""}')">
-              <div style="display:flex;align-items:center;min-width:0;">${img}<div style="min-width:0;"><b>${l.name}</b><br><small>${l.days}h</small></div></div>
-              <button class="qty-btn pvp" style="background:var(--pvp);color:white;width:40px;height:40px;" onclick="event.stopPropagation(); app.pvp.openLib(${l.id})"><i class="fas fa-pen"></i></button>
-              <button class="qty-btn pvp" style="background:var(--pvp);color:white;width:40px;height:40px;margin-left:10px;" onclick="event.stopPropagation(); app.pvp.addStock(${l.id})">+</button>
-            </div>`;
-          });
-        });
+          Object.keys(gLib).sort().forEach(f => {
+            const id = 'L-'+f;
+            const c = window.app.closed.has(id);
+            bib.innerHTML += `<div class="group-header" onclick="app.toggleFam('${id}')"><span>${f}</span><i class="fas fa-chevron-${c?'right':'down'}"></i></div>`;
+            if(c) return;
 
-        // STOCK
-        let st = document.getElementById('pvp-stock'); st.innerHTML = "";
-        let gStock = {};
-        window.app.data.pvpStock.slice().sort((a,b)=>(a.end||0)-(b.end||0)).forEach(s => {
-          let l = window.app.data.pvpLib.find(x=>x.id==s.libId);
-          let f = l ? l.family : "DIVERS";
-          if(!gStock[f]) gStock[f]=[];
-          gStock[f].push(s);
-        });
-
-        Object.keys(gStock).sort().forEach(f => {
-          let id = 'S-'+f; let c = window.app.closed.has(id);
-          st.innerHTML += `<div class="group-header" style="background:var(--pvp)" onclick="app.toggleFam('${id}')"><span>${f}</span><i class="fas fa-chevron-${c?'right':'down'}"></i></div>`;
-          if(!c) gStock[f].forEach(i => {
-            let dS = window.app.common.formatDate(i.out);
-            let dE = window.app.common.formatDate(i.end);
-            let isExp = new Date(i.end) < new Date();
-            let l = window.app.data.pvpLib.find(x=>x.id==i.libId), img = l?l.img:null;
-            let safeName = (i.name||"").replace(/'/g," ");
-            let displayImg = img
-              ? `<img src="${img}" class="item-img" onclick="event.stopPropagation(); app.common.showBarcode('${i.ean}','${safeName}','${img}')">`
-              : `<div class="item-img" onclick="event.stopPropagation(); app.common.showBarcode('${i.ean}','${safeName}')"><i class="fas fa-bread-slice"></i></div>`;
-
-            st.innerHTML += `
-              <div class="swipe-wrapper"><div class="swipe-content">
-                <div style="display:flex;align-items:center;flex:1;min-width:0;">${displayImg}
-                  <div style="min-width:0;">
-                    <div class="item-title" onclick="app.pvp.openEditStock(${i.id})">${i.name}</div>
-                    <div class="qty-ctrl">
-                      <button class="qty-btn pvp" onclick="app.pvp.changeQty(${i.id},-1)">-</button>
-                      <b>${i.qty}</b>
-                      <button class="qty-btn pvp" onclick="app.pvp.changeQty(${i.id},1)">+</button>
-                    </div>
-                  </div>
-                </div>
-                <div class="date-col">
-                  <div class="d-lbl">Sortie: ${dS}</div>
-                  <div class="d-val ${isExp?'expired':''}">FIN: ${dE}</div>
-                </div>
-              </div></div>`;
-          });
-        });
-
-        // BESOINS
-        let cl = document.getElementById('pvp-calc');
-        let now = new Date();
-        let tom = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0, 0);
-        const noonTomorrow = new Date(tom.getFullYear(), tom.getMonth(), tom.getDate(), 12, 0, 0, 0).getTime();
-
-        let gTodo = {}; let doneH = ""; let hasNeeds = false;
-
-        window.app.data.pvpLib.forEach(l => {
-          let target = Number((l.targets||{})[tom.getDay()] || 0);
-          if(target > 0) {
-            // compter ce qui reste en rayon demain midi
-            let stillAvail = window.app.data.pvpStock
-              .filter(s => s.libId == l.id && Number(s.qty) > 0 && Number(s.end) >= noonTomorrow)
-              .reduce((acc, s) => acc + Number(s.qty||0), 0);
-
-            let need = Math.max(0, target - stillAvail);
-
-            if(need > 0) {
-              hasNeeds = true;
-              let isC = window.app.data.checkedNeeds.includes(l.id);
-              let img = l.img ? `<img src="${l.img}" class="item-img">` : `<div class="item-img"><i class="fas fa-bread-slice"></i></div>`;
-              let h = `
-                <div class="list-item ${isC?'item-done':''}" style="border-left:5px solid var(--pvp);">
-                  <div style="display:flex;align-items:center;flex:1;min-width:0;">${img}
+            gLib[f].forEach(l => {
+              const img = l.img ? `<img src="${l.img}" class="item-img">` : `<div class="item-img"><i class="fas fa-bread-slice"></i></div>`;
+              bib.innerHTML += `
+                <div class="list-item" onclick="app.common.showBarcode('${l.ean||""}','${(l.name||"").replace(/'/g," ")}','${l.img||""}')">
+                  <div style="display:flex;align-items:center;min-width:0;gap:12px;">
+                    ${img}
                     <div style="min-width:0;">
                       <div class="item-title">${l.name}</div>
-                      <div style="color:var(--pvp);font-weight:900;">A SORTIR : ${need}</div>
-                      <div class="small">Objectif: ${target} • En rayon demain midi: ${stillAvail}</div>
+                      <div class="item-sub">${l.days||0}h • ${l.ean||"EAN ?"}</div>
                     </div>
                   </div>
-                  <div class="todo-check ${isC?'checked':''}" onclick="app.pvp.toggleNeed(${l.id})" style="width:36px;height:36px;border-radius:10px;background:#f1f5f9;display:flex;align-items:center;justify-content:center;">
-                    <i class="fas fa-check" style="color:${isC?'var(--pvp)':'#94a3b8'}"></i>
+
+                  <div class="right-col">
+                    <button class="icon-btn pvp" title="Modifier" onclick="event.stopPropagation(); app.pvp.openLib(${l.id})"><i class="fas fa-pen"></i></button>
+                    <button class="icon-btn pvp" title="Ajouter au rayon" onclick="event.stopPropagation(); app.pvp.addStock(${l.id})"><i class="fas fa-plus"></i></button>
                   </div>
                 </div>`;
-              if(isC) doneH += h;
-              else { let f = l.family||"DIVERS"; if(!gTodo[f]) gTodo[f]=[]; gTodo[f].push(h); }
-            }
-          }
-        });
-
-        let resH = `<h4 style="text-align:center;color:var(--primary);">À SORTIR DEMAIN</h4>`;
-        if(!hasNeeds) resH += "<p style='text-align:center;color:#999'>Rien de prévu</p>";
-        else Object.keys(gTodo).sort().forEach(f => {
-          let id = 'N-'+f; let c = window.app.closed.has(id);
-          resH += `<div class="group-header" style="background:var(--primary)" onclick="app.toggleFam('${id}')"><span>${f}</span><i class="fas fa-chevron-${c?'right':'down'}"></i></div>`;
-          if(!c) resH += gTodo[f].join('');
-        });
-        cl.innerHTML = resH + `<h4 style="text-align:center;color:#64748b;margin-top:20px;">TERMINÉ</h4>` + (doneH || "<p style='text-align:center;color:#ccc;'>Rien de fait</p>");
-      }
-    },
-
-    // ---- SALAD BAR
-    salad: {
-      tab: function(t) {
-        document.querySelectorAll('#view-salad .tab').forEach(e => e.classList.remove('active-salad'));
-        document.getElementById(t=='stock'?'ts-1':'ts-2').classList.add('active-salad');
-        ['salad-stock','salad-bib'].forEach(id => document.getElementById(id).classList.add('hidden'));
-        document.getElementById('salad-'+t).classList.remove('hidden');
-      },
-
-      seedLib: function() {
-        const mk = (group, name, hours) => ({ id: Date.now()+Math.floor(Math.random()*99999), group, name, hours });
-        const list = [];
-
-        // SALADE
-        list.push(mk("SALADE","Batavia",48));
-        list.push(mk("SALADE","Mâche",48));
-        list.push(mk("SALADE","Mélange Gourmand",48));
-        list.push(mk("SALADE","Iceberg",48));
-
-        // BASE
-        list.push(mk("BASE","Penne au basilic",48));
-        list.push(mk("BASE","Radiatori au tomates mi-séchées",48));
-        list.push(mk("BASE","Garganelli et graines de lin",48));
-        list.push(mk("BASE","Quinoa Boulgour,Tomates mi-séches,fèves de soja",48));
-        list.push(mk("BASE","Boulgour et lentilles",48));
-        list.push(mk("BASE","Farfalles au pesto",48));
-        list.push(mk("BASE","Duo de riz à l'algue wakamé",48));
-        list.push(mk("BASE","Nouilles Asiatiques",48));
-        list.push(mk("BASE","Trio de quinoa lentilles corail",48));
-        list.push(mk("BASE","Féta, blé, légumes",48));
-
-        // LEGUMES ET FRUITS
-        list.push(mk("LÉGUMES & FRUITS","Tomates cerise marinées",48));
-        list.push(mk("LÉGUMES & FRUITS","Légumes grillés",48));
-        list.push(mk("LÉGUMES & FRUITS","Duo de carottes",48));
-        list.push(mk("LÉGUMES & FRUITS","Betterave",48));
-        list.push(mk("LÉGUMES & FRUITS","Fèves de soja",48));
-        list.push(mk("LÉGUMES & FRUITS","Pois chiches",48));
-        list.push(mk("LÉGUMES & FRUITS","Avocat",24));
-        list.push(mk("LÉGUMES & FRUITS","Dés de mangue",48));
-        list.push(mk("LÉGUMES & FRUITS","Tartare de concombre",48));
-        list.push(mk("LÉGUMES & FRUITS","Tartare de tomates",48));
-        list.push(mk("LÉGUMES & FRUITS","Coleslaw pommes cranberry",48));
-
-        // PROTÉINE
-        list.push(mk("PROTÉINE","Œufs durs",48));
-        list.push(mk("PROTÉINE","Pâtes saumon fumé à l'aneth",48));
-        list.push(mk("PROTÉINE","Poulet émincé",48));
-        list.push(mk("PROTÉINE","Poulet pané",48));
-        list.push(mk("PROTÉINE","Jambon cuit",48));
-        list.push(mk("PROTÉINE","Thon",48));
-        list.push(mk("PROTÉINE","Farfalles",48));
-        list.push(mk("PROTÉINE","Poulet mariné",48));
-        list.push(mk("PROTÉINE","Ditali chorizo",48));
-
-        // FROMAGES
-        list.push(mk("FROMAGES","Billes mozzarella",48));
-        list.push(mk("FROMAGES","Emmental",48));
-        list.push(mk("FROMAGES","Fromages italien",48));
-
-        // FÉCULENTS
-        list.push(mk("FÉCULENTS","Radiatori tomate mi séchée",48));
-        list.push(mk("FÉCULENTS","Pâtes penne au basilic",48));
-        list.push(mk("FÉCULENTS","Boulgour",48));
-        list.push(mk("FÉCULENTS","Riz sauvage",48));
-
-        // TOPPING
-        list.push(mk("TOPPING","Noix/Amandes/Noix de cajou/Graines de courge/Raisin",168));
-        list.push(mk("TOPPING","Crumble salé",168));
-        list.push(mk("TOPPING","Sauce balsamique",1920));
-        list.push(mk("TOPPING","Sauce Caesar",1920));
-        list.push(mk("TOPPING","Sauce soja citron vert",1920));
-
-        return list;
-      },
-
-      openLib: function(id=null) {
-        document.getElementById('modal-salad-lib').classList.remove('hidden');
-
-        const groups = [...new Set(window.app.data.saladLib.map(i => i.group || "DIVERS"))].sort();
-        document.getElementById('slib-group').innerHTML =
-          groups.map(g => `<option value="${g}">${g}</option>`).join('') + `<option value="new">+ Créer...</option>`;
-
-        const groupSel = document.getElementById('slib-group');
-        const groupNew = document.getElementById('slib-group-new');
-        groupSel.onchange = () => groupNew.classList.toggle('hidden', groupSel.value !== 'new');
-
-        if(id) {
-          const i = window.app.data.saladLib.find(x => x.id == id);
-          document.getElementById('slib-id').value = id;
-          document.getElementById('slib-name').value = i.name || "";
-          document.getElementById('slib-hours').value = i.hours || 48;
-          document.getElementById('slib-group').value = i.group || "DIVERS";
-          groupNew.classList.add('hidden');
-        } else {
-          document.getElementById('slib-id').value = "";
-          document.getElementById('slib-name').value = "";
-          document.getElementById('slib-hours').value = 48;
-          document.getElementById('slib-group').value = groups[0] || "DIVERS";
-          groupNew.classList.add('hidden');
-        }
-      },
-
-      saveLib: function() {
-        const id = document.getElementById('slib-id').value;
-        const groupSel = document.getElementById('slib-group').value;
-        const group = groupSel === 'new'
-          ? (document.getElementById('slib-group-new').value || "DIVERS").toUpperCase()
-          : groupSel;
-
-        const o = {
-          id: id ? Number(id) : Date.now(),
-          group,
-          name: (document.getElementById('slib-name').value || "").trim(),
-          hours: Number(document.getElementById('slib-hours').value || 48)
-        };
-
-        if(!o.name) return alert("Nom requis");
-
-        if(id) {
-          const idx = window.app.data.saladLib.findIndex(x => String(x.id) === String(id));
-          if(idx > -1) window.app.data.saladLib[idx] = o;
-        } else {
-          window.app.data.saladLib.push(o);
-        }
-
-        window.app.queueSave('salad', 0);
-        document.getElementById('modal-salad-lib').classList.add('hidden');
-        window.app.salad.render();
-        window.app.toast("✅ Bibliothèque enregistrée");
-      },
-
-      delLib: function() {
-        const id = document.getElementById('slib-id').value;
-        window.app.data.saladLib = window.app.data.saladLib.filter(x => String(x.id) !== String(id));
-        window.app.queueSave('salad', 0);
-        document.getElementById('modal-salad-lib').classList.add('hidden');
-        window.app.salad.render();
-        window.app.toast("🗑️ Supprimé");
-      },
-
-      addStock: function(libId, qty = 1, goStock = true) {
-        const l = window.app.data.saladLib.find(x => x.id == libId);
-        if(!l) return;
-
-        // UX : ajout direct (par défaut 1) => évite les prompts lents sur mobile
-        let q = parseInt(qty, 10);
-        if(!q || q < 1) q = 1;
-
-        const now = new Date();
-        const endTs = window.app.common.calculateEnd(now.getTime(), l.hours);
-
-        window.app.data.saladStock.push({
-          id: Date.now(),
-          libId,
-          name: l.name,
-          qty: q,
-          out: now.getTime(),
-          end: endTs,
-          hours: l.hours
-        });
-
-        window.app.queueSave('salad');
-
-        // Si on ajoute depuis la bibliothèque, on revient sur Rayon pour voir l’ajout
-        if(goStock) this.tab('stock');
-
-        window.app.salad.render();
-      },
-
-      openTraca: function(stockId) {
-        const s = window.app.data.saladStock.find(x => x.id == stockId);
-        if(!s) return;
-
-        document.getElementById('modal-traca').classList.remove('hidden');
-        document.getElementById('traca-title').textContent = `${s.name} • sortie ${window.app.common.formatDate(s.out)}`;
-
-        // store current
-        this.traca._current = { stockId, libId: s.libId, name: s.name, fileB64: null };
-
-        document.getElementById('traca-preview').classList.add('hidden');
-        document.getElementById('traca-history').innerHTML = "<span class='small'>Chargement…</span>";
-
-        this.traca.loadForLib(s.libId);
-      },
-
-      openEditStock: function(id) {
-        let i = window.app.data.saladStock.find(x=>x.id==id);
-        document.getElementById('modal-salad-stock').classList.remove('hidden');
-        document.getElementById('sstock-id').value=id;
-        document.getElementById('sstock-name').innerText=i.name;
-        document.getElementById('sstock-qty').value=i.qty;
-        document.getElementById('sstock-start').value = window.app.common.tsToInput(i.out);
-        document.getElementById('sstock-end').value = window.app.common.tsToInput(i.end);
-      },
-
-      saveStock: function() {
-        let idx = window.app.data.saladStock.findIndex(x=>String(x.id)===String(document.getElementById('sstock-id').value));
-        if(idx<0) return;
-        window.app.data.saladStock[idx].qty = Number(document.getElementById('sstock-qty').value || 0);
-        window.app.data.saladStock[idx].out = new Date(document.getElementById('sstock-start').value).getTime();
-        window.app.data.saladStock[idx].end = new Date(document.getElementById('sstock-end').value).getTime();
-        window.app.queueSave('salad', 0);
-        document.getElementById('modal-salad-stock').classList.add('hidden');
-        window.app.salad.render();
-        window.app.toast("✅ Rayon modifié");
-      },
-
-      delStock: function() {
-        let id = document.getElementById('sstock-id').value;
-        window.app.data.saladStock = window.app.data.saladStock.filter(x=>String(x.id)!==String(id));
-        window.app.queueSave('salad', 0);
-        document.getElementById('modal-salad-stock').classList.add('hidden');
-        window.app.salad.render();
-        window.app.toast("🗑️ Retiré du rayon");
-      },
-
-      changeQty: function(id, delta) {
-        let idx = window.app.data.saladStock.findIndex(x => x.id == id);
-        if(idx > -1) {
-          let n = parseInt(window.app.data.saladStock[idx].qty) + delta;
-          if(n <= 0) window.app.data.saladStock.splice(idx, 1);
-          else window.app.data.saladStock[idx].qty = n;
-
-          window.app.salad.render();
-          window.app.queueSave('salad', 260);
-        }
-      },
-
-      render: function() {
-        // BIBLIO
-        let bib = document.getElementById('salad-lib-list'); if(!bib) return;
-        bib.innerHTML = "";
-
-        let gLib = {};
-        window.app.data.saladLib
-          .slice()
-          .sort((a,b)=>window.app.common.cleanName(a.name).localeCompare(window.app.common.cleanName(b.name)))
-          .forEach(l => { let g = l.group || "DIVERS"; if(!gLib[g]) gLib[g]=[]; gLib[g].push(l); });
-
-        Object.keys(gLib).sort().forEach(g => {
-          let id = 'SL-'+g; let c = window.app.closed.has(id);
-          bib.innerHTML += `<div class="group-header" style="background:var(--salad)" onclick="app.toggleFam('${id}')"><span>${g}</span><i class="fas fa-chevron-${c?'right':'down'}"></i></div>`;
-          if(!c) gLib[g].forEach(l => {
-            bib.innerHTML += `
-              <div class="list-item" onclick="app.salad.addStock(${l.id})">
-                <div style="display:flex;align-items:center;min-width:0;">
-                  <div class="item-img"><i class="fas fa-leaf" style="color:var(--salad)"></i></div>
-                  <div style="min-width:0;">
-                    <b>${l.name}</b><br>
-                    <small>${l.hours}h</small>
-                  </div>
-                </div>
-
-                <div style="display:flex;gap:8px;flex-shrink:0;">
-                  <button class="qty-btn salad" style="background:var(--salad);color:white;width:40px;height:40px;" onclick="event.stopPropagation(); app.salad.openLib(${l.id})"><i class="fas fa-pen"></i></button>
-                  <button class="qty-btn salad" style="background:var(--salad);color:white;width:40px;height:40px;" onclick="event.stopPropagation(); app.salad.addStock(${l.id})">+</button>
-                </div>
-              </div>`;
+            });
           });
-        });
+        }
 
         // STOCK
-        let st = document.getElementById('salad-stock'); st.innerHTML = "";
-        let gStock = {};
-        window.app.data.saladStock.slice().sort((a,b)=>(a.end||0)-(b.end||0)).forEach(s => {
-          let l = window.app.data.saladLib.find(x=>x.id==s.libId);
-          let g = l ? (l.group || "DIVERS") : "DIVERS";
-          if(!gStock[g]) gStock[g]=[];
-          gStock[g].push(s);
-        });
+        const st = document.getElementById('pvp-stock');
+        if(st) {
+          st.innerHTML = "";
+          const gStock = {};
+          window.app.data.pvpStock
+            .slice()
+            .sort((a,b)=>(a.end||0)-(b.end||0))
+            .forEach(s => {
+              const l = window.app.data.pvpLib.find(x=>x.id==s.libId);
+              const f = l ? l.family : "DIVERS";
+              if(!gStock[f]) gStock[f]=[];
+              gStock[f].push(s);
+            });
 
-        Object.keys(gStock).sort().forEach(g => {
-          let id = 'SS-'+g; let c = window.app.closed.has(id);
-          st.innerHTML += `<div class="group-header" style="background:var(--salad)" onclick="app.toggleFam('${id}')"><span>${g}</span><i class="fas fa-chevron-${c?'right':'down'}"></i></div>`;
-          if(!c) gStock[g].forEach(i => {
-            let dS = window.app.common.formatDate(i.out);
-            let dE = window.app.common.formatDate(i.end);
-            let isExp = new Date(i.end) < new Date();
+          Object.keys(gStock).sort().forEach(f => {
+            const id = 'S-'+f;
+            const c = window.app.closed.has(id);
+            st.innerHTML += `<div class="group-header" style="background:var(--pvp)" onclick="app.toggleFam('${id}')"><span>${f}</span><i class="fas fa-chevron-${c?'right':'down'}"></i></div>`;
+            if(c) return;
 
-            st.innerHTML += `
-              <div class="swipe-wrapper" style="background:var(--salad)">
-                <div class="swipe-content">
-                  <div style="display:flex;align-items:center;flex:1;min-width:0;">
-                    <div class="item-img" onclick="event.stopPropagation(); app.salad.openTraca(${i.id})"><i class="fas fa-camera" style="color:var(--salad)"></i></div>
+            gStock[f].forEach(i => {
+              const dS = window.app.common.formatDate(i.out);
+              const dE = window.app.common.formatDate(i.end);
+              const isExp = new Date(i.end) < new Date();
+              const l = window.app.data.pvpLib.find(x=>x.id==i.libId);
+              const imgUrl = l ? l.img : null;
+
+              const displayImg = imgUrl
+                ? `<img src="${imgUrl}" class="item-img" onclick="event.stopPropagation(); app.common.showBarcode('${i.ean||""}','${(i.name||"").replace(/'/g," ")}','${imgUrl}')">`
+                : `<div class="item-img" onclick="event.stopPropagation(); app.common.showBarcode('${i.ean||""}','${(i.name||"").replace(/'/g," ")}')"><i class="fas fa-bread-slice"></i></div>`;
+
+              st.innerHTML += `
+                <div class="swipe-wrapper"><div class="swipe-content">
+                  <div style="display:flex;align-items:center;flex:1;min-width:0;gap:12px;">
+                    ${displayImg}
                     <div style="min-width:0;">
-                      <div class="item-title" onclick="app.salad.openEditStock(${i.id})">${i.name}</div>
+                      <div class="item-title" onclick="app.pvp.openEditStock(${i.id})">${i.name}</div>
                       <div class="qty-ctrl">
-                        <button class="qty-btn salad" onclick="app.salad.changeQty(${i.id},-1)">-</button>
+                        <button class="qty-btn" onclick="app.pvp.changeQty(${i.id},-1)">-</button>
                         <b>${i.qty}</b>
-                        <button class="qty-btn salad" onclick="app.salad.changeQty(${i.id},1)">+</button>
+                        <button class="qty-btn" onclick="app.pvp.changeQty(${i.id},1)">+</button>
                       </div>
-                      <div class="small">Tracabilité : clique sur l’icône caméra</div>
                     </div>
                   </div>
                   <div class="date-col">
                     <div class="d-lbl">Sortie: ${dS}</div>
                     <div class="d-val ${isExp?'expired':''}">FIN: ${dE}</div>
                   </div>
-                </div>
-              </div>`;
+                </div></div>`;
+            });
           });
-        });
+        }
+
+        // BESOINS (avec règle "avant midi non compté")
+        const cl = document.getElementById('pvp-calc');
+        if(cl) {
+          const tom = new Date(); tom.setDate(tom.getDate()+1);
+          const tomorrowNoon = new Date(tom.getFullYear(), tom.getMonth(), tom.getDate(), 12, 0, 0, 0).getTime();
+
+          const gTodo = {};
+          let doneH = "";
+          let hasNeeds = false;
+
+          // calc "available" pour demain : stock dont end >= demain 12:00
+          const availableByLib = {};
+          window.app.data.pvpStock.forEach(s => {
+            if((s.end||0) >= tomorrowNoon) {
+              availableByLib[s.libId] = (availableByLib[s.libId] || 0) + Number(s.qty||0);
+            }
+          });
+
+          window.app.data.pvpLib.forEach(l => {
+            const target = Number((l.targets||{})[tom.getDay()] || 0);
+            if(target <= 0) return;
+
+            const avail = Number(availableByLib[l.id] || 0);
+            const need = Math.max(0, target - avail);
+            if(need <= 0) return;
+
+            hasNeeds = true;
+            const isC = window.app.data.checkedNeeds.includes(l.id);
+            const img = l.img ? `<img src="${l.img}" class="item-img">` : `<div class="item-img"><i class="fas fa-bread-slice"></i></div>`;
+
+            const h = `
+              <div class="list-item ${isC?'item-done':''}" style="border-left:5px solid var(--pvp);">
+                <div style="display:flex;align-items:center;flex:1;min-width:0;gap:12px;">
+                  ${img}
+                  <div style="min-width:0;">
+                    <div class="item-title">${l.name}</div>
+                    <div style="color:var(--pvp);font-weight:950;">
+                      A SORTIR : ${need} <span class="small">(objectif ${target} • dispo ${avail})</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="todo-check ${isC?'checked':''}" onclick="app.pvp.toggleNeed(${l.id})"><i class="fas fa-check"></i></div>
+              </div>`;
+
+            if(isC) doneH += h;
+            else {
+              const f = l.family||"DIVERS";
+              if(!gTodo[f]) gTodo[f]=[];
+              gTodo[f].push(h);
+            }
+          });
+
+          let resH = `<h4 style="text-align:center;color:var(--primary);">À SORTIR DEMAIN (règle: stock qui expire avant 12h ne compte pas)</h4>`;
+          if(!hasNeeds) resH += "<p style='text-align:center;color:#999'>Rien de prévu</p>";
+          else Object.keys(gTodo).sort().forEach(f => {
+            const id = 'N-'+f; const c = window.app.closed.has(id);
+            resH += `<div class="group-header" style="background:var(--primary)" onclick="app.toggleFam('${id}')"><span>${f}</span><i class="fas fa-chevron-${c?'right':'down'}"></i></div>`;
+            if(!c) resH += gTodo[f].join('');
+          });
+
+          cl.innerHTML = resH
+            + `<h4 style="text-align:center;color:#64748b;margin-top:20px;">TERMINÉ</h4>`
+            + (doneH || "<p style='text-align:center;color:#ccc;'>Rien de fait</p>");
+        }
+      }
+    },
+
+    // SALAD BAR
+    salad: {
+      tab: function(t) {
+        document.querySelectorAll('#view-salad .tab').forEach(e => e.classList.remove('active-salad'));
+        document.getElementById(t=='stock'?'ts-1':'ts-2').classList.add('active-salad');
+        document.getElementById('salad-stock').classList.add('hidden');
+        document.getElementById('salad-bib').classList.add('hidden');
+        document.getElementById('salad-'+t).classList.remove('hidden');
       },
 
-      traca: {
-        _current: null,
+      openLib: function(id=null) {
+        document.getElementById('modal-salad-lib').classList.remove('hidden');
+        if(id) {
+          const i = window.app.data.saladLib.find(x=>x.id==id);
+          document.getElementById('sal-lib-id').value = i.id;
+          document.getElementById('sal-lib-fam').value = i.family || "DIVERS";
+          document.getElementById('sal-lib-name').value = i.name || "";
+          document.getElementById('sal-lib-hours').value = String(i.hours||48);
+        } else {
+          document.getElementById('sal-lib-id').value = "";
+          document.getElementById('sal-lib-fam').value = "SALADE";
+          document.getElementById('sal-lib-name').value = "";
+          document.getElementById('sal-lib-hours').value = "48";
+        }
+      },
 
-        handleFile: function(input) {
-          const file = input.files && input.files[0];
-          if(!file || !window.app.salad.traca._current) return;
+      saveLib: function() {
+        const id = document.getElementById('sal-lib-id').value;
+        const fam = document.getElementById('sal-lib-fam').value || "DIVERS";
+        const name = (document.getElementById('sal-lib-name').value || "").trim();
+        const hours = Number(document.getElementById('sal-lib-hours').value || 48);
+        if(!name) return alert("Nom requis");
 
-          window.app.common.compressImg(file, (b64) => {
-            window.app.salad.traca._current.fileB64 = b64;
-            document.getElementById('traca-img-preview').src = b64;
-            document.getElementById('traca-preview').classList.remove('hidden');
+        const o = { id: id ? Number(id) : Date.now(), family:fam, name, hours };
+        if(id) {
+          const idx = window.app.data.saladLib.findIndex(x => String(x.id)===String(id));
+          if(idx>-1) window.app.data.saladLib[idx] = o;
+        } else {
+          window.app.data.saladLib.push(o);
+        }
+        document.getElementById('modal-salad-lib').classList.add('hidden');
+        window.app.salad.render();
+        window.app.saveDebounced('salad', 350);
+      },
+
+      delLib: function() {
+        const id = document.getElementById('sal-lib-id').value;
+        window.app.data.saladLib = window.app.data.saladLib.filter(x => String(x.id)!==String(id));
+        document.getElementById('modal-salad-lib').classList.add('hidden');
+        window.app.salad.render();
+        window.app.saveDebounced('salad', 350);
+      },
+
+      addStock: function(libId) {
+        const l = window.app.data.saladLib.find(x=>x.id==libId);
+        const q = Number(prompt('Quantité ?', "1") || 0);
+        if(q > 0) {
+          const now = new Date();
+          const endTs = window.app.common.calculateEnd(now.getTime(), l.hours);
+          window.app.data.saladStock.push({
+            id: Date.now(),
+            libId,
+            name: l.name,
+            qty: q,
+            out: now.getTime(),
+            end: endTs,
+            hours: l.hours
           });
+          window.app.salad.render();
+          window.app.saveDebounced('salad', 350);
+        }
+      },
+
+      changeQty: function(id, delta) {
+        const idx = window.app.data.saladStock.findIndex(x => x.id == id);
+        if(idx > -1) {
+          const n = Number(window.app.data.saladStock[idx].qty || 0) + delta;
+          if(n <= 0) window.app.data.saladStock.splice(idx, 1);
+          else window.app.data.saladStock[idx].qty = n;
+          window.app.salad.render();
+          window.app.saveDebounced('salad', 350);
+        }
+      },
+
+      openEditStock: function(id) {
+        const i = window.app.data.saladStock.find(x=>x.id==id);
+        const q = prompt("Quantité :", String(i.qty||0));
+        if(q === null) return;
+        const n = Number(q||0);
+        if(n <= 0) {
+          window.app.data.saladStock = window.app.data.saladStock.filter(x=>x.id!==id);
+        } else {
+          i.qty = n;
+        }
+        window.app.salad.render();
+        window.app.saveDebounced('salad', 350);
+      },
+
+      // TRACEABILITY
+      trace: {
+        ctx: null, // { productId, productName }
+        imgData: "",
+        open: async function(productId, productName) {
+          window.app.salad.trace.ctx = { productId, productName };
+          window.app.salad.trace.imgData = "";
+          document.getElementById('trace-preview').style.display = "none";
+          document.getElementById('trace-preview').src = "";
+          document.getElementById('trace-title').textContent = productName || "";
+          document.getElementById('modal-trace').classList.remove('hidden');
+          await window.app.salad.trace.loadHistory();
         },
-
-        saveCurrent: async function() {
-          const cur = window.app.salad.traca._current;
-          if(!cur || !cur.fileB64) return alert("Prends une photo d’abord.");
-
-          try {
-            // 1) upload sur Storage
-            const key = `salad_traca/${cur.libId}/${Date.now()}.jpg`;
-            const r = ref(storage, key);
-            await uploadString(r, cur.fileB64, 'data_url');
-            const url = await getDownloadURL(r);
-
-            // 2) save meta dans Firestore (6 mois)
-            await addDoc(colSaladTraca, {
-              libId: cur.libId,
-              name: cur.name,
-              storagePath: key,
-              url,
-              createdAt: serverTimestamp()
-            });
-
-            window.app.toast("✅ Tracabilité enregistrée");
-            document.getElementById('traca-preview').classList.add('hidden');
-            document.getElementById('traca-input').value = "";
-            cur.fileB64 = null;
-
-            await window.app.salad.traca.loadForLib(cur.libId);
-          } catch(e) {
-            console.warn(e);
-            alert("Erreur tracabilité. Vérifie Storage + Rules + App Check.");
-          }
+        close: function() {
+          document.getElementById('modal-trace').classList.add('hidden');
+          window.app.salad.trace.ctx = null;
+          window.app.salad.trace.imgData = "";
         },
+        loadHistory: async function() {
+          const wrap = document.getElementById("trace-history");
+          wrap.textContent = "Chargement…";
+          const ctx = window.app.salad.trace.ctx;
+          if(!ctx) return (wrap.textContent = "—");
 
-        loadForLib: async function(libId) {
-          const wrap = document.getElementById('traca-history');
-          wrap.innerHTML = "<span class='small'>Chargement…</span>";
-
+          const cutoff = Date.now() - (180 * 24 * 60 * 60 * 1000);
           try {
-            const cutoff = new Date();
-            cutoff.setMonth(cutoff.getMonth() - 6);
-
-            const qy = query(colSaladTraca,
-              where("libId", "==", libId)
+            const qy = query(
+              colSaladTrace,
+              where("productId", "==", ctx.productId),
+              orderBy("createdAt", "desc"),
+              limit(10)
             );
-
             const snap = await getDocs(qy);
-
-            const items = [];
-            snap.forEach(docu => items.push({ id: docu.id, ...(docu.data()||{}) }));
-
-            // tri (client-side) par createdAt desc
-            items.sort((a,b) => {
-              const ta = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0;
-              const tb = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0;
-              return tb - ta;
+            const rows = [];
+            snap.forEach(docu => {
+              const d = docu.data();
+              if((d.createdAt||0) >= cutoff) rows.push({ id: docu.id, ...d });
             });
 
-            const recent = items.filter(x => {
-              const t = x.createdAt?.toDate ? x.createdAt.toDate() : null;
-              return t ? (t >= cutoff) : true;
-            }).slice(0, 30); // limite affichage
+            if(!rows.length) { wrap.innerHTML = "<div class='small'>Aucune photo récente.</div>"; return; }
 
-            if(!recent.length) {
-              wrap.innerHTML = "<span class='small'>Aucune photo.</span>";
-              return;
-            }
-
-            wrap.innerHTML = recent.map(x => {
-              const t = x.createdAt?.toDate ? x.createdAt.toDate() : null;
-              const when = t ? `${t.getDate()}/${String(t.getMonth()+1).padStart(2,'0')} ${String(t.getHours()).padStart(2,'0')}:${String(t.getMinutes()).padStart(2,'0')}` : "date inconnue";
+            wrap.innerHTML = rows.map(r => {
+              const when = window.app.common.formatDate(r.createdAt);
               return `
-                <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px;">
-                  <img src="${x.url}" style="width:70px;height:70px;object-fit:cover;border-radius:12px;background:#f8fafc;">
+                <div style="padding:10px;border:1px solid #e2e8f0;border-radius:12px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:10px;">
                   <div style="min-width:0;">
                     <div style="font-weight:900;">${when}</div>
-                    <div class="small" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:230px;">${x.storagePath||""}</div>
+                    <div class="small" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${r.path || ""}</div>
                   </div>
+                  <button class="icon-btn salad" onclick="app.salad.trace.view('${r.path||""}')"><i class="fas fa-eye"></i></button>
                 </div>
               `;
             }).join("");
-
           } catch(e) {
-            console.warn(e);
-            wrap.innerHTML = "<span class='small'>Erreur chargement historique.</span>";
+            wrap.innerHTML = "<div class='small'>Impossible de charger l’historique (rules/index).</div>";
           }
         },
-
-        pruneOld: async function() {
-          // delete > 6 months
-          const cutoff = new Date();
-          cutoff.setMonth(cutoff.getMonth() - 6);
-
-          const snap = await getDocs(colSaladTraca);
-          const toDelete = [];
-          snap.forEach(docu => {
-            const d = docu.data() || {};
-            const t = d.createdAt?.toDate ? d.createdAt.toDate() : null;
-            if(t && t < cutoff) toDelete.push({ id: docu.id, ...d });
-          });
-
-          // limite pour éviter d'exploser en une fois
-          for(const item of toDelete.slice(0, 25)) {
-            try { if(item.storagePath) await deleteObject(ref(storage, item.storagePath)); } catch(e){}
-            try { await deleteDoc(doc(db, "store_master", "DATA_SALAD_TRACA", "items", item.id)); } catch(e){}
+        view: async function(path) {
+          if(!path) return;
+          try {
+            const url = await getDownloadURL(sRef(storage, path));
+            window.app.common.showBarcode("", "Tracabilité", url);
+          } catch(e) {
+            alert("Impossible d’ouvrir la photo.");
           }
+        },
+        save: async function() {
+          const ctx = window.app.salad.trace.ctx;
+          if(!ctx) return;
+          if(!window.app.salad.trace.imgData) return alert("Aucune photo.");
+
+          const ts = Date.now();
+          const d = new Date(ts);
+          const ym = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+          const safeId = String(ctx.productId).replace(/[^a-zA-Z0-9_-]/g, "_");
+          const path = `salad_traca/${safeId}/${ym}/${ts}.jpg`;
+
+          try {
+            // upload storage
+            await uploadString(sRef(storage, path), window.app.salad.trace.imgData, "data_url");
+
+            // write firestore trace doc
+            await addDoc(colSaladTrace, {
+              productId: ctx.productId,
+              productName: ctx.productName,
+              createdAt: ts,
+              path
+            });
+
+            alert("Tracabilité enregistrée.");
+            window.app.salad.trace.imgData = "";
+            document.getElementById('trace-preview').style.display = "none";
+            document.getElementById('trace-preview').src = "";
+            await window.app.salad.trace.loadHistory();
+          } catch(e) {
+            alert("Erreur upload (Storage/rules).");
+          }
+        }
+      },
+
+      render: function() {
+        // BIB
+        const bib = document.getElementById('salad-lib-list');
+        if(bib) {
+          bib.innerHTML = "";
+          const gLib = {};
+          window.app.data.saladLib
+            .slice()
+            .sort((a,b)=>window.app.common.cleanName(a.name).localeCompare(window.app.common.cleanName(b.name)))
+            .forEach(l => { const f = l.family||"DIVERS"; if(!gLib[f]) gLib[f]=[]; gLib[f].push(l); });
+
+          Object.keys(gLib).sort().forEach(f => {
+            const id = 'SL-'+f;
+            const c = window.app.closed.has(id);
+            bib.innerHTML += `<div class="group-header" style="background:var(--salad)" onclick="app.toggleFam('${id}')"><span>${f}</span><i class="fas fa-chevron-${c?'right':'down'}"></i></div>`;
+            if(c) return;
+
+            gLib[f].forEach(l => {
+              bib.innerHTML += `
+                <div class="list-item">
+                  <div style="display:flex;align-items:center;min-width:0;gap:12px;">
+                    <div class="item-img"><i class="fas fa-bowl-food"></i></div>
+                    <div style="min-width:0;">
+                      <div class="item-title">${l.name}</div>
+                      <div class="item-sub">${l.hours||48}h</div>
+                    </div>
+                  </div>
+                  <div class="right-col">
+                    <button class="icon-btn salad" title="Modifier" onclick="app.salad.openLib(${l.id})"><i class="fas fa-pen"></i></button>
+                    <button class="icon-btn salad" title="Ajouter au rayon" onclick="app.salad.addStock(${l.id})"><i class="fas fa-plus"></i></button>
+                  </div>
+                </div>`;
+            });
+          });
+        }
+
+        // STOCK
+        const st = document.getElementById('salad-stock');
+        if(st) {
+          st.innerHTML = "";
+          const gStock = {};
+          window.app.data.saladStock
+            .slice()
+            .sort((a,b)=>(a.end||0)-(b.end||0))
+            .forEach(s => {
+              const l = window.app.data.saladLib.find(x=>x.id==s.libId);
+              const f = l ? l.family : "DIVERS";
+              if(!gStock[f]) gStock[f]=[];
+              gStock[f].push(s);
+            });
+
+          Object.keys(gStock).sort().forEach(f => {
+            const id = 'SS-'+f;
+            const c = window.app.closed.has(id);
+            st.innerHTML += `<div class="group-header" style="background:var(--salad)" onclick="app.toggleFam('${id}')"><span>${f}</span><i class="fas fa-chevron-${c?'right':'down'}"></i></div>`;
+            if(c) return;
+
+            gStock[f].forEach(i => {
+              const dS = window.app.common.formatDate(i.out);
+              const dE = window.app.common.formatDate(i.end);
+              const isExp = new Date(i.end) < new Date();
+
+              st.innerHTML += `
+                <div class="swipe-wrapper" style="background:#0b4f4a;"><div class="swipe-content">
+                  <div style="display:flex;align-items:center;flex:1;min-width:0;gap:12px;">
+                    <div class="item-img"><i class="fas fa-bowl-food"></i></div>
+                    <div style="min-width:0;">
+                      <div class="item-title" onclick="app.salad.openEditStock(${i.id})">${i.name}</div>
+                      <div class="qty-ctrl">
+                        <button class="qty-btn" onclick="app.salad.changeQty(${i.id},-1)">-</button>
+                        <b>${i.qty}</b>
+                        <button class="qty-btn" onclick="app.salad.changeQty(${i.id},1)">+</button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="right-col">
+                    <button class="icon-btn salad" title="Tracabilité (photo)" onclick="app.salad.trace.open('${i.libId}','${(i.name||"").replace(/'/g," ")}')">
+                      <i class="fas fa-camera"></i>
+                    </button>
+                    <div class="date-col">
+                      <div class="d-lbl">Sortie: ${dS}</div>
+                      <div class="d-val ${isExp?'expired':''}">FIN: ${dE}</div>
+                    </div>
+                  </div>
+                </div></div></div>`;
+            });
+          });
         }
       }
     },
 
     checkAlerts: function() {
-      let alert = window.app.data.frais.some(i => {
-        let d = new Date(i.date);
+      const alert = window.app.data.frais.some(i => {
+        const d = new Date(i.date);
         return !isNaN(d.getTime()) && (d - new Date())/(1000*60*60*24) < 1;
       });
       document.getElementById('alert-box').style.display = alert ? 'block' : 'none';
     }
   };
+
+  // wire photo inputs
+  document.getElementById("cam-input").addEventListener("change", (e) => {
+    const f = e.target.files?.[0];
+    if(!f) return;
+    window.app.common.compressImgFileToDataUrl(f, (b64) => {
+      document.getElementById('img-preview').src = b64;
+      document.getElementById('img-preview').style.display='block';
+      document.getElementById('lib-img-data').value = b64;
+    });
+  });
+
+  document.getElementById("trace-file").addEventListener("change", (e) => {
+    const f = e.target.files?.[0];
+    if(!f) return;
+    window.app.common.compressImgFileToDataUrl(f, (b64) => {
+      window.app.salad.trace.imgData = b64;
+      document.getElementById('trace-preview').src = b64;
+      document.getElementById('trace-preview').style.display = "block";
+    });
+  });
 
   // Auth state
   onAuthStateChanged(auth, async (user) => {
