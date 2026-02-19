@@ -163,8 +163,7 @@
       </h3>
       <div class="small" id="trace-title" style="margin-bottom:10px;"></div>
 
-      <!-- ✅ IMPORTANT: on passe par pickPhoto() pour flush avant d'ouvrir la caméra -->
-      <button class="btn salad" onclick="app.salad.trace.pickPhoto()">
+      <button class="btn salad" onclick="document.getElementById('trace-file').click()">
         <i class="fas fa-image"></i> Prendre / choisir une photo
       </button>
       <input type="file" id="trace-file" accept="image/*" capture="environment" class="hidden">
@@ -422,8 +421,15 @@
 
   // Salad bar (nouveau doc)
   const docSalad = doc(db, "store_master", "DATA_SALAD");
-  // Tracabilité (nouvelle collection)
-  const colSaladTrace = collection(db, "salad_traca");
+
+  // ✅ PATCH TRACABILITÉ:
+  // - Nouveau stockage Firestore: sous-collection par produit => /salad_traca/{productId}/items/{doc}
+  // - Plus besoin d'index composite
+  const colSaladTraceFor = (productId) =>
+    collection(db, "salad_traca", String(productId), "items");
+
+  // Legacy (si tu avais déjà des docs dans /salad_traca)
+  const colSaladTraceLegacy = collection(db, "salad_traca");
 
   const codeReader = new ZXing.BrowserMultiFormatReader();
 
@@ -498,17 +504,6 @@
     debounceTimer: null,
     saveTimers: {},
 
-    // ✅ NEW: suivi des saves en attente + flush (évite disparition après caméra)
-    pendingSaves: new Set(),
-    flushSaves: async function() {
-      const secs = Array.from(this.pendingSaves);
-      this.pendingSaves.clear();
-      for (const s of secs) {
-        if (this.saveTimers[s]) clearTimeout(this.saveTimers[s]);
-        try { await this.save(s); } catch(e) {}
-      }
-    },
-
     ui: {
       err: (msg) => {
         const box = document.getElementById("login-error");
@@ -531,6 +526,8 @@
         if(ean) {
           try { JsBarcode("#barcode", ean, {format:"EAN13", height:80, displayValue:true}); }
           catch(e) { try{ JsBarcode("#barcode", ean, {format:"CODE128", height:80, displayValue:true}); } catch(e2){} }
+        } else {
+          try { document.querySelector("#barcode").innerHTML = ""; } catch(e) {}
         }
       },
       parseDateLocal: function(dateStr) {
@@ -633,11 +630,9 @@
 
     // Debounced saving => réduit la latence (+/-)
     saveDebounced: function(sec, delay=350) {
-      this.pendingSaves.add(sec);
       if(this.saveTimers[sec]) clearTimeout(this.saveTimers[sec]);
       this.saveTimers[sec] = setTimeout(async () => {
         try { await this.save(sec); } catch(e) {}
-        this.pendingSaves.delete(sec);
       }, delay);
     },
 
@@ -977,7 +972,7 @@
       }
     },
 
-    // PVP
+    // PVP (inchangé sauf images rayon + besoins)
     pvp: {
       tab: function(t) {
         document.querySelectorAll('#view-pvp .tab').forEach(e => e.classList.remove('active-pvp'));
@@ -1108,8 +1103,6 @@
       },
 
       render: function() {
-        /* ... (inchangé, identique à ton code) ... */
-
         // BIBLIOTHÈQUE
         const bib = document.getElementById('lib-list');
         if(bib) {
@@ -1369,15 +1362,11 @@
       trace: {
         ctx: null, // { productId, productName }
         imgData: "",
-
-        // ✅ NEW: flush avant d'ouvrir l'appareil photo
-        pickPhoto: async function() {
-          await window.app.flushSaves();
-          document.getElementById('trace-file').click();
-        },
-
         open: async function(productId, productName) {
-          window.app.salad.trace.ctx = { productId, productName };
+          // ✅ PATCH: reset input pour pouvoir reprendre la même photo / et éviter l'état "bloqué"
+          document.getElementById('trace-file').value = "";
+
+          window.app.salad.trace.ctx = { productId: String(productId), productName };
           window.app.salad.trace.imgData = "";
           document.getElementById('trace-preview').style.display = "none";
           document.getElementById('trace-preview').src = "";
@@ -1389,9 +1378,11 @@
           document.getElementById('modal-trace').classList.add('hidden');
           window.app.salad.trace.ctx = null;
           window.app.salad.trace.imgData = "";
+          document.getElementById('trace-file').value = "";
         },
 
-        // ✅ FIX: historique sans orderBy (évite index), tri côté app, garde 6 mois
+        // ✅ PATCH: lecture depuis /salad_traca/{productId}/items (sans index composite)
+        // + fallback legacy /salad_traca (where seul, pas d'index composite)
         loadHistory: async function() {
           const wrap = document.getElementById("trace-history");
           wrap.textContent = "Chargement…";
@@ -1400,26 +1391,12 @@
 
           const cutoff = Date.now() - (180 * 24 * 60 * 60 * 1000);
 
-          try {
-            const qy = query(
-              colSaladTrace,
-              where("productId", "==", ctx.productId),
-              limit(50)
-            );
-
-            const snap = await getDocs(qy);
-            const rows = [];
-            snap.forEach(docu => {
-              const d = docu.data();
-              if((d.createdAt||0) >= cutoff) rows.push({ id: docu.id, ...d });
-            });
-
-            rows.sort((a,b) => (b.createdAt||0) - (a.createdAt||0));
-            const top = rows.slice(0, 10);
-
-            if(!top.length) { wrap.innerHTML = "<div class='small'>Aucune photo récente.</div>"; return; }
-
-            wrap.innerHTML = top.map(r => {
+          const renderRows = (rows) => {
+            if(!rows.length) {
+              wrap.innerHTML = "<div class='small'>Aucune photo récente.</div>";
+              return;
+            }
+            wrap.innerHTML = rows.map(r => {
               const when = window.app.common.formatDate(r.createdAt);
               return `
                 <div style="padding:10px;border:1px solid #e2e8f0;border-radius:12px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:10px;">
@@ -1431,8 +1408,42 @@
                 </div>
               `;
             }).join("");
+          };
+
+          try {
+            // NEW
+            const qy = query(
+              colSaladTraceFor(ctx.productId),
+              orderBy("createdAt", "desc"),
+              limit(10)
+            );
+            const snap = await getDocs(qy);
+            const rows = [];
+            snap.forEach(docu => {
+              const d = docu.data();
+              if((d.createdAt||0) >= cutoff) rows.push({ id: docu.id, ...d });
+            });
+
+            if(rows.length) return renderRows(rows);
+
+            // LEGACY fallback (sans orderBy)
+            const qLegacy = query(
+              colSaladTraceLegacy,
+              where("productId", "==", String(ctx.productId)),
+              limit(50)
+            );
+            const snap2 = await getDocs(qLegacy);
+            const rows2 = [];
+            snap2.forEach(docu => {
+              const d = docu.data();
+              if((d.createdAt||0) >= cutoff) rows2.push({ id: docu.id, ...d });
+            });
+            rows2.sort((a,b)=> (b.createdAt||0) - (a.createdAt||0));
+            renderRows(rows2.slice(0,10));
+
           } catch(e) {
-            wrap.innerHTML = "<div class='small'>Impossible de charger l’historique (rules).</div>";
+            console.error(e);
+            wrap.innerHTML = "<div class='small'>Impossible de charger l’historique (Firestore rules).</div>";
           }
         },
 
@@ -1458,10 +1469,12 @@
           const path = `salad_traca/${safeId}/${ym}/${ts}.jpg`;
 
           try {
+            // upload storage
             await uploadString(sRef(storage, path), window.app.salad.trace.imgData, "data_url");
 
-            await addDoc(colSaladTrace, {
-              productId: ctx.productId,
+            // ✅ PATCH: write firestore dans sous-collection du produit
+            await addDoc(colSaladTraceFor(ctx.productId), {
+              productId: String(ctx.productId),
               productName: ctx.productName,
               createdAt: ts,
               path
@@ -1471,9 +1484,11 @@
             window.app.salad.trace.imgData = "";
             document.getElementById('trace-preview').style.display = "none";
             document.getElementById('trace-preview').src = "";
+            document.getElementById('trace-file').value = "";
             await window.app.salad.trace.loadHistory();
           } catch(e) {
-            alert("Erreur upload (Storage/rules).");
+            console.error(e);
+            alert("Erreur tracabilité (Storage/Firestore rules).");
           }
         }
       },
@@ -1540,6 +1555,7 @@
               const dE = window.app.common.formatDate(i.end);
               const isExp = new Date(i.end) < new Date();
 
+              // ✅ PATCH: HTML corrigé (plus de </div> en trop)
               st.innerHTML += `
                 <div class="swipe-wrapper" style="background:#0b4f4a;"><div class="swipe-content">
                   <div style="display:flex;align-items:center;flex:1;min-width:0;gap:12px;">
@@ -1563,7 +1579,7 @@
                       <div class="d-val ${isExp?'expired':''}">FIN: ${dE}</div>
                     </div>
                   </div>
-                </div></div></div>`;
+                </div></div>`;
             });
           });
         }
@@ -1598,11 +1614,6 @@
       document.getElementById('trace-preview').src = b64;
       document.getElementById('trace-preview').style.display = "block";
     });
-  });
-
-  // ✅ Bonus: flush quand l'app passe en arrière-plan (mobile)
-  document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState === "hidden") window.app.flushSaves();
   });
 
   // Auth state
