@@ -229,6 +229,24 @@ textarea{min-height:80px;resize:none;}
 .kpi-card{border-radius:12px;padding:14px;text-align:center;}
 .kpi-card .kpi-val{font-size:28px;font-weight:950;}
 .kpi-card .kpi-lbl{font-size:11px;font-weight:800;opacity:.8;margin-top:2px;}
+/* ── SUPPLIER SELECT ── */
+.supplier-select-btn{padding:14px;border-radius:14px;background:linear-gradient(135deg,var(--reception),#047857);color:#fff;cursor:pointer;text-align:center;border:3px solid transparent;transition:all .15s;}
+.supplier-select-btn:active{transform:scale(.97);}
+.supplier-select-btn.selected{border-color:#fff;box-shadow:0 0 0 3px var(--reception);}
+
+/* ── ÉTIQUETTES ── */
+.etiq-product-row{background:#fff;border-radius:14px;padding:14px;margin-bottom:10px;border:2px solid #e9d5ff;display:flex;align-items:center;gap:12px;}
+.etiq-product-row.selected{border-color:#9333ea;background:#faf5ff;}
+.etiq-check{width:28px;height:28px;border-radius:8px;border:2px solid #d1d5db;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all .15s;}
+.etiq-check.on{background:#9333ea;border-color:#9333ea;color:#fff;}
+.etiq-qty-ctrl{display:flex;align-items:center;gap:8px;}
+.etiq-qty-ctrl button{width:32px;height:32px;border-radius:8px;border:none;background:#f1f5f9;font-weight:900;font-size:16px;cursor:pointer;}
+.etiq-label-preview{background:linear-gradient(135deg,#9333ea,#6b21a8);color:#fff;border-radius:16px;padding:20px;text-align:center;margin:12px 0;}
+.etiq-label-preview .etiq-name{font-weight:950;font-size:18px;line-height:1.2;}
+.etiq-label-preview .etiq-prix-original{font-size:14px;text-decoration:line-through;opacity:.7;margin-top:6px;}
+.etiq-label-preview .etiq-prix-reduit{font-size:32px;font-weight:950;margin-top:4px;}
+.etiq-label-preview .etiq-pct{font-size:14px;background:rgba(255,255,255,.25);border-radius:8px;padding:4px 10px;margin-top:6px;display:inline-block;}
+
 .export-btn{width:100%;padding:14px;border-radius:12px;border:none;font-weight:900;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:opacity .15s;}
 .export-btn:active{opacity:.85;}
 </style>
@@ -505,6 +523,10 @@ textarea{min-height:80px;resize:none;}
         <i class="fas fa-chart-bar"></i><br>INSPECTION
         <div class="small" style="color:rgba(255,255,255,.8);margin-top:6px;">Rapports & export</div>
       </div>
+      <div class="home-btn wide" onclick="app.nav('etiquettes')" style="background:linear-gradient(135deg,#9333ea,#6b21a8);">
+        <i class="fas fa-tag"></i><br>ÉTIQUETTES -50%
+        <div class="small" style="color:rgba(255,255,255,.8);margin-top:6px;">Brother TD-2120N • Too Good To Go</div>
+      </div>
     </div>
     <div class="card hidden" id="btn-team" onclick="app.nav('team')" style="text-align:center;cursor:pointer;"><i class="fas fa-users"></i> Équipe</div>
   </div>
@@ -513,6 +535,7 @@ textarea{min-height:80px;resize:none;}
   <div id="view-frais" class="hidden">
     <div class="tabs">
       <div class="tab active" id="tf-1" onclick="app.frais.tab('scan')">SCAN</div>
+      <div class="tab"        id="tf-3" onclick="app.frais.tab('tgtg')" style="color:#006B3C;">TOO GOOD TO GO</div>
       <div class="tab"        id="tf-2" onclick="app.frais.tab('list')">LISTE</div>
     </div>
     <div class="card" id="frais-today-card" style="border-left:6px solid var(--primary);">
@@ -534,11 +557,33 @@ textarea{min-height:80px;resize:none;}
         <button class="btn" onclick="app.frais.add()">AJOUTER</button>
       </div>
     </div>
+    <!-- TOO GOOD TO GO -->
+    <div id="frais-tgtg" class="hidden">
+      <div class="card" style="border-left:5px solid #006B3C;background:linear-gradient(135deg,#f0fdf4,#fff);">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+          <div style="font-size:32px;">🍃</div>
+          <div>
+            <div style="font-weight:950;font-size:16px;color:#006B3C;">Too Good To Go</div>
+            <div class="small">Scannez ou cherchez un produit à déduire du stock</div>
+          </div>
+        </div>
+        <div id="tgtg-scanner-box" style="height:200px;background:black;margin-bottom:10px;display:none;border-radius:12px;overflow:hidden;">
+          <video id="tgtg-video" style="width:100%;height:100%;object-fit:cover;"></video>
+        </div>
+        <button class="btn" style="background:#006B3C;" onclick="app.frais.tgtgToggleScan()"><i class="fas fa-camera"></i> SCANNER</button>
+        <div class="search-wrap" style="margin-top:10px;">
+          <i class="fas fa-magnifying-glass"></i>
+          <input class="search-input" type="search" id="tgtg-search" placeholder="Rechercher un produit…" oninput="app.frais.renderTgtg()" autocomplete="off">
+        </div>
+        <div id="tgtg-result-list" style="margin-top:8px;"></div>
+      </div>
+    </div>
     <div id="frais-list" class="hidden">
       <div class="search-wrap">
         <i class="fas fa-magnifying-glass"></i>
         <input class="search-input" type="search" id="frais-search" placeholder="Rechercher un produit frais…" oninput="app.frais.render()" autocomplete="off">
       </div>
+      <div id="frais-list-items"></div>
     </div>
   </div>
 
@@ -612,10 +657,12 @@ textarea{min-height:80px;resize:none;}
   <div id="view-todo" class="hidden">
     <div class="tabs">
       <div class="tab active-todo" id="tt-1" onclick="app.todo.tab('today')">AUJOURD'HUI</div>
+      <div class="tab"             id="tt-4" onclick="app.todo.tab('tomorrow')">À VENIR</div>
       <div class="tab"             id="tt-2" onclick="app.todo.tab('config')">CONFIGURER</div>
       <div class="tab"             id="tt-3" onclick="app.todo.tab('history')">HISTORIQUE</div>
     </div>
     <div id="todo-today"></div>
+    <div id="todo-tomorrow" class="hidden"></div>
     <div id="todo-config" class="hidden"></div>
     <div id="todo-history" class="hidden"></div>
   </div>
@@ -630,15 +677,36 @@ textarea{min-height:80px;resize:none;}
       <div class="card" style="border-left:5px solid var(--reception);">
         <h3 style="margin-top:0;color:var(--reception);"><i class="fas fa-truck-ramp-box"></i> Contrôle à la réception</h3>
         <label>Fournisseur</label>
-        <input type="text" id="rec-supplier" placeholder="Nom du fournisseur" list="rec-supplier-list" autocomplete="off">
-        <datalist id="rec-supplier-list"></datalist>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;" id="rec-supplier-grid">
+          <div class="supplier-select-btn" id="sup-btn-011" onclick="app.reception.selectSupplier('011','COLOMIERS 011','sec',null,null)">
+            <div style="font-weight:950;">COLOMIERS</div><div style="font-size:11px;opacity:.8;">011 • SEC</div>
+          </div>
+          <div class="supplier-select-btn" id="sup-btn-392" onclick="app.reception.selectSupplier('392','PLAISANCE 392','frais',0,4)">
+            <div style="font-weight:950;">PLAISANCE</div><div style="font-size:11px;opacity:.8;">392 • FRAIS 0–4°C</div>
+          </div>
+          <div class="supplier-select-btn" id="sup-btn-032" onclick="app.reception.selectSupplier('032','ST GILES 032','surgele',-23,-18)" style="grid-column:1/-1;">
+            <div style="font-weight:950;">ST GILES</div><div style="font-size:11px;opacity:.8;">032 • SURGELÉ -18 à -23°C</div>
+          </div>
+        </div>
+        <div id="rec-selected-supplier" style="display:none;margin-bottom:12px;">
+          <div style="background:#f0fdf4;border:2px solid var(--reception);border-radius:12px;padding:12px;display:flex;align-items:center;justify-content:space-between;">
+            <div>
+              <div style="font-weight:950;" id="rec-sup-label">—</div>
+              <div class="small" id="rec-sup-type-label">—</div>
+            </div>
+            <button onclick="app.reception.clearSupplier()" style="border:none;background:#fee2e2;color:#991b1b;border-radius:8px;padding:6px 10px;font-weight:900;cursor:pointer;">Changer</button>
+          </div>
+        </div>
+        <div id="rec-temp-section" style="display:none;">
+          <label>Température à réception (°C)</label>
+          <div style="background:#f8fafc;border-radius:12px;padding:10px;margin-bottom:10px;">
+            <div class="small" id="rec-temp-range-label" style="font-weight:800;color:#475569;margin-bottom:6px;"></div>
+            <input type="number" id="rec-temp" inputmode="decimal" step="0.1" placeholder="Ex: 3.5" oninput="app.reception._updateTempStatus()">
+            <div id="rec-temp-status"></div>
+          </div>
+        </div>
         <label>Produit / Nature de la livraison</label>
         <input type="text" id="rec-product" placeholder="Ex: Viande fraîche, Légumes, Poisson…">
-        <label>Température à réception (°C)</label>
-        <input type="number" id="rec-temp" inputmode="decimal" step="0.1" placeholder="Ex: 3.5">
-        <div id="rec-temp-status" style="margin-bottom:10px;"></div>
-        <label>Température limite acceptée (°C max)</label>
-        <input type="number" id="rec-temp-limit" value="8" inputmode="decimal" step="0.1">
         <label>Date et heure de contrôle</label>
         <input type="datetime-local" id="rec-datetime">
         <label>Observations / Non-conformités</label>
@@ -663,6 +731,36 @@ textarea{min-height:80px;resize:none;}
       <button class="gear-btn" id="inspection-settings-btn" onclick="app.nav('team')" title="Paramètres équipe"><i class="fas fa-gear"></i></button>
     </div>
     <div id="inspection-content"></div>
+  </div>
+
+  <!-- ÉTIQUETTES -50% -->
+  <div id="view-etiquettes" class="hidden">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+      <div style="font-size:28px;">🏷️</div>
+      <div>
+        <div style="font-weight:950;font-size:18px;color:#9333ea;">Étiquettes -50%</div>
+        <div class="small">Imprimante Brother TD-2120N</div>
+      </div>
+    </div>
+    <div class="card" style="border-left:5px solid #9333ea;">
+      <div style="font-weight:950;margin-bottom:10px;color:#9333ea;"><i class="fas fa-triangle-exclamation"></i> Produits à date du jour</div>
+      <div id="etiq-product-list"></div>
+      <button class="btn" style="background:#9333ea;margin-top:8px;" onclick="app.etiquettes.loadProducts()"><i class="fas fa-rotate"></i> Actualiser la liste</button>
+    </div>
+    <div class="card" id="etiq-config-card" style="display:none;">
+      <h3 style="margin-top:0;color:#9333ea;"><i class="fas fa-sliders"></i> Configuration impression</h3>
+      <div id="etiq-items-config"></div>
+      <div style="display:flex;gap:8px;margin-top:12px;">
+        <button class="btn" style="background:#9333ea;" onclick="app.etiquettes.printAll()"><i class="fas fa-print"></i> IMPRIMER TOUT</button>
+      </div>
+    </div>
+    <div class="card" style="background:#f8f4ff;border:1px dashed #9333ea;">
+      <h4 style="margin-top:0;color:#9333ea;"><i class="fas fa-network-wired"></i> Connexion imprimante</h4>
+      <input id="etiq-printer-ip" placeholder="IP imprimante (ex: 192.168.1.50)" style="margin-bottom:8px;">
+      <input id="etiq-printer-port" placeholder="Port (défaut: 9100)" value="9100" style="margin-bottom:8px;">
+      <div id="etiq-printer-status" class="small" style="color:var(--muted);margin-bottom:8px;">Non connecté</div>
+      <button class="btn secondary" onclick="app.etiquettes.testPrinter()"><i class="fas fa-plug"></i> Tester la connexion</button>
+    </div>
   </div>
 
   <!-- TEAM -->
@@ -986,6 +1084,7 @@ window.app={
 
   nav(v,saveHistory=true){
     if(this.frais&&this.frais.scanning)this.frais.toggleScan();
+    if(this.frais&&this.frais.tgtgScanning)this.frais.tgtgToggleScan();
     const cur=document.querySelector('main > div:not(.hidden)');
     if(saveHistory&&cur)this.viewHistory.push(cur.id.replace('view-',''));
     document.querySelectorAll('main > div').forEach(e=>e.classList.add('hidden'));
@@ -993,6 +1092,7 @@ window.app={
     if(v==='todo'){this.todo.renderToday();this.todo.tab('today');}
     if(v==='reception'){this.reception.init();this.reception.tab('new');}
     if(v==='inspection'){this.inspection.render();}
+    if(v==='etiquettes'){this.etiquettes.loadProducts();}
   },
   goBack(){if(this.viewHistory.length)this.nav(this.viewHistory.pop(),false);else this.nav('home',false);},
   toggleFam(id){if(this.closed.has(id))this.closed.delete(id);else this.closed.add(id);this.updateUI();},
@@ -1199,16 +1299,69 @@ window.app={
 
   // ── FRAIS ──
   frais:{
-    scanning:false,imgUrl:'',
+    scanning:false,tgtgScanning:false,imgUrl:'',
     tab(t){
       document.querySelectorAll('#view-frais .tab').forEach(e=>e.classList.remove('active'));
-      document.getElementById(t==='scan'?'tf-1':'tf-2').classList.add('active');
-      document.getElementById('frais-scan').classList.add('hidden');document.getElementById('frais-list').classList.add('hidden');
+      const tabMap={scan:'tf-1',tgtg:'tf-3',list:'tf-2'};
+      document.getElementById(tabMap[t]).classList.add('active');
+      ['frais-scan','frais-tgtg','frais-list'].forEach(id=>document.getElementById(id).classList.add('hidden'));
       document.getElementById('frais-'+t).classList.remove('hidden');
+      if(t==='list'){this.render();}
+      if(t==='tgtg'){this.renderTgtg();}
     },
     toggleScan(){
-      if(this.scanning){this.scanning=false;document.getElementById('scanner-box').style.display='none';codeReader.reset();}
+      if(this.scanning){this.scanning=false;document.getElementById('scanner-box').style.display='none';try{codeReader.reset();}catch(e){}}
       else{this.scanning=true;document.getElementById('scanner-box').style.display='block';codeReader.decodeFromVideoDevice(null,'video',(r)=>{if(r){this.handleInput(r.text);this.toggleScan();}});}
+    },
+    tgtgToggleScan(){
+      if(this.tgtgScanning){this.tgtgScanning=false;document.getElementById('tgtg-scanner-box').style.display='none';try{codeReader.reset();}catch(e){}}
+      else{this.tgtgScanning=true;document.getElementById('tgtg-scanner-box').style.display='block';codeReader.decodeFromVideoDevice(null,'tgtg-video',(r)=>{if(r){this.tgtgHandleScan(r.text);this.tgtgToggleScan();}});}
+    },
+    tgtgHandleScan(ean){
+      // Find product by EAN in frais list and deduct qty
+      const match=window.app.data.frais.find(i=>String(i.ean||'')===String(ean));
+      if(match){this.tgtgDeduct(match.id,true);}
+      else{document.getElementById('tgtg-search').value=ean;this.renderTgtg();}
+    },
+    tgtgDeduct:async function(id,fromScan=false){
+      const idx=window.app.data.frais.findIndex(x=>x.id==id);
+      if(idx<0)return;
+      const item=window.app.data.frais[idx];
+      const currentQty=Number(item.qty||0);
+      if(currentQty<=1){
+        // Remove completely
+        window.app.data.frais.splice(idx,1);
+        toast(`${item.name} retiré du stock (Too Good To Go)`,fromScan?'ok':'info',3000);
+      } else {
+        window.app.data.frais[idx].qty=currentQty-1;
+        toast(`${item.name} : ${currentQty}→${currentQty-1}`,'ok',2000);
+      }
+      spin(true);try{await window.app.save('frais');}catch(e){toast('Erreur synchro.','err');}finally{spin(false);}
+      this.renderTgtg();this.render();window.app.updateHomeBadges();
+    },
+    renderTgtg(){
+      const wrap=document.getElementById('tgtg-result-list');if(!wrap)return;
+      const q=(document.getElementById('tgtg-search')?.value||'').toLowerCase().trim();
+      const today=new Date();today.setHours(0,0,0,0);
+      // Show products expiring today or with search
+      const items=window.app.data.frais.filter(i=>{
+        if(q){return(i.name||'').toLowerCase().includes(q)||(i.ean||'').includes(q);}
+        const d=new Date(i.date);return!isNaN(d.getTime())&&d<=today;
+      }).sort((a,b)=>new Date(a.date)-new Date(b.date));
+      if(!items.length){
+        wrap.innerHTML=`<div class="empty-state" style="padding:20px 0;"><i class="fas fa-check-circle" style="color:#006B3C;"></i>${q?'Aucun résultat':'Aucun produit à retirer aujourd\'hui 🎉'}</div>`;
+        return;
+      }
+      wrap.innerHTML=items.map(i=>{
+        const d=new Date(i.date);const dateStr=!isNaN(d.getTime())?d.toLocaleDateString('fr'):'?';
+        return`<div class="list-item" style="border-left:4px solid #006B3C;">
+          <div style="flex:1;min-width:0;">
+            <div style="font-weight:900;font-size:14px;">${i.name||''}</div>
+            <div class="small">x${i.qty||0} • DLC: ${dateStr} • ${i.fam||''}</div>
+          </div>
+          <button onclick="app.frais.tgtgDeduct(${i.id})" style="background:#006B3C;color:#fff;border:none;border-radius:10px;padding:10px 14px;font-weight:900;cursor:pointer;white-space:nowrap;"><i class="fas fa-minus"></i> -1</button>
+        </div>`;
+      }).join('');
     },
     handleInput(val){
       const clean=String(val||'').replace(/\D/g,'').slice(0,13);
@@ -1228,7 +1381,7 @@ window.app={
       window.app.updateHomeBadges();
     },
     render(){
-      const div=document.getElementById('frais-list');if(!div)return;
+      const div=document.getElementById('frais-list-items');if(!div)return;
       const q=(document.getElementById('frais-search')?.value||'').toLowerCase().trim();
       const grp={};
       const filtered=q?window.app.data.frais.filter(i=>(i.name||'').toLowerCase().includes(q)||(i.fam||'').toLowerCase().includes(q)||(i.ean||'').includes(q)):window.app.data.frais;
@@ -1243,8 +1396,7 @@ window.app={
           const d=new Date(i.date);let badge='bg-grey';
           if(!isNaN(d.getTime())){const diff=(d-new Date())/(1000*60*60*24);badge=diff<0?'bg-red':(diff<2?'bg-orange':'bg-green');}
           const sn=(i.name||'').replace(/'/g,' ');
-          const img=i.img?`<img src="${i.img}" class="item-img" onclick="event.stopPropagation();app.common.showBarcode('${i.ean||''}','${sn}','${i.img}')">`
-            :`<div class="item-img" onclick="event.stopPropagation();app.common.showBarcode('${i.ean||''}','${sn}')"><i class="fas fa-barcode"></i></div>`;
+          const img=i.img?`<img src="${i.img}" class="item-img" onclick="event.stopPropagation();app.common.showBarcode('${i.ean||''}','${sn}','${i.img}')">`:`<div class="item-img" onclick="event.stopPropagation();app.common.showBarcode('${i.ean||''}','${sn}')"><i class="fas fa-barcode"></i></div>`;
           const sc=window.app.common.isASaisir(i.date)?`<span class="chip warn"><i class="fas fa-triangle-exclamation"></i> À SAISIR</span>`:'';
           parts.push(`<div class="swipe-wrapper"><div class="swipe-content" onclick="app.frais.openEdit(${i.id})">
             <div style="display:flex;align-items:center;flex:1;min-width:0;gap:12px;">${img}<div class="item-info"><div class="item-title">${i.name||''}</div><div class="item-sub">x${i.qty||0} • ${i.ean||'EAN ?'} ${sc}</div></div></div>
@@ -1459,6 +1611,7 @@ window.app={
     addStock:async function(libId){
       if(!window.app.canDo('saladStock')){toast('Permission refusée.','err');return;}
       const l=window.app.data.saladLib.find(x=>x.id==libId);
+      if(!l)return toast('Produit introuvable.','err');
       const q=await dlgPrompt('Quantité ?','1','number');
       if(q===null)return;
       const n=Number(q||0);
@@ -1466,11 +1619,16 @@ window.app={
       const now=Date.now();
       const entry={id:now,libId,name:l.name,qty:n,out:now,end:window.app.common.calculateEnd(now,l.hours),hours:l.hours};
       window.app.data.saladStock.push(entry);
-      this.render();
       spin(true);
-      try{await window.app.save('salad');toast(`${n}× ${l.name} sorti — fin: ${formatDate(entry.end)}`,'ok',4000);}
-      catch(e){toast('Erreur sauvegarde.','err');}
-      finally{spin(false);}
+      try{
+        await window.app.save('salad');
+        toast(`${n}× ${l.name} sorti — fin: ${formatDate(entry.end)}`,'ok',4000);
+        this.render();
+      }catch(e){
+        // Rollback on error
+        window.app.data.saladStock=window.app.data.saladStock.filter(x=>x.id!==entry.id);
+        toast('Erreur sauvegarde.','err');
+      }finally{spin(false);}
     },
     changeQty:async function(id,delta){
       const idx=window.app.data.saladStock.findIndex(x=>x.id==id);
@@ -1610,10 +1768,12 @@ window.app={
 
     tab(t){
       document.querySelectorAll('#view-todo .tab').forEach(e=>e.classList.remove('active-todo'));
-      document.getElementById(t==='today'?'tt-1':(t==='config'?'tt-2':'tt-3')).classList.add('active-todo');
-      ['todo-today','todo-config','todo-history'].forEach(id=>document.getElementById(id).classList.add('hidden'));
-      document.getElementById('todo-'+t).classList.remove('hidden');
+      const tabMap={today:'tt-1',tomorrow:'tt-4',config:'tt-2',history:'tt-3'};
+      if(document.getElementById(tabMap[t]))document.getElementById(tabMap[t]).classList.add('active-todo');
+      ['todo-today','todo-tomorrow','todo-config','todo-history'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.add('hidden');});
+      const panel=document.getElementById('todo-'+t);if(panel)panel.classList.remove('hidden');
       if(t==='today')this.renderToday();
+      if(t==='tomorrow')this.renderTomorrow();
       if(t==='config'){
         if(!window.app.canDo('todoConfig')){
           document.getElementById('todo-config').innerHTML='<div class="empty-state"><i class="fas fa-lock"></i>Accès réservé aux administrateurs et aux utilisateurs autorisés.</div>';
@@ -1628,7 +1788,7 @@ window.app={
     subscribeToday(){
       if(this._unsubscribeLogs){try{this._unsubscribeLogs();}catch(e){}}
       const {onSnapshot}=window._fsImports||{};
-      if(!onSnapshot){return;}// fallback if not imported
+      if(!onSnapshot){return;}
       const today=todayStr();
       try{
         const q=window._fsQuery(colTodoLogs,window._fsWhere("date","==",today));
@@ -1640,30 +1800,31 @@ window.app={
       }catch(e){}
     },
 
-    // Check if a task is applicable today based on its frequency
-    isTaskToday(task){
-      const now=new Date();
+    // Check if a task is applicable for a given date
+    isTaskForDate(task, date){
       const freq=task.freq||'weekly';
+      const dow=date.getDay();
+      const dom=date.getDate();
+      const month=date.getMonth()+1;
       if(freq==='daily') return true;
-      if(freq==='weekly'){
-        const dow=now.getDay();
-        return (task.days||[]).includes(dow);
-      }
-      if(freq==='monthly'){
-        const dom=now.getDate();
-        return (task.monthDays||[]).includes(dom);
-      }
+      if(freq==='weekly') return (task.days||[]).includes(dow);
+      if(freq==='monthly') return (task.monthDays||[]).includes(dom);
       if(freq==='yearly'){
-        const md=task.yearlyDate||'';
-        if(!md)return false;
+        const md=task.yearlyDate||'';if(!md)return false;
         const[d,m]=(md.split('/')).map(Number);
-        return now.getDate()===d&&(now.getMonth()+1)===m;
+        return dom===d&&month===m;
       }
       return false;
     },
 
     todayTaskList(){
-      return (window.app.data.todo.tasks||[]).filter(t=>this.isTaskToday(t));
+      const today=new Date();
+      return (window.app.data.todo.tasks||[]).filter(t=>this.isTaskForDate(t,today));
+    },
+
+    tomorrowTaskList(){
+      const tomorrow=new Date();tomorrow.setDate(tomorrow.getDate()+1);
+      return (window.app.data.todo.tasks||[]).filter(t=>this.isTaskForDate(t,tomorrow));
     },
 
     isDone(taskId){
@@ -1779,6 +1940,56 @@ window.app={
           const log=done?window.app.data.todoLogs.find(l=>String(l.taskId)===String(t.id)):null;
           parts.push(`<div class="task-card ${done?'done':''}"><div style="flex:1;min-width:0;"><div style="font-weight:900;${done?'text-decoration:line-through;color:#94a3b8;':''}">${t.name||''}</div>${done&&log?`<div class="small" style="color:var(--success);"><i class="fas fa-check-circle"></i> ${log.user}</div>`:''}${t.notes?`<div class="small">${t.notes}</div>`:''}</div><div class="todo-check ${done?'checked':''}" onclick="app.todo.${done?'uncheckTask':'checkTask'}('${t.id}')"><i class="fas fa-check"></i></div></div>`);
         });
+      }
+      wrap.innerHTML=parts.join('');
+    },
+
+    renderTomorrow(){
+      const wrap=document.getElementById('todo-tomorrow');if(!wrap)return;
+      const zones=window.app.data.todo.zones||[];
+      const tasks=this.tomorrowTaskList();
+      const tomorrow=new Date();tomorrow.setDate(tomorrow.getDate()+1);
+      const dateLabel=tomorrow.toLocaleDateString('fr',{weekday:'long',day:'numeric',month:'long'});
+      const FREQ_LABELS={daily:'Quotidien',weekly:'Hebdo',monthly:'Mensuel',yearly:'Annuel'};
+
+      if(!tasks.length){
+        wrap.innerHTML=`
+          <div style="text-align:center;padding:20px;">
+            <div style="font-weight:950;font-size:18px;color:var(--todo);margin-bottom:4px;">${dateLabel}</div>
+          </div>
+          <div class="empty-state"><i class="fas fa-calendar-check"></i>Aucune tâche prévue demain.</div>`;
+        return;
+      }
+
+      const parts=[`
+        <div style="background:linear-gradient(135deg,#475569,#334155);border-radius:18px;padding:18px;margin-bottom:16px;color:#fff;">
+          <div style="font-weight:950;font-size:17px;">${dateLabel}</div>
+          <div style="font-size:13px;opacity:.85;margin-top:4px;">${tasks.length} tâche${tasks.length>1?'s':''} prévue${tasks.length>1?'s':''}</div>
+        </div>
+      `];
+
+      zones.forEach(z=>{
+        const zoneTasks=tasks.filter(t=>String(t.zoneId)===String(z.id)).sort((a,b)=>(a.time||'00:00').localeCompare(b.time||'00:00'));
+        if(!zoneTasks.length)return;
+        parts.push(`<div style="background:${z.color||'var(--todo)'};border-radius:14px;padding:14px 16px;margin-bottom:4px;color:#fff;"><div style="font-weight:950;font-size:15px;">${z.name||'ZONE'}</div></div>`);
+        zoneTasks.forEach(t=>{
+          const freqLabel=FREQ_LABELS[t.freq||'weekly']||'';
+          parts.push(`<div class="task-card">
+            ${t.time?`<span class="time-chip">${t.time}</span>`:''}
+            <div style="flex:1;min-width:0;">
+              <div style="font-weight:900;font-size:14px;">${t.name||''} <span class="chip" style="background:#f1f5f9;color:#64748b;font-size:10px;">${freqLabel}</span></div>
+              ${t.notes?`<div class="small" style="margin-top:2px;">${t.notes}</div>`:''}
+            </div>
+            <div style="width:32px;height:32px;border-radius:50%;background:#e2e8f0;display:flex;align-items:center;justify-content:center;color:#94a3b8;"><i class="fas fa-clock"></i></div>
+          </div>`);
+        });
+        parts.push('<div style="margin-bottom:8px;"></div>');
+      });
+
+      const unzoned=tasks.filter(t=>!zones.find(z=>String(z.id)===String(t.zoneId)));
+      if(unzoned.length){
+        parts.push(`<div style="background:#475569;border-radius:14px;padding:14px 16px;margin-bottom:4px;color:#fff;"><div style="font-weight:950;">SANS ZONE</div></div>`);
+        unzoned.forEach(t=>{parts.push(`<div class="task-card"><div style="flex:1;font-weight:900;">${t.name||''}</div></div>`);});
       }
       wrap.innerHTML=parts.join('');
     },
@@ -2017,28 +2228,66 @@ window.app={
   // ══════════════════════════════════════════════════
   reception:{
     _photoData:'',
+    _currentSupplier:null, // {code, name, type, tempMin, tempMax}
+
+    SUPPLIERS:[
+      {code:'011',name:'COLOMIERS 011',type:'sec',   tempMin:null,tempMax:null,  color:'#92400e',icon:'fa-box'},
+      {code:'392',name:'PLAISANCE 392', type:'frais', tempMin:0,   tempMax:4,    color:'#065f46',icon:'fa-snowflake'},
+      {code:'032',name:'ST GILES 032',  type:'surgele',tempMin:-23, tempMax:-18, color:'#1e3a8a',icon:'fa-temperature-arrow-down'}
+    ],
+
     init(){
       const inp=document.getElementById('rec-datetime');
       if(inp)inp.value=tsToInput(Date.now());
       const fi=document.getElementById('rec-photo-input');
       if(fi&&!fi._wired){fi._wired=true;fi.addEventListener('change',e=>{const f=e.target.files?.[0];if(!f)return;window.app.common.compressImg(f,b64=>{window.app.reception._photoData=b64;const prev=document.getElementById('rec-photo-preview');prev.src=b64;prev.style.display='block';});});}
-      const ti=document.getElementById('rec-temp');
-      if(ti&&!ti._wired){ti._wired=true;ti.addEventListener('input',()=>window.app.reception._updateTempStatus());}
-      this._fillSupplierList();
     },
-    _fillSupplierList(){
-      const dl=document.getElementById('rec-supplier-list');if(!dl)return;
-      const suppliers=[...new Set((window.app.data.reception||[]).map(r=>r.supplier||'').filter(Boolean))].sort();
-      dl.innerHTML=suppliers.map(s=>`<option value="${s}">`).join('');
+
+    selectSupplier(code,name,type,tempMin,tempMax){
+      this._currentSupplier={code,name,type,tempMin,tempMax};
+      // Highlight selected
+      document.querySelectorAll('.supplier-select-btn').forEach(b=>b.classList.remove('selected'));
+      const btn=document.getElementById('sup-btn-'+code);if(btn)btn.classList.add('selected');
+      // Show selected label
+      document.getElementById('rec-selected-supplier').style.display='block';
+      document.getElementById('rec-sup-label').textContent=name;
+      const sup=this.SUPPLIERS.find(s=>s.code===code);
+      let typeLabel='';
+      if(type==='sec')typeLabel='SEC — Pas de contrôle température';
+      else if(type==='frais')typeLabel=`FRAIS — Plage: ${tempMin}°C à ${tempMax}°C`;
+      else if(type==='surgele')typeLabel=`SURGELÉ — Plage: ${tempMin}°C à ${tempMax}°C`;
+      document.getElementById('rec-sup-type-label').textContent=typeLabel;
+      // Show/hide temp section
+      const tempSec=document.getElementById('rec-temp-section');
+      if(type==='sec'){
+        tempSec.style.display='none';
+        document.getElementById('rec-temp').value='';
+      } else {
+        tempSec.style.display='block';
+        const rangeLabel=`Plage acceptée : ${tempMin}°C à ${tempMax}°C`;
+        document.getElementById('rec-temp-range-label').textContent=rangeLabel;
+        document.getElementById('rec-temp').placeholder=`Ex: ${type==='frais'?'2.5':'-20'}`;
+        document.getElementById('rec-temp-status').innerHTML='';
+      }
     },
+
+    clearSupplier(){
+      this._currentSupplier=null;
+      document.querySelectorAll('.supplier-select-btn').forEach(b=>b.classList.remove('selected'));
+      document.getElementById('rec-selected-supplier').style.display='none';
+      document.getElementById('rec-temp-section').style.display='none';
+    },
+
     _updateTempStatus(){
+      const sup=this._currentSupplier;if(!sup||sup.type==='sec')return;
       const v=parseFloat(document.getElementById('rec-temp').value);
-      const lim=parseFloat(document.getElementById('rec-temp-limit').value||'8');
       const div=document.getElementById('rec-temp-status');
       if(isNaN(v)){div.innerHTML='';return;}
-      if(v<=lim){div.innerHTML=`<div style="background:#d1fae5;color:#065f46;padding:10px;border-radius:10px;font-weight:900;margin-bottom:8px;"><i class="fas fa-check-circle"></i> ${v}°C — Dans les normes (limite: ${lim}°C)</div>`;}
-      else{div.innerHTML=`<div style="background:#fee2e2;color:#991b1b;padding:10px;border-radius:10px;font-weight:900;margin-bottom:8px;"><i class="fas fa-triangle-exclamation"></i> ${v}°C — HORS NORME ! (limite: ${lim}°C)</div>`;}
+      const ok=v>=sup.tempMin&&v<=sup.tempMax;
+      if(ok){div.innerHTML=`<div style="background:#d1fae5;color:#065f46;padding:10px;border-radius:10px;font-weight:900;margin-bottom:8px;"><i class="fas fa-check-circle"></i> ${v}°C — DANS LA NORME (${sup.tempMin}°C à ${sup.tempMax}°C)</div>`;}
+      else{div.innerHTML=`<div style="background:#fee2e2;color:#991b1b;padding:10px;border-radius:10px;font-weight:900;margin-bottom:8px;"><i class="fas fa-triangle-exclamation"></i> ${v}°C — HORS NORME ! (plage: ${sup.tempMin}°C à ${sup.tempMax}°C)</div>`;}
     },
+
     tab(t){
       document.querySelectorAll('#view-reception .tab').forEach(e=>e.classList.remove('active'));
       document.getElementById(t==='new'?'trec-1':'trec-2').classList.add('active');
@@ -2046,25 +2295,37 @@ window.app={
       document.getElementById('reception-history').classList.toggle('hidden',t!=='history');
       if(t==='history')this.renderHistory();
     },
+
     save:async function(conform){
-      const supplier=(document.getElementById('rec-supplier').value||'').trim();
+      const sup=this._currentSupplier;
+      if(!sup)return toast('Sélectionnez un fournisseur.','warn');
       const product=(document.getElementById('rec-product').value||'').trim();
-      const temp=document.getElementById('rec-temp').value;
-      const tempLimit=parseFloat(document.getElementById('rec-temp-limit').value||'8');
-      if(!supplier||!product)return toast('Fournisseur et produit requis.','warn');
-      if(temp===''||isNaN(parseFloat(temp)))return toast('Température requise.','warn');
+      if(!product)return toast('Produit requis.','warn');
       const ts=inputToTs(document.getElementById('rec-datetime').value)||Date.now();
-      const entry={ts,date:todayStr(),supplier,product,temp:parseFloat(temp),tempLimit,conform,notes:(document.getElementById('rec-notes').value||'').trim(),photo:this._photoData||'',user:window.app.me?.name||(window.app.me?.email||'USER')};
+      let temp=null;let tempOk=true;
+      if(sup.type!=='sec'){
+        const tv=document.getElementById('rec-temp').value;
+        if(tv===''||isNaN(parseFloat(tv)))return toast('Température requise.','warn');
+        temp=parseFloat(tv);
+        tempOk=temp>=sup.tempMin&&temp<=sup.tempMax;
+        // Auto-set conform based on temp
+        if(!tempOk&&conform){const ok=await dlgConfirm('Température hors norme','La température est hors norme. Confirmer quand même comme CONFORME ?');if(!ok)return;}
+      }
+      const entry={ts,date:todayStr(),supplier:sup.name,supplierCode:sup.code,supplierType:sup.type,product,temp,tempMin:sup.tempMin,tempMax:sup.tempMax,tempOk,conform,notes:(document.getElementById('rec-notes').value||'').trim(),photo:this._photoData||'',user:window.app.me?.name||(window.app.me?.email||'USER')};
       spin(true);
       try{
         const ref=await addDoc(colReception,entry);
         window.app.data.reception.unshift({_id:ref.id,...entry});
-        document.getElementById('rec-supplier').value='';document.getElementById('rec-product').value='';document.getElementById('rec-temp').value='';document.getElementById('rec-notes').value='';document.getElementById('rec-temp-status').innerHTML='';document.getElementById('rec-photo-preview').style.display='none';document.getElementById('rec-datetime').value=tsToInput(Date.now());document.getElementById('rec-photo-input').value='';
-        this._photoData='';
-        toast(conform?'Réception conforme enregistrée ✓':'⚠ NON CONFORME enregistrée','ok',4000);
-        this._fillSupplierList();
+        document.getElementById('rec-product').value='';document.getElementById('rec-notes').value='';
+        if(document.getElementById('rec-temp'))document.getElementById('rec-temp').value='';
+        document.getElementById('rec-temp-status').innerHTML='';
+        document.getElementById('rec-photo-preview').style.display='none';
+        document.getElementById('rec-datetime').value=tsToInput(Date.now());
+        document.getElementById('rec-photo-input').value='';this._photoData='';
+        toast(conform?`✓ ${sup.name} — Conforme`:`⚠ ${sup.name} — NON CONFORME`,'ok',4000);
       }catch(e){toast('Erreur sauvegarde.','err');}finally{spin(false);}
     },
+
     renderHistory(){
       const wrap=document.getElementById('reception-history');if(!wrap)return;
       const logs=(window.app.data.reception||[]).slice().sort((a,b)=>(b.ts||0)-(a.ts||0));
@@ -2077,8 +2338,17 @@ window.app={
         parts.push(`<div class="group-header" style="background:var(--reception)"><span>${label}</span><span class="small" style="color:rgba(255,255,255,.8)">${byDay[day].length} contrôle(s)</span></div>`);
         byDay[day].forEach(l=>{
           const conformBadge=l.conform?`<span class="chip ok"><i class="fas fa-check"></i> CONFORME</span>`:`<span class="chip warn"><i class="fas fa-triangle-exclamation"></i> NON CONFORME</span>`;
-          const tempColor=l.temp>l.tempLimit?'color:#ef4444;':'color:#10b981;';
-          parts.push(`<div class="reception-card"><div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px;"><div style="font-weight:950;font-size:15px;">${l.supplier||''}</div>${conformBadge}</div><div style="font-size:14px;font-weight:700;margin-bottom:4px;">${l.product||''}</div><div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:4px;"><span style="${tempColor}font-weight:950;font-size:18px;"><i class="fas fa-thermometer-half"></i> ${l.temp}°C</span><span class="small">limite: ${l.tempLimit}°C</span><span class="small">${formatDate(l.ts)}</span><span class="small"><i class="fas fa-user"></i> ${l.user||''}</span></div>${l.notes?`<div class="small" style="margin-top:4px;color:#475569;">${l.notes}</div>`:''}${l.photo?`<img src="${l.photo}" style="width:100%;max-height:140px;object-fit:contain;border-radius:10px;margin-top:8px;background:#f8fafc;">`:''}</div>`);
+          const typeColors={frais:'#065f46',surgele:'#1e3a8a',sec:'#92400e'};
+          const typeColor=typeColors[l.supplierType]||'#475569';
+          const tempInfo=l.temp!==null&&l.temp!==undefined?`<span style="font-weight:950;color:${l.tempOk!==false?'#10b981':'#ef4444'};font-size:16px;">${l.temp}°C</span> <span class="small">(${l.tempMin??'?'}°C à ${l.tempMax??'?'}°C)</span>`:'<span class="small">Sec — pas de température</span>';
+          parts.push(`<div class="reception-card">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px;">
+              <div style="font-weight:950;font-size:15px;color:${typeColor};">${l.supplier||''}</div>${conformBadge}
+            </div>
+            <div style="font-size:14px;font-weight:700;margin-bottom:6px;">${l.product||''}</div>
+            <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:4px;">${tempInfo}<span class="small">${formatDate(l.ts)}</span><span class="small"><i class="fas fa-user"></i> ${l.user||''}</span></div>
+            ${l.notes?`<div class="small" style="margin-top:4px;color:#475569;font-style:italic;">${l.notes}</div>`:''}
+            ${l.photo?`<img src="${l.photo}" style="width:100%;max-height:140px;object-fit:contain;border-radius:10px;margin-top:8px;background:#f8fafc;">`:''}</div>`);
         });
       });
       wrap.innerHTML=parts.join('');
@@ -2120,6 +2390,157 @@ window.app={
       const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
       const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=filename;a.click();URL.revokeObjectURL(url);
       toast('Export CSV téléchargé.','ok');
+    }
+  },
+
+  // ══════════════════════════════════════════════════
+  // ── ÉTIQUETTES MODULE (Brother TD-2120N) ──
+  // ══════════════════════════════════════════════════
+  etiquettes:{
+    _items:[],
+
+    loadProducts(){
+      const today=new Date();today.setHours(23,59,59,999);
+      const yesterday=new Date();yesterday.setDate(yesterday.getDate()-1);yesterday.setHours(23,59,59,999);
+      this._items=window.app.data.frais
+        .filter(i=>{const d=new Date(i.date);return!isNaN(d.getTime())&&d<=today;})
+        .map(i=>({fraisId:i.id,name:i.name,fam:i.fam||'',qty:Number(i.qty||0),date:i.date,price:'',pct:50,printQty:1,selected:true}));
+      this.renderProductList();
+    },
+
+    renderProductList(){
+      const wrap=document.getElementById('etiq-product-list');if(!wrap)return;
+      if(!this._items.length){
+        wrap.innerHTML=`<div style="text-align:center;padding:20px;color:#9333ea;"><i class="fas fa-check-circle" style="font-size:30px;margin-bottom:8px;display:block;"></i><div style="font-weight:900;">Aucun produit à DLC aujourd\'hui 🎉</div></div>`;
+        document.getElementById('etiq-config-card').style.display='none';
+        return;
+      }
+      wrap.innerHTML=this._items.map((it,idx)=>`
+        <div class="etiq-product-row ${it.selected?'selected':''}">
+          <div class="etiq-check ${it.selected?'on':''}" onclick="app.etiquettes.toggleItem(${idx})">
+            <i class="fas fa-check" style="${it.selected?'':'opacity:0'}"></i>
+          </div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-weight:900;font-size:14px;">${it.name}</div>
+            <div class="small">${it.fam} • x${it.qty} • DLC: ${new Date(it.date).toLocaleDateString('fr')}</div>
+          </div>
+        </div>
+      `).join('');
+      document.getElementById('etiq-config-card').style.display='block';
+      this.renderConfigSection();
+    },
+
+    toggleItem(idx){this._items[idx].selected=!this._items[idx].selected;this.renderProductList();},
+
+    renderConfigSection(){
+      const wrap=document.getElementById('etiq-items-config');if(!wrap)return;
+      const selected=this._items.filter(it=>it.selected);
+      if(!selected.length){wrap.innerHTML=`<div class="small" style="text-align:center;padding:10px;color:var(--muted);">Sélectionnez des produits ci-dessus</div>`;return;}
+      wrap.innerHTML=selected.map(it=>{
+        const realIdx=this._items.indexOf(it);
+        const prixOrig=parseFloat(it.price||0);
+        const prixReduit=it.price?(prixOrig*(1-it.pct/100)).toFixed(2):'';
+        return`<div style="background:#faf5ff;border-radius:14px;padding:14px;margin-bottom:12px;border:2px solid #e9d5ff;">
+          <div style="font-weight:950;font-size:15px;color:#9333ea;margin-bottom:10px;"><i class="fas fa-tag"></i> ${it.name}</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+            <div>
+              <label style="font-size:12px;font-weight:800;color:#6b21a8;display:block;margin-bottom:4px;">Prix original (€)</label>
+              <input type="number" step="0.01" min="0" placeholder="Ex: 4.90" value="${it.price}" oninput="app.etiquettes.setPrice(${realIdx},this.value)" style="margin:0;padding:10px;border-radius:8px;border:1.5px solid #d8b4fe;font-size:14px;">
+            </div>
+            <div>
+              <label style="font-size:12px;font-weight:800;color:#6b21a8;display:block;margin-bottom:4px;">Réduction %</label>
+              <input type="number" min="1" max="99" value="${it.pct}" oninput="app.etiquettes.setPct(${realIdx},this.value)" style="margin:0;padding:10px;border-radius:8px;border:1.5px solid #d8b4fe;font-size:14px;">
+            </div>
+          </div>
+          <div style="margin-bottom:10px;">
+            <label style="font-size:12px;font-weight:800;color:#6b21a8;display:block;margin-bottom:4px;">Nb d'étiquettes à imprimer</label>
+            <div class="etiq-qty-ctrl">
+              <button onclick="app.etiquettes.setPrintQty(${realIdx},${it.printQty-1})">−</button>
+              <span style="font-weight:950;font-size:20px;min-width:36px;text-align:center;">${it.printQty}</span>
+              <button onclick="app.etiquettes.setPrintQty(${realIdx},${it.printQty+1})">+</button>
+              <span class="small" style="margin-left:4px;">/ 50 max</span>
+            </div>
+          </div>
+          ${it.price?`<div class="etiq-label-preview">
+            <div class="etiq-name">${it.name}</div>
+            <div class="etiq-prix-original">${prixOrig.toFixed(2)} €</div>
+            <div class="etiq-prix-reduit">${prixReduit} €</div>
+            <div class="etiq-pct">-${it.pct}%</div>
+            <div style="font-size:11px;margin-top:6px;opacity:.85;">DLC: ${new Date(it.date).toLocaleDateString('fr')} • TOO GOOD TO GO • ${it.printQty} étiquette(s)</div>
+          </div>`:`<div class="small" style="text-align:center;color:#9333ea;opacity:.6;padding:8px;">Entrez un prix pour voir l'aperçu</div>`}
+        </div>`;
+      }).join('');
+    },
+
+    setPrice(idx,v){this._items[idx].price=v;this.renderConfigSection();},
+    setPct(idx,v){this._items[idx].pct=Math.max(1,Math.min(99,parseInt(v)||50));this.renderConfigSection();},
+    setPrintQty(idx,v){this._items[idx].printQty=Math.max(1,Math.min(50,parseInt(v)||1));this.renderConfigSection();},
+
+    buildZpl(it){
+      const prixOrig=parseFloat(it.price||0).toFixed(2);
+      const prixReduit=(parseFloat(it.price||0)*(1-it.pct/100)).toFixed(2);
+      const dlcStr=new Date(it.date).toLocaleDateString('fr');
+      const nameLine1=(it.name||'').substring(0,22);
+      const nameLine2=(it.name||'').length>22?(it.name||'').substring(22,44):'';
+      // ZPL for Brother TD-2120N 62mm width, 203dpi
+      return `^XA^MMT
+^PW480
+^LL320
+^CF0,30^FO15,10^FD${nameLine1}^FS
+${nameLine2?`^CF0,30^FO15,45^FD${nameLine2}^FS`:''}
+^FO15,${nameLine2?85:55}^GB450,3,3^FS
+^CF0,60^FO15,${nameLine2?95:65}^FD${prixReduit} EUR^FS
+^CF0,22^FO250,${nameLine2?105:75}^FDau lieu de ${prixOrig} EUR^FS
+^FO15,${nameLine2?160:130}^GB450,3,3^FS
+^CF0,48^FO15,${nameLine2?170:140}^FD-${it.pct}%^FS
+^CF0,22^FO110,${nameLine2?183:153}^FDTOO GOOD TO GO^FS
+^CF0,18^FO15,${nameLine2?225:195}^FDDLC: ${dlcStr}^FS
+^XZ`;
+    },
+
+    printAll:async function(){
+      const toprint=this._items.filter(it=>it.selected&&it.price&&parseFloat(it.price)>0);
+      if(!toprint.length)return toast('Sélectionnez des produits avec un prix valide.','warn');
+      const ip=(document.getElementById('etiq-printer-ip')?.value||'').trim();
+      const port=parseInt(document.getElementById('etiq-printer-port')?.value||'9100');
+      let allZpl='';
+      toprint.forEach(it=>{for(let i=0;i<it.printQty;i++)allZpl+=this.buildZpl(it)+'\n';});
+      const totalLabels=toprint.reduce((s,it)=>s+it.printQty,0);
+
+      if(!ip){
+        toast(`Pas d'IP configurée — téléchargement ZPL (${totalLabels} étiquettes).`,'warn',5000);
+        this._downloadZpl(allZpl,totalLabels);return;
+      }
+      toast(`Envoi de ${totalLabels} étiquette(s) vers ${ip}:${port}…`,'info',3000);
+      try{
+        const resp=await fetch(`http://${ip}/print`,{method:'POST',headers:{'Content-Type':'text/plain','Accept':'*/*'},body:allZpl,signal:AbortSignal.timeout(10000)});
+        if(resp.ok){toast(`✓ ${totalLabels} étiquette(s) imprimée(s) !`,'ok',4000);}
+        else{throw new Error('HTTP '+resp.status);}
+      }catch(e){
+        toast('Connexion imprimante échouée — téléchargement ZPL.','warn',4000);
+        this._downloadZpl(allZpl,totalLabels);
+      }
+    },
+
+    _downloadZpl(zpl,n){
+      const blob=new Blob([zpl],{type:'application/octet-stream'});
+      const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`etiquettes_${n}x.zpl`;a.click();URL.revokeObjectURL(url);
+    },
+
+    testPrinter:async function(){
+      const ip=(document.getElementById('etiq-printer-ip')?.value||'').trim();
+      if(!ip)return toast('Entrez l\'IP de l\'imprimante.','warn');
+      const port=parseInt(document.getElementById('etiq-printer-port')?.value||'9100');
+      const status=document.getElementById('etiq-printer-status');
+      status.textContent='Test en cours…';status.style.color='#f59e0b';
+      try{
+        const r=await fetch(`http://${ip}/`,{method:'HEAD',mode:'no-cors',signal:AbortSignal.timeout(4000)});
+        status.textContent=`✓ Imprimante accessible — ${ip}:${port}`;status.style.color='#10b981';
+        toast('Imprimante accessible !','ok');
+      }catch(e){
+        status.textContent=`✗ Non accessible — vérifiez IP et réseau`;status.style.color='#ef4444';
+        toast('Imprimante non accessible. Vérifiez l\'IP et le réseau Wi-Fi.','warn',5000);
+      }
     }
   }
 
