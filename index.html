@@ -3,18 +3,34 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"/>
-<meta name="theme-color" content="#ffffff"/>
-<title>Araujo App V4.3</title>
+<meta name="theme-color" content="#003896"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Araujo App"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="application-name" content="Araujo App"/>
+<link rel="apple-touch-icon" href="https://raw.githubusercontent.com/araujoexploitation/Magasin/main/LOGO.png"/>
+<link rel="manifest" id="pwa-manifest"/>
+<title>Araujo App V5.0</title>
+<script>
+// Inject PWA manifest dynamically
+const manifest={name:"Araujo App",short_name:"Araujo",display:"fullscreen",background_color:"#003896",theme_color:"#003896",start_url:window.location.href,icons:[{src:"https://raw.githubusercontent.com/araujoexploitation/Magasin/main/LOGO.png",sizes:"192x192",type:"image/png"}]};
+const blob=new Blob([JSON.stringify(manifest)],{type:"application/json"});
+document.getElementById('pwa-manifest').href=URL.createObjectURL(blob);
+</script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
 <script src="https://unpkg.com/@zxing/library@latest"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
 <style>
 :root{
   --primary:#003896;--accent:#E2001A;--pvp:#d97706;--salad:#0f766e;--frigo:#0ea5e9;--todo:#7c3aed;
+  --reception:#059669;--inspection:#7c3aed;
   --bg:#f3f4f6;--surface:#ffffff;--text:#1e293b;--success:#10b981;--danger:#ef4444;--muted:#64748b;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;font-family:system-ui,sans-serif;user-select:none;}
 body{margin:0;background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+/* iOS safe area */
+body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);}
 .hidden{display:none!important;}
 
 /* ── TOAST ── */
@@ -178,6 +194,43 @@ textarea{min-height:80px;resize:none;}
 .color-swatch{height:40px;border-radius:10px;cursor:pointer;border:3px solid transparent;transition:transform .1s;}
 .color-swatch.selected{border-color:#1e293b;transform:scale(.95);}
 .days-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
+
+/* ── PERMISSIONS ── */
+.perm-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;}
+.perm-toggle{display:flex;align-items:center;justify-content:space-between;background:#f8fafc;border-radius:10px;padding:10px 12px;gap:8px;}
+.perm-toggle label{font-size:13px;font-weight:800;color:#334155;cursor:pointer;flex:1;}
+.perm-toggle input[type=checkbox]{width:18px;height:18px;cursor:pointer;accent-color:var(--primary);flex-shrink:0;}
+.perm-section-title{font-size:11px;font-weight:950;text-transform:uppercase;color:var(--muted);margin:12px 0 6px 0;grid-column:1/-1;}
+
+/* ── FREQUENCY SELECTOR ── */
+.freq-type-tabs{display:flex;gap:6px;margin-bottom:12px;}
+.freq-tab{flex:1;padding:10px 6px;text-align:center;border-radius:10px;border:2px solid #e2e8f0;font-weight:900;font-size:12px;cursor:pointer;transition:all .15s;}
+.freq-tab.active{border-color:var(--todo);background:var(--todo);color:#fff;}
+.freq-panel{display:none;}
+.freq-panel.active{display:block;}
+.month-days-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:10px;}
+.month-day-btn{height:36px;border-radius:8px;border:2px solid #e2e8f0;font-weight:900;font-size:12px;cursor:pointer;background:#fff;transition:all .15s;}
+.month-day-btn.on{background:var(--todo);border-color:var(--todo);color:#fff;}
+
+/* ── RÉCEPTION MODULE ── */
+.reception-card{background:var(--surface);border-radius:16px;padding:16px;box-shadow:0 4px 10px rgba(0,0,0,.04);margin-bottom:12px;border-left:5px solid var(--reception);}
+.supplier-chip{font-size:12px;padding:4px 10px;border-radius:20px;background:#d1fae5;color:#065f46;font-weight:900;}
+.temp-display{font-size:28px;font-weight:950;color:var(--reception);}
+.temp-ok{color:var(--success);}
+.temp-warn{color:#f59e0b;}
+.temp-err{color:var(--danger);}
+
+/* ── INSPECTION MODULE ── */
+.gear-btn{width:44px;height:44px;border-radius:50%;border:none;background:#f1f5f9;color:#334155;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;transition:transform .3s;}
+.gear-btn:hover{transform:rotate(90deg);}
+.inspection-section{background:var(--surface);border-radius:16px;padding:16px;margin-bottom:12px;box-shadow:0 4px 10px rgba(0,0,0,.03);}
+.inspection-section h4{margin:0 0 12px 0;color:var(--primary);font-size:15px;display:flex;align-items:center;gap:8px;}
+.kpi-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:8px;}
+.kpi-card{border-radius:12px;padding:14px;text-align:center;}
+.kpi-card .kpi-val{font-size:28px;font-weight:950;}
+.kpi-card .kpi-lbl{font-size:11px;font-weight:800;opacity:.8;margin-top:2px;}
+.export-btn{width:100%;padding:14px;border-radius:12px;border:none;font-weight:900;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:opacity .15s;}
+.export-btn:active{opacity:.85;}
 </style>
 </head>
 <body>
@@ -372,9 +425,34 @@ textarea{min-height:80px;resize:none;}
     <div class="field-err" id="err-tt-name">Nom requis</div>
     <label>Heure cible</label>
     <input type="time" id="tt-time" placeholder="Ex: 08:00">
-    <label>Jours d'application</label>
-    <div class="days-row" id="tt-days-row"></div>
-    <div class="field-err" id="err-tt-days">Sélectionner au moins un jour</div>
+    <label>Fréquence</label>
+    <div class="freq-type-tabs">
+      <div class="freq-tab active" id="freq-daily-tab"   onclick="app.todo._setFreq('daily')">Journalier</div>
+      <div class="freq-tab"        id="freq-weekly-tab"  onclick="app.todo._setFreq('weekly')">Hebdo</div>
+      <div class="freq-tab"        id="freq-monthly-tab" onclick="app.todo._setFreq('monthly')">Mensuel</div>
+      <div class="freq-tab"        id="freq-yearly-tab"  onclick="app.todo._setFreq('yearly')">Annuel</div>
+    </div>
+    <!-- Journalier : tous les jours -->
+    <div class="freq-panel active" id="freq-panel-daily">
+      <div class="small" style="color:var(--muted);text-align:center;padding:8px;">Tâche active tous les jours</div>
+    </div>
+    <!-- Hebdomadaire : jours de la semaine -->
+    <div class="freq-panel" id="freq-panel-weekly">
+      <label>Jours d'application</label>
+      <div class="days-row" id="tt-days-row"></div>
+      <div class="field-err" id="err-tt-days">Sélectionner au moins un jour</div>
+    </div>
+    <!-- Mensuel : jour du mois -->
+    <div class="freq-panel" id="freq-panel-monthly">
+      <label>Jours du mois</label>
+      <div class="month-days-grid" id="tt-month-days-grid"></div>
+      <div class="field-err" id="err-tt-days-m">Sélectionner au moins un jour</div>
+    </div>
+    <!-- Annuel : date exacte -->
+    <div class="freq-panel" id="freq-panel-yearly">
+      <label>Date (chaque année)</label>
+      <input type="text" id="tt-yearly-date" placeholder="JJ/MM (ex: 01/01)" inputmode="numeric" maxlength="5">
+    </div>
     <label>Notes (optionnel)</label>
     <textarea id="tt-notes" placeholder="Instructions, détails…"></textarea>
     <div class="row" style="margin-top:8px;">
@@ -418,6 +496,15 @@ textarea{min-height:80px;resize:none;}
         <i class="fas fa-list-check"></i><br>CHECK-LIST
         <div class="small" style="color:rgba(255,255,255,.8);margin-top:6px;">Tâches du jour</div>
       </div>
+      <div class="home-btn" onclick="app.nav('reception')" style="background:linear-gradient(135deg,#059669,#047857);">
+        <div id="badge-reception" class="home-badge hidden" style="background:rgba(255,255,255,.92);color:#065f46;">0</div>
+        <i class="fas fa-truck-ramp-box"></i><br>RÉCEPTION
+        <div class="small" style="color:rgba(255,255,255,.8);margin-top:6px;">Contrôle livraison</div>
+      </div>
+      <div class="home-btn" onclick="app.nav('inspection')" style="background:linear-gradient(135deg,#475569,#1e293b);">
+        <i class="fas fa-chart-bar"></i><br>INSPECTION
+        <div class="small" style="color:rgba(255,255,255,.8);margin-top:6px;">Rapports & export</div>
+      </div>
     </div>
     <div class="card hidden" id="btn-team" onclick="app.nav('team')" style="text-align:center;cursor:pointer;"><i class="fas fa-users"></i> Équipe</div>
   </div>
@@ -447,7 +534,12 @@ textarea{min-height:80px;resize:none;}
         <button class="btn" onclick="app.frais.add()">AJOUTER</button>
       </div>
     </div>
-    <div id="frais-list" class="hidden"></div>
+    <div id="frais-list" class="hidden">
+      <div class="search-wrap">
+        <i class="fas fa-magnifying-glass"></i>
+        <input class="search-input" type="search" id="frais-search" placeholder="Rechercher un produit frais…" oninput="app.frais.render()" autocomplete="off">
+      </div>
+    </div>
   </div>
 
   <!-- PVP -->
@@ -463,7 +555,7 @@ textarea{min-height:80px;resize:none;}
         <i class="fas fa-magnifying-glass"></i>
         <input class="search-input" type="search" id="pvp-search" placeholder="Rechercher un produit PVP…" oninput="app.pvp.render()" autocomplete="off">
       </div>
-      <button class="btn secondary" onclick="app.pvp.openLib()" style="margin-bottom:12px;">+ Créer Produit</button>
+      <button class="btn secondary" id="pvp-create-btn" onclick="app.pvp.openLib()" style="margin-bottom:12px;">+ Créer Produit</button>
       <div id="lib-list"></div>
     </div>
     <div id="pvp-calc" class="hidden"></div>
@@ -481,7 +573,7 @@ textarea{min-height:80px;resize:none;}
         <i class="fas fa-magnifying-glass"></i>
         <input class="search-input" type="search" id="salad-search" placeholder="Rechercher un produit Salad Bar…" oninput="app.salad.render()" autocomplete="off">
       </div>
-      <button class="btn secondary" onclick="app.salad.openLib()" style="margin-bottom:12px;">+ Créer Produit</button>
+      <button class="btn secondary" id="salad-create-btn" onclick="app.salad.openLib()" style="margin-bottom:12px;">+ Créer Produit</button>
       <div id="salad-lib-list"></div>
     </div>
   </div>
@@ -528,6 +620,51 @@ textarea{min-height:80px;resize:none;}
     <div id="todo-history" class="hidden"></div>
   </div>
 
+  <!-- RÉCEPTION -->
+  <div id="view-reception" class="hidden">
+    <div class="tabs">
+      <div class="tab active" style="color:var(--reception);" id="trec-1" onclick="app.reception.tab('new')">NOUVEAU</div>
+      <div class="tab"        id="trec-2" onclick="app.reception.tab('history')">HISTORIQUE</div>
+    </div>
+    <div id="reception-new">
+      <div class="card" style="border-left:5px solid var(--reception);">
+        <h3 style="margin-top:0;color:var(--reception);"><i class="fas fa-truck-ramp-box"></i> Contrôle à la réception</h3>
+        <label>Fournisseur</label>
+        <input type="text" id="rec-supplier" placeholder="Nom du fournisseur" list="rec-supplier-list" autocomplete="off">
+        <datalist id="rec-supplier-list"></datalist>
+        <label>Produit / Nature de la livraison</label>
+        <input type="text" id="rec-product" placeholder="Ex: Viande fraîche, Légumes, Poisson…">
+        <label>Température à réception (°C)</label>
+        <input type="number" id="rec-temp" inputmode="decimal" step="0.1" placeholder="Ex: 3.5">
+        <div id="rec-temp-status" style="margin-bottom:10px;"></div>
+        <label>Température limite acceptée (°C max)</label>
+        <input type="number" id="rec-temp-limit" value="8" inputmode="decimal" step="0.1">
+        <label>Date et heure de contrôle</label>
+        <input type="datetime-local" id="rec-datetime">
+        <label>Observations / Non-conformités</label>
+        <textarea id="rec-notes" placeholder="État emballage, odeur, couleur, quantité…"></textarea>
+        <label>Photo (optionnel)</label>
+        <button class="btn secondary" style="margin-bottom:8px;" onclick="document.getElementById('rec-photo-input').click()"><i class="fas fa-camera"></i> Prendre une photo</button>
+        <input type="file" id="rec-photo-input" accept="image/*" capture="environment" class="hidden">
+        <img id="rec-photo-preview" style="width:100%;max-height:180px;object-fit:contain;border-radius:12px;display:none;margin-bottom:10px;background:#f8fafc;">
+        <div style="display:flex;gap:8px;margin-top:4px;">
+          <button class="btn success" style="margin-top:0;" onclick="app.reception.save(true)"><i class="fas fa-check"></i> CONFORME</button>
+          <button class="btn danger"  style="margin-top:0;" onclick="app.reception.save(false)"><i class="fas fa-xmark"></i> NON CONFORME</button>
+        </div>
+      </div>
+    </div>
+    <div id="reception-history" class="hidden"></div>
+  </div>
+
+  <!-- INSPECTION -->
+  <div id="view-inspection" class="hidden">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <h2 style="margin:0;font-size:18px;color:var(--primary);"><i class="fas fa-chart-bar"></i> Inspection & Rapports</h2>
+      <button class="gear-btn" id="inspection-settings-btn" onclick="app.nav('team')" title="Paramètres équipe"><i class="fas fa-gear"></i></button>
+    </div>
+    <div id="inspection-content"></div>
+  </div>
+
   <!-- TEAM -->
   <div id="view-team" class="hidden">
     <div class="card">
@@ -554,7 +691,7 @@ textarea{min-height:80px;resize:none;}
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
   getFirestore,doc,setDoc,getDoc,collection,addDoc,getDocs,deleteDoc,
-  query,where,orderBy,limit,doc as fDoc
+  query,where,orderBy,limit,doc as fDoc,onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import {
   getAuth,onAuthStateChanged,signInWithEmailAndPassword,signOut,
@@ -586,6 +723,7 @@ const docSalad=doc(db,"store_master","DATA_SALAD");
 const docFrigo=doc(db,"store_master","DATA_FRIGO");
 const docTodo =doc(db,"store_master","DATA_TODO");
 const colTodoLogs=collection(db,"todo_logs");
+const colReception=collection(db,"reception_logs");
 const TRACE_PREFIX={salad:"salad_traca",pvp:"pvp_traca"};
 const colTraceFor=(mod,pid)=>collection(db,TRACE_PREFIX[mod],String(pid),"items");
 
@@ -662,7 +800,8 @@ window.app={
     saladLib:[],saladStock:[],
     frigo:{perDay:2,fridges:[],logs:[]},
     todo:{zones:[],tasks:[]},
-    todoLogs:[] // today's completions
+    todoLogs:[], // today's completions
+    reception:[] // reception logs in memory (last 30 days)
   },
   viewHistory:[],closed:new Set(),debounceTimer:null,saveTimers:{},
 
@@ -698,7 +837,10 @@ window.app={
       try{await sendPasswordResetEmail(auth,e);toast('Email de réinitialisation envoyé.','ok');}
       catch(err){box.style.display='block';box.textContent='Impossible d\'envoyer le reset.';}
     },
-    logout:async function(){try{await signOut(auth);}catch(e){}}
+    logout:async function(){
+      if(window.app._todoUnsubscribe){try{window.app._todoUnsubscribe();}catch(e){}}
+      try{await signOut(auth);}catch(e){}
+    }
   },
 
   saveDebounced(sec,delay=350){
@@ -720,6 +862,33 @@ window.app={
     else{this.data.frigo={perDay:2,fridges:[],logs:[]};}
     if(tdS.exists()){const d=tdS.data()||{};this.data.todo.zones=d.zones||[];this.data.todo.tasks=d.tasks||[];}
     else{this.data.todo={zones:[],tasks:[]};}
+  },
+
+  _todoUnsubscribe:null,
+
+  _startTodoSync(){
+    if(this._todoUnsubscribe){try{this._todoUnsubscribe();}catch(e){}}
+    const today=todayStr();
+    try{
+      const q=query(colTodoLogs,where("date","==",today));
+      this._todoUnsubscribe=onSnapshot(q,snap=>{
+        this.data.todoLogs=[];
+        snap.forEach(d=>this.data.todoLogs.push({_id:d.id,...d.data()}));
+        this.todo.renderToday();
+        this.updateHomeBadges();
+      },err=>{/* silently ignore permission errors */});
+    }catch(e){}
+  },
+
+  loadReceptionLogs:async function(){
+    try{
+      const cutoff=new Date();cutoff.setDate(cutoff.getDate()-30);
+      const cutTs=cutoff.getTime();
+      const q=query(colReception,where("ts",">=",cutTs),orderBy("ts","desc"),limit(200));
+      const snap=await getDocs(q);
+      this.data.reception=[];
+      snap.forEach(d=>this.data.reception.push({_id:d.id,...d.data()}));
+    }catch(e){this.data.reception=[];}
   },
 
   loadTodoLogs:async function(){
@@ -761,6 +930,10 @@ window.app={
       if(!this.me){toast('Compte non autorisé.','err');await signOut(auth);return;}
 
       await this.loadTodoLogs();
+      await this.loadReceptionLogs();
+
+      // Start real-time sync for today's todo logs
+      this._startTodoSync();
 
       document.getElementById('login-overlay').classList.add('hidden');
       document.getElementById('app-header').classList.remove('hidden');
@@ -768,6 +941,12 @@ window.app={
       document.getElementById('user-badge').innerText=this.me.name||(this.me.email||"USER");
       if(this.me.role==='admin')document.getElementById('btn-team').classList.remove('hidden');
       else document.getElementById('btn-team').classList.add('hidden');
+
+      // Show/hide create buttons based on permissions
+      const pvpCreateBtn=document.getElementById('pvp-create-btn');
+      if(pvpCreateBtn)pvpCreateBtn.style.display=this.canDo('pvpLib')?'':'none';
+      const saladCreateBtn=document.getElementById('salad-create-btn');
+      if(saladCreateBtn)saladCreateBtn.style.display=this.canDo('saladLib')?'':'none';
 
       this.updateUI();
     }finally{spin(false);}
@@ -812,6 +991,8 @@ window.app={
     document.querySelectorAll('main > div').forEach(e=>e.classList.add('hidden'));
     document.getElementById('view-'+v).classList.remove('hidden');
     if(v==='todo'){this.todo.renderToday();this.todo.tab('today');}
+    if(v==='reception'){this.reception.init();this.reception.tab('new');}
+    if(v==='inspection'){this.inspection.render();}
   },
   goBack(){if(this.viewHistory.length)this.nav(this.viewHistory.pop(),false);else this.nav('home',false);},
   toggleFam(id){if(this.closed.has(id))this.closed.delete(id);else this.closed.add(id);this.updateUI();},
@@ -846,6 +1027,30 @@ window.app={
     randPwd(len=14){const c="ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%";let o="";for(let i=0;i<len;i++)o+=c[Math.floor(Math.random()*c.length)];return o;},
     compressImg(file,callback){const r=new FileReader();r.readAsDataURL(file);r.onload=e=>{const img=new Image();img.src=e.target.result;img.onload=()=>{const c=document.createElement('canvas');const ctx=c.getContext('2d');const mx=600;let w=img.width,h=img.height;if(w>h){if(w>mx){h*=mx/w;w=mx;}}else{if(h>mx){w*=mx/h;h=mx;}}c.width=w;c.height=h;ctx.drawImage(img,0,0,w,h);callback(c.toDataURL('image/jpeg',0.7));};};},
     isASaisir(dlcTs){if(!dlcTs)return false;const dlc=new Date(dlcTs);if(isNaN(dlc.getTime()))return false;const thr=new Date(dlc.getFullYear(),dlc.getMonth(),dlc.getDate()-1,18,0,0,0).getTime();const eod=new Date(dlc.getFullYear(),dlc.getMonth(),dlc.getDate(),23,59,59,999).getTime();const now=Date.now();return now>=thr&&now<=eod;}
+  },
+
+  // ── PERMISSIONS ──
+  // Définition de toutes les permissions disponibles
+  PERMS:{
+    saladLib:    {label:'Modifier bibliothèque Salad Bar', icon:'fa-leaf'},
+    saladStock:  {label:'Saisir stock Salad Bar',         icon:'fa-bowl-food'},
+    pvpLib:      {label:'Modifier bibliothèque PVP',      icon:'fa-store'},
+    pvpStock:    {label:'Saisir stock PVP',               icon:'fa-boxes-stacked'},
+    frigoConfig: {label:'Configurer les frigos',          icon:'fa-temperature-low'},
+    frigoSaisie: {label:'Saisir relevés frigo',           icon:'fa-pen-to-square'},
+    todoConfig:  {label:'Configurer la check-list',       icon:'fa-list-check'},
+    todoSaisie:  {label:'Valider tâches check-list',      icon:'fa-circle-check'},
+    fraisEdit:   {label:'Modifier / supprimer Frais',     icon:'fa-calendar-xmark'},
+  },
+
+  // Vérifie si l'utilisateur courant peut faire une action
+  // admin = tout par défaut, staff = selon permissions
+  canDo(perm){
+    const me=this.me;
+    if(!me)return false;
+    if(me.role==='admin')return true;
+    if(me.permissions&&me.permissions[perm]===true)return true;
+    return false;
   },
 
   // ── TEAM ──
@@ -885,6 +1090,17 @@ window.app={
       if(!users.length){wrap.innerHTML=`<div class="empty-state"><i class="fas fa-users-slash"></i>Aucun utilisateur.</div>`;return;}
       wrap.innerHTML=users.map(u=>{
         const chip=u.role==='admin'?`<span class="chip admin">ADMIN</span>`:`<span class="chip staff">STAFF</span>`;
+        const permsBlock=u.role==='staff'?`
+          <div style="margin-top:10px;">
+            <div style="font-size:11px;font-weight:950;text-transform:uppercase;color:#64748b;margin-bottom:8px;">Permissions</div>
+            <div class="perm-grid">
+              ${Object.entries(window.app.PERMS).map(([key,def])=>`
+              <div class="perm-toggle">
+                <label for="perm-${u.uid}-${key}"><i class="fas ${def.icon}" style="margin-right:5px;color:#64748b;"></i>${def.label}</label>
+                <input type="checkbox" id="perm-${u.uid}-${key}" ${(u.permissions||{})[key]?'checked':''} onchange="app.team.togglePerm('${u.uid}','${key}',this.checked)">
+              </div>`).join('')}
+            </div>
+          </div>`:'<div class="small" style="margin-top:6px;color:var(--muted);">Admin : accès complet à tout.</div>';
         return `<div style="padding:12px;border-bottom:1px solid #eee;">
           <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
             <div style="min-width:0;"><div style="font-weight:950;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${u.name||"(Sans nom)"} ${chip}</div><div class="small" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${u.email||""}</div></div>
@@ -899,8 +1115,18 @@ window.app={
               <option value="admin" ${u.role==='admin'?'selected':''}>admin</option>
             </select>
           </div>
+          ${permsBlock}
         </div>`;
       }).join('');
+    },
+
+    togglePerm:async function(uid,perm,val){
+      if(!this.ensureAdmin())return;
+      const u=window.app.data.users.find(x=>x.uid===uid);if(!u)return;
+      if(!u.permissions)u.permissions={};
+      u.permissions[perm]=val;
+      try{await window.app.save('users');toast(val?'Permission accordée.':'Permission retirée.','ok');}
+      catch(e){toast('Erreur sauvegarde.','err');}
     }
   },
 
@@ -1003,8 +1229,10 @@ window.app={
     },
     render(){
       const div=document.getElementById('frais-list');if(!div)return;
+      const q=(document.getElementById('frais-search')?.value||'').toLowerCase().trim();
       const grp={};
-      window.app.data.frais.slice().sort((a,b)=>(a.fam||'').localeCompare(b.fam||'')||(a.date||0)-(b.date||0)).forEach(i=>{if(!grp[i.fam])grp[i.fam]=[];grp[i.fam].push(i);});
+      const filtered=q?window.app.data.frais.filter(i=>(i.name||'').toLowerCase().includes(q)||(i.fam||'').toLowerCase().includes(q)||(i.ean||'').includes(q)):window.app.data.frais;
+      filtered.slice().sort((a,b)=>(a.fam||'').localeCompare(b.fam||'')||(a.date||0)-(b.date||0)).forEach(i=>{if(!grp[i.fam])grp[i.fam]=[];grp[i.fam].push(i);});
       if(!Object.keys(grp).length){div.innerHTML=`<div class="empty-state"><i class="fas fa-box-open"></i>Aucun produit frais.</div>`;return;}
       const parts=[];
       for(const f in grp){
@@ -1027,6 +1255,7 @@ window.app={
       div.innerHTML=parts.join('');
     },
     openEdit(id){
+      if(!window.app.canDo('fraisEdit')){toast('Permission refusée.','err');return;}
       const i=window.app.data.frais.find(x=>x.id==id);
       document.getElementById('modal-edit-frais').classList.remove('hidden');
       document.getElementById('edit-id').value=id;document.getElementById('edit-famille').value=i.fam;
@@ -1067,6 +1296,7 @@ window.app={
     },
     toggleFamInput(){const v=document.getElementById('lib-fam-select').value;document.getElementById('lib-fam-new').classList.toggle('hidden',v!=='new');},
     openLib(id=null){
+      if(!window.app.canDo('pvpLib')){toast('Permission refusée.','err');return;}
       document.getElementById('modal-pvp-lib').classList.remove('hidden');
       const uF=[...new Set(window.app.data.pvpLib.map(i=>i.family||'DIVERS'))].sort();
       document.getElementById('lib-fam-select').innerHTML=uF.map(f=>`<option value="${f}">${f}</option>`).join('')+`<option value="new">+ Créer...</option>`;
@@ -1091,6 +1321,7 @@ window.app={
       document.getElementById('modal-pvp-lib').classList.add('hidden');this.render();
     },
     addStock:async function(libId){
+      if(!window.app.canDo('pvpStock')){toast('Permission refusée.','err');return;}
       const l=window.app.data.pvpLib.find(x=>x.id==libId);
       const q=await dlgPrompt('Quantité ?','1','number');
       if(q===null)return;
@@ -1155,6 +1386,8 @@ window.app={
         if(!window.app.data.pvpLib.length){bib.innerHTML=`<div class="empty-state"><i class="fas fa-bread-slice"></i>Bibliothèque vide.</div>`;}
         else if(!filtered.length){bib.innerHTML=`<div class="search-no-result"><i class="fas fa-magnifying-glass" style="font-size:28px;opacity:.3;display:block;margin-bottom:8px;"></i>Aucun résultat pour "<b>${q}</b>"</div>`;}
         else{
+          const canEdit=window.app.canDo('pvpLib');
+          const canStock=window.app.canDo('pvpStock');
           if(q){
             // En mode recherche : liste plate sans groupes
             bib.innerHTML=filtered.map(l=>{
@@ -1164,9 +1397,9 @@ window.app={
               return `<div class="list-item" onclick="app.common.showBarcode('${l.ean||''}','${sn}','${l.img||''}')">
                 <div style="display:flex;align-items:center;min-width:0;gap:12px;">${img}<div style="min-width:0;"><div class="item-title">${l.name}</div><div class="item-sub">${l.days||0}h • ${fam}</div></div></div>
                 <div class="right-col">
-                  <button class="icon-btn pvp" onclick="event.stopPropagation();app.pvp.openLib(${l.id})"><i class="fas fa-pen"></i></button>
+                  ${canEdit?`<button class="icon-btn pvp" onclick="event.stopPropagation();app.pvp.openLib(${l.id})"><i class="fas fa-pen"></i></button>`:''}
                   <button class="icon-btn dark" onclick="event.stopPropagation();app.trace.open('pvp','${l.id}','${sn}')"><i class="fas fa-camera"></i></button>
-                  <button class="icon-btn pvp" onclick="event.stopPropagation();app.pvp.addStock(${l.id})"><i class="fas fa-plus"></i></button>
+                  ${canStock?`<button class="icon-btn pvp" onclick="event.stopPropagation();app.pvp.addStock(${l.id})"><i class="fas fa-plus"></i></button>`:''}
                 </div>
               </div>`;
             }).join('');
@@ -1183,9 +1416,9 @@ window.app={
                 parts.push(`<div class="list-item" onclick="app.common.showBarcode('${l.ean||''}','${sn}','${l.img||''}')">
                   <div style="display:flex;align-items:center;min-width:0;gap:12px;">${img}<div style="min-width:0;"><div class="item-title">${l.name}</div><div class="item-sub">${l.days||0}h • ${l.ean||'EAN ?'}</div></div></div>
                   <div class="right-col">
-                    <button class="icon-btn pvp" onclick="event.stopPropagation();app.pvp.openLib(${l.id})"><i class="fas fa-pen"></i></button>
+                    ${canEdit?`<button class="icon-btn pvp" onclick="event.stopPropagation();app.pvp.openLib(${l.id})"><i class="fas fa-pen"></i></button>`:''}
                     <button class="icon-btn dark" onclick="event.stopPropagation();app.trace.open('pvp','${l.id}','${sn}')"><i class="fas fa-camera"></i></button>
-                    <button class="icon-btn pvp" onclick="event.stopPropagation();app.pvp.addStock(${l.id})"><i class="fas fa-plus"></i></button>
+                    ${canStock?`<button class="icon-btn pvp" onclick="event.stopPropagation();app.pvp.addStock(${l.id})"><i class="fas fa-plus"></i></button>`:''}
                   </div>
                 </div>`);
               });
@@ -1220,10 +1453,11 @@ window.app={
   // ── SALAD ──
   salad:{
     tab(t){document.querySelectorAll('#view-salad .tab').forEach(e=>e.classList.remove('active-salad'));document.getElementById(t==='stock'?'ts-1':'ts-2').classList.add('active-salad');document.getElementById('salad-stock').classList.add('hidden');document.getElementById('salad-bib').classList.add('hidden');document.getElementById('salad-'+t).classList.remove('hidden');},
-    openLib(id=null){document.getElementById('modal-salad-lib').classList.remove('hidden');if(id){const i=window.app.data.saladLib.find(x=>x.id==id);document.getElementById('sal-lib-id').value=i.id;document.getElementById('sal-lib-fam').value=i.family||'DIVERS';document.getElementById('sal-lib-name').value=i.name||'';document.getElementById('sal-lib-hours').value=String(i.hours||48);}else{document.getElementById('sal-lib-id').value='';document.getElementById('sal-lib-fam').value='SALADE';document.getElementById('sal-lib-name').value='';document.getElementById('sal-lib-hours').value='48';}},
-    saveLib:async function(){const id=document.getElementById('sal-lib-id').value;const name=(document.getElementById('sal-lib-name').value||'').trim();if(!name)return toast('Nom requis.','warn');const o={id:id?Number(id):Date.now(),family:document.getElementById('sal-lib-fam').value||'DIVERS',name,hours:Number(document.getElementById('sal-lib-hours').value||48)};if(id){const idx=window.app.data.saladLib.findIndex(x=>String(x.id)===String(id));if(idx>-1)window.app.data.saladLib[idx]=o;}else window.app.data.saladLib.push(o);document.getElementById('modal-salad-lib').classList.add('hidden');this.render();spin(true);try{await window.app.save('salad');toast('Enregistré.','ok');}catch(e){toast('Erreur.','err');}finally{spin(false);};},
-    delLib:async function(){const ok=await dlgConfirm('Supprimer','Supprimer ce produit ?');if(!ok)return;const id=document.getElementById('sal-lib-id').value;window.app.data.saladLib=window.app.data.saladLib.filter(x=>String(x.id)!==String(id));document.getElementById('modal-salad-lib').classList.add('hidden');this.render();spin(true);try{await window.app.save('salad');toast('Supprimé.','ok');}catch(e){toast('Erreur.','err');}finally{spin(false);};},
+    openLib(id=null){if(!window.app.canDo('saladLib')){toast('Permission refusée.','err');return;}document.getElementById('modal-salad-lib').classList.remove('hidden');if(id){const i=window.app.data.saladLib.find(x=>x.id==id);document.getElementById('sal-lib-id').value=i.id;document.getElementById('sal-lib-fam').value=i.family||'DIVERS';document.getElementById('sal-lib-name').value=i.name||'';document.getElementById('sal-lib-hours').value=String(i.hours||48);}else{document.getElementById('sal-lib-id').value='';document.getElementById('sal-lib-fam').value='SALADE';document.getElementById('sal-lib-name').value='';document.getElementById('sal-lib-hours').value='48';}},
+    saveLib:async function(){if(!window.app.canDo('saladLib')){toast('Permission refusée.','err');return;}const id=document.getElementById('sal-lib-id').value;const name=(document.getElementById('sal-lib-name').value||'').trim();if(!name)return toast('Nom requis.','warn');const o={id:id?Number(id):Date.now(),family:document.getElementById('sal-lib-fam').value||'DIVERS',name,hours:Number(document.getElementById('sal-lib-hours').value||48)};if(id){const idx=window.app.data.saladLib.findIndex(x=>String(x.id)===String(id));if(idx>-1)window.app.data.saladLib[idx]=o;}else window.app.data.saladLib.push(o);document.getElementById('modal-salad-lib').classList.add('hidden');this.render();spin(true);try{await window.app.save('salad');toast('Enregistré.','ok');}catch(e){toast('Erreur.','err');}finally{spin(false);};},
+    delLib:async function(){if(!window.app.canDo('saladLib')){toast('Permission refusée.','err');return;}const ok=await dlgConfirm('Supprimer','Supprimer ce produit ?');if(!ok)return;const id=document.getElementById('sal-lib-id').value;window.app.data.saladLib=window.app.data.saladLib.filter(x=>String(x.id)!==String(id));document.getElementById('modal-salad-lib').classList.add('hidden');this.render();spin(true);try{await window.app.save('salad');toast('Supprimé.','ok');}catch(e){toast('Erreur.','err');}finally{spin(false);};},
     addStock:async function(libId){
+      if(!window.app.canDo('saladStock')){toast('Permission refusée.','err');return;}
       const l=window.app.data.saladLib.find(x=>x.id==libId);
       const q=await dlgPrompt('Quantité ?','1','number');
       if(q===null)return;
@@ -1268,6 +1502,8 @@ window.app={
         if(!window.app.data.saladLib.length){bib.innerHTML=`<div class="empty-state"><i class="fas fa-bowl-food"></i>Bibliothèque vide.</div>`;}
         else if(!filtered.length){bib.innerHTML=`<div class="search-no-result"><i class="fas fa-magnifying-glass" style="font-size:28px;opacity:.3;display:block;margin-bottom:8px;"></i>Aucun résultat pour "<b>${q}</b>"</div>`;}
         else{
+          const canEdit=window.app.canDo('saladLib');
+          const canStock=window.app.canDo('saladStock');
           if(q){
             bib.innerHTML=filtered.map(l=>{
               const sn=(l.name||'').replace(/'/g,' ');
@@ -1275,9 +1511,9 @@ window.app={
               return `<div class="list-item">
                 <div style="display:flex;align-items:center;min-width:0;gap:12px;"><div class="item-img"><i class="fas fa-bowl-food"></i></div><div style="min-width:0;"><div class="item-title">${l.name}</div><div class="item-sub">${l.hours||48}h • ${fam}</div></div></div>
                 <div class="right-col">
-                  <button class="icon-btn salad" onclick="app.salad.openLib(${l.id})"><i class="fas fa-pen"></i></button>
+                  ${canEdit?`<button class="icon-btn salad" onclick="app.salad.openLib(${l.id})"><i class="fas fa-pen"></i></button>`:''}
                   <button class="icon-btn dark" onclick="app.trace.open('salad','${l.id}','${sn}')"><i class="fas fa-camera"></i></button>
-                  <button class="icon-btn salad" onclick="app.salad.addStock(${l.id})"><i class="fas fa-plus"></i></button>
+                  ${canStock?`<button class="icon-btn salad" onclick="app.salad.addStock(${l.id})"><i class="fas fa-plus"></i></button>`:''}
                 </div>
               </div>`;
             }).join('');
@@ -1292,9 +1528,9 @@ window.app={
                 parts.push(`<div class="list-item">
                   <div style="display:flex;align-items:center;min-width:0;gap:12px;"><div class="item-img"><i class="fas fa-bowl-food"></i></div><div style="min-width:0;"><div class="item-title">${l.name}</div><div class="item-sub">${l.hours||48}h</div></div></div>
                   <div class="right-col">
-                    <button class="icon-btn salad" onclick="app.salad.openLib(${l.id})"><i class="fas fa-pen"></i></button>
+                    ${canEdit?`<button class="icon-btn salad" onclick="app.salad.openLib(${l.id})"><i class="fas fa-pen"></i></button>`:''}
                     <button class="icon-btn dark" onclick="app.trace.open('salad','${l.id}','${sn}')"><i class="fas fa-camera"></i></button>
-                    <button class="icon-btn salad" onclick="app.salad.addStock(${l.id})"><i class="fas fa-plus"></i></button>
+                    ${canStock?`<button class="icon-btn salad" onclick="app.salad.addStock(${l.id})"><i class="fas fa-plus"></i></button>`:''}
                   </div>
                 </div>`);
               });
@@ -1318,11 +1554,11 @@ window.app={
     tab(t){document.querySelectorAll('#view-frigo .tab').forEach(e=>e.classList.remove('active-frigo'));document.getElementById(t==='take'?'tfr-1':(t==='fridges'?'tfr-2':'tfr-3')).classList.add('active-frigo');['frigo-take','frigo-fridges','frigo-history'].forEach(id=>document.getElementById(id).classList.add('hidden'));document.getElementById('frigo-'+t).classList.remove('hidden');},
     remainingTodayTotal(){const pd=Number(window.app.data.frigo.perDay||2);const{start,end}=dayBounds();const today=(window.app.data.frigo.logs||[]).filter(l=>(l.ts||0)>=start&&(l.ts||0)<=end);let tot=0;(window.app.data.frigo.fridges||[]).forEach(fr=>{const done=today.filter(l=>String(l.fridgeId)===String(fr.id)).length;tot+=Math.max(0,pd-done);});return tot;},
     remainingForFridgeToday(fid){const pd=Number(window.app.data.frigo.perDay||2);const{start,end}=dayBounds();const done=(window.app.data.frigo.logs||[]).filter(l=>String(l.fridgeId)===String(fid)&&(l.ts||0)>=start&&(l.ts||0)<=end).length;return Math.max(0,pd-done);},
-    setPerDay:async function(v){window.app.data.frigo.perDay=Number(v||2);await window.app.save('frigo');this.render();window.app.updateHomeBadges();},
-    addFridge:async function(){const n=await dlgPrompt('Nom du frigo :',`FRIGO ${(window.app.data.frigo.fridges||[]).length+1}`);if(!n)return;window.app.data.frigo.fridges.push({id:Date.now(),name:n.trim().toUpperCase()});await window.app.save('frigo');this.render();window.app.updateHomeBadges();},
-    renameFridge:async function(id){const f=(window.app.data.frigo.fridges||[]).find(x=>String(x.id)===String(id));if(!f)return;const n=await dlgPrompt('Renommer :',f.name||'');if(!n)return;f.name=n.trim().toUpperCase();await window.app.save('frigo');this.render();},
-    delFridge:async function(id){const f=(window.app.data.frigo.fridges||[]).find(x=>String(x.id)===String(id));if(!f)return;const ok=await dlgConfirm(`Supprimer ${f.name}`,`Supprimer ce frigo ? Les relevés restent en historique.`);if(!ok)return;window.app.data.frigo.fridges=window.app.data.frigo.fridges.filter(x=>String(x.id)!==String(id));await window.app.save('frigo');this.render();window.app.updateHomeBadges();},
-    openLogModal(fid=null){const sel=document.getElementById('frigo-log-fridge');sel.innerHTML=(window.app.data.frigo.fridges||[]).map(fr=>`<option value="${fr.id}">${fr.name||"FRIGO"}</option>`).join('');if(fid)sel.value=String(fid);document.getElementById('frigo-log-temp').value='';document.getElementById('frigo-log-time').value=tsToInput(Date.now());document.getElementById('modal-frigo-log').classList.remove('hidden');},
+    setPerDay:async function(v){if(!window.app.canDo('frigoConfig')){toast('Permission refusée.','err');this.render();return;}window.app.data.frigo.perDay=Number(v||2);await window.app.save('frigo');this.render();window.app.updateHomeBadges();},
+    addFridge:async function(){if(!window.app.canDo('frigoConfig')){toast('Permission refusée.','err');return;}const n=await dlgPrompt('Nom du frigo :',`FRIGO ${(window.app.data.frigo.fridges||[]).length+1}`);if(!n)return;window.app.data.frigo.fridges.push({id:Date.now(),name:n.trim().toUpperCase()});await window.app.save('frigo');this.render();window.app.updateHomeBadges();},
+    renameFridge:async function(id){if(!window.app.canDo('frigoConfig')){toast('Permission refusée.','err');return;}const f=(window.app.data.frigo.fridges||[]).find(x=>String(x.id)===String(id));if(!f)return;const n=await dlgPrompt('Renommer :',f.name||'');if(!n)return;f.name=n.trim().toUpperCase();await window.app.save('frigo');this.render();},
+    delFridge:async function(id){if(!window.app.canDo('frigoConfig')){toast('Permission refusée.','err');return;}const f=(window.app.data.frigo.fridges||[]).find(x=>String(x.id)===String(id));if(!f)return;const ok=await dlgConfirm(`Supprimer ${f.name}`,`Supprimer ce frigo ? Les relevés restent en historique.`);if(!ok)return;window.app.data.frigo.fridges=window.app.data.frigo.fridges.filter(x=>String(x.id)!==String(id));await window.app.save('frigo');this.render();window.app.updateHomeBadges();},
+    openLogModal(fid=null){if(!window.app.canDo('frigoSaisie')){toast('Permission refusée.','err');return;}const sel=document.getElementById('frigo-log-fridge');sel.innerHTML=(window.app.data.frigo.fridges||[]).map(fr=>`<option value="${fr.id}">${fr.name||"FRIGO"}</option>`).join('');if(fid)sel.value=String(fid);document.getElementById('frigo-log-temp').value='';document.getElementById('frigo-log-time').value=tsToInput(Date.now());document.getElementById('modal-frigo-log').classList.remove('hidden');},
     saveLog:async function(){
       const fid=document.getElementById('frigo-log-fridge').value;const fr=(window.app.data.frigo.fridges||[]).find(x=>String(x.id)===String(fid));
       const temp=Number(document.getElementById('frigo-log-temp').value);const ts=inputToTs(document.getElementById('frigo-log-time').value);
@@ -1341,7 +1577,17 @@ window.app={
         take.innerHTML=fridges.map(fr=>{const rem=window.app.frigo.remainingForFridgeToday(fr.id);const done=(window.app.data.frigo.perDay||2)-rem;const chip=rem>0?`<span class="chip warn"><i class="fas fa-circle-exclamation"></i> ${rem} restant</span>`:`<span class="chip ok"><i class="fas fa-check"></i> OK</span>`;return`<div class="list-item" style="border-left:6px solid var(--frigo);"><div style="display:flex;align-items:center;gap:12px;min-width:0;flex:1;"><div class="item-img" style="color:var(--frigo)"><i class="fas fa-snowflake"></i></div><div style="min-width:0;"><div class="item-title">${fr.name||"FRIGO"}</div><div class="item-sub">${done}/${window.app.data.frigo.perDay||2} relevé(s) • ${chip}</div></div></div><div class="right-col"><button class="icon-btn frigo" onclick="app.frigo.openLogModal('${fr.id}')"><i class="fas fa-plus"></i></button></div></div>`;}).join('');
       }
       const list=document.getElementById('frigo-list');
-      if(list){const fridges=window.app.data.frigo.fridges||[];list.innerHTML=fridges.length?fridges.map(fr=>`<div class="list-item"><div style="display:flex;align-items:center;gap:12px;min-width:0;flex:1;"><div class="item-img" style="color:var(--frigo)"><i class="fas fa-snowflake"></i></div><div style="min-width:0;"><div class="item-title">${fr.name||"FRIGO"}</div><div class="item-sub">fréquence: ${window.app.data.frigo.perDay||2}/jour</div></div></div><div class="right-col"><button class="icon-btn frigo" onclick="app.frigo.renameFridge('${fr.id}')"><i class="fas fa-pen"></i></button><button class="icon-btn red" onclick="app.frigo.delFridge('${fr.id}')"><i class="fas fa-trash"></i></button></div></div>`).join(''):`<div class="empty-state"><i class="fas fa-snowflake"></i>Aucun frigo.</div>`;}
+      if(list){
+        const fridges=window.app.data.frigo.fridges||[];
+        const canCfg=window.app.canDo('frigoConfig');
+        // Show/hide add fridge button
+        const addBtn=document.querySelector('#view-frigo .btn.frigo');
+        if(addBtn)addBtn.style.display=canCfg?'':'none';
+        // Show/hide frequency config
+        const paramCard=document.querySelector('#frigo-fridges .card');
+        if(paramCard)paramCard.style.display=canCfg?'':'none';
+        list.innerHTML=fridges.length?fridges.map(fr=>`<div class="list-item"><div style="display:flex;align-items:center;gap:12px;min-width:0;flex:1;"><div class="item-img" style="color:var(--frigo)"><i class="fas fa-snowflake"></i></div><div style="min-width:0;"><div class="item-title">${fr.name||"FRIGO"}</div><div class="item-sub">fréquence: ${window.app.data.frigo.perDay||2}/jour</div></div></div><div class="right-col">${canCfg?`<button class="icon-btn frigo" onclick="app.frigo.renameFridge('${fr.id}')"><i class="fas fa-pen"></i></button><button class="icon-btn red" onclick="app.frigo.delFridge('${fr.id}')"><i class="fas fa-trash"></i></button>`:''}</div></div>`).join(''):`<div class="empty-state"><i class="fas fa-snowflake"></i>Aucun frigo.</div>`;
+      }
       const hist=document.getElementById('frigo-history');
       if(hist){
         const logs=(window.app.data.frigo.logs||[]).slice().sort((a,b)=>(b.ts||0)-(a.ts||0));
@@ -1354,10 +1600,13 @@ window.app={
   },
 
   // ══════════════════════════════════════════════════
-  // ── TODO MODULE ──
+  // ── TODO MODULE (with real-time sync) ──
   // ══════════════════════════════════════════════════
   todo:{
     _editingTaskDays: new Set(),
+    _editingMonthDays: new Set(),
+    _editingFreq: 'weekly',
+    _unsubscribeLogs: null,
 
     tab(t){
       document.querySelectorAll('#view-todo .tab').forEach(e=>e.classList.remove('active-todo'));
@@ -1365,24 +1614,65 @@ window.app={
       ['todo-today','todo-config','todo-history'].forEach(id=>document.getElementById(id).classList.add('hidden'));
       document.getElementById('todo-'+t).classList.remove('hidden');
       if(t==='today')this.renderToday();
-      if(t==='config')this.renderConfig();
+      if(t==='config'){
+        if(!window.app.canDo('todoConfig')){
+          document.getElementById('todo-config').innerHTML='<div class="empty-state"><i class="fas fa-lock"></i>Accès réservé aux administrateurs et aux utilisateurs autorisés.</div>';
+          return;
+        }
+        this.renderConfig();
+      }
       if(t==='history')this.renderHistory();
     },
 
-    // Return tasks applicable today
-    todayTaskList(){
-      const dow=new Date().getDay(); // 0=Sun
-      return (window.app.data.todo.tasks||[]).filter(t=>(t.days||[]).includes(dow));
+    // Realtime listener for today's logs
+    subscribeToday(){
+      if(this._unsubscribeLogs){try{this._unsubscribeLogs();}catch(e){}}
+      const {onSnapshot}=window._fsImports||{};
+      if(!onSnapshot){return;}// fallback if not imported
+      const today=todayStr();
+      try{
+        const q=window._fsQuery(colTodoLogs,window._fsWhere("date","==",today));
+        this._unsubscribeLogs=onSnapshot(q,snap=>{
+          window.app.data.todoLogs=[];
+          snap.forEach(d=>window.app.data.todoLogs.push({_id:d.id,...d.data()}));
+          this.renderToday();window.app.updateHomeBadges();
+        });
+      }catch(e){}
     },
 
-    // Check if a task is done today
+    // Check if a task is applicable today based on its frequency
+    isTaskToday(task){
+      const now=new Date();
+      const freq=task.freq||'weekly';
+      if(freq==='daily') return true;
+      if(freq==='weekly'){
+        const dow=now.getDay();
+        return (task.days||[]).includes(dow);
+      }
+      if(freq==='monthly'){
+        const dom=now.getDate();
+        return (task.monthDays||[]).includes(dom);
+      }
+      if(freq==='yearly'){
+        const md=task.yearlyDate||'';
+        if(!md)return false;
+        const[d,m]=(md.split('/')).map(Number);
+        return now.getDate()===d&&(now.getMonth()+1)===m;
+      }
+      return false;
+    },
+
+    todayTaskList(){
+      return (window.app.data.todo.tasks||[]).filter(t=>this.isTaskToday(t));
+    },
+
     isDone(taskId){
       return window.app.data.todoLogs.some(l=>String(l.taskId)===String(taskId));
     },
 
-    // Mark task done
     checkTask:async function(taskId){
-      if(this.isDone(taskId))return; // already done, ignore
+      if(!window.app.canDo('todoSaisie')){toast('Permission refusée.','err');return;}
+      if(this.isDone(taskId))return;
       const task=(window.app.data.todo.tasks||[]).find(t=>String(t.id)===String(taskId));
       const zone=(window.app.data.todo.zones||[]).find(z=>String(z.id)===String(task?.zoneId));
       const today=todayStr();
@@ -1395,7 +1685,6 @@ window.app={
       }catch(e){toast('Erreur enregistrement.','err');}
     },
 
-    // Uncheck task (delete log)
     uncheckTask:async function(taskId){
       const log=window.app.data.todoLogs.find(l=>String(l.taskId)===String(taskId));
       if(!log)return;
@@ -1421,7 +1710,6 @@ window.app={
         wrap.innerHTML=`
           <div style="text-align:center;padding:20px;">
             <div style="font-weight:950;font-size:18px;color:var(--todo);margin-bottom:4px;">${dateLabel}</div>
-            <div class="small" style="margin-bottom:20px;">${DAY_FULL[now.getDay()]}</div>
           </div>
           <div class="empty-state">
             <i class="fas fa-list-check"></i>
@@ -1433,7 +1721,7 @@ window.app={
       const parts=[`
         <div style="background:linear-gradient(135deg,var(--todo),#5b21b6);border-radius:18px;padding:18px;margin-bottom:16px;color:#fff;">
           <div style="font-weight:950;font-size:17px;">${dateLabel}</div>
-          <div style="font-size:13px;opacity:.85;margin-bottom:12px;">${done} / ${tasks.length} tâche${tasks.length>1?'s':''} effectuée${done>1?'s':''}</div>
+          <div style="font-size:13px;opacity:.85;margin-bottom:12px;">${done} / ${tasks.length} tâche${tasks.length>1?'s':''}</div>
           <div style="background:rgba(255,255,255,.25);border-radius:999px;height:8px;overflow:hidden;">
             <div style="height:100%;border-radius:999px;background:#fff;width:${pct}%;transition:width .5s ease;"></div>
           </div>
@@ -1441,13 +1729,11 @@ window.app={
         </div>
       `];
 
-      // Group tasks by zone
       zones.forEach(z=>{
         const zoneTasks=tasks.filter(t=>String(t.zoneId)===String(z.id)).sort((a,b)=>(a.time||'00:00').localeCompare(b.time||'00:00'));
         if(!zoneTasks.length)return;
         const zDone=zoneTasks.filter(t=>this.isDone(t.id)).length;
         const zPct=zoneTasks.length>0?Math.round(zDone/zoneTasks.length*100):0;
-
         parts.push(`
           <div style="background:${z.color||'var(--todo)'};border-radius:14px;padding:14px 16px;margin-bottom:4px;color:#fff;">
             <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
@@ -1459,21 +1745,19 @@ window.app={
             </div>
           </div>
         `);
-
         zoneTasks.forEach(t=>{
           const done=this.isDone(t.id);
           const log=done?window.app.data.todoLogs.find(l=>String(l.taskId)===String(t.id)):null;
           let taskMin=Infinity;
           if(t.time){const[h,m]=(t.time||'00:00').split(':').map(Number);taskMin=h*60+(m||0);}
           const overdue=!done&&taskMin!==Infinity&&nowMin>taskMin+15;
-          const timeClass=done?'done':(overdue?'overdue':'');
           const cardClass=done?'done':(overdue?'overdue':'');
-
+          const freqLabel=t.freq==='monthly'?'mensuel':t.freq==='yearly'?'annuel':t.freq==='daily'?'quotidien':'';
           parts.push(`
             <div class="task-card ${cardClass}" style="border-left-color:${z.color||'var(--todo)'};${done?'border-left-color:var(--success);':''}${overdue?'border-left-color:var(--danger);':''}">
-              ${t.time?`<span class="time-chip ${timeClass}">${t.time}</span>`:''}
+              ${t.time?`<span class="time-chip ${done?'done':(overdue?'overdue':'')}">${t.time}</span>`:''}
               <div style="flex:1;min-width:0;">
-                <div style="font-weight:900;font-size:14px;${done?'text-decoration:line-through;color:#94a3b8;':''}">${t.name||''}</div>
+                <div style="font-weight:900;font-size:14px;${done?'text-decoration:line-through;color:#94a3b8;':''}">${t.name||''}${freqLabel?` <span class="chip" style="background:#f1f5f9;color:#64748b;font-size:10px;">${freqLabel}</span>`:''}</div>
                 ${t.notes?`<div class="small" style="margin-top:2px;">${t.notes}</div>`:''}
                 ${done&&log?`<div class="small" style="margin-top:3px;color:var(--success);"><i class="fas fa-check-circle"></i> ${log.user} • ${formatDate(log.ts)}</div>`:''}
                 ${overdue?`<div class="small" style="color:var(--danger);margin-top:2px;"><i class="fas fa-clock"></i> En retard</div>`:''}
@@ -1487,7 +1771,6 @@ window.app={
         parts.push('<div style="margin-bottom:8px;"></div>');
       });
 
-      // Tasks without zone
       const unzonedTasks=tasks.filter(t=>!zones.find(z=>String(z.id)===String(t.zoneId))).sort((a,b)=>(a.time||'00:00').localeCompare(b.time||'00:00'));
       if(unzonedTasks.length){
         parts.push(`<div style="background:#475569;border-radius:14px;padding:14px 16px;margin-bottom:4px;color:#fff;"><div style="font-weight:950;">SANS ZONE</div></div>`);
@@ -1497,7 +1780,6 @@ window.app={
           parts.push(`<div class="task-card ${done?'done':''}"><div style="flex:1;min-width:0;"><div style="font-weight:900;${done?'text-decoration:line-through;color:#94a3b8;':''}">${t.name||''}</div>${done&&log?`<div class="small" style="color:var(--success);"><i class="fas fa-check-circle"></i> ${log.user}</div>`:''}${t.notes?`<div class="small">${t.notes}</div>`:''}</div><div class="todo-check ${done?'checked':''}" onclick="app.todo.${done?'uncheckTask':'checkTask'}('${t.id}')"><i class="fas fa-check"></i></div></div>`);
         });
       }
-
       wrap.innerHTML=parts.join('');
     },
 
@@ -1505,8 +1787,8 @@ window.app={
       const wrap=document.getElementById('todo-config');if(!wrap)return;
       const zones=window.app.data.todo.zones||[];
       const tasks=window.app.data.todo.tasks||[];
+      const FREQ_LABELS={daily:'Quotidien',weekly:'Hebdo',monthly:'Mensuel',yearly:'Annuel'};
       const parts=[`<button class="btn todo" style="margin-bottom:15px;" onclick="app.todo.openZone()"><i class="fas fa-plus"></i> Créer une zone</button>`];
-
       if(!zones.length){
         parts.push(`<div class="empty-state"><i class="fas fa-map-marker-alt"></i>Aucune zone créée.<br><span class="small">Une zone = un espace physique (Réserve, Rayon, Caisse…)</span></div>`);
       } else {
@@ -1525,15 +1807,22 @@ window.app={
                 </div>
               </div>
           `);
-
           if(zt.length){
             zt.sort((a,b)=>(a.time||'').localeCompare(b.time||'')).forEach(t=>{
-              const dayPills=(t.days||[]).map(d=>`<span class="day-pill on">${DAY_LABELS[d]}</span>`).join(' ');
+              const freqLabel=FREQ_LABELS[t.freq||'weekly']||'Hebdo';
+              let schedLabel='';
+              if(!t.freq||t.freq==='weekly')schedLabel=(t.days||[]).map(d=>DAY_LABELS[d]).join(' ');
+              else if(t.freq==='daily')schedLabel='Tous les jours';
+              else if(t.freq==='monthly')schedLabel='Jours: '+(t.monthDays||[]).join(', ');
+              else if(t.freq==='yearly')schedLabel=t.yearlyDate||'?/?';
               parts.push(`
                 <div class="list-item" style="min-height:60px;border-left:3px solid ${z.color||'var(--todo)'};">
                   <div style="flex:1;min-width:0;">
                     <div style="font-weight:900;font-size:14px;">${t.time?`<span class="time-chip" style="font-size:11px;margin-right:6px;">${t.time}</span>`:''}${t.name||''}</div>
-                    <div style="margin-top:4px;display:flex;gap:4px;flex-wrap:wrap;">${dayPills}</div>
+                    <div style="margin-top:4px;display:flex;gap:4px;flex-wrap:wrap;align-items:center;">
+                      <span class="chip" style="background:#ede9fe;color:#5b21b6;">${freqLabel}</span>
+                      <span class="small">${schedLabel}</span>
+                    </div>
                     ${t.notes?`<div class="small" style="margin-top:3px;">${t.notes}</div>`:''}
                   </div>
                   <button class="icon-btn todo" style="flex-shrink:0;" onclick="app.todo.openTask('${t.id}')"><i class="fas fa-pen"></i></button>
@@ -1558,21 +1847,16 @@ window.app={
         const q=query(colTodoLogs,where("date",">=",cutStr),orderBy("date","desc"),limit(500));
         const snap=await getDocs(q);
         const logs=[];snap.forEach(d=>logs.push({_id:d.id,...d.data()}));
-
         if(!logs.length){wrap.innerHTML=`<div class="empty-state"><i class="fas fa-clock-rotate-left"></i>Aucun historique cette semaine.</div>`;return;}
-
         const byDay={};
         logs.forEach(l=>{if(!byDay[l.date])byDay[l.date]=[];byDay[l.date].push(l);});
-
         const parts=[];
         Object.keys(byDay).sort().reverse().forEach(day=>{
           const d=new Date(day+'T12:00:00');
           const label=d.toLocaleDateString('fr',{weekday:'long',day:'numeric',month:'short'});
           const dl=byDay[day];
           const byZone={};dl.forEach(l=>{const k=l.zoneName||'Sans zone';if(!byZone[k])byZone[k]=[];byZone[k].push(l);});
-
           parts.push(`<div class="group-header" style="background:var(--todo)"><span>${label}</span><span class="small" style="color:rgba(255,255,255,.8)">${dl.length} tâche${dl.length>1?'s':''}</span></div>`);
-
           Object.keys(byZone).sort().forEach(zn=>{
             parts.push(`<div style="padding:4px 0 4px 10px;font-weight:800;font-size:12px;color:var(--todo);text-transform:uppercase;">${zn}</div>`);
             byZone[zn].sort((a,b)=>(a.ts||0)-(b.ts||0)).forEach(l=>{
@@ -1593,13 +1877,10 @@ window.app={
       document.getElementById('todo-zone-modal-title').innerHTML=id?'<i class="fas fa-pen"></i> Modifier Zone':'<i class="fas fa-plus"></i> Créer une Zone';
       document.getElementById('tz-del-btn').style.display=id?'block':'none';
       document.getElementById('tz-id').value=id||'';
-
-      // Build color grid
       const grid=document.getElementById('tz-color-grid');
       const cur=id?(window.app.data.todo.zones||[]).find(z=>String(z.id)===String(id))?.color||ZONE_COLORS[0]:ZONE_COLORS[0];
       grid.innerHTML=ZONE_COLORS.map(c=>`<div class="color-swatch ${c===cur?'selected':''}" style="background:${c};" onclick="app.todo._selectColor('${c}',this)"></div>`).join('');
       document.getElementById('tz-color').value=cur;
-
       if(id){const z=(window.app.data.todo.zones||[]).find(x=>String(x.id)===String(id));document.getElementById('tz-name').value=z?.name||'';}
       else{document.getElementById('tz-name').value='';}
       document.getElementById('err-tz-name').classList.remove('show');document.getElementById('tz-name').classList.remove('invalid');
@@ -1628,17 +1909,36 @@ window.app={
       document.getElementById('modal-todo-zone').classList.add('hidden');this.renderConfig();this.renderToday();
     },
 
+    // ── FREQUENCY HELPERS ──
+    _setFreq(freq){
+      this._editingFreq=freq;
+      ['daily','weekly','monthly','yearly'].forEach(f=>{
+        document.getElementById(`freq-${f}-tab`).classList.toggle('active',f===freq);
+        document.getElementById(`freq-panel-${f}`).classList.toggle('active',f===freq);
+      });
+    },
+    _renderMonthDaysGrid(){
+      const grid=document.getElementById('tt-month-days-grid');if(!grid)return;
+      let html='';
+      for(let d=1;d<=31;d++){
+        const on=this._editingMonthDays.has(d);
+        html+=`<button type="button" class="month-day-btn ${on?'on':''}" onclick="app.todo._toggleMonthDay(${d})">${d}</button>`;
+      }
+      grid.innerHTML=html;
+    },
+    _toggleMonthDay(d){
+      if(this._editingMonthDays.has(d))this._editingMonthDays.delete(d);else this._editingMonthDays.add(d);
+      this._renderMonthDaysGrid();
+    },
+
     // ── TASK MODAL ──
     openTask(id=null,defaultZoneId=null){
       const m=document.getElementById('modal-todo-task');m.classList.remove('hidden');
       document.getElementById('todo-task-modal-title').innerHTML=id?'<i class="fas fa-pen"></i> Modifier Tâche':'<i class="fas fa-plus"></i> Créer une Tâche';
       document.getElementById('tt-del-btn').style.display=id?'block':'none';
       document.getElementById('tt-id').value=id||'';
-
-      // Fill zone select
       const zSel=document.getElementById('tt-zone');
       zSel.innerHTML=(window.app.data.todo.zones||[]).map(z=>`<option value="${z.id}">${z.name||'Zone'}</option>`).join('');
-
       if(id){
         const t=(window.app.data.todo.tasks||[]).find(x=>String(x.id)===String(id));
         if(t){
@@ -1646,21 +1946,29 @@ window.app={
           document.getElementById('tt-name').value=t.name||'';
           document.getElementById('tt-time').value=t.time||'';
           document.getElementById('tt-notes').value=t.notes||'';
+          const freq=t.freq||'weekly';
+          this._editingFreq=freq;
           this._editingTaskDays=new Set((t.days||[]).map(d=>Number(d)));
+          this._editingMonthDays=new Set((t.monthDays||[]).map(d=>Number(d)));
+          document.getElementById('tt-yearly-date').value=t.yearlyDate||'';
+          this._setFreq(freq);
         }
       } else {
         document.getElementById('tt-name').value='';document.getElementById('tt-time').value='';document.getElementById('tt-notes').value='';
+        document.getElementById('tt-yearly-date').value='';
         if(defaultZoneId)zSel.value=String(defaultZoneId);
-        this._editingTaskDays=new Set([1,2,3,4,5]); // Mon-Fri by default
+        this._editingFreq='weekly';
+        this._editingTaskDays=new Set([1,2,3,4,5]);
+        this._editingMonthDays=new Set();
+        this._setFreq('weekly');
       }
-
       this._renderDayPills();
-      document.getElementById('err-tt-name').classList.remove('show');document.getElementById('err-tt-days').classList.remove('show');
+      this._renderMonthDaysGrid();
+      document.getElementById('err-tt-name').classList.remove('show');
       document.getElementById('tt-name').classList.remove('invalid');
     },
     _renderDayPills(){
-      const row=document.getElementById('tt-days-row');
-      // Order: L M M J V S D  => 1 2 3 4 5 6 0
+      const row=document.getElementById('tt-days-row');if(!row)return;
       const order=[1,2,3,4,5,6,0];
       row.innerHTML=order.map(d=>{
         const on=this._editingTaskDays.has(d);
@@ -1674,14 +1982,20 @@ window.app={
     saveTask:async function(){
       const name=(document.getElementById('tt-name').value||'').trim();
       if(!name){document.getElementById('tt-name').classList.add('invalid');document.getElementById('err-tt-name').classList.add('show');return;}
-      if(!this._editingTaskDays.size){document.getElementById('err-tt-days').classList.add('show');return;}
+      const freq=this._editingFreq||'weekly';
+      // Validate
+      if(freq==='weekly'&&!this._editingTaskDays.size){document.getElementById('err-tt-days').classList.add('show');return;}
+      if(freq==='monthly'&&!this._editingMonthDays.size){document.getElementById('err-tt-days-m').classList.add('show');return;}
       const id=document.getElementById('tt-id').value;
       const o={
         id:id?Number(id):Date.now(),
         zoneId:Number(document.getElementById('tt-zone').value)||0,
         name,
         time:document.getElementById('tt-time').value||'',
-        days:[...this._editingTaskDays].sort(),
+        freq,
+        days:freq==='weekly'?[...this._editingTaskDays].sort():[],
+        monthDays:freq==='monthly'?[...this._editingMonthDays].sort():[],
+        yearlyDate:freq==='yearly'?(document.getElementById('tt-yearly-date').value||''):'',
         notes:(document.getElementById('tt-notes').value||'').trim()
       };
       if(id){const idx=(window.app.data.todo.tasks||[]).findIndex(t=>String(t.id)===String(id));if(idx>-1)window.app.data.todo.tasks[idx]=o;}
@@ -1696,10 +2010,120 @@ window.app={
       spin(true);try{await window.app.save('todo');toast('Tâche supprimée.','ok');}catch(e){toast('Erreur.','err');}finally{spin(false);}
       document.getElementById('modal-todo-task').classList.add('hidden');this.renderConfig();this.renderToday();window.app.updateHomeBadges();
     }
-  }
-};
+  },
 
-// ── INIT ──
+  // ══════════════════════════════════════════════════
+  // ── RÉCEPTION MODULE ──
+  // ══════════════════════════════════════════════════
+  reception:{
+    _photoData:'',
+    init(){
+      const inp=document.getElementById('rec-datetime');
+      if(inp)inp.value=tsToInput(Date.now());
+      const fi=document.getElementById('rec-photo-input');
+      if(fi&&!fi._wired){fi._wired=true;fi.addEventListener('change',e=>{const f=e.target.files?.[0];if(!f)return;window.app.common.compressImg(f,b64=>{window.app.reception._photoData=b64;const prev=document.getElementById('rec-photo-preview');prev.src=b64;prev.style.display='block';});});}
+      const ti=document.getElementById('rec-temp');
+      if(ti&&!ti._wired){ti._wired=true;ti.addEventListener('input',()=>window.app.reception._updateTempStatus());}
+      this._fillSupplierList();
+    },
+    _fillSupplierList(){
+      const dl=document.getElementById('rec-supplier-list');if(!dl)return;
+      const suppliers=[...new Set((window.app.data.reception||[]).map(r=>r.supplier||'').filter(Boolean))].sort();
+      dl.innerHTML=suppliers.map(s=>`<option value="${s}">`).join('');
+    },
+    _updateTempStatus(){
+      const v=parseFloat(document.getElementById('rec-temp').value);
+      const lim=parseFloat(document.getElementById('rec-temp-limit').value||'8');
+      const div=document.getElementById('rec-temp-status');
+      if(isNaN(v)){div.innerHTML='';return;}
+      if(v<=lim){div.innerHTML=`<div style="background:#d1fae5;color:#065f46;padding:10px;border-radius:10px;font-weight:900;margin-bottom:8px;"><i class="fas fa-check-circle"></i> ${v}°C — Dans les normes (limite: ${lim}°C)</div>`;}
+      else{div.innerHTML=`<div style="background:#fee2e2;color:#991b1b;padding:10px;border-radius:10px;font-weight:900;margin-bottom:8px;"><i class="fas fa-triangle-exclamation"></i> ${v}°C — HORS NORME ! (limite: ${lim}°C)</div>`;}
+    },
+    tab(t){
+      document.querySelectorAll('#view-reception .tab').forEach(e=>e.classList.remove('active'));
+      document.getElementById(t==='new'?'trec-1':'trec-2').classList.add('active');
+      document.getElementById('reception-new').classList.toggle('hidden',t!=='new');
+      document.getElementById('reception-history').classList.toggle('hidden',t!=='history');
+      if(t==='history')this.renderHistory();
+    },
+    save:async function(conform){
+      const supplier=(document.getElementById('rec-supplier').value||'').trim();
+      const product=(document.getElementById('rec-product').value||'').trim();
+      const temp=document.getElementById('rec-temp').value;
+      const tempLimit=parseFloat(document.getElementById('rec-temp-limit').value||'8');
+      if(!supplier||!product)return toast('Fournisseur et produit requis.','warn');
+      if(temp===''||isNaN(parseFloat(temp)))return toast('Température requise.','warn');
+      const ts=inputToTs(document.getElementById('rec-datetime').value)||Date.now();
+      const entry={ts,date:todayStr(),supplier,product,temp:parseFloat(temp),tempLimit,conform,notes:(document.getElementById('rec-notes').value||'').trim(),photo:this._photoData||'',user:window.app.me?.name||(window.app.me?.email||'USER')};
+      spin(true);
+      try{
+        const ref=await addDoc(colReception,entry);
+        window.app.data.reception.unshift({_id:ref.id,...entry});
+        document.getElementById('rec-supplier').value='';document.getElementById('rec-product').value='';document.getElementById('rec-temp').value='';document.getElementById('rec-notes').value='';document.getElementById('rec-temp-status').innerHTML='';document.getElementById('rec-photo-preview').style.display='none';document.getElementById('rec-datetime').value=tsToInput(Date.now());document.getElementById('rec-photo-input').value='';
+        this._photoData='';
+        toast(conform?'Réception conforme enregistrée ✓':'⚠ NON CONFORME enregistrée','ok',4000);
+        this._fillSupplierList();
+      }catch(e){toast('Erreur sauvegarde.','err');}finally{spin(false);}
+    },
+    renderHistory(){
+      const wrap=document.getElementById('reception-history');if(!wrap)return;
+      const logs=(window.app.data.reception||[]).slice().sort((a,b)=>(b.ts||0)-(a.ts||0));
+      if(!logs.length){wrap.innerHTML=`<div class="empty-state"><i class="fas fa-truck-ramp-box"></i>Aucun contrôle enregistré.</div>`;return;}
+      const byDay={};logs.forEach(l=>{const d=l.date||todayStr();if(!byDay[d])byDay[d]=[];byDay[d].push(l);});
+      const parts=[];
+      Object.keys(byDay).sort().reverse().forEach(day=>{
+        const d=new Date(day+'T12:00:00');
+        const label=d.toLocaleDateString('fr',{weekday:'long',day:'numeric',month:'short',year:'numeric'});
+        parts.push(`<div class="group-header" style="background:var(--reception)"><span>${label}</span><span class="small" style="color:rgba(255,255,255,.8)">${byDay[day].length} contrôle(s)</span></div>`);
+        byDay[day].forEach(l=>{
+          const conformBadge=l.conform?`<span class="chip ok"><i class="fas fa-check"></i> CONFORME</span>`:`<span class="chip warn"><i class="fas fa-triangle-exclamation"></i> NON CONFORME</span>`;
+          const tempColor=l.temp>l.tempLimit?'color:#ef4444;':'color:#10b981;';
+          parts.push(`<div class="reception-card"><div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px;"><div style="font-weight:950;font-size:15px;">${l.supplier||''}</div>${conformBadge}</div><div style="font-size:14px;font-weight:700;margin-bottom:4px;">${l.product||''}</div><div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:4px;"><span style="${tempColor}font-weight:950;font-size:18px;"><i class="fas fa-thermometer-half"></i> ${l.temp}°C</span><span class="small">limite: ${l.tempLimit}°C</span><span class="small">${formatDate(l.ts)}</span><span class="small"><i class="fas fa-user"></i> ${l.user||''}</span></div>${l.notes?`<div class="small" style="margin-top:4px;color:#475569;">${l.notes}</div>`:''}${l.photo?`<img src="${l.photo}" style="width:100%;max-height:140px;object-fit:contain;border-radius:10px;margin-top:8px;background:#f8fafc;">`:''}</div>`);
+        });
+      });
+      wrap.innerHTML=parts.join('');
+    }
+  },
+
+  // ══════════════════════════════════════════════════
+  // ── INSPECTION MODULE ──
+  // ══════════════════════════════════════════════════
+  inspection:{
+    render:async function(){
+      const wrap=document.getElementById('inspection-content');if(!wrap)return;
+      wrap.innerHTML=`<div style="text-align:center;padding:30px;"><i class="fas fa-spinner fa-spin" style="font-size:30px;color:var(--primary);"></i></div>`;
+      try{
+        const today=new Date();today.setHours(0,0,0,0);const todayTs=today.getTime();
+        const weekAgo=todayTs-(7*24*60*60*1000);const monthAgo=todayTs-(30*24*60*60*1000);
+        const todoLogs=window.app.data.todoLogs||[];const todayTasks=window.app.todo.todayTaskList();
+        const todoDone=todoLogs.length;const todoTotal=todayTasks.length;const todoPct=todoTotal>0?Math.round(todoDone/todoTotal*100):0;
+        const frigoRem=window.app.frigo.remainingTodayTotal();const frigoTotal=(window.app.data.frigo.fridges||[]).length*(window.app.data.frigo.perDay||2);const frigoDone=frigoTotal-frigoRem;
+        const recLogs=(window.app.data.reception||[]).filter(r=>(r.ts||0)>=monthAgo);const recConform=recLogs.filter(r=>r.conform).length;const recNonConform=recLogs.filter(r=>!r.conform).length;
+        const fraisAlerts=window.app.data.frais.filter(i=>{const d=new Date(i.date);return!isNaN(d.getTime())&&d<=today;}).length;
+        const users=window.app.data.users||[];const frigoLogs7=(window.app.data.frigo.logs||[]).filter(l=>(l.ts||0)>=weekAgo);
+        const parts=[];
+        parts.push(`<div class="kpi-grid"><div class="kpi-card" style="background:linear-gradient(135deg,var(--todo),#5b21b6);color:#fff;"><div class="kpi-val">${todoPct}%</div><div class="kpi-lbl">CHECK-LIST</div></div><div class="kpi-card" style="background:linear-gradient(135deg,var(--frigo),#0369a1);color:#fff;"><div class="kpi-val">${frigoDone}/${frigoTotal}</div><div class="kpi-lbl">RELEVÉS FRIGO</div></div><div class="kpi-card" style="background:linear-gradient(135deg,var(--reception),#047857);color:#fff;"><div class="kpi-val">${recConform}</div><div class="kpi-lbl">CONF. (30J)</div></div><div class="kpi-card" style="background:linear-gradient(135deg,${recNonConform>0?'#ef4444,#b91c1c':'#6b7280,#374151'});color:#fff;"><div class="kpi-val">${recNonConform}</div><div class="kpi-lbl">NON CONF. (30J)</div></div></div>${fraisAlerts>0?`<div style="background:#fee2e2;border-left:5px solid #ef4444;border-radius:12px;padding:14px;margin-bottom:12px;font-weight:900;color:#991b1b;"><i class="fas fa-triangle-exclamation"></i> ${fraisAlerts} produit(s) frais à DLC !</div>`:''}`);
+        parts.push(`<div class="inspection-section"><h4><i class="fas fa-users"></i> Équipe (${users.length})</h4>${users.map(u=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f1f5f9;"><div style="font-weight:800;">${u.name||u.email||'?'} ${u.role==='admin'?'<span class="chip admin">ADMIN</span>':'<span class="chip staff">STAFF</span>'}</div><div class="small">${u.email||''}</div></div>`).join('')}</div>`);
+        if(frigoLogs7.length){const avgTemp=(frigoLogs7.reduce((s,l)=>s+(l.temp||0),0)/frigoLogs7.length).toFixed(1);const maxTemp=Math.max(...frigoLogs7.map(l=>l.temp||0)).toFixed(1);const minTemp=Math.min(...frigoLogs7.map(l=>l.temp||0)).toFixed(1);parts.push(`<div class="inspection-section"><h4><i class="fas fa-temperature-half" style="color:var(--frigo);"></i> Températures (7 jours)</h4><div class="kpi-grid"><div class="kpi-card" style="background:#f0f9ff;"><div class="kpi-val" style="color:var(--frigo);font-size:22px;">${avgTemp}°C</div><div class="kpi-lbl" style="color:#0369a1;">MOYENNE</div></div><div class="kpi-card" style="background:#f0f9ff;"><div class="kpi-val" style="color:#ef4444;font-size:22px;">${maxTemp}°C</div><div class="kpi-lbl" style="color:#0369a1;">MAX</div></div></div><div class="small">Min: ${minTemp}°C • ${frigoLogs7.length} relevé(s)</div></div>`);}
+        const recNC=(window.app.data.reception||[]).filter(r=>!r.conform&&(r.ts||0)>=monthAgo);
+        if(recNC.length){parts.push(`<div class="inspection-section" style="border-left:4px solid #ef4444;"><h4 style="color:#ef4444;"><i class="fas fa-triangle-exclamation"></i> Non-conformités (30J)</h4>${recNC.slice(0,5).map(r=>`<div style="padding:8px 0;border-bottom:1px solid #fee2e2;"><div style="font-weight:800;">${r.supplier||'?'} — ${r.product||'?'}</div><div class="small">${formatDate(r.ts)} • ${r.temp}°C (lim. ${r.tempLimit}°C) • ${r.user||''}</div>${r.notes?`<div class="small" style="color:#7f1d1d;">${r.notes}</div>`:''}</div>`).join('')}${recNC.length>5?`<div class="small" style="text-align:center;margin-top:8px;">+ ${recNC.length-5} autre(s)</div>`:''}</div>`);}
+        parts.push(`<div class="inspection-section"><h4><i class="fas fa-file-export"></i> Exporter</h4><button class="export-btn" style="background:linear-gradient(135deg,#0ea5e9,#0369a1);color:#fff;margin-bottom:10px;" onclick="app.inspection.exportCSV('frigo')"><i class="fas fa-temperature-half"></i> Export températures (CSV)</button><button class="export-btn" style="background:linear-gradient(135deg,var(--reception),#047857);color:#fff;margin-bottom:10px;" onclick="app.inspection.exportCSV('reception')"><i class="fas fa-truck-ramp-box"></i> Export réceptions (CSV)</button><button class="export-btn" style="background:linear-gradient(135deg,var(--todo),#5b21b6);color:#fff;margin-bottom:10px;" onclick="app.inspection.exportCSV('todo')"><i class="fas fa-list-check"></i> Export check-list (CSV)</button></div>`);
+        wrap.innerHTML=parts.join('');
+      }catch(e){wrap.innerHTML=`<div class="empty-state"><i class="fas fa-circle-exclamation"></i>Erreur de chargement.</div>`;}
+    },
+    exportCSV(type){
+      let rows=[];let filename='';
+      if(type==='frigo'){filename='temperatures.csv';rows=[['Frigo','Temperature','Date','Heure','Operateur']];(window.app.data.frigo.logs||[]).slice().sort((a,b)=>(b.ts||0)-(a.ts||0)).forEach(l=>{const d=new Date(l.ts||0);rows.push([l.fridgeName||'',l.temp||'',d.toLocaleDateString('fr'),d.toLocaleTimeString('fr'),l.user||'']);});}
+      else if(type==='reception'){filename='receptions.csv';rows=[['Date','Heure','Fournisseur','Produit','Temperature','Limite','Conforme','Operateur','Observations']];(window.app.data.reception||[]).slice().sort((a,b)=>(b.ts||0)-(a.ts||0)).forEach(l=>{const d=new Date(l.ts||0);rows.push([d.toLocaleDateString('fr'),d.toLocaleTimeString('fr'),l.supplier||'',l.product||'',l.temp||'',l.tempLimit||'',l.conform?'OUI':'NON',l.user||'',l.notes||'']);});}
+      else if(type==='todo'){filename='checklist.csv';rows=[['Date','Zone','Tache','Operateur','Heure']];(window.app.data.todoLogs||[]).forEach(l=>{const d=new Date(l.ts||0);rows.push([l.date||'',l.zoneName||'',l.taskName||'',l.user||'',d.toLocaleTimeString('fr')]);});}
+      const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(';')).join('\n');
+      const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
+      const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=filename;a.click();URL.revokeObjectURL(url);
+      toast('Export CSV téléchargé.','ok');
+    }
+  }
+
+};
 window.app.initOffline();
 
 // Wire photo inputs
@@ -1713,7 +2137,7 @@ onAuthStateChanged(auth,async user=>{
     document.getElementById('app-header').classList.add('hidden');
     document.getElementById('app-nav').classList.add('hidden');
     window.app.me=null;
-    window.app.data={frais:[],users:[],pvpLib:[],pvpStock:[],checkedNeeds:[],saladLib:[],saladStock:[],frigo:{perDay:2,fridges:[],logs:[]},todo:{zones:[],tasks:[]},todoLogs:[]};
+    window.app.data={frais:[],users:[],pvpLib:[],pvpStock:[],checkedNeeds:[],saladLib:[],saladStock:[],frigo:{perDay:2,fridges:[],logs:[]},todo:{zones:[],tasks:[]},todoLogs:[],reception:[]};
     return;
   }
   await window.app.afterLoginBootstrap();
