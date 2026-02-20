@@ -160,6 +160,13 @@ textarea{min-height:80px;resize:none;}
 .empty-state{text-align:center;padding:40px 20px;color:var(--muted);}
 .empty-state i{font-size:40px;margin-bottom:12px;opacity:.35;display:block;}
 
+/* ── SEARCH ── */
+.search-wrap{position:relative;margin-bottom:12px;}
+.search-wrap i{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:15px;pointer-events:none;}
+.search-input{padding:13px 13px 13px 40px!important;border-radius:12px!important;background:#f8fafc!important;border:1.5px solid #e2e8f0!important;font-size:15px!important;margin-bottom:0!important;}
+.search-input:focus{border-color:var(--primary)!important;background:#fff!important;}
+.search-no-result{text-align:center;padding:30px;color:var(--muted);font-size:14px;}
+
 /* ── MODALS ── */
 .modal-bc{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:5000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;}
 #modal-barcode{z-index:6500;}
@@ -452,7 +459,11 @@ textarea{min-height:80px;resize:none;}
     </div>
     <div id="pvp-stock"></div>
     <div id="pvp-bib" class="hidden">
-      <button class="btn secondary" onclick="app.pvp.openLib()" style="margin-bottom:15px;">+ Créer Produit</button>
+      <div class="search-wrap">
+        <i class="fas fa-magnifying-glass"></i>
+        <input class="search-input" type="search" id="pvp-search" placeholder="Rechercher un produit PVP…" oninput="app.pvp.render()" autocomplete="off">
+      </div>
+      <button class="btn secondary" onclick="app.pvp.openLib()" style="margin-bottom:12px;">+ Créer Produit</button>
       <div id="lib-list"></div>
     </div>
     <div id="pvp-calc" class="hidden"></div>
@@ -466,7 +477,11 @@ textarea{min-height:80px;resize:none;}
     </div>
     <div id="salad-stock"></div>
     <div id="salad-bib" class="hidden">
-      <button class="btn secondary" onclick="app.salad.openLib()" style="margin-bottom:15px;">+ Créer Produit</button>
+      <div class="search-wrap">
+        <i class="fas fa-magnifying-glass"></i>
+        <input class="search-input" type="search" id="salad-search" placeholder="Rechercher un produit Salad Bar…" oninput="app.salad.render()" autocomplete="off">
+      </div>
+      <button class="btn secondary" onclick="app.salad.openLib()" style="margin-bottom:12px;">+ Créer Produit</button>
       <div id="salad-lib-list"></div>
     </div>
   </div>
@@ -817,7 +832,16 @@ window.app={
     parseDateLocal(dateStr){if(!dateStr)return null;const p=dateStr.split('-');return new Date(p[0],p[1]-1,p[2],12,0,0).getTime();},
     dateToInputLocal(ts){if(!ts)return"";const d=new Date(ts);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;},
     tsToInput,formatDate,inputToTs,dayBounds,
-    calculateEnd(startTs,hours){const end=new Date(startTs);const h=parseInt(hours||0,10);if(h===0)end.setHours(22,0,0,0);else end.setHours(end.getHours()+h);return end.getTime();},
+    calculateEnd(startTs,hours){
+      const h=parseInt(hours||0,10);
+      if(h===0){
+        // JOURNÉE → fin du jour courant à 22:00
+        const d=new Date(startTs);
+        return new Date(d.getFullYear(),d.getMonth(),d.getDate(),22,0,0,0).getTime();
+      }
+      // Calcul en millisecondes pur — fiable quelle que soit la durée
+      return startTs + h * 3600 * 1000;
+    },
     cleanName(name){return(name||"").toUpperCase().replace(/^[\d\s\.,xX]+(G|KG|ML|CL|L|P)?\s*/g,'');},
     randPwd(len=14){const c="ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%";let o="";for(let i=0;i<len;i++)o+=c[Math.floor(Math.random()*c.length)];return o;},
     compressImg(file,callback){const r=new FileReader();r.readAsDataURL(file);r.onload=e=>{const img=new Image();img.src=e.target.result;img.onload=()=>{const c=document.createElement('canvas');const ctx=c.getContext('2d');const mx=600;let w=img.width,h=img.height;if(w>h){if(w>mx){h*=mx/w;w=mx;}}else{if(h>mx){w*=mx/h;h=mx;}}c.width=w;c.height=h;ctx.drawImage(img,0,0,w,h);callback(c.toDataURL('image/jpeg',0.7));};};},
@@ -1068,11 +1092,18 @@ window.app={
     },
     addStock:async function(libId){
       const l=window.app.data.pvpLib.find(x=>x.id==libId);
-      const q=await dlgPrompt('Quantité ?','1','number');if(q===null)return;
+      const q=await dlgPrompt('Quantité ?','1','number');
+      if(q===null)return;
       const n=Number(q||0);if(n<=0)return toast('Quantité invalide.','warn');
-      const now=new Date();const end=window.app.common.calculateEnd(now.getTime(),l.days);
-      window.app.data.pvpStock.push({id:Date.now(),libId,name:l.name,ean:l.ean,qty:n,out:now.getTime(),end,days:l.days});
-      this.render();window.app.saveDebounced('pvp',350);toast(`${n}× ${l.name} ajouté.`,'ok');
+      const now=Date.now();
+      const end=window.app.common.calculateEnd(now,l.days);
+      const entry={id:now,libId,name:l.name,ean:l.ean,qty:n,out:now,end,days:l.days};
+      window.app.data.pvpStock.push(entry);
+      this.render();
+      spin(true);
+      try{await window.app.save('pvp');toast(`${n}× ${l.name} sorti — fin: ${formatDate(end)}`,'ok',4000);}
+      catch(e){toast('Erreur sauvegarde.','err');}
+      finally{spin(false);}
     },
     openEditStock(id){
       const i=window.app.data.pvpStock.find(x=>x.id==id);
@@ -1080,31 +1111,88 @@ window.app={
       document.getElementById('stock-id').value=id;document.getElementById('stock-name').innerText=i.name;
       document.getElementById('stock-qty').value=i.qty;document.getElementById('stock-start').value=tsToInput(i.out);document.getElementById('stock-end').value=tsToInput(i.end);
     },
-    saveStock(){
+    saveStock:async function(){
       const idx=window.app.data.pvpStock.findIndex(x=>String(x.id)===String(document.getElementById('stock-id').value));if(idx<0)return;
-      const qty=Number(document.getElementById('stock-qty').value||0);const out=new Date(document.getElementById('stock-start').value).getTime();const end=new Date(document.getElementById('stock-end').value).getTime();
-      if(!isFinite(qty)||qty<0)return toast('Quantité invalide.','warn');if(isNaN(out)||isNaN(end))return toast('Dates invalides.','warn');
+      const qty=Number(document.getElementById('stock-qty').value||0);
+      const out=new Date(document.getElementById('stock-start').value).getTime();
+      const end=new Date(document.getElementById('stock-end').value).getTime();
+      if(!isFinite(qty)||qty<0)return toast('Quantité invalide.','warn');
+      if(isNaN(out)||isNaN(end))return toast('Dates invalides.','warn');
       window.app.data.pvpStock[idx].qty=qty;window.app.data.pvpStock[idx].out=out;window.app.data.pvpStock[idx].end=end;
-      document.getElementById('modal-pvp-stock').classList.add('hidden');this.render();window.app.saveDebounced('pvp',350);toast('Mis à jour.','ok');
+      document.getElementById('modal-pvp-stock').classList.add('hidden');
+      this.render();
+      spin(true);try{await window.app.save('pvp');toast('Mis à jour.','ok');}catch(e){toast('Erreur.','err');}finally{spin(false);}
     },
     delStock:async function(){
       const ok=await dlgConfirm('Retirer','Retirer ce produit du rayon ?');if(!ok)return;
       const id=document.getElementById('stock-id').value;
       window.app.data.pvpStock=window.app.data.pvpStock.filter(x=>String(x.id)!==String(id));
-      document.getElementById('modal-pvp-stock').classList.add('hidden');this.render();window.app.saveDebounced('pvp',350);toast('Retiré.','ok');
+      document.getElementById('modal-pvp-stock').classList.add('hidden');
+      this.render();
+      spin(true);try{await window.app.save('pvp');toast('Retiré.','ok');}catch(e){toast('Erreur.','err');}finally{spin(false);}
     },
-    changeQty(id,delta){
+    changeQty:async function(id,delta){
       const idx=window.app.data.pvpStock.findIndex(x=>x.id==id);
-      if(idx>-1){const n=Number(window.app.data.pvpStock[idx].qty||0)+delta;if(n<=0)window.app.data.pvpStock.splice(idx,1);else window.app.data.pvpStock[idx].qty=n;this.render();window.app.saveDebounced('pvp',350);}
+      if(idx>-1){
+        const n=Number(window.app.data.pvpStock[idx].qty||0)+delta;
+        if(n<=0)window.app.data.pvpStock.splice(idx,1);else window.app.data.pvpStock[idx].qty=n;
+        this.render();
+        try{await window.app.save('pvp');}catch(e){toast('Erreur synchro.','err');}
+      }
     },
-    toggleNeed(libId){const idx=window.app.data.checkedNeeds.indexOf(libId);if(idx>-1)window.app.data.checkedNeeds.splice(idx,1);else window.app.data.checkedNeeds.push(libId);this.render();window.app.saveDebounced('pvp',350);},
+    toggleNeed:async function(libId){
+      const idx=window.app.data.checkedNeeds.indexOf(libId);
+      if(idx>-1)window.app.data.checkedNeeds.splice(idx,1);else window.app.data.checkedNeeds.push(libId);
+      this.render();try{await window.app.save('pvp');}catch(e){}
+    },
     render(){
       const bib=document.getElementById('lib-list');
       if(bib){
-        if(!window.app.data.pvpLib.length){bib.innerHTML=`<div class="empty-state"><i class="fas fa-bread-slice"></i>Bibliothèque vide.</div>`;return;}
-        const gL={};window.app.data.pvpLib.slice().sort((a,b)=>window.app.common.cleanName(a.name).localeCompare(window.app.common.cleanName(b.name))).forEach(l=>{const f=l.family||'DIVERS';if(!gL[f])gL[f]=[];gL[f].push(l);});
-        const parts=[];Object.keys(gL).sort().forEach(f=>{const id='L-'+f;const c=window.app.closed.has(id);parts.push(`<div class="group-header" onclick="app.toggleFam('${id}')"><span>${f}</span><i class="fas fa-chevron-${c?'right':'down'}"></i></div>`);if(c)return;gL[f].forEach(l=>{const img=l.img?`<img src="${l.img}" class="item-img">`:`<div class="item-img"><i class="fas fa-bread-slice"></i></div>`;const sn=(l.name||'').replace(/'/g,' ');parts.push(`<div class="list-item" onclick="app.common.showBarcode('${l.ean||''}','${sn}','${l.img||''}')"><div style="display:flex;align-items:center;min-width:0;gap:12px;">${img}<div style="min-width:0;"><div class="item-title">${l.name}</div><div class="item-sub">${l.days||0}h • ${l.ean||'EAN ?'}</div></div></div><div class="right-col"><button class="icon-btn pvp" onclick="event.stopPropagation();app.pvp.openLib(${l.id})"><i class="fas fa-pen"></i></button><button class="icon-btn dark" onclick="event.stopPropagation();app.trace.open('pvp','${l.id}','${sn}')"><i class="fas fa-camera"></i></button><button class="icon-btn pvp" onclick="event.stopPropagation();app.pvp.addStock(${l.id})"><i class="fas fa-plus"></i></button></div></div>`);});});
-        bib.innerHTML=parts.join('');
+        const q=(document.getElementById('pvp-search')?.value||'').toLowerCase().trim();
+        const allLib=window.app.data.pvpLib.slice().sort((a,b)=>window.app.common.cleanName(a.name).localeCompare(window.app.common.cleanName(b.name)));
+        const filtered=q?allLib.filter(l=>(l.name||'').toLowerCase().includes(q)||(l.family||'').toLowerCase().includes(q)||(l.ean||'').includes(q)):allLib;
+
+        if(!window.app.data.pvpLib.length){bib.innerHTML=`<div class="empty-state"><i class="fas fa-bread-slice"></i>Bibliothèque vide.</div>`;}
+        else if(!filtered.length){bib.innerHTML=`<div class="search-no-result"><i class="fas fa-magnifying-glass" style="font-size:28px;opacity:.3;display:block;margin-bottom:8px;"></i>Aucun résultat pour "<b>${q}</b>"</div>`;}
+        else{
+          if(q){
+            // En mode recherche : liste plate sans groupes
+            bib.innerHTML=filtered.map(l=>{
+              const img=l.img?`<img src="${l.img}" class="item-img">`:`<div class="item-img"><i class="fas fa-bread-slice"></i></div>`;
+              const sn=(l.name||'').replace(/'/g,' ');
+              const fam=`<span class="chip" style="background:#f1f5f9;color:#475569;">${l.family||'DIVERS'}</span>`;
+              return `<div class="list-item" onclick="app.common.showBarcode('${l.ean||''}','${sn}','${l.img||''}')">
+                <div style="display:flex;align-items:center;min-width:0;gap:12px;">${img}<div style="min-width:0;"><div class="item-title">${l.name}</div><div class="item-sub">${l.days||0}h • ${fam}</div></div></div>
+                <div class="right-col">
+                  <button class="icon-btn pvp" onclick="event.stopPropagation();app.pvp.openLib(${l.id})"><i class="fas fa-pen"></i></button>
+                  <button class="icon-btn dark" onclick="event.stopPropagation();app.trace.open('pvp','${l.id}','${sn}')"><i class="fas fa-camera"></i></button>
+                  <button class="icon-btn pvp" onclick="event.stopPropagation();app.pvp.addStock(${l.id})"><i class="fas fa-plus"></i></button>
+                </div>
+              </div>`;
+            }).join('');
+          } else {
+            // Mode normal : groupé par famille
+            const gL={};filtered.forEach(l=>{const f=l.family||'DIVERS';if(!gL[f])gL[f]=[];gL[f].push(l);});
+            const parts=[];Object.keys(gL).sort().forEach(f=>{
+              const id='L-'+f;const c=window.app.closed.has(id);
+              parts.push(`<div class="group-header" onclick="app.toggleFam('${id}')"><span>${f}</span><i class="fas fa-chevron-${c?'right':'down'}"></i></div>`);
+              if(c)return;
+              gL[f].forEach(l=>{
+                const img=l.img?`<img src="${l.img}" class="item-img">`:`<div class="item-img"><i class="fas fa-bread-slice"></i></div>`;
+                const sn=(l.name||'').replace(/'/g,' ');
+                parts.push(`<div class="list-item" onclick="app.common.showBarcode('${l.ean||''}','${sn}','${l.img||''}')">
+                  <div style="display:flex;align-items:center;min-width:0;gap:12px;">${img}<div style="min-width:0;"><div class="item-title">${l.name}</div><div class="item-sub">${l.days||0}h • ${l.ean||'EAN ?'}</div></div></div>
+                  <div class="right-col">
+                    <button class="icon-btn pvp" onclick="event.stopPropagation();app.pvp.openLib(${l.id})"><i class="fas fa-pen"></i></button>
+                    <button class="icon-btn dark" onclick="event.stopPropagation();app.trace.open('pvp','${l.id}','${sn}')"><i class="fas fa-camera"></i></button>
+                    <button class="icon-btn pvp" onclick="event.stopPropagation();app.pvp.addStock(${l.id})"><i class="fas fa-plus"></i></button>
+                  </div>
+                </div>`);
+              });
+            });
+            bib.innerHTML=parts.join('');
+          }
+        }
       }
       const st=document.getElementById('pvp-stock');
       if(st){
@@ -1133,18 +1221,87 @@ window.app={
   salad:{
     tab(t){document.querySelectorAll('#view-salad .tab').forEach(e=>e.classList.remove('active-salad'));document.getElementById(t==='stock'?'ts-1':'ts-2').classList.add('active-salad');document.getElementById('salad-stock').classList.add('hidden');document.getElementById('salad-bib').classList.add('hidden');document.getElementById('salad-'+t).classList.remove('hidden');},
     openLib(id=null){document.getElementById('modal-salad-lib').classList.remove('hidden');if(id){const i=window.app.data.saladLib.find(x=>x.id==id);document.getElementById('sal-lib-id').value=i.id;document.getElementById('sal-lib-fam').value=i.family||'DIVERS';document.getElementById('sal-lib-name').value=i.name||'';document.getElementById('sal-lib-hours').value=String(i.hours||48);}else{document.getElementById('sal-lib-id').value='';document.getElementById('sal-lib-fam').value='SALADE';document.getElementById('sal-lib-name').value='';document.getElementById('sal-lib-hours').value='48';}},
-    saveLib:async function(){const id=document.getElementById('sal-lib-id').value;const name=(document.getElementById('sal-lib-name').value||'').trim();if(!name)return toast('Nom requis.','warn');const o={id:id?Number(id):Date.now(),family:document.getElementById('sal-lib-fam').value||'DIVERS',name,hours:Number(document.getElementById('sal-lib-hours').value||48)};if(id){const idx=window.app.data.saladLib.findIndex(x=>String(x.id)===String(id));if(idx>-1)window.app.data.saladLib[idx]=o;}else window.app.data.saladLib.push(o);document.getElementById('modal-salad-lib').classList.add('hidden');this.render();window.app.saveDebounced('salad',350);toast('Enregistré.','ok');},
-    delLib:async function(){const ok=await dlgConfirm('Supprimer','Supprimer ce produit ?');if(!ok)return;const id=document.getElementById('sal-lib-id').value;window.app.data.saladLib=window.app.data.saladLib.filter(x=>String(x.id)!==String(id));document.getElementById('modal-salad-lib').classList.add('hidden');this.render();window.app.saveDebounced('salad',350);toast('Supprimé.','ok');},
-    addStock:async function(libId){const l=window.app.data.saladLib.find(x=>x.id==libId);const q=await dlgPrompt('Quantité ?','1','number');if(q===null)return;const n=Number(q||0);if(n<=0)return toast('Quantité invalide.','warn');const now=new Date();window.app.data.saladStock.push({id:Date.now(),libId,name:l.name,qty:n,out:now.getTime(),end:window.app.common.calculateEnd(now.getTime(),l.hours),hours:l.hours});this.render();window.app.saveDebounced('salad',350);toast(`${n}× ${l.name} ajouté.`,'ok');},
-    changeQty(id,delta){const idx=window.app.data.saladStock.findIndex(x=>x.id==id);if(idx>-1){const n=Number(window.app.data.saladStock[idx].qty||0)+delta;if(n<=0)window.app.data.saladStock.splice(idx,1);else window.app.data.saladStock[idx].qty=n;this.render();window.app.saveDebounced('salad',350);}},
-    openEditStock:async function(id){const i=window.app.data.saladStock.find(x=>x.id==id);const q=await dlgPrompt('Quantité :',String(i.qty||0),'number');if(q===null)return;const n=Number(q||0);if(n<=0)window.app.data.saladStock=window.app.data.saladStock.filter(x=>x.id!==id);else i.qty=n;this.render();window.app.saveDebounced('salad',350);},
+    saveLib:async function(){const id=document.getElementById('sal-lib-id').value;const name=(document.getElementById('sal-lib-name').value||'').trim();if(!name)return toast('Nom requis.','warn');const o={id:id?Number(id):Date.now(),family:document.getElementById('sal-lib-fam').value||'DIVERS',name,hours:Number(document.getElementById('sal-lib-hours').value||48)};if(id){const idx=window.app.data.saladLib.findIndex(x=>String(x.id)===String(id));if(idx>-1)window.app.data.saladLib[idx]=o;}else window.app.data.saladLib.push(o);document.getElementById('modal-salad-lib').classList.add('hidden');this.render();spin(true);try{await window.app.save('salad');toast('Enregistré.','ok');}catch(e){toast('Erreur.','err');}finally{spin(false);};},
+    delLib:async function(){const ok=await dlgConfirm('Supprimer','Supprimer ce produit ?');if(!ok)return;const id=document.getElementById('sal-lib-id').value;window.app.data.saladLib=window.app.data.saladLib.filter(x=>String(x.id)!==String(id));document.getElementById('modal-salad-lib').classList.add('hidden');this.render();spin(true);try{await window.app.save('salad');toast('Supprimé.','ok');}catch(e){toast('Erreur.','err');}finally{spin(false);};},
+    addStock:async function(libId){
+      const l=window.app.data.saladLib.find(x=>x.id==libId);
+      const q=await dlgPrompt('Quantité ?','1','number');
+      if(q===null)return;
+      const n=Number(q||0);
+      if(n<=0)return toast('Quantité invalide.','warn');
+      const now=Date.now();
+      const entry={id:now,libId,name:l.name,qty:n,out:now,end:window.app.common.calculateEnd(now,l.hours),hours:l.hours};
+      window.app.data.saladStock.push(entry);
+      this.render();
+      spin(true);
+      try{await window.app.save('salad');toast(`${n}× ${l.name} sorti — fin: ${formatDate(entry.end)}`,'ok',4000);}
+      catch(e){toast('Erreur sauvegarde.','err');}
+      finally{spin(false);}
+    },
+    changeQty:async function(id,delta){
+      const idx=window.app.data.saladStock.findIndex(x=>x.id==id);
+      if(idx>-1){
+        const n=Number(window.app.data.saladStock[idx].qty||0)+delta;
+        if(n<=0)window.app.data.saladStock.splice(idx,1);
+        else window.app.data.saladStock[idx].qty=n;
+        this.render();
+        try{await window.app.save('salad');}catch(e){toast('Erreur synchro.','err');}
+      }
+    },
+    openEditStock:async function(id){
+      const i=window.app.data.saladStock.find(x=>x.id==id);
+      const q=await dlgPrompt('Quantité :',String(i.qty||0),'number');
+      if(q===null)return;
+      const n=Number(q||0);
+      if(n<=0)window.app.data.saladStock=window.app.data.saladStock.filter(x=>x.id!==id);
+      else i.qty=n;
+      this.render();
+      try{await window.app.save('salad');}catch(e){toast('Erreur synchro.','err');}
+    },
     render(){
       const bib=document.getElementById('salad-lib-list');
       if(bib){
-        if(!window.app.data.saladLib.length){bib.innerHTML=`<div class="empty-state"><i class="fas fa-bowl-food"></i>Bibliothèque vide.</div>`;return;}
-        const gL={};window.app.data.saladLib.slice().sort((a,b)=>window.app.common.cleanName(a.name).localeCompare(window.app.common.cleanName(b.name))).forEach(l=>{const f=l.family||'DIVERS';if(!gL[f])gL[f]=[];gL[f].push(l);});
-        const parts=[];Object.keys(gL).sort().forEach(f=>{const id='SL-'+f;const c=window.app.closed.has(id);parts.push(`<div class="group-header" style="background:var(--salad)" onclick="app.toggleFam('${id}')"><span>${f}</span><i class="fas fa-chevron-${c?'right':'down'}"></i></div>`);if(c)return;gL[f].forEach(l=>{const sn=(l.name||'').replace(/'/g,' ');parts.push(`<div class="list-item"><div style="display:flex;align-items:center;min-width:0;gap:12px;"><div class="item-img"><i class="fas fa-bowl-food"></i></div><div style="min-width:0;"><div class="item-title">${l.name}</div><div class="item-sub">${l.hours||48}h</div></div></div><div class="right-col"><button class="icon-btn salad" onclick="app.salad.openLib(${l.id})"><i class="fas fa-pen"></i></button><button class="icon-btn dark" onclick="app.trace.open('salad','${l.id}','${sn}')"><i class="fas fa-camera"></i></button><button class="icon-btn salad" onclick="app.salad.addStock(${l.id})"><i class="fas fa-plus"></i></button></div></div>`);});});
-        bib.innerHTML=parts.join('');
+        const q=(document.getElementById('salad-search')?.value||'').toLowerCase().trim();
+        const allLib=window.app.data.saladLib.slice().sort((a,b)=>window.app.common.cleanName(a.name).localeCompare(window.app.common.cleanName(b.name)));
+        const filtered=q?allLib.filter(l=>(l.name||'').toLowerCase().includes(q)||(l.family||'').toLowerCase().includes(q)):allLib;
+
+        if(!window.app.data.saladLib.length){bib.innerHTML=`<div class="empty-state"><i class="fas fa-bowl-food"></i>Bibliothèque vide.</div>`;}
+        else if(!filtered.length){bib.innerHTML=`<div class="search-no-result"><i class="fas fa-magnifying-glass" style="font-size:28px;opacity:.3;display:block;margin-bottom:8px;"></i>Aucun résultat pour "<b>${q}</b>"</div>`;}
+        else{
+          if(q){
+            bib.innerHTML=filtered.map(l=>{
+              const sn=(l.name||'').replace(/'/g,' ');
+              const fam=`<span class="chip" style="background:#f1f5f9;color:#475569;">${l.family||'DIVERS'}</span>`;
+              return `<div class="list-item">
+                <div style="display:flex;align-items:center;min-width:0;gap:12px;"><div class="item-img"><i class="fas fa-bowl-food"></i></div><div style="min-width:0;"><div class="item-title">${l.name}</div><div class="item-sub">${l.hours||48}h • ${fam}</div></div></div>
+                <div class="right-col">
+                  <button class="icon-btn salad" onclick="app.salad.openLib(${l.id})"><i class="fas fa-pen"></i></button>
+                  <button class="icon-btn dark" onclick="app.trace.open('salad','${l.id}','${sn}')"><i class="fas fa-camera"></i></button>
+                  <button class="icon-btn salad" onclick="app.salad.addStock(${l.id})"><i class="fas fa-plus"></i></button>
+                </div>
+              </div>`;
+            }).join('');
+          } else {
+            const gL={};filtered.forEach(l=>{const f=l.family||'DIVERS';if(!gL[f])gL[f]=[];gL[f].push(l);});
+            const parts=[];Object.keys(gL).sort().forEach(f=>{
+              const id='SL-'+f;const c=window.app.closed.has(id);
+              parts.push(`<div class="group-header" style="background:var(--salad)" onclick="app.toggleFam('${id}')"><span>${f}</span><i class="fas fa-chevron-${c?'right':'down'}"></i></div>`);
+              if(c)return;
+              gL[f].forEach(l=>{
+                const sn=(l.name||'').replace(/'/g,' ');
+                parts.push(`<div class="list-item">
+                  <div style="display:flex;align-items:center;min-width:0;gap:12px;"><div class="item-img"><i class="fas fa-bowl-food"></i></div><div style="min-width:0;"><div class="item-title">${l.name}</div><div class="item-sub">${l.hours||48}h</div></div></div>
+                  <div class="right-col">
+                    <button class="icon-btn salad" onclick="app.salad.openLib(${l.id})"><i class="fas fa-pen"></i></button>
+                    <button class="icon-btn dark" onclick="app.trace.open('salad','${l.id}','${sn}')"><i class="fas fa-camera"></i></button>
+                    <button class="icon-btn salad" onclick="app.salad.addStock(${l.id})"><i class="fas fa-plus"></i></button>
+                  </div>
+                </div>`);
+              });
+            });
+            bib.innerHTML=parts.join('');
+          }
+        }
       }
       const st=document.getElementById('salad-stock');
       if(st){
