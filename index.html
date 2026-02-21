@@ -3919,6 +3919,8 @@ ${nameLine2?`^CF0,30^FO15,45^FD${nameLine2}^FS`:''}
   }
 
 };
+// Expose app globally (nécessaire car script type="module" isole la portée)
+globalThis.app = window.app;
 window.app.initOffline();
 window.app._initInstallPrompt();
 
@@ -3933,7 +3935,7 @@ onAuthStateChanged(auth,async user=>{
     document.getElementById('app-header').classList.add('hidden');
     document.getElementById('app-nav').classList.add('hidden');
     window.app.me=null;
-    window.app.data={frais:window.app.data={frais:[],users:[],pvpLib:[],pvpStock:[],checkedNeeds:[],saladLib:[],saladStock:[],frigo:{perDay:2,fridges:[],logs:[]},todo:{zones:[],tasks:[]},todoLogs:[],reception:[]};
+    window.app.data={frais:[],users:[],pvpLib:[],pvpStock:[],checkedNeeds:[],saladLib:[],saladStock:[],frigo:{perDay:2,fridges:[],logs:[]},todo:{zones:[],tasks:[]},todoLogs:[],reception:[]};
     return;
   }
   await window.app.afterLoginBootstrap();
