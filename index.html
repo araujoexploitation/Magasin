@@ -1,4 +1,8 @@
-<!doctype html>
+<!,
+
+
+
+ype html>
 <html lang="fr">
 <head>
 <meta charset="utf-8"/>
@@ -3603,8 +3607,8 @@ ${nameLine2?`^CF0,30^FO15,45^FD${nameLine2}^FS`:''}
       const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
       const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='planning.csv';a.click();URL.revokeObjectURL(url);
       toast('Planning exporté en CSV','ok');
-    }
-  }
+    },
+  },
 
 
 
