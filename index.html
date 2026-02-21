@@ -11,7 +11,7 @@
 <meta name="application-name" content="Araujo App"/>
 <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/araujoexploitation/Magasin/main/LOGO.png"/>
 <link rel="manifest" id="pwa-manifest"/>
-<title>Araujo App V7.0</title>
+<title>Araujo App V8.0</title>
 <script>
 // Inject PWA manifest dynamically
 const manifest={name:"Araujo App",short_name:"Araujo",display:"fullscreen",background_color:"#003896",theme_color:"#003896",start_url:window.location.href,icons:[{src:"https://raw.githubusercontent.com/araujoexploitation/Magasin/main/LOGO.png",sizes:"192x192",type:"image/png"}]};
@@ -26,7 +26,144 @@ document.getElementById('pwa-manifest').href=URL.createObjectURL(blob);
   --primary:#003896;--accent:#E2001A;--pvp:#d97706;--salad:#0f766e;--frigo:#0ea5e9;--todo:#7c3aed;
   --reception:#059669;--inspection:#7c3aed;
   --bg:#f3f4f6;--surface:#ffffff;--text:#1e293b;--success:#10b981;--danger:#ef4444;--muted:#64748b;
+  --ce-blue:#003896;--ce-red:#E2001A;--carrefour:#003896;--carrefour-red:#E2001A;
 }
+
+/* ── CARREFOUR EXPRESS BANNER ── */
+#home-banner{
+  background:linear-gradient(135deg,#003896 0%,#1a50c8 50%,#003896 100%);
+  border-radius:18px;
+  padding:0;
+  margin-bottom:16px;
+  overflow:hidden;
+  box-shadow:0 8px 30px rgba(0,56,150,.25);
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  min-height:72px;
+}
+#home-banner::before{
+  content:'';position:absolute;top:0;left:0;right:0;bottom:0;
+  background:repeating-linear-gradient(45deg,rgba(255,255,255,.03) 0,rgba(255,255,255,.03) 1px,transparent 1px,transparent 12px);
+}
+#home-banner .banner-logo-wrap{display:flex;align-items:center;gap:12px;padding:12px 16px;position:relative;z-index:2;}
+#home-banner .banner-logo{height:46px;object-fit:contain;filter:brightness(10);}
+#home-banner .banner-text{color:#fff;position:relative;z-index:2;}
+#home-banner .banner-title{font-weight:950;font-size:15px;letter-spacing:.5px;}
+#home-banner .banner-sub{font-size:11px;opacity:.75;margin-top:2px;}
+#home-banner .banner-red-stripe{width:8px;background:var(--ce-red);align-self:stretch;flex-shrink:0;}
+
+/* ── MODULE CARREFOUR & GESTION MAGASIN ── */
+.module-parent-card{
+  background:var(--surface);
+  border-radius:18px;
+  padding:0;
+  box-shadow:0 4px 15px rgba(0,0,0,.06);
+  margin-bottom:15px;
+  overflow:hidden;
+  border:2px solid #e2e8f0;
+}
+.module-parent-header{
+  background:linear-gradient(135deg,#003896,#1a50c8);
+  padding:14px 18px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  cursor:pointer;
+}
+.module-parent-header.red-header{
+  background:linear-gradient(135deg,#b91c1c,#ef4444);
+}
+.module-parent-header.green-header{
+  background:linear-gradient(135deg,#065f46,#059669);
+}
+.module-parent-header i{color:#fff;font-size:22px;}
+.module-parent-header-text{color:#fff;}
+.module-parent-header-text .mph-title{font-weight:950;font-size:16px;}
+.module-parent-header-text .mph-sub{font-size:12px;opacity:.75;margin-top:2px;}
+.module-parent-body{padding:14px;display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.module-sub-btn{
+  background:linear-gradient(135deg,#f8fafc,#fff);
+  border:2px solid #e2e8f0;
+  border-radius:14px;
+  padding:14px 10px;
+  text-align:center;
+  cursor:pointer;
+  transition:all .15s;
+  position:relative;
+}
+.module-sub-btn:active{transform:scale(.97);}
+.module-sub-btn i{font-size:22px;margin-bottom:6px;display:block;}
+.module-sub-btn .msb-title{font-weight:950;font-size:13px;color:#1e293b;}
+.module-sub-btn .msb-sub{font-size:11px;color:#64748b;margin-top:3px;}
+.module-sub-btn.wide{grid-column:1/-1;}
+.module-sub-btn.blue-accent{border-color:#bfdbfe;}
+.module-sub-btn.blue-accent i{color:#003896;}
+.module-sub-btn.red-accent{border-color:#fecaca;}
+.module-sub-btn.red-accent i{color:#E2001A;}
+.module-sub-btn.green-accent{border-color:#bbf7d0;}
+.module-sub-btn.green-accent i{color:#059669;}
+.module-sub-btn.purple-accent{border-color:#e9d5ff;}
+.module-sub-btn.purple-accent i{color:#7c3aed;}
+.module-sub-btn.orange-accent{border-color:#fed7aa;}
+.module-sub-btn.orange-accent i{color:#ea580c;}
+
+/* ── PLANNING MODULE ── */
+#view-planning{animation:fadeIn .2s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.planning-week-nav{display:flex;align-items:center;justify-content:space-between;background:#fff;border-radius:14px;padding:12px 16px;margin-bottom:14px;box-shadow:0 2px 8px rgba(0,0,0,.05);}
+.planning-week-nav button{background:#f1f5f9;border:none;border-radius:10px;padding:8px 14px;font-weight:900;cursor:pointer;font-size:16px;}
+.planning-week-nav .wk-label{font-weight:950;font-size:15px;color:#1e293b;}
+.planning-staff-row{background:#fff;border-radius:14px;margin-bottom:10px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+.planning-staff-header{background:#f8fafc;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e2e8f0;}
+.planning-staff-name{font-weight:950;font-size:14px;color:#1e293b;}
+.planning-staff-hours{font-size:12px;font-weight:800;color:var(--primary);}
+.planning-days-row{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;padding:8px;}
+.planning-day-cell{border-radius:8px;padding:4px;text-align:center;cursor:pointer;min-height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:all .15s;border:1.5px solid transparent;}
+.planning-day-cell.off{background:#f8fafc;color:#94a3b8;}
+.planning-day-cell.work{background:#dbeafe;border-color:#93c5fd;color:#1d4ed8;}
+.planning-day-cell.rest{background:#fce7f3;border-color:#f9a8d4;color:#be185d;}
+.planning-day-cell.work .dc-hours{font-size:10px;font-weight:800;}
+.planning-day-cell .dc-day{font-size:10px;font-weight:900;margin-bottom:2px;}
+.planning-day-cell .dc-content{font-size:11px;font-weight:950;}
+.planning-rules-banner{background:linear-gradient(135deg,#fffbeb,#fef3c7);border:1.5px solid #fcd34d;border-radius:12px;padding:12px;margin-bottom:14px;}
+.planning-rules-banner h4{margin:0 0 6px 0;color:#92400e;font-size:13px;display:flex;align-items:center;gap:6px;}
+.rule-chip{display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,.7);border-radius:20px;padding:4px 10px;font-size:11px;font-weight:800;color:#78350f;margin:3px;}
+.planning-new-staff{background:#fff;border-radius:14px;padding:14px;box-shadow:0 2px 8px rgba(0,0,0,.05);margin-bottom:14px;}
+.shift-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9000;display:flex;align-items:flex-end;justify-content:center;padding:16px;}
+.shift-modal-card{background:#fff;border-radius:20px;padding:22px;width:100%;max-width:420px;animation:slideUp .22s cubic-bezier(.34,1.56,.64,1);}
+.time-input-row{display:flex;gap:10px;align-items:center;margin-bottom:12px;}
+.time-input-row label{font-size:12px;font-weight:800;color:#64748b;white-space:nowrap;}
+.time-input-row input{flex:1;padding:12px;border:1.5px solid #cbd5e1;border-radius:10px;font-size:16px;background:#fff;outline:none;}
+
+/* ── CARREFOUR MODULE VIEW ── */
+#view-carrefour{animation:fadeIn .2s ease;}
+.carrefour-sub-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.carrefour-sub-card{
+  background:#fff;border-radius:18px;padding:18px 12px;
+  text-align:center;border:2px solid #e2e8f0;
+  cursor:pointer;transition:all .15s;
+  box-shadow:0 3px 10px rgba(0,0,0,.05);
+}
+.carrefour-sub-card:active{transform:scale(.97);}
+.carrefour-sub-card i{font-size:28px;margin-bottom:8px;display:block;}
+.carrefour-sub-card .csc-title{font-weight:950;font-size:14px;color:#1e293b;}
+.carrefour-sub-card .csc-sub{font-size:11px;color:#64748b;margin-top:4px;}
+.carrefour-sub-card.wide{grid-column:1/-1;}
+
+/* ── METI MODULE ── */
+#view-meti{animation:fadeIn .2s ease;}
+#meti-iframe-wrap{position:fixed;inset:0;z-index:8000;background:#fff;display:flex;flex-direction:column;}
+#meti-bar{background:var(--primary);padding:12px 16px;display:flex;align-items:center;gap:12px;padding-top:calc(12px + env(safe-area-inset-top));}
+
+/* ── GESTION MAGASIN ── */
+#view-gestion-magasin{animation:fadeIn .2s ease;}
+.gm-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.gm-card{background:#fff;border-radius:18px;padding:18px 10px;text-align:center;cursor:pointer;color:#fff;font-weight:950;box-shadow:0 8px 20px rgba(0,0,0,.08);transition:transform .15s;}
+.gm-card:active{transform:scale(.97);}
+.gm-card i{font-size:24px;margin-bottom:8px;display:block;}
+.gm-card .gmc-sub{font-size:11px;opacity:.8;margin-top:4px;font-weight:700;}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;font-family:system-ui,sans-serif;user-select:none;}
 body{margin:0;background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden;}
 /* iOS safe area */
@@ -527,12 +664,30 @@ textarea{min-height:80px;resize:none;}
 <main>
   <!-- HOME -->
   <div id="view-home">
+    <!-- CARREFOUR EXPRESS BANNER -->
+    <div id="home-banner">
+      <div class="banner-red-stripe"></div>
+      <div class="banner-logo-wrap">
+        <img src="https://raw.githubusercontent.com/araujoexploitation/Magasin/main/LOGO.png" class="banner-logo" onerror="this.style.display='none'">
+        <div class="banner-text">
+          <div class="banner-title">ARAUJO EXPRESS</div>
+          <div class="banner-sub">Gestion Magasin • v8.0</div>
+        </div>
+      </div>
+      <div style="padding-right:16px;position:relative;z-index:2;">
+        <div style="background:var(--ce-red);border-radius:10px;padding:6px 12px;text-align:center;">
+          <div style="color:#fff;font-size:10px;font-weight:950;letter-spacing:.5px;">CARREFOUR</div>
+          <div style="color:#fff;font-size:9px;opacity:.85;">EXPRESS</div>
+        </div>
+      </div>
+    </div>
+
     <div id="alert-box" style="display:none;background:#ef4444;color:white;padding:15px;border-radius:12px;margin-bottom:15px;text-align:center;font-weight:950;">⚠️ Dates Courtes !</div>
     <div class="home-grid">
       <div class="home-btn wide" onclick="app.nav('dlc')" style="background:linear-gradient(135deg,#003896,#1e40af);position:relative;">
         <div id="badge-frais" class="home-badge red hidden">0</div>
         <i class="fas fa-barcode"></i><br>GESTION DLC
-        <div class="small" style="color:rgba(255,255,255,.8);margin-top:6px;">Frais • PVP • Salad Bar</div>
+        <div class="small" style="color:rgba(255,255,255,.8);margin-top:6px;">Frais • PVP • Salad Bar • Too Good To Go</div>
       </div>
       <div class="home-btn" onclick="app.nav('frigo')" style="background:linear-gradient(135deg,#0ea5e9,#0369a1);">
         <div id="badge-frigo" class="home-badge blue hidden">0</div>
@@ -557,9 +712,17 @@ textarea{min-height:80px;resize:none;}
         <i class="fas fa-tag"></i><br>ÉTIQUETTES -50%
         <div class="small" style="color:rgba(255,255,255,.8);margin-top:6px;">Brother TD-2120N</div>
       </div>
-      <div class="home-btn wide" onclick="app.dynacad.open()" style="background:linear-gradient(135deg,#0f172a,#1e293b);">
-        <i class="fas fa-store"></i><br>DYNACAD
-        <div class="small" style="color:rgba(255,255,255,.8);margin-top:6px;">Carrefour • Planogrammes</div>
+
+      <!-- MODULE CARREFOUR (parent) -->
+      <div class="home-btn wide" onclick="app.nav('carrefour')" style="background:linear-gradient(135deg,#003896,#1a50c8);">
+        <i class="fas fa-store"></i><br>MODULE CARREFOUR
+        <div class="small" style="color:rgba(255,255,255,.8);margin-top:6px;">Dynacad • METI • Outils Carrefour</div>
+      </div>
+
+      <!-- GESTION MAGASIN (parent) -->
+      <div class="home-btn wide" onclick="app.nav('gestion-magasin')" style="background:linear-gradient(135deg,#0f766e,#134e4a);">
+        <i class="fas fa-building"></i><br>GESTION MAGASIN
+        <div class="small" style="color:rgba(255,255,255,.8);margin-top:6px;">Planning • RH • Organisation</div>
       </div>
     </div>
     <div class="card hidden" id="btn-team" onclick="app.nav('team')" style="text-align:center;cursor:pointer;"><i class="fas fa-users"></i> Équipe</div>
@@ -588,6 +751,11 @@ textarea{min-height:80px;resize:none;}
         <i class="fas fa-bowl-food" style="color:var(--salad);"></i>
         <div class="sub-title" style="color:var(--salad);">SALAD BAR</div>
         <div class="sub-sub">DLC + Traçabilité</div>
+      </div>
+      <div class="dlc-sub-card wide" onclick="app.tgtgPortal.open()" style="border-color:#006B3C;background:linear-gradient(135deg,#f0fdf4,#fff);">
+        <i class="fas fa-leaf" style="color:#006B3C;font-size:28px;"></i>
+        <div class="sub-title" style="color:#006B3C;">TOO GOOD TO GO — PORTAIL</div>
+        <div class="sub-sub">Gérer vos paniers sur store.toogoodtogo.com</div>
       </div>
     </div>
   </div>
@@ -733,6 +901,7 @@ textarea{min-height:80px;resize:none;}
     <div class="tabs">
       <div class="tab active" style="color:var(--reception);" id="trec-1" onclick="app.reception.tab('new')">NOUVEAU</div>
       <div class="tab"        id="trec-3" onclick="app.reception.tab('planning')">PLANNING</div>
+      <div class="tab"        id="trec-4" onclick="app.reception.tab('tracking')" style="color:#0369a1;">🚚 CAMION</div>
       <div class="tab"        id="trec-2" onclick="app.reception.tab('history')">HISTORIQUE</div>
     </div>
     <div id="reception-new">
@@ -792,6 +961,23 @@ textarea{min-height:80px;resize:none;}
     </div>
     <div id="reception-history" class="hidden"></div>
     <div id="reception-planning" class="hidden"></div>
+    <div id="reception-tracking" class="hidden">
+      <div class="card" style="border-left:5px solid #0369a1;background:linear-gradient(135deg,#eff6ff,#fff);">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+          <div style="font-size:32px;">🚚</div>
+          <div>
+            <div style="font-weight:950;font-size:16px;color:#0369a1;">Suivi des Camions</div>
+            <div class="small">MyTravis — Carrefour logistique</div>
+          </div>
+        </div>
+        <div style="background:#f0f7ff;border-radius:10px;padding:12px;margin-bottom:16px;">
+          <div class="small" style="font-weight:800;color:#0369a1;margin-bottom:4px;">IDENTIFIANTS</div>
+          <div style="font-weight:900;font-size:14px;">ID : jonathan_araujo_4@franchise.carrefour.com</div>
+          <div style="font-weight:900;font-size:14px;color:#64748b;">MDP : KzD?VB&amp;6bNnS5.3</div>
+        </div>
+        <button class="btn" style="background:#0369a1;" onclick="app.mytravis.open()"><i class="fas fa-external-link-alt"></i> Ouvrir MyTravis</button>
+      </div>
+    </div>
   </div>
   <div id="view-inspection" class="hidden">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
@@ -828,6 +1014,83 @@ textarea{min-height:80px;resize:none;}
       <input id="etiq-printer-port" placeholder="Port (défaut: 9100)" value="9100" style="margin-bottom:8px;">
       <div id="etiq-printer-status" class="small" style="color:var(--muted);margin-bottom:8px;">Non connecté</div>
       <button class="btn secondary" onclick="app.etiquettes.testPrinter()"><i class="fas fa-plug"></i> Tester la connexion</button>
+    </div>
+  </div>
+
+  <!-- MODULE CARREFOUR (parent) -->
+  <div id="view-carrefour" class="hidden">
+    <div style="text-align:center;margin-bottom:16px;">
+      <div style="font-weight:950;font-size:20px;color:var(--carrefour-red);"><i class="fas fa-building"></i> MODULE CARREFOUR</div>
+      <div class="small" style="margin-top:4px;">Outils et accès franchise</div>
+    </div>
+    <div class="dlc-module-grid">
+      <div class="dlc-sub-card wide" onclick="app.dynacad.open()" style="border-color:#0f172a;background:linear-gradient(135deg,#f8fafc,#fff);">
+        <i class="fas fa-store" style="color:#0f172a;font-size:30px;"></i>
+        <div class="sub-title" style="color:#0f172a;">DYNACAD</div>
+        <div class="sub-sub">Planogrammes Carrefour</div>
+      </div>
+      <div class="dlc-sub-card wide" onclick="app.metiPortal.open()" style="border-color:var(--carrefour-red);background:linear-gradient(135deg,#fff5f5,#fff);">
+        <i class="fas fa-laptop" style="color:var(--carrefour-red);font-size:30px;"></i>
+        <div class="sub-title" style="color:var(--carrefour-red);">METI</div>
+        <div class="sub-sub">Portail VPN Carrefour</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GESTION MAGASIN (parent) -->
+  <div id="view-gestion-magasin" class="hidden">
+    <div style="text-align:center;margin-bottom:16px;">
+      <div style="font-weight:950;font-size:20px;color:#0891b2;"><i class="fas fa-store-alt"></i> GESTION MAGASIN</div>
+      <div class="small" style="margin-top:4px;">Outils de gestion interne</div>
+    </div>
+    <div class="dlc-module-grid">
+      <div class="dlc-sub-card wide" onclick="app.nav('planning')" style="border-color:#0891b2;background:linear-gradient(135deg,#ecfeff,#fff);">
+        <i class="fas fa-calendar-days" style="color:#0891b2;font-size:30px;"></i>
+        <div class="sub-title" style="color:#0891b2;">PLANNING RH</div>
+        <div class="sub-sub">Planification équipe — règles droit du travail France</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PLANNING MODULE -->
+  <div id="view-planning" class="hidden">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <h2 style="margin:0;font-size:18px;color:#0891b2;"><i class="fas fa-calendar-days"></i> Planning RH</h2>
+    </div>
+    <!-- Règles RH France info card -->
+    <div class="card" style="border-left:5px solid #0891b2;margin-bottom:12px;">
+      <div style="font-weight:950;color:#0891b2;margin-bottom:8px;"><i class="fas fa-scale-balanced"></i> Règles droit du travail France</div>
+      <div style="font-size:13px;line-height:1.8;color:#334155;">
+        <b>⏱ Durée max quotidienne :</b> 10h/jour (dérogation 12h possible)<br>
+        <b>📅 Durée max hebdomadaire :</b> 48h/semaine (44h en moyenne sur 12 semaines)<br>
+        <b>😴 Repos quotidien :</b> 11h consécutives minimum<br>
+        <b>📆 Repos hebdomadaire :</b> 35h consécutives (2 jours dont dimanche)<br>
+        <b>🔴 Jours de repos :</b> 2 jours/semaine minimum<br>
+        <b>🌙 Travail de nuit :</b> 21h–6h → majoration 25%<br>
+        <b>🏖 Congés payés :</b> 2.5 jours ouvrables/mois
+      </div>
+    </div>
+
+    <!-- Planning builder -->
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div style="font-weight:950;color:#0891b2;">Semaine <span id="plan-week-label"></span></div>
+        <div style="display:flex;gap:8px;">
+          <button class="qty-btn" onclick="app.planning.prevWeek()"><i class="fas fa-chevron-left"></i></button>
+          <button class="qty-btn" onclick="app.planning.nextWeek()"><i class="fas fa-chevron-right"></i></button>
+        </div>
+      </div>
+      <div id="plan-employees" style="margin-bottom:12px;"></div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn" style="background:#0891b2;margin-top:0;flex:1;" onclick="app.planning.addEmployee()"><i class="fas fa-user-plus"></i> Ajouter employé</button>
+        <button class="btn secondary" style="margin-top:0;" onclick="app.planning.exportCSV()"><i class="fas fa-file-csv"></i></button>
+      </div>
+    </div>
+
+    <!-- Weekly summary -->
+    <div class="card" id="plan-summary" style="display:none;">
+      <div style="font-weight:950;color:#0891b2;margin-bottom:8px;"><i class="fas fa-chart-bar"></i> Récapitulatif</div>
+      <div id="plan-summary-content"></div>
     </div>
   </div>
 
@@ -872,6 +1135,48 @@ textarea{min-height:80px;resize:none;}
       </div>
     </div>
     <iframe id="dynacad-iframe" src="about:blank" style="flex:1;border:none;width:100%;display:none;"></iframe>
+  </div>
+</div>
+
+<!-- METI OVERLAY (fullscreen iframe) -->
+<div id="meti-overlay" style="display:none;position:fixed;inset:0;z-index:9500;background:#000;flex-direction:column;">
+  <div style="background:var(--carrefour-red);color:#fff;padding:10px 14px;display:flex;align-items:center;gap:12px;flex-shrink:0;height:50px;">
+    <button onclick="app.metiPortal.close()" style="background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:8px;padding:8px 12px;font-weight:900;cursor:pointer;font-size:13px;"><i class="fas fa-arrow-left"></i> RETOUR</button>
+    <span style="font-weight:950;font-size:15px;"><i class="fas fa-laptop"></i> METI — VPN Carrefour</span>
+    <button onclick="app.metiPortal.openExternal()" style="margin-left:auto;background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:8px;padding:8px 12px;font-weight:900;cursor:pointer;font-size:12px;"><i class="fas fa-external-link-alt"></i> Ouvrir</button>
+  </div>
+  <div style="flex:1;display:flex;flex-direction:column;background:#f0f4f8;overflow-y:auto;">
+    <div style="padding:20px;text-align:center;">
+      <div style="background:#fff;border-radius:16px;padding:24px;max-width:400px;margin:0 auto;box-shadow:0 8px 30px rgba(0,0,0,.1);">
+        <div style="font-size:36px;margin-bottom:12px;">🔐</div>
+        <div style="font-weight:950;font-size:17px;color:var(--carrefour-red);margin-bottom:8px;">Connexion METI</div>
+        <div class="small" style="margin-bottom:16px;line-height:1.6;">Le portail METI nécessite une connexion VPN Pulse Secure. Assurez-vous d'être connecté au VPN avant d'accéder à ce module.</div>
+        <div style="background:#fff5f5;border:1.5px solid #fca5a5;border-radius:10px;padding:12px;margin-bottom:16px;text-align:left;">
+          <div class="small" style="font-weight:900;color:var(--carrefour-red);margin-bottom:6px;"><i class="fas fa-triangle-exclamation"></i> PRÉREQUIS VPN</div>
+          <div style="font-size:13px;line-height:1.7;">
+            1. Aller sur <b>vpnportal.carrefour.com/franchise</b><br>
+            2. Cliquer sur <b>Démarrer</b> (application Pulse)<br>
+            3. Cliquer sur <b>Ouvrir Pulse Secure</b><br>
+            4. Cliquer sur <b>Oui / Toujours</b><br>
+            5. Vérifier la connexion dans la barre système
+          </div>
+        </div>
+        <button onclick="app.metiPortal.openExternal()" class="btn" style="background:var(--carrefour-red);"><i class="fas fa-external-link-alt"></i> Accéder à METI</button>
+        <button onclick="window.open('https://vpnportal.carrefour.com/franchise','_blank','noopener')" class="btn secondary" style="margin-top:8px;"><i class="fas fa-shield"></i> Ouvrir VPN Portal</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MYTRAVIS OVERLAY -->
+<div id="mytravis-overlay" style="display:none;position:fixed;inset:0;z-index:9500;background:#000;flex-direction:column;">
+  <div style="background:#0369a1;color:#fff;padding:10px 14px;display:flex;align-items:center;gap:12px;flex-shrink:0;height:50px;">
+    <button onclick="app.mytravis.close()" style="background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:8px;padding:8px 12px;font-weight:900;cursor:pointer;font-size:13px;"><i class="fas fa-arrow-left"></i> RETOUR</button>
+    <span style="font-weight:950;font-size:15px;">🚚 MyTravis — Suivi camion</span>
+    <button onclick="app.mytravis.openExternal()" style="margin-left:auto;background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:8px;padding:8px 12px;font-weight:900;cursor:pointer;font-size:12px;"><i class="fas fa-external-link-alt"></i> Ouvrir</button>
+  </div>
+  <div style="flex:1;display:flex;flex-direction:column;">
+    <iframe id="mytravis-iframe" src="about:blank" style="flex:1;border:none;width:100%;"></iframe>
   </div>
 </div>
 
@@ -1202,6 +1507,7 @@ window.app={
     if(v==='reception'){this.reception.init();this.reception.tab('new');}
     if(v==='inspection'){this.inspection.render();}
     if(v==='etiquettes'){this.etiquettes.loadProducts();}
+    if(v==='planning'){this.planning.render();}
   },
   goBack(){if(this.viewHistory.length)this.nav(this.viewHistory.pop(),false);else this.nav('home',false);},
   toggleFam(id){if(this.closed.has(id))this.closed.delete(id);else this.closed.add(id);this.updateUI();},
@@ -1241,15 +1547,19 @@ window.app={
   // ── PERMISSIONS ──
   // Définition de toutes les permissions disponibles
   PERMS:{
-    saladLib:    {label:'Modifier bibliothèque Salad Bar', icon:'fa-leaf'},
-    saladStock:  {label:'Saisir stock Salad Bar',         icon:'fa-bowl-food'},
-    pvpLib:      {label:'Modifier bibliothèque PVP',      icon:'fa-store'},
-    pvpStock:    {label:'Saisir stock PVP',               icon:'fa-boxes-stacked'},
-    frigoConfig: {label:'Configurer les frigos',          icon:'fa-temperature-low'},
-    frigoSaisie: {label:'Saisir relevés frigo',           icon:'fa-pen-to-square'},
-    todoConfig:  {label:'Configurer la check-list',       icon:'fa-list-check'},
-    todoSaisie:  {label:'Valider tâches check-list',      icon:'fa-circle-check'},
-    fraisEdit:   {label:'Modifier / supprimer Frais',     icon:'fa-calendar-xmark'},
+    saladLib:    {label:'Modifier bibliothèque Salad Bar', icon:'fa-leaf',           group:'DLC'},
+    saladStock:  {label:'Saisir stock Salad Bar',         icon:'fa-bowl-food',       group:'DLC'},
+    pvpLib:      {label:'Modifier bibliothèque PVP',      icon:'fa-store',           group:'DLC'},
+    pvpStock:    {label:'Saisir stock PVP',               icon:'fa-boxes-stacked',   group:'DLC'},
+    fraisEdit:   {label:'Modifier / supprimer Frais',     icon:'fa-calendar-xmark',  group:'DLC'},
+    frigoConfig: {label:'Configurer les frigos',          icon:'fa-temperature-low', group:'TEMPÉRATURES'},
+    frigoSaisie: {label:'Saisir relevés frigo',           icon:'fa-pen-to-square',   group:'TEMPÉRATURES'},
+    todoConfig:  {label:'Configurer la check-list',       icon:'fa-list-check',      group:'CHECK-LIST'},
+    todoSaisie:  {label:'Valider tâches check-list',      icon:'fa-circle-check',    group:'CHECK-LIST'},
+    dynacad:     {label:'Accès Dynacad',                  icon:'fa-store',           group:'CARREFOUR'},
+    meti:        {label:'Accès METI (VPN Carrefour)',     icon:'fa-laptop',          group:'CARREFOUR'},
+    planning:    {label:'Accès Planning RH',              icon:'fa-calendar-days',   group:'GESTION MAGASIN'},
+    mytravis:    {label:'Suivi camion MyTravis',          icon:'fa-truck',           group:'RÉCEPTION'},
   },
 
   // Vérifie si l'utilisateur courant peut faire une action
@@ -1301,14 +1611,26 @@ window.app={
         const chip=u.role==='admin'?`<span class="chip admin">ADMIN</span>`:`<span class="chip staff">STAFF</span>`;
         const permsBlock=u.role==='staff'?`
           <div style="margin-top:10px;">
-            <div style="font-size:11px;font-weight:950;text-transform:uppercase;color:#64748b;margin-bottom:8px;">Permissions</div>
-            <div class="perm-grid">
-              ${Object.entries(window.app.PERMS).map(([key,def])=>`
-              <div class="perm-toggle">
-                <label for="perm-${u.uid}-${key}"><i class="fas ${def.icon}" style="margin-right:5px;color:#64748b;"></i>${def.label}</label>
-                <input type="checkbox" id="perm-${u.uid}-${key}" ${(u.permissions||{})[key]?'checked':''} onchange="app.team.togglePerm('${u.uid}','${key}',this.checked)">
-              </div>`).join('')}
-            </div>
+            <div style="font-size:11px;font-weight:950;text-transform:uppercase;color:#64748b;margin-bottom:8px;">Permissions par module</div>
+            ${(() => {
+              const grouped = {};
+              Object.entries(window.app.PERMS).forEach(([key,def]) => {
+                const g = def.group || 'AUTRES';
+                if(!grouped[g]) grouped[g] = [];
+                grouped[g].push({key, ...def});
+              });
+              return Object.entries(grouped).map(([grp, perms]) => `
+                <div style="margin-bottom:10px;">
+                  <div style="font-size:10px;font-weight:950;color:#94a3b8;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;padding:4px 8px;background:#f8fafc;border-radius:6px;">${grp}</div>
+                  <div class="perm-grid">
+                    ${perms.map(({key:k,label,icon}) => `
+                    <div class="perm-toggle">
+                      <label for="perm-${u.uid}-${k}"><i class="fas ${icon}" style="margin-right:5px;color:#64748b;"></i>${label}</label>
+                      <input type="checkbox" id="perm-${u.uid}-${k}" ${(u.permissions||{})[k]?'checked':''} onchange="app.team.togglePerm('${u.uid}','${k}',this.checked)">
+                    </div>`).join('')}
+                  </div>
+                </div>`).join('');
+            })()}
           </div>`:'<div class="small" style="margin-top:6px;color:var(--muted);">Admin : accès complet à tout.</div>';
         return `<div style="padding:12px;border-bottom:1px solid #eee;">
           <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
@@ -2504,11 +2826,13 @@ window.app={
 
     tab(t){
       document.querySelectorAll('#view-reception .tab').forEach(e=>e.classList.remove('active'));
-      const tabMap={new:'trec-1',history:'trec-2',planning:'trec-3'};
+      const tabMap={new:'trec-1',history:'trec-2',planning:'trec-3',tracking:'trec-4'};
       if(document.getElementById(tabMap[t]))document.getElementById(tabMap[t]).classList.add('active');
-      ['reception-new','reception-history','reception-planning'].forEach(id=>{
-        const el=document.getElementById(id);if(el)el.classList.toggle('hidden',!id.includes(t));
-      });
+      document.getElementById('reception-new').classList.toggle('hidden',t!=='new');
+      document.getElementById('reception-history').classList.toggle('hidden',t!=='history');
+      document.getElementById('reception-planning').classList.toggle('hidden',t!=='planning');
+      const trackEl=document.getElementById('reception-tracking');
+      if(trackEl)trackEl.classList.toggle('hidden',t!=='tracking');
       if(t==='history')this.renderHistory();
       if(t==='planning')this.renderPlanning();
     },
@@ -2848,6 +3172,263 @@ ${nameLine2?`^CF0,30^FO15,45^FD${nameLine2}^FS`:''}
         status.textContent=`✗ Non accessible — vérifiez IP et réseau`;status.style.color='#ef4444';
         toast('Imprimante non accessible. Vérifiez l\'IP et le réseau Wi-Fi.','warn',5000);
       }
+    }
+  },
+
+  // ══════════════════════════════════════════════════
+  // ── METI PORTAL MODULE ──
+  // ══════════════════════════════════════════════════
+  metiPortal:{
+    _url:'https://vpnportal.carrefour.com/dana/user/#',
+    open(){
+      const el=document.getElementById('meti-overlay');
+      if(el)el.style.display='flex';
+    },
+    close(){
+      const el=document.getElementById('meti-overlay');
+      if(el)el.style.display='none';
+    },
+    openExternal(){
+      window.open(this._url,'_blank','noopener');
+    }
+  },
+
+  // ══════════════════════════════════════════════════
+  // ── MYTRAVIS MODULE ──
+  // ══════════════════════════════════════════════════
+  mytravis:{
+    _url:'https://mytravis.fr.carrefour.com/mytravis',
+    _id:'jonathan_araujo_4@franchise.carrefour.com',
+    _pwd:'KzD?VB&6bNnS5.3',
+    open(){
+      const el=document.getElementById('mytravis-overlay');
+      if(el){el.style.display='flex';}
+      // Try to load in iframe
+      const frame=document.getElementById('mytravis-iframe');
+      if(frame&&frame.src==='about:blank'){
+        try{navigator.clipboard.writeText(this._id+'\n'+this._pwd);}catch(e){}
+        frame.src=this._url;
+        toast('Identifiants copiés dans le presse-papier','info',3000);
+      }
+    },
+    close(){
+      const el=document.getElementById('mytravis-overlay');
+      if(el)el.style.display='none';
+      const frame=document.getElementById('mytravis-iframe');
+      if(frame)frame.src='about:blank';
+    },
+    openExternal(){
+      try{navigator.clipboard.writeText(this._id+'\n'+this._pwd);}catch(e){}
+      window.open(this._url,'_blank','noopener');
+      toast('Identifiants copiés ! Collez-les sur la page de connexion.','ok',4000);
+    }
+  },
+
+  // ══════════════════════════════════════════════════
+  // ── TOO GOOD TO GO PORTAL ──
+  // ══════════════════════════════════════════════════
+  tgtgPortal:{
+    _url:'https://store.toogoodtogo.com/stores',
+    _id:'jonathan_araujo_4@franchise.carrefour.com',
+    _pwd:'KzD?VB&6bNnS5.3',
+    open(){
+      try{navigator.clipboard.writeText(this._id+'\n'+this._pwd);}catch(e){}
+      window.open(this._url,'_blank','noopener');
+      toast('Identifiants copiés ! Utilisez-les sur la page Too Good To Go.','ok',4000);
+    }
+  },
+
+  // ══════════════════════════════════════════════════
+  // ── PLANNING RH MODULE ──
+  // ══════════════════════════════════════════════════
+  planning:{
+    _weekOffset:0,
+    _employees:[],
+
+    init(){
+      if(!this._employees.length){
+        // Load from localStorage if available
+        try{const s=JSON.parse(localStorage.getItem('planning_employees')||'[]');if(s.length)this._employees=s;}catch(e){}
+      }
+    },
+
+    save(){try{localStorage.setItem('planning_employees',JSON.stringify(this._employees));}catch(e){}},
+
+    getWeekDates(){
+      const now=new Date();
+      const day=now.getDay();
+      const mondayOffset=day===0?-6:1-day;
+      const monday=new Date(now);
+      monday.setDate(now.getDate()+mondayOffset+this._weekOffset*7);
+      monday.setHours(0,0,0,0);
+      const dates=[];
+      for(let i=0;i<7;i++){const d=new Date(monday);d.setDate(monday.getDate()+i);dates.push(d);}
+      return dates;
+    },
+
+    prevWeek(){this._weekOffset--;this.render();},
+    nextWeek(){this._weekOffset++;this.render();},
+
+    addEmployee:async function(){
+      const name=await dlgPrompt('Nom de l\'employé :');
+      if(!name||!name.trim())return;
+      const id=Date.now();
+      const days={L:null,M:null,MM:null,J:null,V:null,S:null,D:null};
+      this._employees.push({id,name:name.trim().toUpperCase(),schedule:{}});
+      this.save();
+      this.render();
+    },
+
+    // Validate RH rules for an employee
+    validateSchedule(emp){
+      const days=this.getWeekDates();
+      const dayLabels=['L','M','MM','J','V','S','D'];
+      const warnings=[];
+      let totalHours=0;
+      let restDays=0;
+
+      days.forEach((date,i)=>{
+        const key=date.toISOString().slice(0,10);
+        const shift=emp.schedule[key];
+        if(!shift||shift.type==='rest'){restDays++;return;}
+        if(shift.start&&shift.end){
+          const [sh,sm]=shift.start.split(':').map(Number);
+          const [eh,em]=shift.end.split(':').map(Number);
+          let h=(eh*60+em-sh*60-sm)/60;
+          if(h<0)h+=24;
+          if(h>10)warnings.push(`${dayLabels[i]}: journée > 10h (${h.toFixed(1)}h)`);
+          totalHours+=h;
+        }
+      });
+
+      if(restDays<2)warnings.push(`Repos insuffisants: ${restDays} jour(s) (min. 2)`);
+      if(totalHours>48)warnings.push(`Semaine > 48h (${totalHours.toFixed(1)}h)`);
+
+      return{totalHours,restDays,warnings};
+    },
+
+    render(){
+      this.init();
+      const dates=this.getWeekDates();
+      const labelEl=document.getElementById('plan-week-label');
+      if(labelEl){
+        const opts={day:'2-digit',month:'2-digit'};
+        labelEl.textContent=`${dates[0].toLocaleDateString('fr',opts)} – ${dates[6].toLocaleDateString('fr',opts)}`;
+      }
+
+      const wrap=document.getElementById('plan-employees');
+      if(!wrap)return;
+      const dayNames=['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+
+      if(!this._employees.length){
+        wrap.innerHTML=`<div class="empty-state"><i class="fas fa-users"></i><br>Aucun employé. Ajoutez-en un pour commencer.</div>`;
+        document.getElementById('plan-summary').style.display='none';
+        return;
+      }
+
+      wrap.innerHTML=this._employees.map(emp=>{
+        const {totalHours,restDays,warnings}=this.validateSchedule(emp);
+        const hasWarn=warnings.length>0;
+        const warningsHtml=hasWarn?`<div style="background:#fef3c7;border-radius:8px;padding:8px;margin-top:8px;font-size:12px;color:#92400e;"><i class="fas fa-triangle-exclamation"></i> ${warnings.join(' • ')}</div>`:'';
+        const shiftsHtml=dates.map((date,i)=>{
+          const key=date.toISOString().slice(0,10);
+          const shift=emp.schedule[key]||{type:'rest'};
+          const isRest=!shift||shift.type==='rest';
+          return`<div style="flex:1;min-width:0;">
+            <div style="font-size:10px;font-weight:950;text-align:center;color:#64748b;margin-bottom:3px;">${dayNames[i]}<br><span style="font-size:9px;">${date.getDate()}</span></div>
+            <div style="background:${isRest?'#f1f5f9':'#dbeafe'};border-radius:8px;padding:5px 2px;text-align:center;cursor:pointer;min-height:42px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1.5px solid ${isRest?'#e2e8f0':'#93c5fd'};font-size:10px;"
+              onclick="app.planning.editShift('${emp.id}','${key}','${date.toLocaleDateString('fr')}')">
+              ${isRest?'<i class="fas fa-bed" style="color:#94a3b8;font-size:12px;"></i>':'<span style="font-weight:900;color:#1e40af;">'+(shift.start||'?')+'<br>'+(shift.end||'?')+'</span>'}
+            </div>
+          </div>`;
+        }).join('');
+
+        return`<div style="background:#fff;border-radius:14px;padding:14px;margin-bottom:10px;border:1.5px solid ${hasWarn?'#fcd34d':'#e2e8f0'};">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+            <div style="font-weight:950;font-size:15px;">${emp.name}</div>
+            <div style="display:flex;gap:6px;align-items:center;">
+              <span style="font-size:12px;font-weight:900;color:#0891b2;">${totalHours.toFixed(1)}h</span>
+              <span style="font-size:11px;padding:2px 6px;border-radius:6px;background:${restDays>=2?'#d1fae5':'#fee2e2'};color:${restDays>=2?'#065f46':'#991b1b'};font-weight:900;">${restDays}R</span>
+              <button class="qty-btn" onclick="app.planning.removeEmployee('${emp.id}')"><i class="fas fa-trash" style="font-size:12px;color:#ef4444;"></i></button>
+            </div>
+          </div>
+          <div style="display:flex;gap:4px;">${shiftsHtml}</div>
+          ${warningsHtml}
+        </div>`;
+      }).join('');
+
+      // Summary
+      const summaryEl=document.getElementById('plan-summary');
+      const summaryContent=document.getElementById('plan-summary-content');
+      if(summaryEl&&summaryContent&&this._employees.length){
+        summaryEl.style.display='block';
+        const totalWeekHours=this._employees.reduce((s,e)=>s+this.validateSchedule(e).totalHours,0);
+        summaryContent.innerHTML=`
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <div style="background:#eff6ff;border-radius:10px;padding:10px;text-align:center;">
+              <div style="font-size:20px;font-weight:950;color:#0891b2;">${this._employees.length}</div>
+              <div style="font-size:11px;color:#64748b;">Employés</div>
+            </div>
+            <div style="background:#f0fdf4;border-radius:10px;padding:10px;text-align:center;">
+              <div style="font-size:20px;font-weight:950;color:#059669;">${totalWeekHours.toFixed(0)}h</div>
+              <div style="font-size:11px;color:#64748b;">Total semaine</div>
+            </div>
+          </div>`;
+      }
+    },
+
+    editShift:async function(empId,dateKey,dateLabel){
+      const emp=this._employees.find(e=>String(e.id)===String(empId));if(!emp)return;
+      const shift=emp.schedule[dateKey]||{type:'rest'};
+      const isRest=!shift||shift.type==='rest';
+
+      const choice=await dlgConfirm(
+        `${emp.name} — ${dateLabel}`,
+        isRest?'Ce jour est un repos. Définir un horaire ?':'Supprimer ce créneau (→ repos) ?',
+        false
+      );
+      if(!choice)return;
+
+      if(isRest){
+        // Set a shift
+        const start=await dlgPrompt('Heure de début (HH:MM):','09:00');
+        if(!start)return;
+        const end=await dlgPrompt('Heure de fin (HH:MM):','17:00');
+        if(!end)return;
+        emp.schedule[dateKey]={type:'work',start:start.trim(),end:end.trim()};
+      }else{
+        emp.schedule[dateKey]={type:'rest'};
+      }
+      this.save();
+      this.render();
+    },
+
+    removeEmployee:async function(empId){
+      const ok=await dlgConfirm('Supprimer cet employé ?','Cette action supprime l\'employé et son planning.',true);
+      if(!ok)return;
+      this._employees=this._employees.filter(e=>String(e.id)!==String(empId));
+      this.save();
+      this.render();
+    },
+
+    exportCSV(){
+      const dates=this.getWeekDates();
+      const dayNames=['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+      const header=['Employé',...dates.map((d,i)=>`${dayNames[i]} ${d.toLocaleDateString('fr')}`), 'Total heures'];
+      const rows=[header];
+      this._employees.forEach(emp=>{
+        const {totalHours}=this.validateSchedule(emp);
+        const row=[emp.name,...dates.map(d=>{
+          const key=d.toISOString().slice(0,10);
+          const s=emp.schedule[key]||{type:'rest'};
+          return s.type==='rest'?'Repos':`${s.start||'?'}-${s.end||'?'}`;
+        }),totalHours.toFixed(1)+'h'];
+        rows.push(row);
+      });
+      const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(';')).join('\n');
+      const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
+      const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='planning.csv';a.click();URL.revokeObjectURL(url);
+      toast('Planning exporté en CSV','ok');
     }
   }
 
