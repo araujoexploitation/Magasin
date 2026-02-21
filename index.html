@@ -6,15 +6,15 @@
 <meta name="theme-color" content="#003896"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-<meta name="apple-mobile-web-app-title" content="Araujo App"/>
+<meta name="apple-mobile-web-app-title" content="Express Purpan"/>
 <meta name="mobile-web-app-capable" content="yes"/>
-<meta name="application-name" content="Araujo App"/>
+<meta name="application-name" content="Express Purpan"/>
 <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/araujoexploitation/Magasin/main/LOGO.png"/>
 <link rel="manifest" id="pwa-manifest"/>
-<title>Araujo App V8.0</title>
+<title>Express Purpan V9.0</title>
 <script>
 // Inject PWA manifest dynamically
-const manifest={name:"Araujo App",short_name:"Araujo",display:"fullscreen",background_color:"#003896",theme_color:"#003896",start_url:window.location.href,icons:[{src:"https://raw.githubusercontent.com/araujoexploitation/Magasin/main/LOGO.png",sizes:"192x192",type:"image/png"}]};
+const manifest={name:"Express Purpan",short_name:"Purpan",display:"fullscreen",background_color:"#003896",theme_color:"#003896",start_url:window.location.href,icons:[{src:"https://raw.githubusercontent.com/araujoexploitation/Magasin/main/LOGO.png",sizes:"192x192",type:"image/png"}]};
 const blob=new Blob([JSON.stringify(manifest)],{type:"application/json"});
 document.getElementById('pwa-manifest').href=URL.createObjectURL(blob);
 </script>
@@ -111,6 +111,7 @@ document.getElementById('pwa-manifest').href=URL.createObjectURL(blob);
 
 /* ── PLANNING MODULE ── */
 #view-planning{animation:fadeIn .2s ease;}
+#plan-employees{overflow-x:auto;}
 @keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
 .planning-week-nav{display:flex;align-items:center;justify-content:space-between;background:#fff;border-radius:14px;padding:12px 16px;margin-bottom:14px;box-shadow:0 2px 8px rgba(0,0,0,.05);}
 .planning-week-nav button{background:#f1f5f9;border:none;border-radius:10px;padding:8px 14px;font-weight:900;cursor:pointer;font-size:16px;}
@@ -422,11 +423,71 @@ textarea{min-height:80px;resize:none;}
 
 /* ── FRIGO HISTORY EDIT ── */
 .frigo-log-row{padding:10px;border:1.5px solid #e2e8f0;border-radius:12px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+
+/* ── PWA INSTALL BANNER ── */
+#pwa-install-banner{display:none;position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:60000;background:linear-gradient(135deg,#003896,#1a50c8);color:#fff;border-radius:18px;padding:14px 18px;align-items:center;gap:14px;box-shadow:0 8px 30px rgba(0,56,150,.4);width:min(360px,92vw);animation:slideUp .3s ease;}
+#pwa-install-banner .pwa-text{flex:1;min-width:0;}
+#pwa-install-banner .pwa-title{font-weight:950;font-size:14px;}
+#pwa-install-banner .pwa-sub{font-size:12px;opacity:.8;margin-top:2px;}
+#pwa-install-banner .pwa-btn{background:#fff;color:#003896;border:none;border-radius:10px;padding:10px 16px;font-weight:950;font-size:13px;cursor:pointer;white-space:nowrap;}
+#pwa-install-banner .pwa-close{background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:8px;width:32px;height:32px;cursor:pointer;font-size:16px;flex-shrink:0;}
+
+/* ── DEMO MODE BANNER ── */
+#demo-banner{display:none;position:fixed;top:0;left:0;right:0;z-index:65000;background:linear-gradient(90deg,#7c3aed,#6d28d9);color:#fff;padding:8px 16px;align-items:center;justify-content:space-between;font-size:13px;font-weight:900;}
+#demo-banner.show{display:flex;}
+.demo-badge{background:rgba(255,255,255,.25);border-radius:8px;padding:3px 10px;font-size:11px;}
+
+/* ── CHAT MODULE ── */
+#view-chat{animation:fadeIn .2s ease;display:flex;flex-direction:column;height:100%;}
+.chat-layout{display:flex;flex-direction:column;height:calc(100vh - 160px);gap:0;}
+.chat-channels{display:flex;gap:8px;overflow-x:auto;padding:4px 0 12px 0;flex-shrink:0;scrollbar-width:none;}
+.chat-channels::-webkit-scrollbar{display:none;}
+.chat-channel-btn{display:flex;align-items:center;padding:8px 14px;border-radius:20px;background:#fff;border:2px solid #e2e8f0;font-weight:900;font-size:12px;cursor:pointer;white-space:nowrap;transition:all .15s;color:#334155;}
+.chat-channel-btn.active{background:var(--primary);border-color:var(--primary);color:#fff;}
+.chat-channel-btn.active i{color:#fff!important;}
+.chat-messages-wrap{flex:1;overflow-y:auto;background:#f8fafc;border-radius:16px;padding:12px;margin-bottom:10px;min-height:0;}
+.chat-msg-wrap{display:flex;align-items:flex-end;gap:8px;margin-bottom:10px;}
+.chat-msg-wrap.me{flex-direction:row-reverse;}
+.chat-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--primary),#1a50c8);color:#fff;font-weight:950;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.chat-avatar.me{background:linear-gradient(135deg,#7c3aed,#5b21b6);}
+.chat-bubble{max-width:72%;border-radius:16px;padding:10px 13px;}
+.chat-bubble.other{background:#fff;border-bottom-left-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,.06);}
+.chat-bubble.me{background:linear-gradient(135deg,#003896,#1a50c8);color:#fff;border-bottom-right-radius:4px;}
+.chat-sender{font-size:11px;font-weight:950;color:#64748b;margin-bottom:3px;}
+.chat-text{font-size:14px;line-height:1.4;word-break:break-word;}
+.chat-bubble.me .chat-text{color:#fff;}
+.chat-time{font-size:10px;opacity:.6;margin-top:4px;text-align:right;}
+.chat-input-row{display:flex;gap:8px;align-items:flex-end;flex-shrink:0;}
+.chat-input-row textarea{flex:1;border:2px solid #e2e8f0;border-radius:14px;padding:12px 14px;font-size:15px;resize:none;min-height:48px;max-height:120px;background:#fff;font-family:inherit;outline:none;}
+.chat-input-row textarea:focus{border-color:var(--primary);}
+.chat-send-btn{width:48px;height:48px;border-radius:14px;background:var(--primary);border:none;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+
+/* ── ALERT NET OVERLAY ── */
+#alertnet-overlay{position:fixed;inset:0;z-index:9000;background:#fff;display:none;flex-direction:column;}
+#alertnet-bar{background:#dc2626;padding:12px 16px;display:flex;align-items:center;gap:12px;padding-top:calc(12px + env(safe-area-inset-top));}
+#alertnet-iframe{flex:1;border:none;width:100%;background:#f8fafc;}
 </style>
 </head>
 <body>
 
 <div id="offline-banner"><i class="fas fa-wifi-slash"></i> Hors ligne – reconnexion en cours…</div>
+
+<!-- PWA INSTALL BANNER -->
+<div id="pwa-install-banner">
+  <i class="fas fa-mobile-screen-button" style="font-size:24px;flex-shrink:0;"></i>
+  <div class="pwa-text">
+    <div class="pwa-title">Installer Express Purpan</div>
+    <div class="pwa-sub">Accès rapide depuis l'écran d'accueil</div>
+  </div>
+  <button class="pwa-btn" onclick="app.installPWA()"><i class="fas fa-download"></i> Installer</button>
+  <button class="pwa-close" onclick="document.getElementById('pwa-install-banner').style.display='none'">✕</button>
+</div>
+
+<!-- DEMO MODE BANNER -->
+<div id="demo-banner">
+  <div><i class="fas fa-flask"></i> MODE CONSEILLER ACTIF <span class="demo-badge">Données anonymisées</span></div>
+  <button onclick="app.demoMode.toggle()" style="background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:8px;padding:6px 12px;font-weight:900;cursor:pointer;font-size:12px;">Désactiver</button>
+</div>
 <div id="toast-container"></div>
 <div id="spinner-overlay" class="hidden"><div class="spinner"></div></div>
 
@@ -664,26 +725,14 @@ textarea{min-height:80px;resize:none;}
 <main>
   <!-- HOME -->
   <div id="view-home">
-    <!-- CARREFOUR EXPRESS BANNER -->
-    <div id="home-banner">
-      <div class="banner-red-stripe"></div>
-      <div class="banner-logo-wrap">
-        <img src="https://raw.githubusercontent.com/araujoexploitation/Magasin/main/LOGO.png" class="banner-logo" onerror="this.style.display='none'">
-        <div class="banner-text">
-          <div class="banner-title">ARAUJO EXPRESS</div>
-          <div class="banner-sub">Gestion Magasin • v8.0</div>
-        </div>
-      </div>
-      <div style="padding-right:16px;position:relative;z-index:2;">
-        <div style="background:var(--ce-red);border-radius:10px;padding:6px 12px;text-align:center;">
-          <div style="color:#fff;font-size:10px;font-weight:950;letter-spacing:.5px;">CARREFOUR</div>
-          <div style="color:#fff;font-size:9px;opacity:.85;">EXPRESS</div>
-        </div>
-      </div>
-    </div>
 
-    <div id="alert-box" style="display:none;background:#ef4444;color:white;padding:15px;border-radius:12px;margin-bottom:15px;text-align:center;font-weight:950;">⚠️ Dates Courtes !</div>
-    <div class="home-grid">
+
+    <div id="home-edit-bar" style="display:none;background:linear-gradient(135deg,#7c3aed,#5b21b6);border-radius:14px;padding:12px 16px;margin-bottom:12px;color:#fff;">
+      <div style="font-weight:950;font-size:14px;margin-bottom:8px;"><i class="fas fa-grip-vertical"></i> Mode édition — réorganiser les modules</div>
+      <div class="small" style="margin-bottom:10px;opacity:.85;">Utilisez les flèches pour déplacer les modules. L'ordre est sauvegardé automatiquement.</div>
+      <button onclick="app.homeOrder.stopEdit()" style="background:rgba(255,255,255,.25);border:none;color:#fff;border-radius:10px;padding:10px 18px;font-weight:950;cursor:pointer;"><i class="fas fa-check"></i> Terminé</button>
+    </div>
+    <div class="home-grid" id="home-grid">
       <div class="home-btn wide" onclick="app.nav('dlc')" style="background:linear-gradient(135deg,#003896,#1e40af);position:relative;">
         <div id="badge-frais" class="home-badge red hidden">0</div>
         <i class="fas fa-barcode"></i><br>GESTION DLC
@@ -704,28 +753,23 @@ textarea{min-height:80px;resize:none;}
         <i class="fas fa-truck-ramp-box"></i><br>RÉCEPTION
         <div class="small" style="color:rgba(255,255,255,.8);margin-top:6px;">Contrôle livraison</div>
       </div>
-      <div class="home-btn" onclick="app.nav('inspection')" style="background:linear-gradient(135deg,#475569,#1e293b);">
-        <i class="fas fa-chart-bar"></i><br>INSPECTION
-        <div class="small" style="color:rgba(255,255,255,.8);margin-top:6px;">Rapports & export</div>
-      </div>
-      <div class="home-btn" onclick="app.nav('etiquettes')" style="background:linear-gradient(135deg,#9333ea,#6b21a8);">
-        <i class="fas fa-tag"></i><br>ÉTIQUETTES -50%
-        <div class="small" style="color:rgba(255,255,255,.8);margin-top:6px;">Brother TD-2120N</div>
+      <div class="home-btn" onclick="app.nav('chat')" style="background:linear-gradient(135deg,#0891b2,#0369a1);">
+        <div id="badge-chat" class="home-badge hidden" style="background:rgba(255,255,255,.92);color:#0369a1;">0</div>
+        <i class="fas fa-comments"></i><br>MESSAGERIE
+        <div class="small" style="color:rgba(255,255,255,.8);margin-top:6px;">Canaux de discussion</div>
       </div>
 
-      <!-- MODULE CARREFOUR (parent) -->
-      <div class="home-btn wide" onclick="app.nav('carrefour')" style="background:linear-gradient(135deg,#003896,#1a50c8);">
-        <i class="fas fa-store"></i><br>MODULE CARREFOUR
-        <div class="small" style="color:rgba(255,255,255,.8);margin-top:6px;">Dynacad • METI • Outils Carrefour</div>
-      </div>
 
-      <!-- GESTION MAGASIN (parent) -->
+
+
+
+      <!-- GESTION MAGASIN (parent) - inclut aussi Module Carrefour -->
       <div class="home-btn wide" onclick="app.nav('gestion-magasin')" style="background:linear-gradient(135deg,#0f766e,#134e4a);">
         <i class="fas fa-building"></i><br>GESTION MAGASIN
-        <div class="small" style="color:rgba(255,255,255,.8);margin-top:6px;">Planning • RH • Organisation</div>
+        <div class="small" style="color:rgba(255,255,255,.8);margin-top:6px;">Planning • Inspection • Carrefour • Chat</div>
       </div>
     </div>
-    <div class="card hidden" id="btn-team" onclick="app.nav('team')" style="text-align:center;cursor:pointer;"><i class="fas fa-users"></i> Équipe</div>
+    <div class="card hidden" id="btn-team" onclick="app.nav('team')" style="text-align:center;cursor:pointer;margin-bottom:10px;"><i class="fas fa-gear"></i> Paramètres & Équipe</div>
   </div>
 
   <!-- GESTION DLC - Module parent -->
@@ -734,6 +778,7 @@ textarea{min-height:80px;resize:none;}
       <div style="font-weight:950;font-size:20px;color:var(--primary);"><i class="fas fa-barcode"></i> GESTION DLC</div>
       <div class="small" style="margin-top:4px;">Sélectionnez un module</div>
     </div>
+    <div id="alert-box" style="display:none;background:linear-gradient(135deg,#dc2626,#ef4444);color:white;padding:14px;border-radius:14px;margin-bottom:14px;text-align:center;font-weight:950;font-size:16px;box-shadow:0 4px 20px rgba(239,68,68,.35);"><i class="fas fa-triangle-exclamation"></i> ⚠️ Produits à DATES COURTES — Action requise !</div>
     <div class="dlc-module-grid">
       <div class="dlc-sub-card wide" onclick="app.nav('frais')" style="border-color:#003896;background:linear-gradient(135deg,#eff6ff,#fff);">
         <div id="badge-frais-dlc" style="display:none;background:#ef4444;color:#fff;border-radius:20px;padding:2px 10px;font-size:12px;font-weight:950;margin-bottom:4px;">0 à DLC</div>
@@ -756,6 +801,11 @@ textarea{min-height:80px;resize:none;}
         <i class="fas fa-leaf" style="color:#006B3C;font-size:28px;"></i>
         <div class="sub-title" style="color:#006B3C;">TOO GOOD TO GO — PORTAIL</div>
         <div class="sub-sub">Gérer vos paniers sur store.toogoodtogo.com</div>
+      </div>
+      <div class="dlc-sub-card wide" onclick="app.nav('etiquettes')" style="border-color:#9333ea;background:linear-gradient(135deg,#faf5ff,#fff);">
+        <i class="fas fa-tag" style="color:#9333ea;font-size:28px;"></i>
+        <div class="sub-title" style="color:#9333ea;">ÉTIQUETTES -50%</div>
+        <div class="sub-sub">Impression Brother TD-2120N • Démarque</div>
       </div>
     </div>
   </div>
@@ -972,7 +1022,7 @@ textarea{min-height:80px;resize:none;}
         </div>
         <div style="background:#f0f7ff;border-radius:10px;padding:12px;margin-bottom:16px;">
           <div class="small" style="font-weight:800;color:#0369a1;margin-bottom:4px;">IDENTIFIANTS</div>
-          <div style="font-weight:900;font-size:14px;">ID : jonathan_araujo_4@franchise.carrefour.com</div>
+          <div style="font-weight:900;font-size:14px;">ID : <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="b4dedbdad5c0dcd5daebd5c6d5c1dedbeb80f4d2c6d5dad7dcddc7d19ad7d5c6c6d1d2dbc1c69ad7dbd9">[email&#160;protected]</a></div>
           <div style="font-weight:900;font-size:14px;color:#64748b;">MDP : KzD?VB&amp;6bNnS5.3</div>
         </div>
         <button class="btn" style="background:#0369a1;" onclick="app.mytravis.open()"><i class="fas fa-external-link-alt"></i> Ouvrir MyTravis</button>
@@ -1019,20 +1069,33 @@ textarea{min-height:80px;resize:none;}
 
   <!-- MODULE CARREFOUR (parent) -->
   <div id="view-carrefour" class="hidden">
-    <div style="text-align:center;margin-bottom:16px;">
-      <div style="font-weight:950;font-size:20px;color:var(--carrefour-red);"><i class="fas fa-building"></i> MODULE CARREFOUR</div>
-      <div class="small" style="margin-top:4px;">Outils et accès franchise</div>
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+      <button class="qty-btn" onclick="app.goBack()"><i class="fas fa-arrow-left"></i></button>
+      <div>
+        <div style="font-weight:950;font-size:20px;color:#003896;"><i class="fas fa-store"></i> MODULE CARREFOUR</div>
+        <div class="small" style="margin-top:2px;">Outils et accès franchise Carrefour Express</div>
+      </div>
     </div>
     <div class="dlc-module-grid">
-      <div class="dlc-sub-card wide" onclick="app.dynacad.open()" style="border-color:#0f172a;background:linear-gradient(135deg,#f8fafc,#fff);">
+      <div class="dlc-sub-card" onclick="app.dynacad.open()" style="border-color:#0f172a;background:linear-gradient(135deg,#f8fafc,#fff);">
         <i class="fas fa-store" style="color:#0f172a;font-size:30px;"></i>
         <div class="sub-title" style="color:#0f172a;">DYNACAD</div>
-        <div class="sub-sub">Planogrammes Carrefour</div>
+        <div class="sub-sub">Planogrammes</div>
       </div>
-      <div class="dlc-sub-card wide" onclick="app.metiPortal.open()" style="border-color:var(--carrefour-red);background:linear-gradient(135deg,#fff5f5,#fff);">
+      <div class="dlc-sub-card" onclick="app.metiPortal.open()" style="border-color:var(--carrefour-red);background:linear-gradient(135deg,#fff5f5,#fff);">
         <i class="fas fa-laptop" style="color:var(--carrefour-red);font-size:30px;"></i>
         <div class="sub-title" style="color:var(--carrefour-red);">METI</div>
-        <div class="sub-sub">Portail VPN Carrefour</div>
+        <div class="sub-sub">Portail VPN</div>
+      </div>
+      <div class="dlc-sub-card" onclick="app.alertNet.open()" style="border-color:#dc2626;background:linear-gradient(135deg,#fff5f5,#fff);">
+        <i class="fas fa-bell" style="color:#dc2626;font-size:30px;"></i>
+        <div class="sub-title" style="color:#dc2626;">ALERT NET</div>
+        <div class="sub-sub">Alertes Carrefour</div>
+      </div>
+      <div class="dlc-sub-card" onclick="app.mytravis.open()" style="border-color:#0891b2;background:linear-gradient(135deg,#f0f9ff,#fff);">
+        <i class="fas fa-truck" style="color:#0891b2;font-size:30px;"></i>
+        <div class="sub-title" style="color:#0891b2;">MY TRAVIS</div>
+        <div class="sub-sub">Suivi camions</div>
       </div>
     </div>
   </div>
@@ -1040,14 +1103,30 @@ textarea{min-height:80px;resize:none;}
   <!-- GESTION MAGASIN (parent) -->
   <div id="view-gestion-magasin" class="hidden">
     <div style="text-align:center;margin-bottom:16px;">
-      <div style="font-weight:950;font-size:20px;color:#0891b2;"><i class="fas fa-store-alt"></i> GESTION MAGASIN</div>
-      <div class="small" style="margin-top:4px;">Outils de gestion interne</div>
+      <div style="font-weight:950;font-size:20px;color:#0891b2;"><i class="fas fa-building"></i> GESTION MAGASIN</div>
+      <div class="small" style="margin-top:4px;">Outils de gestion • Franchise Carrefour Express</div>
     </div>
     <div class="dlc-module-grid">
-      <div class="dlc-sub-card wide" onclick="app.nav('planning')" style="border-color:#0891b2;background:linear-gradient(135deg,#ecfeff,#fff);">
+      <div class="dlc-sub-card" onclick="app.nav('planning')" style="border-color:#0891b2;background:linear-gradient(135deg,#ecfeff,#fff);">
         <i class="fas fa-calendar-days" style="color:#0891b2;font-size:30px;"></i>
         <div class="sub-title" style="color:#0891b2;">PLANNING RH</div>
-        <div class="sub-sub">Planification équipe — règles droit du travail France</div>
+        <div class="sub-sub">Planification équipe</div>
+      </div>
+      <div class="dlc-sub-card" onclick="app.inspection.render();app.nav('inspection')" style="border-color:#475569;background:linear-gradient(135deg,#f8fafc,#fff);">
+        <i class="fas fa-chart-bar" style="color:#475569;font-size:30px;"></i>
+        <div class="sub-title" style="color:#475569;">INSPECTION</div>
+        <div class="sub-sub">Rapports & export</div>
+      </div>
+      <div class="dlc-sub-card wide" onclick="app.nav('carrefour')" style="border-color:#003896;background:linear-gradient(135deg,#eff6ff,#fff);">
+        <i class="fas fa-store" style="color:#003896;font-size:30px;"></i>
+        <div class="sub-title" style="color:#003896;">MODULE CARREFOUR</div>
+        <div class="sub-sub">Dynacad • METI • Alert Net • Outils franchise</div>
+      </div>
+      <div class="dlc-sub-card wide" onclick="app.nav('chat')" style="border-color:#0891b2;background:linear-gradient(135deg,#f0f9ff,#fff);">
+        <div id="badge-chat-gm" style="display:none;background:#ef4444;color:#fff;border-radius:20px;padding:2px 8px;font-size:11px;font-weight:950;margin-bottom:4px;">0 nouveau(x)</div>
+        <i class="fas fa-comments" style="color:#0891b2;font-size:30px;"></i>
+        <div class="sub-title" style="color:#0891b2;">MESSAGERIE</div>
+        <div class="sub-sub">Canaux de discussion équipe</div>
       </div>
     </div>
   </div>
@@ -1096,6 +1175,16 @@ textarea{min-height:80px;resize:none;}
 
   <!-- TEAM -->
   <div id="view-team" class="hidden">
+    <div class="card" style="border-left:5px solid #003896;background:linear-gradient(135deg,#eff6ff,#fff);">
+      <h3 style="margin-top:0;color:#003896;"><i class="fas fa-grip-vertical"></i> Réorganiser l'écran d'accueil</h3>
+      <p class="small" style="color:#64748b;margin-bottom:12px;">Déplacez les modules à votre convenance. Les modifications sont instantanées.</p>
+      <button class="btn" onclick="app.nav('home');setTimeout(()=>app.homeOrder.startEdit(),100)"><i class="fas fa-arrows-up-down-left-right"></i> Réorganiser les modules</button>
+    </div>
+    <div class="card" style="border-left:5px solid #7c3aed;background:linear-gradient(135deg,#faf5ff,#fff);">
+      <h3 style="margin-top:0;color:#7c3aed;"><i class="fas fa-flask"></i> Mode Conseiller Franchise</h3>
+      <p class="small" style="color:#64748b;margin-bottom:12px;">Activez ce mode pour présenter l'application à votre conseiller de franchise avec des données anonymisées. Un code d'accès est requis.</p>
+      <button class="btn" style="background:linear-gradient(135deg,#7c3aed,#5b21b6);" onclick="app.demoMode.toggle()"><i class="fas fa-flask"></i> Activer / Désactiver mode conseiller</button>
+    </div>
     <div class="card">
       <h3 style="margin-top:0;">Créer un compte staff</h3>
       <input id="new-u-name"  placeholder="Nom (ex: LUCAS)" autocomplete="off">
@@ -1107,6 +1196,26 @@ textarea{min-height:80px;resize:none;}
     <div class="card">
       <h3 style="margin-top:0;">Utilisateurs</h3>
       <div id="user-list"></div>
+    </div>
+  </div>
+  <!-- CHAT MODULE -->
+  <div id="view-chat" class="hidden">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+      <button class="qty-btn" onclick="app.goBack()"><i class="fas fa-arrow-left"></i></button>
+      <div>
+        <div style="font-weight:950;font-size:18px;color:var(--primary);"><i class="fas fa-comments"></i> Messagerie</div>
+        <div class="small" style="margin-top:2px;">Communication équipe Express Purpan</div>
+      </div>
+    </div>
+    <div class="chat-layout">
+      <div class="chat-channels" id="chat-channel-list"></div>
+      <div class="chat-messages-wrap" id="chat-messages">
+        <div style="text-align:center;padding:20px;color:#94a3b8;">Sélectionnez un canal</div>
+      </div>
+      <div class="chat-input-row">
+        <textarea id="chat-input" placeholder="Écrivez un message…" rows="1" onkeydown="app.chat.sendOnEnter(event)"></textarea>
+        <button class="chat-send-btn" onclick="app.chat.send()"><i class="fas fa-paper-plane"></i></button>
+      </div>
     </div>
   </div>
 </main>
@@ -1185,7 +1294,7 @@ textarea{min-height:80px;resize:none;}
   <div class="nav-btn" onclick="app.nav('home')"><i class="fas fa-th-large"></i><br>MENU</div>
 </nav>
 
-<script type="module">
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
   getFirestore,doc,setDoc,getDoc,collection,addDoc,getDocs,deleteDoc,
@@ -1221,6 +1330,9 @@ const docSalad=doc(db,"store_master","DATA_SALAD");
 const docFrigo=doc(db,"store_master","DATA_FRIGO");
 const docTodo =doc(db,"store_master","DATA_TODO");
 const colTodoLogs=collection(db,"todo_logs");
+// Expose for chat module
+window._db=db;
+window._fbChat={collection,query,orderBy,limit,onSnapshot,addDoc,serverTimestamp,where,getDocs,deleteDoc,doc,setDoc,getDoc};
 const colReception=collection(db,"reception_logs");
 const TRACE_PREFIX={salad:"salad_traca",pvp:"pvp_traca"};
 const colTraceFor=(mod,pid)=>collection(db,TRACE_PREFIX[mod],String(pid),"items");
@@ -1502,18 +1614,24 @@ window.app={
     document.querySelectorAll('main > div').forEach(e=>e.classList.add('hidden'));
     const el=document.getElementById('view-'+v);
     if(el)el.classList.remove('hidden');
-    if(v==='dlc'){this.updateDlcBadges();}
+    if(v==='dlc'){this.updateDlcBadges();this.checkAlerts();}
     if(v==='todo'){this.todo.renderToday();this.todo.tab('today');}
     if(v==='reception'){this.reception.init();this.reception.tab('new');}
     if(v==='inspection'){this.inspection.render();}
     if(v==='etiquettes'){this.etiquettes.loadProducts();}
     if(v==='planning'){this.planning.render();}
+    if(v==='chat'){this.chat.render();}
+    if(v==='home'){this._maybeShowInstallPrompt();}
   },
   goBack(){if(this.viewHistory.length)this.nav(this.viewHistory.pop(),false);else this.nav('home',false);},
   toggleFam(id){if(this.closed.has(id))this.closed.delete(id);else this.closed.add(id);this.updateUI();},
   checkAlerts(){
     const a=this.data.frais.some(i=>{const d=new Date(i.date);return!isNaN(d.getTime())&&(d-new Date())/(1000*60*60*24)<1;});
-    document.getElementById('alert-box').style.display=a?'block':'none';
+    const box=document.getElementById('alert-box');
+    if(box)box.style.display=a?'block':'none';
+    // Badge rouge sur le bouton DLC de l'accueil
+    const bf=document.getElementById('badge-frais');
+    if(bf){const cnt=this.data.frais.filter(i=>{const d=new Date(i.date);return!isNaN(d.getTime())&&d<=new Date();}).length;bf.textContent=cnt;bf.classList.toggle('hidden',cnt===0);}
   },
 
   common:{
@@ -3318,7 +3436,8 @@ ${nameLine2?`^CF0,30^FO15,45^FD${nameLine2}^FS`:''}
 
       const wrap=document.getElementById('plan-employees');
       if(!wrap)return;
-      const dayNames=['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+      const DAY_NAMES=['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+      const today=new Date().toISOString().slice(0,10);
 
       if(!this._employees.length){
         wrap.innerHTML=`<div class="empty-state"><i class="fas fa-users"></i><br>Aucun employé. Ajoutez-en un pour commencer.</div>`;
@@ -3326,36 +3445,60 @@ ${nameLine2?`^CF0,30^FO15,45^FD${nameLine2}^FS`:''}
         return;
       }
 
-      wrap.innerHTML=this._employees.map(emp=>{
+      // Header row with day names (Skello style)
+      const headerHtml=`<div style="display:grid;grid-template-columns:120px repeat(7,1fr);gap:4px;margin-bottom:6px;padding:0 2px;">
+        <div></div>
+        ${dates.map((d,i)=>{
+          const isToday=d.toISOString().slice(0,10)===today;
+          return`<div style="text-align:center;padding:6px 2px;border-radius:8px;background:${isToday?'#003896':'#f1f5f9'};color:${isToday?'#fff':'#64748b'};">
+            <div style="font-size:11px;font-weight:950;">${DAY_NAMES[i]}</div>
+            <div style="font-size:13px;font-weight:950;">${d.getDate()}</div>
+          </div>`;
+        }).join('')}
+      </div>`;
+
+      const rowsHtml=this._employees.map(emp=>{
         const {totalHours,restDays,warnings}=this.validateSchedule(emp);
         const hasWarn=warnings.length>0;
-        const warningsHtml=hasWarn?`<div style="background:#fef3c7;border-radius:8px;padding:8px;margin-top:8px;font-size:12px;color:#92400e;"><i class="fas fa-triangle-exclamation"></i> ${warnings.join(' • ')}</div>`:'';
-        const shiftsHtml=dates.map((date,i)=>{
+        const cellsHtml=dates.map(date=>{
           const key=date.toISOString().slice(0,10);
           const shift=emp.schedule[key]||{type:'rest'};
           const isRest=!shift||shift.type==='rest';
-          return`<div style="flex:1;min-width:0;">
-            <div style="font-size:10px;font-weight:950;text-align:center;color:#64748b;margin-bottom:3px;">${dayNames[i]}<br><span style="font-size:9px;">${date.getDate()}</span></div>
-            <div style="background:${isRest?'#f1f5f9':'#dbeafe'};border-radius:8px;padding:5px 2px;text-align:center;cursor:pointer;min-height:42px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1.5px solid ${isRest?'#e2e8f0':'#93c5fd'};font-size:10px;"
-              onclick="app.planning.editShift('${emp.id}','${key}','${date.toLocaleDateString('fr')}')">
-              ${isRest?'<i class="fas fa-bed" style="color:#94a3b8;font-size:12px;"></i>':'<span style="font-weight:900;color:#1e40af;">'+(shift.start||'?')+'<br>'+(shift.end||'?')+'</span>'}
-            </div>
+          const isToday=key===today;
+          if(isRest){
+            return`<div onclick="app.planning.editShift('${emp.id}','${key}','${date.toLocaleDateString('fr')}')"
+              style="text-align:center;cursor:pointer;min-height:50px;border-radius:10px;display:flex;align-items:center;justify-content:center;border:1.5px dashed ${isToday?'#bfdbfe':'#e2e8f0'};background:${isToday?'#eff6ff':'#f8fafc'};">
+              <i class="fas fa-moon" style="color:#cbd5e1;font-size:14px;"></i>
+            </div>`;
+          }
+          const h=(()=>{const[sh,sm]=shift.start.split(':').map(Number);const[eh,em]=shift.end.split(':').map(Number);let v=(eh*60+em-sh*60-sm)/60;if(v<0)v+=24;return v;})();
+          const col=h>9?'#fee2e2':h>7?'#dbeafe':'#d1fae5';
+          const tc=h>9?'#991b1b':h>7?'#1e40af':'#065f46';
+          return`<div onclick="app.planning.editShift('${emp.id}','${key}','${date.toLocaleDateString('fr')}')"
+            style="text-align:center;cursor:pointer;min-height:50px;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:${col};border:1.5px solid ${tc}20;">
+            <div style="font-size:10px;font-weight:950;color:${tc};">${shift.start||'?'}</div>
+            <div style="font-size:9px;color:${tc};opacity:.7;">${h.toFixed(1)}h</div>
+            <div style="font-size:10px;font-weight:950;color:${tc};">${shift.end||'?'}</div>
           </div>`;
         }).join('');
-
-        return`<div style="background:#fff;border-radius:14px;padding:14px;margin-bottom:10px;border:1.5px solid ${hasWarn?'#fcd34d':'#e2e8f0'};">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-            <div style="font-weight:950;font-size:15px;">${emp.name}</div>
-            <div style="display:flex;gap:6px;align-items:center;">
-              <span style="font-size:12px;font-weight:900;color:#0891b2;">${totalHours.toFixed(1)}h</span>
-              <span style="font-size:11px;padding:2px 6px;border-radius:6px;background:${restDays>=2?'#d1fae5':'#fee2e2'};color:${restDays>=2?'#065f46':'#991b1b'};font-weight:900;">${restDays}R</span>
-              <button class="qty-btn" onclick="app.planning.removeEmployee('${emp.id}')"><i class="fas fa-trash" style="font-size:12px;color:#ef4444;"></i></button>
+        return`<div style="display:grid;grid-template-columns:120px repeat(7,1fr);gap:4px;margin-bottom:6px;padding:0 2px;">
+          <div style="display:flex;align-items:center;gap:8px;padding:0 4px;">
+            <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#003896,#1a50c8);color:#fff;font-weight:950;font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${(emp.name||'?').split(' ').map(x=>x[0]||'').join('').toUpperCase().slice(0,2)}</div>
+            <div style="min-width:0;">
+              <div style="font-weight:950;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${emp.name||'?'}</div>
+              <div style="display:flex;gap:4px;">
+                <span style="font-size:10px;font-weight:900;color:#0891b2;">${totalHours.toFixed(0)}h</span>
+                <span style="font-size:10px;font-weight:900;background:${restDays>=2?'#d1fae5':'#fee2e2'};color:${restDays>=2?'#065f46':'#991b1b'};border-radius:4px;padding:0 4px;">${restDays}R</span>
+                ${hasWarn?'<i class="fas fa-triangle-exclamation" style="color:#f59e0b;font-size:10px;margin-top:1px;"></i>':''}
+              </div>
             </div>
           </div>
-          <div style="display:flex;gap:4px;">${shiftsHtml}</div>
-          ${warningsHtml}
-        </div>`;
+          ${cellsHtml}
+        </div>
+        ${hasWarn?`<div style="background:#fef3c7;border-left:4px solid #f59e0b;border-radius:8px;padding:6px 10px;margin:-2px 2px 6px 2px;font-size:11px;color:#92400e;"><i class="fas fa-triangle-exclamation"></i> ${warnings.join(' • ')}</div>`:''}`;
       }).join('');
+
+      wrap.innerHTML=headerHtml+rowsHtml;
 
       // Summary
       const summaryEl=document.getElementById('plan-summary');
@@ -3363,8 +3506,9 @@ ${nameLine2?`^CF0,30^FO15,45^FD${nameLine2}^FS`:''}
       if(summaryEl&&summaryContent&&this._employees.length){
         summaryEl.style.display='block';
         const totalWeekHours=this._employees.reduce((s,e)=>s+this.validateSchedule(e).totalHours,0);
+        const workersDays=this._employees.flatMap(e=>dates.map(d=>{const k=d.toISOString().slice(0,10);const s=e.schedule[k];return s&&s.type!=='rest'?1:0;})).reduce((a,b)=>a+b,0);
         summaryContent.innerHTML=`
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
             <div style="background:#eff6ff;border-radius:10px;padding:10px;text-align:center;">
               <div style="font-size:20px;font-weight:950;color:#0891b2;">${this._employees.length}</div>
               <div style="font-size:11px;color:#64748b;">Employés</div>
@@ -3372,6 +3516,10 @@ ${nameLine2?`^CF0,30^FO15,45^FD${nameLine2}^FS`:''}
             <div style="background:#f0fdf4;border-radius:10px;padding:10px;text-align:center;">
               <div style="font-size:20px;font-weight:950;color:#059669;">${totalWeekHours.toFixed(0)}h</div>
               <div style="font-size:11px;color:#64748b;">Total semaine</div>
+            </div>
+            <div style="background:#fdf4ff;border-radius:10px;padding:10px;text-align:center;">
+              <div style="font-size:20px;font-weight:950;color:#7c3aed;">${workersDays}</div>
+              <div style="font-size:11px;color:#64748b;">Présences</div>
             </div>
           </div>`;
       }
@@ -3432,8 +3580,291 @@ ${nameLine2?`^CF0,30^FO15,45^FD${nameLine2}^FS`:''}
     }
   }
 
+
+
+  // ══════════════════════════════════════════════════
+  // ── HOME MODULE ORDER ──
+  // ══════════════════════════════════════════════════
+  homeOrder:{
+    _editing:false,
+
+    startEdit(){
+      this._editing=true;
+      document.getElementById('home-edit-bar').style.display='block';
+      // Add move buttons to each home-btn
+      const btns=document.querySelectorAll('#home-grid .home-btn');
+      btns.forEach((btn,i)=>{
+        if(btn.querySelector('.home-move-ctrl'))return;
+        const ctrl=document.createElement('div');
+        ctrl.className='home-move-ctrl';
+        ctrl.style.cssText='position:absolute;top:6px;right:6px;display:flex;gap:4px;z-index:10;';
+        ctrl.innerHTML=`
+          <button onclick="event.stopPropagation();app.homeOrder.moveBtn(${i},-1)" style="background:rgba(255,255,255,.3);border:none;color:#fff;border-radius:6px;width:26px;height:26px;cursor:pointer;font-size:12px;">◀</button>
+          <button onclick="event.stopPropagation();app.homeOrder.moveBtn(${i},1)" style="background:rgba(255,255,255,.3);border:none;color:#fff;border-radius:6px;width:26px;height:26px;cursor:pointer;font-size:12px;">▶</button>`;
+        btn.style.position='relative';
+        btn.appendChild(ctrl);
+      });
+    },
+
+    stopEdit(){
+      this._editing=false;
+      document.getElementById('home-edit-bar').style.display='none';
+      document.querySelectorAll('.home-move-ctrl').forEach(e=>e.remove());
+      toast('Ordre sauvegardé.','ok',2000);
+    },
+
+    moveBtn(fromIdx,direction){
+      const grid=document.getElementById('home-grid');
+      if(!grid)return;
+      const btns=Array.from(grid.querySelectorAll('.home-btn'));
+      const toIdx=fromIdx+direction;
+      if(toIdx<0||toIdx>=btns.length)return;
+      const from=btns[fromIdx];
+      const to=btns[toIdx];
+      if(direction>0){
+        grid.insertBefore(to,from);
+      }else{
+        grid.insertBefore(from,to);
+      }
+      // Re-add controls with updated indices after slight delay
+      setTimeout(()=>{
+        document.querySelectorAll('.home-move-ctrl').forEach(e=>e.remove());
+        this.startEdit();
+      },50);
+    }
+  },
+
+  // ══════════════════════════════════════════════════
+  // ── ALERT NET MODULE ──
+  // ══════════════════════════════════════════════════
+  alertNet:{
+    _url:'https://alertnet.carrefour.com/carrefour/users/login',
+    _id:'m31555BF',
+    _pwd:'P16P2!',
+    open(){
+      // Copy credentials to clipboard
+      try{navigator.clipboard.writeText(this._id+':'+this._pwd);}catch(e){}
+      // Open overlay with login helper
+      const ov=document.getElementById('alertnet-overlay');
+      if(ov){ov.style.display='flex';}
+      toast('Identifiants copiés — '+this._id,'info',3000);
+    },
+    close(){
+      const ov=document.getElementById('alertnet-overlay');
+      if(ov)ov.style.display='none';
+      const fr=document.getElementById('alertnet-iframe');
+      if(fr)fr.src='about:blank';
+    },
+    openExternal(){
+      try{navigator.clipboard.writeText(this._id+'
+'+this._pwd);}catch(e){}
+      window.open(this._url,'_blank','noopener');
+      toast('Identifiants copiés ! Collez-les sur Alert Net.','ok',4000);
+    }
+  },
+
+  // ══════════════════════════════════════════════════
+  // ── MODE TEST (Conseiller Franchise) ──
+  // ══════════════════════════════════════════════════
+  demoMode:{
+    _active:false,
+    _pass:'PURPAN2024',
+
+    isActive(){return this._active;},
+
+    toggle:async function(){
+      if(this._active){
+        const ok=await dlgConfirm('Quitter le mode test','Désactiver le mode conseiller ?');
+        if(!ok)return;
+        this._active=false;
+        toast('Mode test désactivé.','info');
+        this.updateBanner();
+        return;
+      }
+      const pass=await dlgPrompt('Code d'accès mode conseiller :','');
+      if(pass===null)return;
+      if(pass.trim().toUpperCase()!==this._pass){return toast('Code incorrect.','err');}
+      this._active=true;
+      toast('✓ Mode conseiller activé — données anonymisées.','ok',4000);
+      this.updateBanner();
+    },
+
+    updateBanner(){
+      const b=document.getElementById('demo-banner');
+      if(!b)return;
+      b.style.display=this._active?'flex':'none';
+    },
+
+    // Mask sensitive data for display
+    maskUser(name){
+      if(!this._active)return name;
+      const n=name||'';
+      if(n.length<3)return '***';
+      return n[0]+'*'.repeat(n.length-2)+n[n.length-1];
+    }
+  },
+
+  // ══════════════════════════════════════════════════
+  // ── CHAT MODULE ──
+  // ══════════════════════════════════════════════════
+  chat:{
+    _channel:'general',
+    _unsubscribe:null,
+    _channels:[
+      {id:'general',   name:'# général',       icon:'fa-hashtag',  color:'#003896'},
+      {id:'dlc',       name:'# dates courtes',  icon:'fa-calendar-xmark', color:'#dc2626'},
+      {id:'reception', name:'# réception',      icon:'fa-truck-ramp-box', color:'#059669'},
+      {id:'planning',  name:'# planning',       icon:'fa-calendar-days',  color:'#0891b2'},
+      {id:'direction', name:'🔒 direction',     icon:'fa-lock',     color:'#7c3aed', adminOnly:true},
+    ],
+
+    render(){
+      const wrap=document.getElementById('chat-channel-list');
+      const msgWrap=document.getElementById('chat-messages');
+      if(!wrap||!msgWrap)return;
+
+      // Render channel list
+      const me=window.app.me||{};
+      const channels=this._channels.filter(c=>!c.adminOnly||(me.role==='admin'));
+      wrap.innerHTML=channels.map(c=>`
+        <div class="chat-channel-btn ${this._channel===c.id?'active':''}" onclick="app.chat.selectChannel('${c.id}')">
+          <i class="fas ${c.icon}" style="color:${c.color};margin-right:8px;"></i>
+          <span>${c.name}</span>
+        </div>`).join('');
+
+      this.loadMessages();
+    },
+
+    selectChannel(id){
+      this._channel=id;
+      if(this._unsubscribe){try{this._unsubscribe();}catch(e){}}
+      this.render();
+    },
+
+    loadMessages(){
+      const wrap=document.getElementById('chat-messages');
+      if(!wrap)return;
+      wrap.innerHTML='<div style="text-align:center;padding:20px;color:#94a3b8;font-size:14px;"><i class="fas fa-spinner fa-spin"></i> Chargement…</div>';
+
+      try{
+        const{collection,query,orderBy,limit,onSnapshot,addDoc,serverTimestamp}=window._fbChat;
+        const colRef=collection(window._db,'chat_'+this._channel);
+        const q=query(colRef,orderBy('ts','desc'),limit(50));
+        this._unsubscribe=onSnapshot(q,snap=>{
+          const msgs=[];snap.forEach(d=>msgs.push({id:d.id,...d.data()}));
+          msgs.reverse();
+          this._renderMessages(msgs);
+          this._updateBadges(0);
+        },()=>{wrap.innerHTML='<div style="text-align:center;padding:20px;color:#94a3b8;">Chargement impossible.</div>';});
+      }catch(e){
+        wrap.innerHTML='<div style="text-align:center;padding:20px;color:#94a3b8;">Firebase non disponible.</div>';
+      }
+    },
+
+    _renderMessages(msgs){
+      const wrap=document.getElementById('chat-messages');
+      if(!wrap)return;
+      const me=window.app.me||{};
+      if(!msgs.length){
+        wrap.innerHTML='<div style="text-align:center;padding:30px;color:#94a3b8;"><i class="fas fa-comment-slash" style="font-size:30px;margin-bottom:8px;display:block;opacity:.3;"></i>Aucun message dans ce canal.</div>';
+        return;
+      }
+      wrap.innerHTML=msgs.map(m=>{
+        const isMe=m.userId===me.uid;
+        const ts=m.ts?new Date(m.ts.toMillis?m.ts.toMillis():(m.ts||0)):new Date();
+        const timeStr=ts.toLocaleTimeString('fr',{hour:'2-digit',minute:'2-digit'});
+        const dateStr=ts.toLocaleDateString('fr',{day:'numeric',month:'short'});
+        const initials=(m.userName||'?').split(' ').map(x=>x[0]||'').join('').toUpperCase().slice(0,2);
+        return`<div class="chat-msg-wrap ${isMe?'me':''}">
+          ${!isMe?`<div class="chat-avatar">${initials}</div>`:''}
+          <div class="chat-bubble ${isMe?'me':'other'}">
+            ${!isMe?`<div class="chat-sender">${m.userName||'?'}</div>`:''}
+            <div class="chat-text">${(m.text||'').replace(/</g,'&lt;').replace(/
+/g,'<br>')}</div>
+            <div class="chat-time">${dateStr} ${timeStr}</div>
+          </div>
+          ${isMe?`<div class="chat-avatar me">${initials}</div>`:''}
+        </div>`;
+      }).join('');
+      // Scroll to bottom
+      wrap.scrollTop=wrap.scrollHeight;
+    },
+
+    send:async function(){
+      const inp=document.getElementById('chat-input');
+      const text=(inp?.value||'').trim();
+      if(!text)return;
+      const me=window.app.me;
+      if(!me)return toast('Connexion requise.','err');
+      inp.value='';
+      try{
+        const{collection,addDoc,serverTimestamp}=window._fbChat;
+        await addDoc(collection(window._db,'chat_'+this._channel),{
+          text,
+          userId:me.uid,
+          userName:me.name||me.email||'USER',
+          ts:serverTimestamp(),
+          channel:this._channel
+        });
+      }catch(e){toast('Erreur envoi message.','err');inp.value=text;}
+    },
+
+    sendOnEnter(e){if((e.key==='Enter')&&!e.shiftKey){e.preventDefault();this.send();}},
+
+    _updateBadges(unread){
+      const b=document.getElementById('badge-chat-gm');
+      if(b){b.textContent=unread+' nouveau(x)';b.style.display=unread>0?'inline-block':'none';}
+    }
+  },
+
+  // ══════════════════════════════════════════════════
+  // ── PWA INSTALL PROMPT ──
+  // ══════════════════════════════════════════════════
+  _deferredInstallPrompt:null,
+
+  _initInstallPrompt(){
+    window.addEventListener('beforeinstallprompt',e=>{
+      e.preventDefault();
+      this._deferredInstallPrompt=e;
+      // Show install banner
+      setTimeout(()=>this._maybeShowInstallPrompt(),2000);
+    });
+    window.addEventListener('appinstalled',()=>{
+      const b=document.getElementById('pwa-install-banner');
+      if(b)b.style.display='none';
+      toast('✓ Application installée avec succès !','ok',4000);
+    });
+  },
+
+  _maybeShowInstallPrompt(){
+    if(!this._deferredInstallPrompt)return;
+    // Check if already installed
+    if(window.matchMedia('(display-mode: fullscreen)').matches||
+       window.matchMedia('(display-mode: standalone)').matches)return;
+    const b=document.getElementById('pwa-install-banner');
+    if(b)b.style.display='flex';
+  },
+
+  installPWA:async function(){
+    const b=document.getElementById('pwa-install-banner');
+    if(!this._deferredInstallPrompt){
+      toast('Pour ajouter : utilisez le menu partage de votre navigateur → "Sur l'écran d'accueil".','info',6000);
+      return;
+    }
+    this._deferredInstallPrompt.prompt();
+    const{outcome}=await this._deferredInstallPrompt.userChoice;
+    this._deferredInstallPrompt=null;
+    if(b)b.style.display='none';
+  }
+
 };
 window.app.initOffline();
+window.app._initInstallPrompt();
+// Wire Firebase refs for chat (using same db instance)
+try{
+  const{collection,query,orderBy,limit,onSnapshot,addDoc,serverTimestamp}=window._FirebaseModules||{};
+  window._fbChat={collection,query,orderBy,limit,onSnapshot,addDoc,serverTimestamp};
+}catch(e){}
 
 // Wire photo inputs
 document.getElementById('cam-input').addEventListener('change',e=>{const f=e.target.files?.[0];if(!f)return;window.app.common.compressImg(f,b64=>{document.getElementById('img-preview').src=b64;document.getElementById('img-preview').style.display='block';document.getElementById('lib-img-data').value=b64;});});
@@ -3446,11 +3877,4 @@ onAuthStateChanged(auth,async user=>{
     document.getElementById('app-header').classList.add('hidden');
     document.getElementById('app-nav').classList.add('hidden');
     window.app.me=null;
-    window.app.data={frais:[],users:[],pvpLib:[],pvpStock:[],checkedNeeds:[],saladLib:[],saladStock:[],frigo:{perDay:2,fridges:[],logs:[]},todo:{zones:[],tasks:[]},todoLogs:[],reception:[]};
-    return;
-  }
-  await window.app.afterLoginBootstrap();
-});
-</script>
-</body>
-</html>
+    window.app.data={frais:
