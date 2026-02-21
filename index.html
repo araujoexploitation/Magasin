@@ -3839,8 +3839,7 @@ ${nameLine2?`^CF0,30^FO15,45^FD${nameLine2}^FS`:''}
           ${!isMe?`<div class="chat-avatar">${initials}</div>`:''}
           <div class="chat-bubble ${isMe?'me':'other'}">
             ${!isMe?`<div class="chat-sender">${m.userName||'?'}</div>`:''}
-            <div class="chat-text">${(m.text||'').replace(/</g,'&lt;').replace(/
-/g,'<br>')}</div>
+            <div class="chat-text">${(m.text||'').replace(/</g,'&lt;').replace(/\n/g,'<br>')}</div>
             <div class="chat-time">${dateStr} ${timeStr}</div>
           </div>
           ${isMe?`<div class="chat-avatar me">${initials}</div>`:''}
@@ -3908,7 +3907,7 @@ ${nameLine2?`^CF0,30^FO15,45^FD${nameLine2}^FS`:''}
   installPWA:async function(){
     const b=document.getElementById('pwa-install-banner');
     if(!this._deferredInstallPrompt){
-      toast('Pour ajouter : utilisez le menu partage de votre navigateur → "Sur l'écran d'accueil".','info',6000);
+      toast('Pour ajouter : utilisez le menu partage de votre navigateur → "Sur l\'écran d\'accueil".','info',6000);
       return;
     }
     this._deferredInstallPrompt.prompt();
