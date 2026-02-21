@@ -432,10 +432,7 @@ textarea{min-height:80px;resize:none;}
 #pwa-install-banner .pwa-btn{background:#fff;color:#003896;border:none;border-radius:10px;padding:10px 16px;font-weight:950;font-size:13px;cursor:pointer;white-space:nowrap;}
 #pwa-install-banner .pwa-close{background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:8px;width:32px;height:32px;cursor:pointer;font-size:16px;flex-shrink:0;}
 
-/* ── DEMO MODE BANNER ── */
-#demo-banner{display:none;position:fixed;top:0;left:0;right:0;z-index:65000;background:linear-gradient(90deg,#7c3aed,#6d28d9);color:#fff;padding:8px 16px;align-items:center;justify-content:space-between;font-size:13px;font-weight:900;}
-#demo-banner.show{display:flex;}
-.demo-badge{background:rgba(255,255,255,.25);border-radius:8px;padding:3px 10px;font-size:11px;}
+
 
 /* ── CHAT MODULE ── */
 #view-chat{animation:fadeIn .2s ease;display:flex;flex-direction:column;height:100%;}
@@ -462,6 +459,17 @@ textarea{min-height:80px;resize:none;}
 .chat-input-row textarea:focus{border-color:var(--primary);}
 .chat-send-btn{width:48px;height:48px;border-radius:14px;background:var(--primary);border:none;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 
+/* ── CONSEILLER BANNER ── */
+#conseiller-banner{display:none;position:fixed;top:0;left:0;right:0;z-index:65000;background:linear-gradient(90deg,#0891b2,#0369a1);color:#fff;padding:9px 16px;align-items:center;justify-content:space-between;font-size:13px;font-weight:900;gap:10px;}
+#conseiller-banner.show{display:flex;}
+
+/* ── HOME REORDER MODE ── */
+.reorder-mode{cursor:grab!important;border:2px dashed rgba(255,255,255,.5)!important;animation:wiggle .4s ease infinite alternate;}
+.reorder-mode:active,.dragging{cursor:grabbing!important;}
+@keyframes wiggle{from{transform:rotate(-.5deg) scale(1)}to{transform:rotate(.5deg) scale(1.01)}}
+.grip-icon{position:absolute;top:8px;left:8px;color:rgba(255,255,255,.7);font-size:14px;z-index:5;pointer-events:none;}
+#home-reorder-btn{display:none;position:fixed;bottom:88px;right:16px;z-index:50000;background:linear-gradient(135deg,#7c3aed,#5b21b6);color:#fff;border:none;border-radius:50%;width:48px;height:48px;align-items:center;justify-content:center;font-size:18px;box-shadow:0 4px 20px rgba(124,58,237,.5);cursor:pointer;}
+
 /* ── ALERT NET OVERLAY ── */
 #alertnet-overlay{position:fixed;inset:0;z-index:9000;background:#fff;display:none;flex-direction:column;}
 #alertnet-bar{background:#dc2626;padding:12px 16px;display:flex;align-items:center;gap:12px;padding-top:calc(12px + env(safe-area-inset-top));}
@@ -483,11 +491,13 @@ textarea{min-height:80px;resize:none;}
   <button class="pwa-close" onclick="document.getElementById('pwa-install-banner').style.display='none'">✕</button>
 </div>
 
-<!-- DEMO MODE BANNER -->
-<div id="demo-banner">
-  <div><i class="fas fa-flask"></i> MODE CONSEILLER ACTIF <span class="demo-badge">Données anonymisées</span></div>
-  <button onclick="app.demoMode.toggle()" style="background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:8px;padding:6px 12px;font-weight:900;cursor:pointer;font-size:12px;">Désactiver</button>
+<!-- CONSEILLER READ-ONLY BANNER -->
+<div id="conseiller-banner">
+  <div><i class="fas fa-eye"></i> Accès Conseiller — <span style="font-weight:700;opacity:.85;">Lecture seule</span></div>
+  <div style="font-size:11px;opacity:.75;">Les modifications sont désactivées</div>
 </div>
+
+
 <div id="toast-container"></div>
 <div id="spinner-overlay" class="hidden"><div class="spinner"></div></div>
 
@@ -727,10 +737,14 @@ textarea{min-height:80px;resize:none;}
   <div id="view-home">
 
 
-    <div id="home-edit-bar" style="display:none;background:linear-gradient(135deg,#7c3aed,#5b21b6);border-radius:14px;padding:12px 16px;margin-bottom:12px;color:#fff;">
-      <div style="font-weight:950;font-size:14px;margin-bottom:8px;"><i class="fas fa-grip-vertical"></i> Mode édition — réorganiser les modules</div>
-      <div class="small" style="margin-bottom:10px;opacity:.85;">Utilisez les flèches pour déplacer les modules. L'ordre est sauvegardé automatiquement.</div>
-      <button onclick="app.homeOrder.stopEdit()" style="background:rgba(255,255,255,.25);border:none;color:#fff;border-radius:10px;padding:10px 18px;font-weight:950;cursor:pointer;"><i class="fas fa-check"></i> Terminé</button>
+    <div id="home-edit-bar" style="display:none;background:linear-gradient(135deg,#7c3aed,#5b21b6);border-radius:16px;padding:14px 16px;margin-bottom:12px;color:#fff;">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+        <div>
+          <div style="font-weight:950;font-size:15px;"><i class="fas fa-hand-pointer"></i> Maintenez et glissez pour réorganiser</div>
+          <div style="font-size:12px;opacity:.8;margin-top:3px;">Les modules se déplacent au toucher • Sauvegarde automatique</div>
+        </div>
+        <button onclick="app.homeOrder.stopEdit()" style="background:rgba(255,255,255,.25);border:none;color:#fff;border-radius:12px;padding:10px 16px;font-weight:950;cursor:pointer;white-space:nowrap;flex-shrink:0;"><i class="fas fa-check"></i> Terminé</button>
+      </div>
     </div>
     <div class="home-grid" id="home-grid">
       <div class="home-btn wide" onclick="app.nav('dlc')" style="background:linear-gradient(135deg,#003896,#1e40af);position:relative;">
@@ -1180,16 +1194,18 @@ textarea{min-height:80px;resize:none;}
       <p class="small" style="color:#64748b;margin-bottom:12px;">Déplacez les modules à votre convenance. Les modifications sont instantanées.</p>
       <button class="btn" onclick="app.nav('home');setTimeout(()=>app.homeOrder.startEdit(),100)"><i class="fas fa-arrows-up-down-left-right"></i> Réorganiser les modules</button>
     </div>
-    <div class="card" style="border-left:5px solid #7c3aed;background:linear-gradient(135deg,#faf5ff,#fff);">
-      <h3 style="margin-top:0;color:#7c3aed;"><i class="fas fa-flask"></i> Mode Conseiller Franchise</h3>
-      <p class="small" style="color:#64748b;margin-bottom:12px;">Activez ce mode pour présenter l'application à votre conseiller de franchise avec des données anonymisées. Un code d'accès est requis.</p>
-      <button class="btn" style="background:linear-gradient(135deg,#7c3aed,#5b21b6);" onclick="app.demoMode.toggle()"><i class="fas fa-flask"></i> Activer / Désactiver mode conseiller</button>
+    <div class="card" style="border-left:5px solid #0891b2;background:linear-gradient(135deg,#f0f9ff,#fff);">
+      <h3 style="margin-top:0;color:#0891b2;"><i class="fas fa-eye"></i> Rôle Conseiller Franchise</h3>
+      <p class="small" style="color:#64748b;margin-bottom:10px;">Le rôle <b>Conseiller</b> donne un accès en <b>lecture seule</b> à toute l'application — le conseiller peut consulter mais ne peut rien modifier. Créez un compte dédié ci-dessous avec le rôle "conseiller (lecture seule)".</p>
+      <div style="background:#e0f2fe;border-radius:10px;padding:10px 12px;font-size:13px;color:#0369a1;font-weight:800;">
+        <i class="fas fa-info-circle"></i> Créez un compte avec le rôle <b>conseiller (lecture seule)</b> dans le formulaire ci-dessous.
+      </div>
     </div>
     <div class="card">
       <h3 style="margin-top:0;">Créer un compte staff</h3>
       <input id="new-u-name"  placeholder="Nom (ex: LUCAS)" autocomplete="off">
       <input id="new-u-email" placeholder="Email (ex: lucas@...)" inputmode="email" autocomplete="off">
-      <select id="new-u-role"><option value="staff">staff</option><option value="admin">admin</option></select>
+      <select id="new-u-role"><option value="staff">staff</option><option value="conseiller">conseiller (lecture seule)</option><option value="admin">admin</option></select>
       <button class="btn" onclick="app.team.createStaff()">Créer + envoyer lien mot de passe</button>
       <div class="small">Le staff clique "Mot de passe oublié" sur l'écran de login.</div>
     </div>
@@ -1549,8 +1565,16 @@ window.app={
       document.getElementById('app-header').classList.remove('hidden');
       document.getElementById('app-nav').classList.remove('hidden');
       document.getElementById('user-badge').innerText=this.me.name||(this.me.email||"USER");
-      if(this.me.role==='admin')document.getElementById('btn-team').classList.remove('hidden');
+      const isAdmin=this.me.role==='admin';
+      const isConseiller=this.me.role==='conseiller';
+      if(isAdmin)document.getElementById('btn-team').classList.remove('hidden');
       else document.getElementById('btn-team').classList.add('hidden');
+      // Bannière bleue lecture seule pour conseiller
+      const cb=document.getElementById('conseiller-banner');
+      if(cb)cb.classList.toggle('show',isConseiller);
+      // Masquer le bouton de réorganisation si pas admin
+      const reorgBtn=document.getElementById('home-reorder-btn');
+      if(reorgBtn)reorgBtn.style.display=isAdmin?'flex':'none';
 
       // Show/hide create buttons based on permissions
       const pvpCreateBtn=document.getElementById('pvp-create-btn');
@@ -1686,6 +1710,7 @@ window.app={
     const me=this.me;
     if(!me)return false;
     if(me.role==='admin')return true;
+    if(me.role==='conseiller')return false; // lecture seule — jamais de modification
     if(me.permissions&&me.permissions[perm]===true)return true;
     return false;
   },
@@ -1761,6 +1786,7 @@ window.app={
           <div style="margin-top:10px;">
             <select onchange="app.team.setRole('${u.uid}',this.value)" style="margin:0;padding:10px;font-size:14px;">
               <option value="staff" ${u.role==='staff'?'selected':''}>staff</option>
+              <option value="conseiller" ${u.role==='conseiller'?'selected':''}>conseiller (lecture seule)</option>
               <option value="admin" ${u.role==='admin'?'selected':''}>admin</option>
             </select>
           </div>
@@ -3583,54 +3609,130 @@ ${nameLine2?`^CF0,30^FO15,45^FD${nameLine2}^FS`:''}
 
 
   // ══════════════════════════════════════════════════
-  // ── HOME MODULE ORDER ──
+  // ── HOME MODULE REORDER (drag-and-drop touch+mouse) ──
   // ══════════════════════════════════════════════════
   homeOrder:{
     _editing:false,
+    _drag:null, // {el, startX, startY, origIdx, clone, lastTarget}
 
     startEdit(){
       this._editing=true;
-      document.getElementById('home-edit-bar').style.display='block';
-      // Add move buttons to each home-btn
-      const btns=document.querySelectorAll('#home-grid .home-btn');
-      btns.forEach((btn,i)=>{
-        if(btn.querySelector('.home-move-ctrl'))return;
-        const ctrl=document.createElement('div');
-        ctrl.className='home-move-ctrl';
-        ctrl.style.cssText='position:absolute;top:6px;right:6px;display:flex;gap:4px;z-index:10;';
-        ctrl.innerHTML=`
-          <button onclick="event.stopPropagation();app.homeOrder.moveBtn(${i},-1)" style="background:rgba(255,255,255,.3);border:none;color:#fff;border-radius:6px;width:26px;height:26px;cursor:pointer;font-size:12px;">◀</button>
-          <button onclick="event.stopPropagation();app.homeOrder.moveBtn(${i},1)" style="background:rgba(255,255,255,.3);border:none;color:#fff;border-radius:6px;width:26px;height:26px;cursor:pointer;font-size:12px;">▶</button>`;
-        btn.style.position='relative';
-        btn.appendChild(ctrl);
+      const bar=document.getElementById('home-edit-bar');
+      const reorgBtn=document.getElementById('home-reorder-btn');
+      if(bar)bar.style.display='block';
+      if(reorgBtn)reorgBtn.style.display='none';
+      const grid=document.getElementById('home-grid');
+      if(!grid)return;
+      // Add visual cues to every module button
+      grid.querySelectorAll('.home-btn').forEach(btn=>{
+        btn.classList.add('reorder-mode');
+        // Add grip icon if not already there
+        if(!btn.querySelector('.grip-icon')){
+          const g=document.createElement('div');
+          g.className='grip-icon';
+          g.innerHTML='<i class="fas fa-grip-vertical"></i>';
+          btn.prepend(g);
+        }
+        // Wire drag events
+        btn.addEventListener('touchstart',this._onTouchStart.bind(this),{passive:false});
+        btn.addEventListener('mousedown',this._onMouseDown.bind(this));
       });
     },
 
     stopEdit(){
       this._editing=false;
-      document.getElementById('home-edit-bar').style.display='none';
-      document.querySelectorAll('.home-move-ctrl').forEach(e=>e.remove());
-      toast('Ordre sauvegardé.','ok',2000);
-    },
-
-    moveBtn(fromIdx,direction){
+      const bar=document.getElementById('home-edit-bar');
+      const reorgBtn=document.getElementById('home-reorder-btn');
+      if(bar)bar.style.display='none';
+      if(reorgBtn)reorgBtn.style.display='flex';
       const grid=document.getElementById('home-grid');
       if(!grid)return;
-      const btns=Array.from(grid.querySelectorAll('.home-btn'));
-      const toIdx=fromIdx+direction;
-      if(toIdx<0||toIdx>=btns.length)return;
-      const from=btns[fromIdx];
-      const to=btns[toIdx];
-      if(direction>0){
-        grid.insertBefore(to,from);
-      }else{
-        grid.insertBefore(from,to);
+      grid.querySelectorAll('.home-btn').forEach(btn=>{
+        btn.classList.remove('reorder-mode','drag-over');
+        btn.querySelectorAll('.grip-icon').forEach(e=>e.remove());
+        // Remove event listeners by cloning
+        const newBtn=btn.cloneNode(true);
+        btn.parentNode.replaceChild(newBtn,btn);
+      });
+      this._saveOrder();
+      toast('✓ Ordre enregistré','ok',2000);
+    },
+
+    _saveOrder(){
+      try{
+        const ids=Array.from(document.querySelectorAll('#home-grid .home-btn')).map(b=>b.dataset.mid||b.textContent.trim().slice(0,20));
+        localStorage.setItem('home_order',JSON.stringify(ids));
+      }catch(e){}
+    },
+
+    _getPos(e){
+      const t=e.touches?e.touches[0]:e;
+      return{x:t.clientX,y:t.clientY};
+    },
+
+    _onTouchStart(e){
+      if(!this._editing)return;
+      e.preventDefault();
+      const btn=e.currentTarget;
+      this._startDrag(btn,e.touches[0].clientX,e.touches[0].clientY);
+      const move=ev=>{ev.preventDefault();this._moveDrag(ev.touches[0].clientX,ev.touches[0].clientY);};
+      const end=()=>{this._endDrag();document.removeEventListener('touchmove',move);document.removeEventListener('touchend',end);};
+      document.addEventListener('touchmove',move,{passive:false});
+      document.addEventListener('touchend',end);
+    },
+
+    _onMouseDown(e){
+      if(!this._editing)return;
+      this._startDrag(e.currentTarget,e.clientX,e.clientY);
+      const move=ev=>this._moveDrag(ev.clientX,ev.clientY);
+      const end=()=>{this._endDrag();document.removeEventListener('mousemove',move);document.removeEventListener('mouseup',end);};
+      document.addEventListener('mousemove',move);
+      document.addEventListener('mouseup',end);
+    },
+
+    _startDrag(btn,x,y){
+      btn.classList.add('dragging');
+      // Create ghost clone
+      const r=btn.getBoundingClientRect();
+      const clone=btn.cloneNode(true);
+      clone.style.cssText=`position:fixed;left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px;opacity:.85;pointer-events:none;z-index:99999;transform:scale(1.04);box-shadow:0 12px 40px rgba(0,0,0,.3);transition:none;border-radius:18px;`;
+      document.body.appendChild(clone);
+      btn.style.opacity='.3';
+      this._drag={el:btn,x,y,ox:r.left,oy:r.top,clone,lastTarget:null};
+    },
+
+    _moveDrag(x,y){
+      if(!this._drag)return;
+      const d=this._drag;
+      const dx=x-d.x, dy=y-d.y;
+      d.clone.style.left=(parseFloat(d.clone.style.left)+dx)+'px';
+      d.clone.style.top=(parseFloat(d.clone.style.top)+dy)+'px';
+      d.x=x; d.y=y;
+      // Find element under pointer
+      d.clone.style.display='none';
+      const under=document.elementFromPoint(x,y);
+      d.clone.style.display='';
+      const target=under&&under.closest('.home-btn');
+      if(target&&target!==d.el&&target!==d.lastTarget){
+        const grid=document.getElementById('home-grid');
+        const btns=Array.from(grid.querySelectorAll('.home-btn'));
+        const fromIdx=btns.indexOf(d.el);
+        const toIdx=btns.indexOf(target);
+        if(fromIdx>-1&&toIdx>-1){
+          if(fromIdx<toIdx)grid.insertBefore(d.el,target.nextSibling);
+          else grid.insertBefore(d.el,target);
+        }
+        d.lastTarget=target;
       }
-      // Re-add controls with updated indices after slight delay
-      setTimeout(()=>{
-        document.querySelectorAll('.home-move-ctrl').forEach(e=>e.remove());
-        this.startEdit();
-      },50);
+    },
+
+    _endDrag(){
+      if(!this._drag)return;
+      const{el,clone}=this._drag;
+      el.style.opacity='';
+      el.classList.remove('dragging');
+      clone.remove();
+      this._drag=null;
     }
   },
 
@@ -3660,47 +3762,6 @@ ${nameLine2?`^CF0,30^FO15,45^FD${nameLine2}^FS`:''}
 '+this._pwd);}catch(e){}
       window.open(this._url,'_blank','noopener');
       toast('Identifiants copiés ! Collez-les sur Alert Net.','ok',4000);
-    }
-  },
-
-  // ══════════════════════════════════════════════════
-  // ── MODE TEST (Conseiller Franchise) ──
-  // ══════════════════════════════════════════════════
-  demoMode:{
-    _active:false,
-    _pass:'PURPAN2024',
-
-    isActive(){return this._active;},
-
-    toggle:async function(){
-      if(this._active){
-        const ok=await dlgConfirm('Quitter le mode test','Désactiver le mode conseiller ?');
-        if(!ok)return;
-        this._active=false;
-        toast('Mode test désactivé.','info');
-        this.updateBanner();
-        return;
-      }
-      const pass=await dlgPrompt('Code d'accès mode conseiller :','');
-      if(pass===null)return;
-      if(pass.trim().toUpperCase()!==this._pass){return toast('Code incorrect.','err');}
-      this._active=true;
-      toast('✓ Mode conseiller activé — données anonymisées.','ok',4000);
-      this.updateBanner();
-    },
-
-    updateBanner(){
-      const b=document.getElementById('demo-banner');
-      if(!b)return;
-      b.style.display=this._active?'flex':'none';
-    },
-
-    // Mask sensitive data for display
-    maskUser(name){
-      if(!this._active)return name;
-      const n=name||'';
-      if(n.length<3)return '***';
-      return n[0]+'*'.repeat(n.length-2)+n[n.length-1];
     }
   },
 
@@ -3860,11 +3921,6 @@ ${nameLine2?`^CF0,30^FO15,45^FD${nameLine2}^FS`:''}
 };
 window.app.initOffline();
 window.app._initInstallPrompt();
-// Wire Firebase refs for chat (using same db instance)
-try{
-  const{collection,query,orderBy,limit,onSnapshot,addDoc,serverTimestamp}=window._FirebaseModules||{};
-  window._fbChat={collection,query,orderBy,limit,onSnapshot,addDoc,serverTimestamp};
-}catch(e){}
 
 // Wire photo inputs
 document.getElementById('cam-input').addEventListener('change',e=>{const f=e.target.files?.[0];if(!f)return;window.app.common.compressImg(f,b64=>{document.getElementById('img-preview').src=b64;document.getElementById('img-preview').style.display='block';document.getElementById('lib-img-data').value=b64;});});
@@ -3877,4 +3933,15 @@ onAuthStateChanged(auth,async user=>{
     document.getElementById('app-header').classList.add('hidden');
     document.getElementById('app-nav').classList.add('hidden');
     window.app.me=null;
-    window.app.data={frais:
+    window.app.data={frais:window.app.data={frais:[],users:[],pvpLib:[],pvpStock:[],checkedNeeds:[],saladLib:[],saladStock:[],frigo:{perDay:2,fridges:[],logs:[]},todo:{zones:[],tasks:[]},todoLogs:[],reception:[]};
+    return;
+  }
+  await window.app.afterLoginBootstrap();
+});
+</script>
+<!-- BOUTON FLOTTANT RÉORGANISER (admin seulement) -->
+<button id="home-reorder-btn" title="Réorganiser les modules" onclick="app.homeOrder.startEdit()">
+  <i class="fas fa-grip-vertical"></i>
+</button>
+</body>
+</html>
