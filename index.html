@@ -3758,8 +3758,7 @@ ${nameLine2?`^CF0,30^FO15,45^FD${nameLine2}^FS`:''}
       if(fr)fr.src='about:blank';
     },
     openExternal(){
-      try{navigator.clipboard.writeText(this._id+'
-'+this._pwd);}catch(e){}
+      try{navigator.clipboard.writeText(this._id+'\n'+this._pwd);}catch(e){}
       window.open(this._url,'_blank','noopener');
       toast('Identifiants copiés ! Collez-les sur Alert Net.','ok',4000);
     }
