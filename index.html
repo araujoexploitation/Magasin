@@ -339,6 +339,10 @@ textarea{min-height:80px;resize:none;}
 .perm-toggle label{font-size:13px;font-weight:800;color:#334155;cursor:pointer;flex:1;}
 .perm-toggle input[type=checkbox]{width:18px;height:18px;cursor:pointer;accent-color:var(--primary);flex-shrink:0;}
 .perm-section-title{font-size:11px;font-weight:950;text-transform:uppercase;color:var(--muted);margin:12px 0 6px 0;grid-column:1/-1;}
+.channel-config-row{background:#f8fafc;border-radius:12px;padding:12px;margin-bottom:10px;border:1.5px solid #e2e8f0;}
+.channel-config-row .ch-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.channel-config-row .ch-name-input{flex:1;padding:10px;border:1.5px solid #cbd5e1;border-radius:8px;font-size:14px;font-weight:800;background:#fff;outline:none;}
+.channel-access-grid{display:flex;flex-wrap:wrap;gap:6px;}
 
 /* ── FREQUENCY SELECTOR ── */
 .freq-type-tabs{display:flex;gap:6px;margin-bottom:12px;}
@@ -469,6 +473,18 @@ textarea{min-height:80px;resize:none;}
 @keyframes wiggle{from{transform:rotate(-.5deg) scale(1)}to{transform:rotate(.5deg) scale(1.01)}}
 .grip-icon{position:absolute;top:8px;left:8px;color:rgba(255,255,255,.7);font-size:14px;z-index:5;pointer-events:none;}
 #home-reorder-btn{display:none;position:fixed;bottom:88px;right:16px;z-index:50000;background:linear-gradient(135deg,#7c3aed,#5b21b6);color:#fff;border:none;border-radius:50%;width:48px;height:48px;align-items:center;justify-content:center;font-size:18px;box-shadow:0 4px 20px rgba(124,58,237,.5);cursor:pointer;}
+
+/* ── FLOATING GEAR SETTINGS BUTTON ── */
+#float-settings-btn{
+  position:fixed;right:0;top:50%;transform:translateY(-50%);z-index:200;
+  background:linear-gradient(135deg,#003896,#1a50c8);color:#fff;border:none;
+  border-radius:14px 0 0 14px;padding:14px 10px;cursor:pointer;
+  box-shadow:-4px 4px 16px rgba(0,56,150,.3);display:none;flex-direction:column;align-items:center;gap:4px;
+}
+#float-settings-btn:active{opacity:.85;}
+#float-settings-btn i{font-size:20px;transition:transform .3s;}
+#float-settings-btn:hover i{transform:rotate(60deg);}
+#float-settings-btn span{font-size:9px;font-weight:900;letter-spacing:.5px;writing-mode:vertical-rl;text-orientation:mixed;transform:rotate(180deg);opacity:.8;}
 
 /* ── ALERT NET OVERLAY ── */
 #alertnet-overlay{position:fixed;inset:0;z-index:9000;background:#fff;display:none;flex-direction:column;}
@@ -780,10 +796,10 @@ textarea{min-height:80px;resize:none;}
       <!-- GESTION MAGASIN (parent) - inclut aussi Module Carrefour -->
       <div class="home-btn wide" onclick="app.nav('gestion-magasin')" style="background:linear-gradient(135deg,#0f766e,#134e4a);">
         <i class="fas fa-building"></i><br>GESTION MAGASIN
-        <div class="small" style="color:rgba(255,255,255,.8);margin-top:6px;">Planning • Inspection • Carrefour • Chat</div>
+        <div class="small" style="color:rgba(255,255,255,.8);margin-top:6px;">Planning • Inspection • Outils Carrefour</div>
       </div>
     </div>
-    <div class="card hidden" id="btn-team" onclick="app.nav('team')" style="text-align:center;cursor:pointer;margin-bottom:10px;"><i class="fas fa-gear"></i> Paramètres & Équipe</div>
+    <div class="card hidden" id="btn-team" onclick="app.nav('team')" style="text-align:center;cursor:pointer;margin-bottom:10px;display:none!important;"><i class="fas fa-gear"></i> Paramètres & Équipe</div>
   </div>
 
   <!-- GESTION DLC - Module parent -->
@@ -1081,12 +1097,39 @@ textarea{min-height:80px;resize:none;}
     </div>
   </div>
 
-  <!-- MODULE CARREFOUR (parent) -->
-  <div id="view-carrefour" class="hidden">
+
+
+  <!-- GESTION MAGASIN (parent) -->
+  <div id="view-gestion-magasin" class="hidden">
+    <div style="text-align:center;margin-bottom:16px;">
+      <div style="font-weight:950;font-size:20px;color:#0891b2;"><i class="fas fa-building"></i> GESTION MAGASIN</div>
+      <div class="small" style="margin-top:4px;">Outils de gestion • Franchise Carrefour Express</div>
+    </div>
+    <div class="dlc-module-grid">
+      <div class="dlc-sub-card" onclick="app.nav('planning')" style="border-color:#0891b2;background:linear-gradient(135deg,#ecfeff,#fff);">
+        <i class="fas fa-calendar-days" style="color:#0891b2;font-size:30px;"></i>
+        <div class="sub-title" style="color:#0891b2;">PLANNING RH</div>
+        <div class="sub-sub">Planification équipe</div>
+      </div>
+      <div class="dlc-sub-card" onclick="app.inspection.render();app.nav('inspection')" style="border-color:#475569;background:linear-gradient(135deg,#f8fafc,#fff);">
+        <i class="fas fa-chart-bar" style="color:#475569;font-size:30px;"></i>
+        <div class="sub-title" style="color:#475569;">INSPECTION</div>
+        <div class="sub-sub">Rapports & export</div>
+      </div>
+      <div class="dlc-sub-card wide" onclick="app.nav('carrefour-tools')" style="border-color:#003896;background:linear-gradient(135deg,#eff6ff,#fff);">
+        <i class="fas fa-store" style="color:#003896;font-size:30px;"></i>
+        <div class="sub-title" style="color:#003896;">OUTILS CARREFOUR</div>
+        <div class="sub-sub">Dynacad • METI • Alert Net • My Travis</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OUTILS CARREFOUR (standalone) -->
+  <div id="view-carrefour-tools" class="hidden">
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
       <button class="qty-btn" onclick="app.goBack()"><i class="fas fa-arrow-left"></i></button>
       <div>
-        <div style="font-weight:950;font-size:20px;color:#003896;"><i class="fas fa-store"></i> MODULE CARREFOUR</div>
+        <div style="font-weight:950;font-size:20px;color:#003896;"><i class="fas fa-store"></i> OUTILS CARREFOUR</div>
         <div class="small" style="margin-top:2px;">Outils et accès franchise Carrefour Express</div>
       </div>
     </div>
@@ -1110,37 +1153,6 @@ textarea{min-height:80px;resize:none;}
         <i class="fas fa-truck" style="color:#0891b2;font-size:30px;"></i>
         <div class="sub-title" style="color:#0891b2;">MY TRAVIS</div>
         <div class="sub-sub">Suivi camions</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- GESTION MAGASIN (parent) -->
-  <div id="view-gestion-magasin" class="hidden">
-    <div style="text-align:center;margin-bottom:16px;">
-      <div style="font-weight:950;font-size:20px;color:#0891b2;"><i class="fas fa-building"></i> GESTION MAGASIN</div>
-      <div class="small" style="margin-top:4px;">Outils de gestion • Franchise Carrefour Express</div>
-    </div>
-    <div class="dlc-module-grid">
-      <div class="dlc-sub-card" onclick="app.nav('planning')" style="border-color:#0891b2;background:linear-gradient(135deg,#ecfeff,#fff);">
-        <i class="fas fa-calendar-days" style="color:#0891b2;font-size:30px;"></i>
-        <div class="sub-title" style="color:#0891b2;">PLANNING RH</div>
-        <div class="sub-sub">Planification équipe</div>
-      </div>
-      <div class="dlc-sub-card" onclick="app.inspection.render();app.nav('inspection')" style="border-color:#475569;background:linear-gradient(135deg,#f8fafc,#fff);">
-        <i class="fas fa-chart-bar" style="color:#475569;font-size:30px;"></i>
-        <div class="sub-title" style="color:#475569;">INSPECTION</div>
-        <div class="sub-sub">Rapports & export</div>
-      </div>
-      <div class="dlc-sub-card wide" onclick="app.nav('carrefour')" style="border-color:#003896;background:linear-gradient(135deg,#eff6ff,#fff);">
-        <i class="fas fa-store" style="color:#003896;font-size:30px;"></i>
-        <div class="sub-title" style="color:#003896;">MODULE CARREFOUR</div>
-        <div class="sub-sub">Dynacad • METI • Alert Net • Outils franchise</div>
-      </div>
-      <div class="dlc-sub-card wide" onclick="app.nav('chat')" style="border-color:#0891b2;background:linear-gradient(135deg,#f0f9ff,#fff);">
-        <div id="badge-chat-gm" style="display:none;background:#ef4444;color:#fff;border-radius:20px;padding:2px 8px;font-size:11px;font-weight:950;margin-bottom:4px;">0 nouveau(x)</div>
-        <i class="fas fa-comments" style="color:#0891b2;font-size:30px;"></i>
-        <div class="sub-title" style="color:#0891b2;">MESSAGERIE</div>
-        <div class="sub-sub">Canaux de discussion équipe</div>
       </div>
     </div>
   </div>
@@ -1196,10 +1208,11 @@ textarea{min-height:80px;resize:none;}
     </div>
     <div class="card" style="border-left:5px solid #0891b2;background:linear-gradient(135deg,#f0f9ff,#fff);">
       <h3 style="margin-top:0;color:#0891b2;"><i class="fas fa-eye"></i> Rôle Conseiller Franchise</h3>
-      <p class="small" style="color:#64748b;margin-bottom:10px;">Le rôle <b>Conseiller</b> donne un accès en <b>lecture seule</b> à toute l'application — le conseiller peut consulter mais ne peut rien modifier. Créez un compte dédié ci-dessous avec le rôle "conseiller (lecture seule)".</p>
-      <div style="background:#e0f2fe;border-radius:10px;padding:10px 12px;font-size:13px;color:#0369a1;font-weight:800;">
-        <i class="fas fa-info-circle"></i> Créez un compte avec le rôle <b>conseiller (lecture seule)</b> dans le formulaire ci-dessous.
+      <p class="small" style="color:#64748b;margin-bottom:10px;">Le rôle <b>Conseiller</b> donne un accès en <b>lecture seule</b> à toute l'application. Vous pouvez lui attribuer une <b>date d'expiration</b> — après cette date, l'accès est automatiquement révoqué.</p>
+      <div style="background:#e0f2fe;border-radius:10px;padding:10px 12px;font-size:13px;color:#0369a1;font-weight:800;margin-bottom:10px;">
+        <i class="fas fa-info-circle"></i> Créez un compte avec le rôle <b>conseiller</b> puis définissez une expiration dans la liste des utilisateurs.
       </div>
+      <div id="conseiller-list" style="margin-top:4px;"></div>
     </div>
     <div class="card">
       <h3 style="margin-top:0;">Créer un compte staff</h3>
@@ -1208,6 +1221,12 @@ textarea{min-height:80px;resize:none;}
       <select id="new-u-role"><option value="staff">staff</option><option value="conseiller">conseiller (lecture seule)</option><option value="admin">admin</option></select>
       <button class="btn" onclick="app.team.createStaff()">Créer + envoyer lien mot de passe</button>
       <div class="small">Le staff clique "Mot de passe oublié" sur l'écran de login.</div>
+    </div>
+    <!-- GESTION DES CANAUX -->
+    <div class="card" style="border-left:5px solid #0891b2;">
+      <h3 style="margin-top:0;color:#0891b2;"><i class="fas fa-comments"></i> Canaux de messagerie</h3>
+      <p class="small" style="color:#64748b;margin-bottom:12px;">Renommez les canaux et définissez qui peut y accéder.</p>
+      <div id="channels-config-list"></div>
     </div>
     <div class="card">
       <h3 style="margin-top:0;">Utilisateurs</h3>
@@ -1555,6 +1574,23 @@ window.app={
       this.me=this.data.users.find(u=>u.uid===auth.currentUser.uid)||null;
       if(!this.me){toast('Compte non autorisé.','err');await signOut(auth);return;}
 
+      // Check conseiller expiry
+      if(this.me.role==='conseiller'&&this.me.conseillerExpiry){
+        if(Date.now()>this.me.conseillerExpiry){
+          toast('Votre accès conseiller a expiré. Contactez l\'administrateur.','err',8000);
+          await signOut(auth);return;
+        }
+      }
+
+      // Load channels config from Firestore
+      try{
+        const chDoc=await getDoc(doc(db,'store_master','CHANNELS'));
+        if(chDoc.exists()){
+          const saved=chDoc.data().list||[];
+          saved.forEach(sc=>{const ch=this.chat._channels.find(c=>c.id===sc.id);if(ch){ch.name=sc.name;if(sc.allowedUsers!==undefined)ch.allowedUsers=sc.allowedUsers;}});
+        }
+      }catch(e){}
+
       await this.loadTodoLogs();
       await this.loadReceptionLogs();
 
@@ -1569,6 +1605,9 @@ window.app={
       const isConseiller=this.me.role==='conseiller';
       if(isAdmin)document.getElementById('btn-team').classList.remove('hidden');
       else document.getElementById('btn-team').classList.add('hidden');
+      // Bouton flottant paramètres
+      const floatSettings=document.getElementById('float-settings-btn');
+      if(floatSettings)floatSettings.style.display=isAdmin?'flex':'none';
       // Bannière bleue lecture seule pour conseiller
       const cb=document.getElementById('conseiller-banner');
       if(cb)cb.classList.toggle('show',isConseiller);
@@ -1589,7 +1628,7 @@ window.app={
   updateUI(){
     this.frais.render();this.pvp.render();this.salad.render();
     this.frigo.render();this.todo.renderToday();
-    this.team.renderUsers();this.checkAlerts();this.updateHomeBadges();
+    this.team.renderUsers();this.team.renderConseilleurs();this.team.renderChannelsConfig();this.checkAlerts();this.updateHomeBadges();
   },
 
   updateDlcBadges(){
@@ -1645,6 +1684,7 @@ window.app={
     if(v==='etiquettes'){this.etiquettes.loadProducts();}
     if(v==='planning'){this.planning.render();}
     if(v==='chat'){this.chat.render();}
+    if(v==='team'){this.team.renderConseilleurs();this.team.renderChannelsConfig();}
     if(v==='home'){this._maybeShowInstallPrompt();}
   },
   goBack(){if(this.viewHistory.length)this.nav(this.viewHistory.pop(),false);else this.nav('home',false);},
@@ -1734,7 +1774,7 @@ window.app={
         await sendPasswordResetEmail(secAuth,email);
         try{await signOut(secAuth);}catch(e){}
         document.getElementById('new-u-name').value='';document.getElementById('new-u-email').value='';
-        toast('Compte créé + email reset envoyé.','ok');this.renderUsers();
+        toast('Compte créé + email reset envoyé.','ok');this.renderUsers();this.renderConseilleurs();this.renderChannelsConfig();
       }catch(e){
         const code=String(e?.code||'');
         if(code.includes('email-already-in-use'))toast('Email déjà utilisé.','err');
@@ -1789,6 +1829,7 @@ window.app={
               <option value="conseiller" ${u.role==='conseiller'?'selected':''}>conseiller (lecture seule)</option>
               <option value="admin" ${u.role==='admin'?'selected':''}>admin</option>
             </select>
+            ${u.role==='conseiller'?`<button onclick="app.team.setConseillerExpiry('${u.uid}')" style="background:#0891b2;color:#fff;border:none;border-radius:8px;padding:8px 12px;font-weight:900;font-size:12px;cursor:pointer;margin-top:6px;width:100%;"><i class="fas fa-clock"></i> Expiration accès : ${u.conseillerExpiry?new Date(u.conseillerExpiry).toLocaleDateString('fr'):'Illimité'}</button>`:''}
           </div>
           ${permsBlock}
         </div>`;
@@ -1802,6 +1843,89 @@ window.app={
       u.permissions[perm]=val;
       try{await window.app.save('users');toast(val?'Permission accordée.':'Permission retirée.','ok');}
       catch(e){toast('Erreur sauvegarde.','err');}
+    },
+
+    setConseillerExpiry:async function(uid){
+      if(!this.ensureAdmin())return;
+      const u=window.app.data.users.find(x=>x.uid===uid);if(!u)return;
+      const current=u.conseillerExpiry?new Date(u.conseillerExpiry).toISOString().slice(0,10):'';
+      const v=await dlgPrompt('Date d\'expiration accès conseiller (JJ/MM/AAAA ou vide = illimité):',current,'date');
+      if(v===null)return;
+      if(!v){u.conseillerExpiry=null;toast('Accès illimité.','ok');}
+      else{
+        const d=new Date(v);if(isNaN(d.getTime()))return toast('Date invalide.','err');
+        u.conseillerExpiry=d.getTime();
+        toast('Expiration définie : '+d.toLocaleDateString('fr'),'ok');
+      }
+      try{await window.app.save('users');this.renderUsers();this.renderConseilleurs();}
+      catch(e){toast('Erreur sauvegarde.','err');}
+    },
+
+    renderConseilleurs(){
+      const wrap=document.getElementById('conseiller-list');if(!wrap)return;
+      const conseillers=(window.app.data.users||[]).filter(u=>u.role==='conseiller');
+      if(!conseillers.length){wrap.innerHTML='<div class="small" style="color:#64748b;">Aucun conseiller créé.</div>';return;}
+      wrap.innerHTML=conseillers.map(u=>{
+        const exp=u.conseillerExpiry?new Date(u.conseillerExpiry):'';
+        const isExpired=exp&&exp<new Date();
+        const expStr=exp?`<span style="color:${isExpired?'#dc2626':'#059669'};font-weight:900;">${isExpired?'⚠️ Expiré':'✓ Valide jusqu\'au'} ${exp.toLocaleDateString('fr')}</span>`:'<span style="color:#64748b;">Illimité</span>';
+        return `<div style="padding:10px;background:${isExpired?'#fff5f5':'#f0fdf4'};border-radius:10px;margin-bottom:8px;border:1.5px solid ${isExpired?'#fca5a5':'#bbf7d0'};">
+          <div style="font-weight:950;">${u.name||u.email}</div>
+          <div class="small" style="margin-top:2px;">${expStr}</div>
+          <button onclick="app.team.setConseillerExpiry('${u.uid}')" style="background:#0891b2;color:#fff;border:none;border-radius:8px;padding:6px 12px;font-weight:900;font-size:12px;cursor:pointer;margin-top:8px;"><i class="fas fa-clock"></i> Modifier expiration</button>
+        </div>`;
+      }).join('');
+    },
+
+    // ── GESTION DES CANAUX ──
+    renderChannelsConfig(){
+      const wrap=document.getElementById('channels-config-list');if(!wrap)return;
+      const channels=window.app.chat._channels;
+      const users=(window.app.data.users||[]).filter(u=>u.role!=='admin');
+      wrap.innerHTML=channels.map((c,idx)=>{
+        const userChecks=users.map(u=>{
+          const allowed=!c.allowedUsers||(c.allowedUsers||[]).includes(u.uid);
+          return `<label style="display:inline-flex;align-items:center;gap:4px;background:${allowed?'#dbeafe':'#f8fafc'};border-radius:20px;padding:4px 10px;font-size:12px;font-weight:800;cursor:pointer;border:1.5px solid ${allowed?'#93c5fd':'#e2e8f0'};">
+            <input type="checkbox" ${allowed?'checked':''} onchange="app.team.toggleChannelUser(${idx},'${u.uid}',this.checked)" style="width:14px;height:14px;cursor:pointer;">
+            ${u.name||u.email}
+          </label>`;
+        }).join('');
+        return `<div class="channel-config-row">
+          <div class="ch-header">
+            <i class="fas ${c.icon}" style="color:${c.color};font-size:18px;flex-shrink:0;"></i>
+            <input class="ch-name-input" value="${c.name}" onchange="app.team.renameChannel(${idx},this.value)" placeholder="Nom du canal">
+            <span style="font-size:11px;font-weight:800;color:#64748b;white-space:nowrap;">${c.adminOnly?'🔒 Admin':'👥 Tous'}</span>
+          </div>
+          <div style="font-size:11px;font-weight:950;color:#64748b;margin-bottom:6px;text-transform:uppercase;">Accès staff (décocher = restreindre) :</div>
+          <div class="channel-access-grid">${users.length?userChecks:'<span class="small">Aucun staff créé.</span>'}</div>
+        </div>`;
+      }).join('');
+    },
+
+    renameChannel(idx,name){
+      if(!name.trim())return;
+      window.app.chat._channels[idx].name=name.trim();
+      // Persist to Firestore
+      this._saveChannels();
+    },
+
+    toggleChannelUser(channelIdx,uid,allowed){
+      const c=window.app.chat._channels[channelIdx];
+      const users=(window.app.data.users||[]).filter(u=>u.role!=='admin').map(u=>u.uid);
+      if(!c.allowedUsers)c.allowedUsers=[...users]; // init with all
+      if(allowed){if(!c.allowedUsers.includes(uid))c.allowedUsers.push(uid);}
+      else{c.allowedUsers=c.allowedUsers.filter(id=>id!==uid);}
+      this._saveChannels();
+    },
+
+    _saveChannels:async function(){
+      try{
+        const{doc,setDoc}=window._fbChat;
+        await setDoc(doc(window._db,'store_master','CHANNELS'),{
+          list:window.app.chat._channels.map(c=>({id:c.id,name:c.name,icon:c.icon,color:c.color,adminOnly:c.adminOnly||false,allowedUsers:c.allowedUsers||null}))
+        });
+        toast('Canaux sauvegardés.','ok');
+      }catch(e){toast('Erreur sauvegarde canaux.','err');}
     }
   },
 
@@ -1969,12 +2093,15 @@ window.app={
         if(c)continue;
         grp[f].forEach(i=>{
           const d=new Date(i.date);let badge='bg-grey';
+          const todayMidnight=new Date();todayMidnight.setHours(0,0,0,0);
+          const isToday=!isNaN(d.getTime())&&d.getTime()===todayMidnight.getTime();
           if(!isNaN(d.getTime())){const diff=(d-new Date())/(1000*60*60*24);badge=diff<0?'bg-red':(diff<2?'bg-orange':'bg-green');}
           const sn=(i.name||'').replace(/'/g,' ');
           const img=i.img?`<img src="${i.img}" class="item-img" onclick="event.stopPropagation();app.common.showBarcode('${i.ean||''}','${sn}','${i.img}')">`:`<div class="item-img" onclick="event.stopPropagation();app.common.showBarcode('${i.ean||''}','${sn}')"><i class="fas fa-barcode"></i></div>`;
           const sc=window.app.common.isASaisir(i.date)?`<span class="chip warn"><i class="fas fa-triangle-exclamation"></i> À SAISIR</span>`:'';
-          parts.push(`<div class="swipe-wrapper"><div class="swipe-content" onclick="app.frais.openEdit(${i.id})">
-            <div style="display:flex;align-items:center;flex:1;min-width:0;gap:12px;">${img}<div class="item-info"><div class="item-title">${i.name||''}</div><div class="item-sub">x${i.qty||0} • ${i.ean||'EAN ?'} ${sc}</div></div></div>
+          const todayStyle=isToday?'border-left:4px solid #ef4444;background:linear-gradient(135deg,#fff5f5,#fff);':badge==='bg-red'?'border-left:4px solid #ef4444;':'';
+          parts.push(`<div class="swipe-wrapper"><div class="swipe-content" style="${todayStyle}" onclick="app.frais.openEdit(${i.id})">
+            <div style="display:flex;align-items:center;flex:1;min-width:0;gap:12px;">${img}<div class="item-info"><div class="item-title" style="${isToday?'color:#dc2626;font-weight:950;':''}">${i.name||''}${isToday?' <span style="font-size:11px;background:#ef4444;color:#fff;border-radius:8px;padding:2px 6px;margin-left:4px;">AUJOURD\'HUI</span>':''}</div><div class="item-sub">x${i.qty||0} • ${i.ean||'EAN ?'} ${sc}</div></div></div>
             <div class="right-col"><div class="date-badge ${badge}"><span>${!isNaN(d.getTime())?d.getDate():'?'}</span><span style="font-size:10px;">${!isNaN(d.getTime())?d.toLocaleString('fr',{month:'short'}):'Err'}</span></div></div>
           </div></div>`);
         });
@@ -3785,7 +3912,12 @@ ${nameLine2?`^CF0,30^FO15,45^FD${nameLine2}^FS`:''}
 
       // Render channel list
       const me=window.app.me||{};
-      const channels=this._channels.filter(c=>!c.adminOnly||(me.role==='admin'));
+      const channels=this._channels.filter(c=>{
+        if(c.adminOnly&&me.role!=='admin')return false;
+        if(me.role==='admin')return true;
+        if(c.allowedUsers&&!c.allowedUsers.includes(me.uid))return false;
+        return true;
+      });
       wrap.innerHTML=channels.map(c=>`
         <div class="chat-channel-btn ${this._channel===c.id?'active':''}" onclick="app.chat.selectChannel('${c.id}')">
           <i class="fas ${c.icon}" style="color:${c.color};margin-right:8px;"></i>
@@ -3938,6 +4070,11 @@ onAuthStateChanged(auth,async user=>{
   await window.app.afterLoginBootstrap();
 });
 </script>
+<!-- BOUTON FLOTTANT PARAMÈTRES (admin seulement) -->
+<button id="float-settings-btn" title="Paramètres & Équipe" onclick="app.nav('team')">
+  <i class="fas fa-gear"></i>
+  <span>PARAM</span>
+</button>
 <!-- BOUTON FLOTTANT RÉORGANISER (admin seulement) -->
 <button id="home-reorder-btn" title="Réorganiser les modules" onclick="app.homeOrder.startEdit()">
   <i class="fas fa-grip-vertical"></i>
