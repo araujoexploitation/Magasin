@@ -116,84 +116,27 @@ document.getElementById('pwa-manifest').href=URL.createObjectURL(blob);
 .planning-week-nav{display:flex;align-items:center;justify-content:space-between;background:#fff;border-radius:14px;padding:12px 16px;margin-bottom:14px;box-shadow:0 2px 8px rgba(0,0,0,.05);}
 .planning-week-nav button{background:#f1f5f9;border:none;border-radius:10px;padding:8px 14px;font-weight:900;cursor:pointer;font-size:16px;}
 .planning-week-nav .wk-label{font-weight:950;font-size:15px;color:#1e293b;}
+.planning-staff-row{background:#fff;border-radius:14px;margin-bottom:10px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+.planning-staff-header{background:#f8fafc;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e2e8f0;}
+.planning-staff-name{font-weight:950;font-size:14px;color:#1e293b;}
+.planning-staff-hours{font-size:12px;font-weight:800;color:var(--primary);}
+.planning-days-row{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;padding:8px;}
+.planning-day-cell{border-radius:8px;padding:4px;text-align:center;cursor:pointer;min-height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:all .15s;border:1.5px solid transparent;}
+.planning-day-cell.off{background:#f8fafc;color:#94a3b8;}
+.planning-day-cell.work{background:#dbeafe;border-color:#93c5fd;color:#1d4ed8;}
+.planning-day-cell.rest{background:#fce7f3;border-color:#f9a8d4;color:#be185d;}
+.planning-day-cell.work .dc-hours{font-size:10px;font-weight:800;}
+.planning-day-cell .dc-day{font-size:10px;font-weight:900;margin-bottom:2px;}
+.planning-day-cell .dc-content{font-size:11px;font-weight:950;}
+.planning-rules-banner{background:linear-gradient(135deg,#fffbeb,#fef3c7);border:1.5px solid #fcd34d;border-radius:12px;padding:12px;margin-bottom:14px;}
+.planning-rules-banner h4{margin:0 0 6px 0;color:#92400e;font-size:13px;display:flex;align-items:center;gap:6px;}
+.rule-chip{display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,.7);border-radius:20px;padding:4px 10px;font-size:11px;font-weight:800;color:#78350f;margin:3px;}
+.planning-new-staff{background:#fff;border-radius:14px;padding:14px;box-shadow:0 2px 8px rgba(0,0,0,.05);margin-bottom:14px;}
 .shift-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9000;display:flex;align-items:flex-end;justify-content:center;padding:16px;}
 .shift-modal-card{background:#fff;border-radius:20px;padding:22px;width:100%;max-width:420px;animation:slideUp .22s cubic-bezier(.34,1.56,.64,1);}
 .time-input-row{display:flex;gap:10px;align-items:center;margin-bottom:12px;}
 .time-input-row label{font-size:12px;font-weight:800;color:#64748b;white-space:nowrap;}
 .time-input-row input{flex:1;padding:12px;border:1.5px solid #cbd5e1;border-radius:10px;font-size:16px;background:#fff;outline:none;}
-/* Planning grid */
-.plan-grid-row{display:grid;grid-template-columns:140px repeat(7,1fr) 56px;gap:2px;margin-bottom:2px;align-items:stretch;}
-.plan-header-row .plan-day-header{background:#f0f9ff;border-radius:8px;padding:6px 2px;text-align:center;}
-.plan-day-header.today{background:#0891b2;color:#fff;}
-.plan-day-header.sunday{background:#fef3c7;color:#92400e;}
-.plan-day-name{font-size:11px;font-weight:900;}
-.plan-day-num{font-size:15px;font-weight:950;}
-.plan-emp-col{display:flex;align-items:center;gap:6px;padding:4px;min-width:0;position:relative;}
-.plan-avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:950;font-size:11px;color:#fff;flex-shrink:0;}
-.plan-emp-info{flex:1;min-width:0;}
-.plan-emp-name{font-weight:950;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#1e293b;}
-.plan-emp-contract{font-size:10px;color:#64748b;}
-.plan-emp-del{background:none;border:none;color:#ef4444;cursor:pointer;padding:4px;font-size:11px;opacity:.5;flex-shrink:0;}
-.plan-emp-del:hover{opacity:1;}
-.plan-cell{border-radius:8px;padding:3px 2px;cursor:pointer;transition:all .15s;min-height:54px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;border:1.5px solid transparent;}
-.plan-cell.rest{background:#f8fafc;color:#cbd5e1;}
-.plan-cell.work{background:#dbeafe;border-color:#93c5fd;}
-.plan-cell.work.sunday-work{background:#fef3c7;border-color:#fbbf24;}
-.plan-cell.work.night-work{background:#ede9fe;border-color:#a78bfa;}
-.plan-cell.work.long{border-color:#f87171;}
-.plan-cell:hover{opacity:.8;transform:scale(.97);}
-.plan-shift-post{font-size:9px;font-weight:900;border-radius:4px;padding:1px 4px;margin-bottom:2px;white-space:nowrap;}
-.plan-shift-times{font-size:10px;font-weight:800;color:#1d4ed8;}
-.plan-shift-h{font-size:11px;font-weight:950;color:#0f172a;}
-.plan-shift-majoration{font-size:8px;font-weight:800;color:#dc2626;margin-top:1px;}
-.plan-rest-label{font-size:18px;color:#cbd5e1;}
-.plan-total-col{text-align:center;padding:4px 2px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;}
-.plan-total-h{font-size:13px;font-weight:950;}
-.plan-rest-badge{font-size:9px;font-weight:900;border-radius:6px;padding:1px 4px;}
-.plan-rest-badge.ok{background:#dcfce7;color:#166534;}
-.plan-rest-badge.warn{background:#fee2e2;color:#991b1b;}
-.plan-warn-row{background:#fffbeb;border:1px solid #fcd34d;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:800;color:#92400e;margin-bottom:4px;}
-.plan-footer-row .plan-day-footer{background:#f8fafc;border-radius:8px;padding:4px;text-align:center;}
-.plan-day-footer .plan-day-count{font-size:10px;color:#64748b;font-weight:800;}
-.plan-day-footer .plan-day-hours{font-size:12px;font-weight:950;color:#0891b2;}
-.plan-post-btn{border:1.5px solid #e2e8f0;border-radius:8px;padding:5px 8px;font-size:11px;font-weight:900;cursor:pointer;transition:all .15s;text-align:center;}
-.plan-post-btn.selected{background:#f0f9ff;}
-.plan-post-btn:hover{opacity:.8;}
-/* Counters bar */
-.plan-counters-bar{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;}
-.plan-counter-chip{background:#fff;border:1.5px solid #e2e8f0;border-radius:10px;padding:6px 10px;font-size:11px;font-weight:800;display:flex;align-items:center;gap:5px;box-shadow:0 1px 3px rgba(0,0,0,.04);}
-.plan-counter-chip.warn{border-color:#fbbf24;background:#fffbeb;color:#92400e;}
-.plan-counter-chip.danger{border-color:#f87171;background:#fef2f2;color:#991b1b;}
-.plan-counter-chip.ok{border-color:#6ee7b7;background:#f0fdf4;color:#166534;}
-/* Alerts panel */
-.plan-alerts-panel{background:#fff;border-radius:14px;padding:12px;box-shadow:0 2px 8px rgba(0,0,0,.05);margin-bottom:12px;}
-.plan-alert-item{display:flex;align-items:flex-start;gap:8px;padding:8px;border-radius:8px;margin-bottom:6px;font-size:12px;font-weight:700;}
-.plan-alert-item.hard{background:#fef2f2;border-left:3px solid #ef4444;color:#991b1b;}
-.plan-alert-item.soft{background:#fffbeb;border-left:3px solid #f59e0b;color:#92400e;}
-.plan-alert-item.info{background:#eff6ff;border-left:3px solid #3b82f6;color:#1d4ed8;}
-/* Tabs planning */
-.plan-tabs{display:flex;background:#e2e8f0;padding:3px;border-radius:10px;margin-bottom:12px;gap:3px;}
-.plan-tab{flex:1;text-align:center;padding:8px 4px;font-weight:900;font-size:11px;color:#64748b;border-radius:8px;cursor:pointer;}
-.plan-tab.active{background:#fff;color:#0891b2;box-shadow:0 1px 3px rgba(0,0,0,.1);}
-/* Legend chips */
-.post-legend{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;}
-.post-chip{border-radius:20px;padding:3px 9px;font-size:11px;font-weight:800;}
-/* Shift cost bar */
-.shift-cost-preview{background:#f0f9ff;border-radius:10px;padding:10px;margin:8px 0;font-size:12px;}
-.shift-cost-row{display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid #e2e8f0;}
-.shift-cost-total{font-weight:950;font-size:14px;color:#0891b2;margin-top:6px;display:flex;justify-content:space-between;}
-/* Féries / absences badges */
-.plan-cell.ferie{background:#fef3c7;border-color:#fbbf24;}
-.plan-cell.absent{background:#fce7f3;border-color:#f9a8d4;}
-.plan-cell.cp{background:#dcfce7;border-color:#6ee7b7;}
-/* Staff view counters */
-.staff-counters{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px;}
-.staff-counter-card{background:#fff;border-radius:12px;padding:10px 12px;box-shadow:0 2px 8px rgba(0,0,0,.04);border-left:3px solid #0891b2;}
-.staff-counter-card .scc-val{font-size:20px;font-weight:950;color:#0891b2;}
-.staff-counter-card .scc-label{font-size:10px;color:#64748b;font-weight:800;margin-top:2px;}
-.staff-counter-card.warn{border-color:#f59e0b;}.staff-counter-card.warn .scc-val{color:#f59e0b;}
-.staff-counter-card.danger{border-color:#ef4444;}.staff-counter-card.danger .scc-val{color:#ef4444;}
-.staff-counter-card.ok{border-color:#10b981;}.staff-counter-card.ok .scc-val{color:#10b981;}
 
 /* ── CARREFOUR MODULE VIEW ── */
 #view-carrefour{animation:fadeIn .2s ease;}
@@ -600,6 +543,31 @@ textarea{min-height:80px;resize:none;}
 .plan-cell.rest.today{background:#eff6ff;border-color:#bfdbfe;}
 .plan-rest-label{color:#cbd5e1;font-size:18px;font-weight:900;}
 .plan-cell.work{border:1.5px solid transparent;border-color:color-mix(in srgb, var(--shift-color) 30%, transparent);}
+/* ── DRAG & DROP PLANNING ── */
+.plan-cell{position:relative;transition:box-shadow .15s,transform .12s;}
+.plan-cell.dragging{opacity:.5;transform:scale(.97);}
+.plan-cell.drag-over{box-shadow:0 0 0 3px #0891b2;background:#e0f2fe!important;}
+
+/* ── HR PROFILE CHIP ── */
+.hr-profile-chip{display:inline-flex;align-items:center;gap:5px;background:#f0f9ff;border:1.5px solid #bae6fd;border-radius:8px;padding:3px 8px;font-size:11px;font-weight:900;color:#0369a1;cursor:pointer;}
+.hr-profile-chip:active{background:#e0f2fe;}
+
+/* ── PRINT PLANNING ── */
+@media print{
+  body>*{display:none!important;}
+  #print-planning-wrap{display:block!important;margin:0;padding:0;}
+}
+#print-planning-wrap{display:none;font-family:Arial,sans-serif;font-size:11px;}
+#print-planning-wrap h2{text-align:center;color:#003896;margin-bottom:8px;font-size:16px;}
+#print-planning-wrap table{width:100%;border-collapse:collapse;}
+#print-planning-wrap th,#print-planning-wrap td{border:1px solid #cbd5e1;padding:5px 4px;text-align:center;vertical-align:middle;}
+#print-planning-wrap th{background:#003896;color:#fff;font-size:10px;}
+#print-planning-wrap td:first-child{text-align:left;font-weight:900;min-width:80px;}
+#print-planning-wrap .p-work{background:#dbeafe;color:#1d4ed8;font-weight:900;font-size:9px;}
+#print-planning-wrap .p-rest{background:#fce7f3;color:#be185d;font-size:9px;}
+#print-planning-wrap .p-total{background:#f0fdf4;color:#065f46;font-weight:900;}
+#print-planning-wrap .p-warn{background:#fef9c3;color:#854d0e;}
+#print-planning-wrap tfoot td{background:#f1f5f9;font-weight:900;font-size:9px;}
 .plan-shift-post{font-size:9px;font-weight:950;padding:1px 5px;border-radius:4px;text-align:center;letter-spacing:.3px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .plan-shift-times{font-size:10px;font-weight:900;color:#374151;}
 .plan-shift-h{font-size:9px;color:#6b7280;font-weight:800;}
@@ -1268,108 +1236,62 @@ textarea{min-height:80px;resize:none;}
     </div>
   </div>
 
-  <!-- PLANNING MODULE — CCN 2216 Grande Distribution -->
+  <!-- PLANNING MODULE — Style ComboHR -->
   <div id="view-planning" class="hidden">
-
-    <!-- Tabs vue -->
-    <div class="plan-tabs">
-      <div class="plan-tab active" id="ptab-week" onclick="app.planning.switchView('week')"><i class="fas fa-calendar-week"></i> Semaine</div>
-      <div class="plan-tab" id="ptab-staff" onclick="app.planning.switchView('staff')"><i class="fas fa-user"></i> Salarié</div>
-      <div class="plan-tab" id="ptab-alerts" onclick="app.planning.switchView('alerts')"><i class="fas fa-triangle-exclamation"></i> Alertes</div>
-      <div class="plan-tab" id="ptab-settings" onclick="app.planning.switchView('settings')"><i class="fas fa-gear"></i> Config</div>
-    </div>
-
-    <!-- ═══ VUE SEMAINE ═══ -->
-    <div id="plan-view-week">
-      <!-- Navigation semaine -->
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;background:#fff;border-radius:14px;padding:10px 12px;box-shadow:0 2px 8px rgba(0,0,0,.05);">
-        <div style="display:flex;align-items:center;gap:8px;">
-          <button class="qty-btn" onclick="app.planning.prevWeek()"><i class="fas fa-chevron-left"></i></button>
-          <div style="font-weight:950;font-size:14px;color:#0891b2;"><span id="plan-week-label"></span></div>
-          <button class="qty-btn" onclick="app.planning.nextWeek()"><i class="fas fa-chevron-right"></i></button>
-        </div>
-        <div style="display:flex;gap:5px;">
-          <button class="qty-btn" title="Publier le planning" onclick="app.planning.publishWeek()" style="background:#0891b2;color:#fff;font-size:11px;padding:6px 10px;"><i class="fas fa-paper-plane"></i></button>
-          <button class="qty-btn" title="Copier semaine" onclick="app.planning.copyWeek()"><i class="fas fa-copy"></i></button>
-          <button class="qty-btn" title="Export CSV paie" onclick="app.planning.exportCSV()"><i class="fas fa-file-csv"></i></button>
-          <button class="qty-btn" title="Exporter PDF" onclick="app.planning.exportPDF()"><i class="fas fa-file-pdf"></i></button>
-          <button class="qty-btn" style="background:#059669;color:#fff;" onclick="app.planning.addEmployee()"><i class="fas fa-user-plus"></i></button>
-        </div>
+    <!-- Navigation semaine -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;background:#fff;border-radius:14px;padding:12px 14px;box-shadow:0 2px 8px rgba(0,0,0,.05);">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <button class="qty-btn" onclick="app.planning.prevWeek()"><i class="fas fa-chevron-left"></i></button>
+        <div style="font-weight:950;font-size:15px;color:#0891b2;"><span id="plan-week-label"></span></div>
+        <button class="qty-btn" onclick="app.planning.nextWeek()"><i class="fas fa-chevron-right"></i></button>
       </div>
-
-      <!-- Résumé semaine -->
-      <div id="plan-week-summary" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;"></div>
-
-      <!-- Légende postes -->
-      <div class="post-legend" id="plan-legend">
-        <span class="post-chip" style="background:#dbeafe;color:#1d4ed8;">🏪 CAISSE</span>
-        <span class="post-chip" style="background:#d1fae5;color:#065f46;">📦 RAYON</span>
-        <span class="post-chip" style="background:#fef3c7;color:#92400e;">🚚 RÉCEPTION</span>
-        <span class="post-chip" style="background:#ede9fe;color:#5b21b6;">👔 MANAGE</span>
-        <span class="post-chip" style="background:#fee2e2;color:#991b1b;">🔒 FERMETURE</span>
-        <span class="post-chip" style="background:#e0f2fe;color:#0369a1;">🔑 OUVERTURE</span>
-        <span class="post-chip" style="background:#fce7f3;color:#be185d;">🌙 NUIT</span>
-        <span class="post-chip" style="background:#fef3c7;color:#b45309;">☀️ DIMANCHE</span>
-      </div>
-
-      <!-- Grille planning -->
-      <div style="background:#fff;border-radius:16px;padding:10px;box-shadow:0 2px 10px rgba(0,0,0,.05);overflow-x:auto;">
-        <div id="plan-employees"></div>
-      </div>
-
-      <!-- Récapitulatif -->
-      <div class="card" id="plan-summary" style="display:none;margin-top:10px;">
-        <div style="font-weight:950;color:#0891b2;margin-bottom:8px;"><i class="fas fa-chart-bar"></i> Récapitulatif de la semaine</div>
-        <div id="plan-summary-content"></div>
+      <div style="display:flex;gap:6px;">
+        <button class="qty-btn" title="Copier semaine →" onclick="app.planning.copyWeek()"><i class="fas fa-copy"></i></button>
+        <button class="qty-btn" title="Imprimer le planning" onclick="app.planning.printWeek()"><i class="fas fa-print"></i></button>
+        <button class="qty-btn" title="Export CSV" onclick="app.planning.exportCSV()"><i class="fas fa-file-csv"></i></button>
+        <button class="qty-btn" title="Modèles RH" style="background:#7c3aed;color:#fff;" onclick="app.planning.openHrModels()"><i class="fas fa-briefcase"></i></button>
+        <button class="qty-btn" title="Importer utilisateurs" style="background:#059669;color:#fff;" onclick="app.planning.importFromUsers()"><i class="fas fa-users-gear"></i></button>
+        <button class="qty-btn" style="background:#0891b2;color:#fff;" onclick="app.planning.addEmployee()"><i class="fas fa-user-plus"></i></button>
       </div>
     </div>
 
-    <!-- ═══ VUE SALARIÉ ═══ -->
-    <div id="plan-view-staff" style="display:none;">
-      <div style="margin-bottom:10px;">
-        <select id="plan-staff-select" style="margin-bottom:8px;" onchange="app.planning.renderStaffView()">
-          <option value="">-- Sélectionner un salarié --</option>
-        </select>
-      </div>
-      <div id="plan-staff-view-content"></div>
+    <!-- Légende des postes -->
+    <div class="post-legend" id="plan-legend">
+      <span class="post-chip" style="background:#dbeafe;color:#1d4ed8;">🏪 CAISSE</span>
+      <span class="post-chip" style="background:#d1fae5;color:#065f46;">📦 RAYON</span>
+      <span class="post-chip" style="background:#fef3c7;color:#92400e;">🚚 RÉCEPTION</span>
+      <span class="post-chip" style="background:#ede9fe;color:#5b21b6;">👔 MANAGE</span>
+      <span class="post-chip" style="background:#fee2e2;color:#991b1b;">🔒 FERMETURE</span>
+      <span class="post-chip" style="background:#e0f2fe;color:#0369a1;">🔑 OUVERTURE</span>
     </div>
 
-    <!-- ═══ VUE ALERTES ═══ -->
-    <div id="plan-view-alerts" style="display:none;">
-      <div style="font-weight:950;color:#0891b2;margin-bottom:12px;"><i class="fas fa-triangle-exclamation"></i> Alertes conformité CCN 2216</div>
-      <div id="plan-alerts-content">
-        <div class="empty-state"><i class="fas fa-check-circle" style="color:#10b981;"></i><br>Aucune alerte active.</div>
-      </div>
+    <!-- Grille planning -->
+    <div style="background:#fff;border-radius:16px;padding:12px;box-shadow:0 2px 10px rgba(0,0,0,.05);overflow-x:auto;">
+      <div id="plan-employees"></div>
     </div>
 
-    <!-- ═══ VUE CONFIGURATION ═══ -->
-    <div id="plan-view-settings" style="display:none;">
-      <div class="card">
-        <h4 style="margin-top:0;color:#0891b2;"><i class="fas fa-store"></i> Paramètres Magasin</h4>
-        <label style="font-size:12px;font-weight:800;color:#64748b;">Surface de vente (m²)</label>
-        <input type="number" id="plan-cfg-surface" placeholder="Ex: 300" style="margin-bottom:10px;" oninput="app.planning.saveCfg()">
-        <label style="font-size:12px;font-weight:800;color:#64748b;">Type dimanche</label>
-        <select id="plan-cfg-sunday-type" style="margin-bottom:10px;" onchange="app.planning.saveCfg()">
-          <option value="regular">Régulier (commerce alimentaire)</option>
-          <option value="exceptional">Exceptionnel uniquement</option>
-        </select>
-        <label style="font-size:12px;font-weight:800;color:#64748b;">Taux horaire moyen (€/h)</label>
-        <input type="number" id="plan-cfg-hourly-rate" placeholder="Ex: 12.50" step="0.01" style="margin-bottom:10px;" oninput="app.planning.saveCfg()">
-        <label style="font-size:12px;font-weight:800;color:#64748b;">Délai prévenance temps partiel (jours ouvrés)</label>
-        <input type="number" id="plan-cfg-notice" placeholder="7" min="3" style="margin-bottom:10px;" oninput="app.planning.saveCfg()">
-      </div>
-      <div class="card">
-        <h4 style="margin-top:0;color:#0891b2;"><i class="fas fa-calendar-check"></i> Jours Fériés Annuels (CCN-11)</h4>
-        <p style="font-size:12px;color:#64748b;margin-bottom:10px;">Sélectionnez les 6 jours fériés chômés/payés pour chaque salarié.</p>
-        <div id="plan-ferie-config"></div>
-      </div>
-      <div class="card">
-        <h4 style="margin-top:0;color:#0891b2;"><i class="fas fa-user-tie"></i> Postes personnalisés</h4>
-        <div id="plan-posts-list" style="margin-bottom:8px;"></div>
-        <button class="btn secondary" style="margin-top:0;" onclick="app.planning.addPost()"><i class="fas fa-plus"></i> Ajouter un poste</button>
-      </div>
+    <!-- Récapitulatif -->
+    <div class="card" id="plan-summary" style="display:none;margin-top:12px;">
+      <div style="font-weight:950;color:#0891b2;margin-bottom:8px;"><i class="fas fa-chart-bar"></i> Récapitulatif de la semaine</div>
+      <div id="plan-summary-content"></div>
     </div>
 
+    <!-- Règles RH -->
+    <details style="margin-top:12px;">
+      <summary style="background:#f0f9ff;border-radius:12px;padding:12px 14px;font-weight:900;color:#0891b2;cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;">
+        <i class="fas fa-scale-balanced"></i> Règles Droit du Travail France
+        <i class="fas fa-chevron-down" style="margin-left:auto;font-size:12px;"></i>
+      </summary>
+      <div style="background:#f8fafc;border-radius:12px;padding:14px;margin-top:4px;font-size:13px;line-height:1.8;color:#334155;">
+        <b>⏱ Max quotidien :</b> 10h/jour<br>
+        <b>📅 Max hebdo :</b> 48h/semaine<br>
+        <b>😴 Repos quotidien :</b> 11h consécutives<br>
+        <b>📆 Repos hebdo :</b> 35h consécutives<br>
+        <b>🔴 Repos :</b> 2 jours minimum/semaine<br>
+        <b>🌙 Nuit (21h–6h) :</b> majoration 25%<br>
+        <b>🏖 CP :</b> 2.5 jours/mois
+      </div>
+    </details>
   </div>
   </div>
 
@@ -1493,43 +1415,44 @@ textarea{min-height:80px;resize:none;}
 <!-- ── SHIFT EDITOR MODAL ── -->
 <div id="modal-shift-editor" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:80000;display:flex;align-items:flex-end;justify-content:center;padding:16px;">
   <div class="dlg-card" style="max-width:420px;max-height:90vh;overflow-y:auto;">
-    <div style="font-weight:950;font-size:16px;margin-bottom:12px;color:#0891b2;" id="shift-modal-emp"></div>
-
-    <!-- Type de journée -->
-    <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;">
-      <button id="smt-work" class="plan-post-btn selected" style="flex:1;background:#dbeafe;border-color:#93c5fd;color:#1d4ed8;" onclick="app.planning._setShiftType('work')"><i class="fas fa-briefcase"></i> Travail</button>
-      <button id="smt-rest" class="plan-post-btn" style="flex:1;" onclick="app.planning._setShiftType('rest')"><i class="fas fa-moon"></i> Repos</button>
-      <button id="smt-cp" class="plan-post-btn" style="flex:1;" onclick="app.planning._setShiftType('cp')"><i class="fas fa-umbrella-beach"></i> CP</button>
-      <button id="smt-absent" class="plan-post-btn" style="flex:1;" onclick="app.planning._setShiftType('absent')"><i class="fas fa-user-slash"></i> Absent</button>
-      <button id="smt-ferie" class="plan-post-btn" style="flex:1;" onclick="app.planning._setShiftType('ferie')"><i class="fas fa-flag"></i> Férié</button>
+    <div style="font-weight:950;font-size:16px;margin-bottom:14px;color:#0891b2;" id="shift-modal-emp"></div>
+    <div class="shift-type-toggle">
+      <label for="shift-modal-rest">Jour de repos</label>
+      <input type="checkbox" id="shift-modal-rest" style="width:22px;height:22px;cursor:pointer;accent-color:#0891b2;" onchange="document.getElementById('shift-modal-fields').style.display=this.checked?'none':'block'">
     </div>
-
     <div id="shift-modal-fields">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
-        <div><label style="font-size:12px;font-weight:800;color:#64748b;display:block;margin-bottom:4px;">Début</label><input type="time" id="shift-modal-start" style="margin:0;padding:10px;font-size:16px;" oninput="app.planning.previewShiftCost()"></div>
-        <div><label style="font-size:12px;font-weight:800;color:#64748b;display:block;margin-bottom:4px;">Fin</label><input type="time" id="shift-modal-end" style="margin:0;padding:10px;font-size:16px;" oninput="app.planning.previewShiftCost()"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+        <div><label style="font-size:12px;font-weight:800;color:#64748b;display:block;margin-bottom:4px;">Début</label><input type="time" id="shift-modal-start" style="margin:0;padding:12px;font-size:16px;"></div>
+        <div><label style="font-size:12px;font-weight:800;color:#64748b;display:block;margin-bottom:4px;">Fin</label><input type="time" id="shift-modal-end" style="margin:0;padding:12px;font-size:16px;"></div>
+      </div>
+      <!-- Pause personnalisée -->
+      <div style="margin-bottom:12px;">
+        <label style="font-size:12px;font-weight:800;color:#64748b;display:block;margin-bottom:4px;"><i class="fas fa-mug-hot" style="color:#f59e0b;"></i> Pause (min)</label>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <input type="number" id="shift-modal-break" min="0" max="120" step="5" placeholder="Auto" style="margin:0;padding:10px;font-size:15px;flex:1;">
+          <div style="font-size:11px;color:#94a3b8;" id="shift-break-hint">Légale: auto</div>
+        </div>
       </div>
       <label style="font-size:12px;font-weight:800;color:#64748b;display:block;margin-bottom:6px;">Poste</label>
-      <div class="plan-post-grid" id="shift-post-grid"></div>
+      <div class="plan-post-grid" id="shift-post-grid">
+        <!-- Built by JS but also available via select -->
+      </div>
       <select id="shift-modal-post" style="display:none;">
         <option>CAISSE</option><option>RAYON</option><option>RÉCEPTION</option>
         <option>MANAGE</option><option>MÉNAGE</option><option>FERMETURE</option>
         <option>OUVERTURE</option><option>AUTRE</option>
       </select>
-      <label style="font-size:12px;font-weight:800;color:#64748b;display:block;margin-bottom:4px;margin-top:8px;">Note / motif</label>
-      <input type="text" id="shift-modal-note" placeholder="Ex: Inventaire, Urgence…" style="margin-bottom:6px;padding:10px;">
-      <!-- Aperçu calcul coût -->
-      <div id="shift-cost-preview" class="shift-cost-preview" style="display:none;"></div>
-      <!-- Alertes temps réel -->
-      <div id="shift-alerts-preview" style="margin-top:6px;"></div>
     </div>
-
-    <div class="dlg-btns" style="margin-top:12px;">
+    <div class="dlg-btns" style="flex-wrap:wrap;gap:6px;">
       <button class="btn" style="background:#0891b2;margin:0;" onclick="app.planning.saveShift()"><i class="fas fa-check"></i> Enregistrer</button>
+      <button class="btn" style="background:#059669;margin:0;" onclick="app.planning.duplicateShift()"><i class="fas fa-clone"></i> Dupliquer</button>
       <button class="btn secondary" style="margin:0;" onclick="app.planning.closeShiftModal()">Annuler</button>
     </div>
   </div>
 </div>
+
+<!-- ── PRINT PLANNING WRAP ── -->
+<div id="print-planning-wrap"></div>
 
 <nav id="app-nav" class="hidden">
   <div class="nav-btn" onclick="app.goBack()"><i class="fas fa-arrow-left"></i><br>RETOUR</div>
@@ -1893,7 +1816,7 @@ window.app={
     if(v==='reception'){this.reception.init();this.reception.tab('new');}
     if(v==='inspection'){this.inspection.render();}
     if(v==='etiquettes'){this.etiquettes.loadProducts();}
-    if(v==='planning'){this.planning.switchView('week');}
+    if(v==='planning'){this.planning.render();}
     if(v==='chat'){this.chat.render();}
     if(v==='team'){this.team.renderConseilleurs();this.team.renderChannelsConfig();}
     if(v==='home'){this._maybeShowInstallPrompt();this.pointeuse&&this.pointeuse._renderClock&&this.pointeuse._renderClock();}
@@ -2230,21 +2153,50 @@ window.app={
     tgtgHandleScan(ean){
       // Find product by EAN in frais list and deduct qty
       const match=window.app.data.frais.find(i=>String(i.ean||'')===String(ean));
-      if(match){this.tgtgDeduct(match.id,true);}
+      if(match){this.tgtgAskMotif(match.id);}
       else{document.getElementById('tgtg-search').value=ean;this.renderTgtg();}
     },
-    tgtgDeduct:async function(id,fromScan=false){
+
+    tgtgAskMotif(id){
+      // Show motif selection overlay
+      let m=document.getElementById('modal-tgtg-motif');
+      if(!m){
+        m=document.createElement('div');m.id='modal-tgtg-motif';
+        m.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:99000;display:flex;align-items:center;justify-content:center;padding:20px;';
+        m.innerHTML=`<div style="background:#fff;border-radius:20px;padding:22px;max-width:340px;width:100%;text-align:center;">
+          <div style="font-weight:950;font-size:16px;margin-bottom:6px;color:#006B3C;"><i class="fas fa-tag"></i> Motif de retrait</div>
+          <div style="font-size:13px;color:#64748b;margin-bottom:18px;">Pourquoi ce produit est-il retiré ?</div>
+          <button id="tgtg-motif-tgtg" style="display:block;width:100%;background:#006B3C;color:#fff;border:none;border-radius:14px;padding:14px;font-size:15px;font-weight:950;cursor:pointer;margin-bottom:10px;">
+            🛍️ Too Good To Go
+          </button>
+          <button id="tgtg-motif-50" style="display:block;width:100%;background:#d97706;color:#fff;border:none;border-radius:14px;padding:14px;font-size:15px;font-weight:950;cursor:pointer;margin-bottom:10px;">
+            🏷️ Promotion –50%
+          </button>
+          <button onclick="document.getElementById('modal-tgtg-motif').style.display='none'" style="display:block;width:100%;background:#f1f5f9;color:#475569;border:none;border-radius:14px;padding:10px;font-size:14px;font-weight:900;cursor:pointer;">
+            Annuler
+          </button>
+        </div>`;
+        document.body.appendChild(m);
+      }
+      m.style.display='flex';
+      m._productId=id;
+      document.getElementById('tgtg-motif-tgtg').onclick=()=>{m.style.display='none';this.tgtgDeduct(m._productId,false,'tgtg');};
+      document.getElementById('tgtg-motif-50').onclick=()=>{m.style.display='none';this.tgtgDeduct(m._productId,false,'promo50');};
+    },
+
+    tgtgDeduct:async function(id,fromScan=false,motif='tgtg'){
       const idx=window.app.data.frais.findIndex(x=>x.id==id);
       if(idx<0)return;
       const item=window.app.data.frais[idx];
       const currentQty=Number(item.qty||0);
+      const motifLabel=motif==='promo50'?'Promo –50%':'Too Good To Go';
       if(currentQty<=1){
         // Remove completely
         window.app.data.frais.splice(idx,1);
-        toast(`${item.name} retiré du stock (Too Good To Go)`,fromScan?'ok':'info',3000);
+        toast(`${item.name} retiré du stock (${motifLabel})`,fromScan?'ok':'info',3000);
       } else {
         window.app.data.frais[idx].qty=currentQty-1;
-        toast(`${item.name} : ${currentQty}→${currentQty-1}`,'ok',2000);
+        toast(`[${motifLabel}] ${item.name} : ${currentQty}→${currentQty-1}`,'ok',2500);
       }
       spin(true);try{await window.app.save('frais');}catch(e){toast('Erreur synchro.','err');}finally{spin(false);}
       this.renderTgtg();this.render();window.app.updateHomeBadges();
@@ -2269,7 +2221,7 @@ window.app={
             <div style="font-weight:900;font-size:14px;">${i.name||''}</div>
             <div class="small">x${i.qty||0} • DLC: ${dateStr} • ${i.fam||''}</div>
           </div>
-          <button onclick="app.frais.tgtgDeduct(${i.id})" style="background:#006B3C;color:#fff;border:none;border-radius:10px;padding:10px 14px;font-weight:900;cursor:pointer;white-space:nowrap;"><i class="fas fa-minus"></i> -1</button>
+          <button onclick="app.frais.tgtgAskMotif(${i.id})" style="background:#006B3C;color:#fff;border:none;border-radius:10px;padding:10px 14px;font-weight:900;cursor:pointer;white-space:nowrap;"><i class="fas fa-minus"></i> -1</button>
         </div>`;
       }).join('');
     },
@@ -3621,746 +3573,294 @@ ${nameLine2?`^CF0,30^FO15,45^FD${nameLine2}^FS`:''}
   },
 
   // ══════════════════════════════════════════════════
-  // ── PLANNING RH — CCN 2216 Commerce Alimentaire Détail ──
-  // ── IDCC 2216 · Établissement <11 SALARIÉS ──
+  // ── PLANNING RH MODULE — Style ComboHR ──
   // ══════════════════════════════════════════════════
   planning:{
     _weekOffset:0,
     _employees:[],
-    _view:'week',
-
-    // ── PARAMÈTRES CCN 2216 COMMERCE ALIMENTAIRE DÉTAIL <11 SALARIÉS ──
-    _cfg:{
-      surface:300,                // m² surface de vente (détermine la règle dimanche)
-      sundayType:'regular',       // regular | exceptional
-      hourlyRate:12.50,           // taux horaire moyen brut (€/h)
-      noticeDays:7,               // délai prévenance temps partiel (jours ouvrés, min légal 3j, CCN 7j)
-      contingentHS:180,           // CCN 2216 : contingent HS annuel = 180h/salarié
-      pauseRate:0.05,             // CCN 2216 Art. : pause payée = 5% du TTE
-      maxDailyH:10,               // max quotidien normal (CCN 2216)
-      maxExceptionH:12,           // max absolu (inventaire/urgence), max 2/an
-      maxExceptionPerYear:2,      // CCN 2216 : max 2 jours >10h par an
-      minDailyRestH:11,           // repos quotidien légal (Code trav. L.3131-1)
-      minWeeklyRestH:35,          // repos hebdomadaire légal
-      minRestDaysPerWeek:2,       // min 2 jours repos/semaine
-      maxWorkDaysPerWeek:6,       // max 6 jours travaillés/semaine
-      maxWeeklyH:48,              // max hebdo absolu (Code trav.)
-      // Heures supplémentaires CCN 2216
-      hs25threshold:35,           // base 35h → HS à +25%
-      hs50threshold:43,           // >43h → HS à +50%
-      // Nuit CCN 2216
-      nightStart1:21, nightEnd1:22, nightRate1:0.05,  // 21h-22h : +5%
-      nightStart2:22, nightEnd2:5,  nightRate2:0.20,  // 22h-5h  : +20%
-      // Dimanche
-      sundayRateLe400:0.20,       // ≤400m² : +20% si pas 1,5j repos consécutif
-      sundayRateGt400:0.30,       // >400m² : +30% pour heures jusqu'à 13h
-      sundayRateExcept:1.00,      // dimanche exceptionnel : +100% (versé en plus)
-      sundayGt400LimitH:13,       // >400m² : limite heure pour la majoration 30%
-      // Amplitude min CCN 2216
-      minShiftH:3,                // pas d'amplitude <3h sans accord exprès
-      // SMIC & minima
-      smiHoraire:11.88,           // SMIC horaire brut 2025 (novembre)
+    _postColors:{
+      CAISSE:'#3b82f6',RAYON:'#10b981',RÉCEPTION:'#f59e0b',MANAGE:'#8b5cf6',
+      MÉNAGE:'#64748b',FERMETURE:'#ef4444',OUVERTURE:'#0891b2',AUTRE:'#475569'
     },
 
-    // ── GRILLE MINIMA CCN 2216 (Commerce alimentaire détail - IDCC 2216) ──
-    // Valeurs indicatives 2024-2025 (à vérifier avec accord de branche en vigueur)
-    _CCN_NIVEAUX:[
-      {niveau:'I-1', label:'Employé I·1 (hôte/hôtesse de caisse débutant)',   coef:120, tauxH:12.06},
-      {niveau:'I-2', label:'Employé I·2',                                      coef:125, tauxH:12.09},
-      {niveau:'I-3', label:'Employé I·3 (employé libre-service exp.)',          coef:130, tauxH:12.17},
-      {niveau:'II-1',label:'Employé II·1 (chef de rayon débutant)',            coef:135, tauxH:12.23},
-      {niveau:'II-2',label:'Employé II·2',                                     coef:140, tauxH:12.28},
-      {niveau:'II-3',label:'Employé II·3',                                     coef:145, tauxH:12.38},
-      {niveau:'III-1',label:'Agent de maîtrise III·1',                         coef:150, tauxH:12.55},
-      {niveau:'III-2',label:'Agent de maîtrise III·2',                         coef:160, tauxH:12.73},
-      {niveau:'III-3',label:'Agent de maîtrise III·3 (resp. de rayon)',        coef:175, tauxH:13.07},
-      {niveau:'IV-1', label:'Cadre IV·1 (directeur adj. débutant)',            coef:200, tauxH:14.20},
-      {niveau:'IV-2', label:'Cadre IV·2',                                      coef:220, tauxH:15.00},
-      {niveau:'V-1',  label:'Cadre supérieur V (directeur magasin)',           coef:260, tauxH:17.00},
-    ],
-
-    // ── 11 JOURS FÉRIÉS LÉGAUX (CCN-11) ──
-    // 6 obligatoirement chômés et payés (dont 1er Mai toujours)
-    // 5 pouvant être travaillés (avec repos compensateur ou majoration au choix salarié)
-    _FERIES_FR:[
-      {key:'01-01', label:'1er Janvier',          obligChome:true },
-      {key:'05-01', label:'1er Mai',               obligChome:true },  // toujours chômé
-      {key:'05-08', label:'8 Mai',                 obligChome:true },
-      {key:'07-14', label:'14 Juillet',            obligChome:true },
-      {key:'11-11', label:'11 Novembre',           obligChome:true },
-      {key:'12-25', label:'Noël',                  obligChome:true },
-      {key:'08-15', label:'15 Août',               obligChome:false},
-      {key:'11-01', label:'Toussaint',             obligChome:false},
-      {key:'paques',   label:'Lundi de Pâques',    obligChome:false},
-      {key:'ascension',label:'Ascension',          obligChome:false},
-      {key:'pentecote',label:'Lundi de Pentecôte', obligChome:false},
-    ],
-
-    _postColors:{
-      CAISSE:'#3b82f6', RAYON:'#10b981', RÉCEPTION:'#f59e0b', MANAGE:'#8b5cf6',
-      DRIVE:'#06b6d4',  MÉNAGE:'#64748b', FERMETURE:'#ef4444', OUVERTURE:'#0891b2', AUTRE:'#475569'
+    // ── MODÈLES RH (Code du travail France) ──
+    HR_PROFILES:{
+      'Apprenti Mineur':{
+        label:'Apprenti Mineur',icon:'👶',color:'#7c3aed',
+        maxHoursDay:8,maxHoursWeek:35,minRestHours:12,minRestWeekHours:48,
+        breakAfterH:4.5,breakMinutes:30,
+        nightBan:{start:'22:00',end:'06:00'},
+        desc:'Max 8h/j · 35h/sem · Repos 12h · Interdit la nuit 22h–6h (Code trav. L3163)'
+      },
+      'Apprenti Majeur':{
+        label:'Apprenti Majeur',icon:'🎓',color:'#0891b2',
+        maxHoursDay:10,maxHoursWeek:48,minRestHours:11,minRestWeekHours:35,
+        breakAfterH:6,breakMinutes:20,
+        desc:'Max 10h/j · 48h/sem · Repos 11h · Pause 20min après 6h (Code trav. L3121-16)'
+      },
+      'CDI Temps Partiel':{
+        label:'CDI Temps Partiel',icon:'🕐',color:'#d97706',
+        maxHoursDay:10,maxHoursWeek:44,minRestHours:11,minRestWeekHours:35,
+        breakAfterH:6,breakMinutes:20,
+        minContractH:24,
+        desc:'Min 24h/sem · Max 10h/j · Pause 20min après 6h · Heures compl. +10%/+25%'
+      },
+      'CDI Temps Complet':{
+        label:'CDI Temps Complet',icon:'⭐',color:'#059669',
+        maxHoursDay:10,maxHoursWeek:48,minRestHours:11,minRestWeekHours:35,
+        breakAfterH:6,breakMinutes:20,
+        refH:35,overtimeThreshold:35,
+        desc:'Réf. 35h · Heures sup >35h (+25% jusqu\'à 8h, +50% au-delà) · Max 48h/sem'
+      }
     },
 
     _docRef:null,
-    _editingShiftType:'work',
 
-    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    // MOTEUR DE CALCUL CCN 2216 — COMMERCE ALIMENTAIRE
-    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-    _toMin(t){const[h,m]=(t||'00:00').split(':').map(Number);return h*60+m;},
-
-    /** Chevauchement en minutes entre [a1,a2[ et [b1,b2[ */
-    _overlap(a1,a2,b1,b2){return Math.max(0,Math.min(a2,b2)-Math.max(a1,b1));},
-
-    /** Clé ISO de la veille / du lendemain d'une date */
-    _prevDayKey(d){const x=new Date(d);x.setDate(x.getDate()-1);return x.toISOString().slice(0,10);},
-    _nextDayKey(d){const x=new Date(d);x.setDate(x.getDate()+1);return x.toISOString().slice(0,10);},
-
-    /**
-     * calcShift(shift, date, emp)
-     * Retourne : { totalH, cost, costTotal, majorations, alerts, pauses, pauseOk }
-     * — Applique toutes les règles CCN 2216 IDCC 2216 supermarché <11 sal.
-     */
-    calcShift(shift, date, emp){
-      const EMPTY={totalH:0,cost:0,costTotal:0,majorations:{nuit5:0,nuit20:0,dim100:0,dim20:0,dim30:0},alerts:[],pauses:0,pauseOk:true};
-      if(!shift||shift.type!=='work'||!shift.start||!shift.end) return EMPTY;
-
-      const cfg=this._cfg;
-      const start=this._toMin(shift.start);
-      let end=this._toMin(shift.end);
-      if(end<=start) end+=1440; // shift traversant minuit
-      const totalMin=end-start;
-      const totalH=totalMin/60;
-      const rate=parseFloat(emp?.hourlyRate)||cfg.hourlyRate;
-      const surface=parseFloat(cfg.surface)||300;
-      const dow=date.getDay(); // 0=Dim
-      const alerts=[];
-      const maj={nuit5:0,nuit20:0,dim100:0,dim20:0,dim30:0};
-
-      // ───────────────────────────────────────────────
-      // A. DURÉE QUOTIDIENNE — CCN 2216
-      // ───────────────────────────────────────────────
-      if(totalH>cfg.maxExceptionH){
-        alerts.push({type:'hard',msg:`🚫 ${totalH.toFixed(1)}h > ${cfg.maxExceptionH}h absolu — shift interdit`});
-      } else if(totalH>cfg.maxDailyH){
-        alerts.push({type:'hard',msg:`⚠️ ${totalH.toFixed(1)}h > ${cfg.maxDailyH}h — motif obligatoire (inventaire/urgence, max ${cfg.maxExceptionPerYear}/an CCN 2216)`});
-      }
-      // Amplitude minimale 3h (CCN 2216 : pas de demi-journée <3h sans accord exprès)
-      if(totalH>0&&totalH<cfg.minShiftH){
-        alerts.push({type:'soft',msg:`Durée ${totalH.toFixed(1)}h < ${cfg.minShiftH}h min CCN 2216 (accord exprès nécessaire)`});
-      }
-
-      // ───────────────────────────────────────────────
-      // B. PAUSES — CCN 2216
-      // Art. sur le temps de pause : 5% du TTE payé (en sus du légal)
-      // Légal art. L.3121-16 : pause ≥20 min après 6h consécutives
-      // CCN 2216 : si pas d'entente, toute période ≥4h doit être coupée avant la 5e heure
-      // ───────────────────────────────────────────────
-      const pausePayeMin=Math.round(totalMin*cfg.pauseRate);
-      const pausePayeH=pausePayeMin/60;
-      let pauseOk=true;
-
-      if(totalH>=6){
-        alerts.push({type:'info',msg:`⏸ Pause légale ≥20 min (art. L.3121-16) + Pause payée CCN: ${pausePayeMin} min (5% TTE = ${pausePayeH.toFixed(2)}h rémunérées)`});
-        if(!(shift.pauseMin>0)){ alerts.push({type:'soft',msg:'Durée de pause non renseignée sur shift >6h — à compléter pour conformité'}); pauseOk=false; }
-      } else if(totalH>=4){
-        alerts.push({type:'info',msg:`⏸ CCN 2216 : pause recommandée avant la 5e heure consécutive`});
-      }
-
-      // ───────────────────────────────────────────────
-      // C. HEURES DE NUIT — CCN 2216 Commerce alimentaire
-      // 21h→22h : +5% | 22h→5h : +20%
-      // Les majorations HS sont également dues (calculées sur taux de base)
-      // ───────────────────────────────────────────────
-      const N1s=cfg.nightStart1*60; const N1e=cfg.nightEnd1*60;         // 21h-22h
-      const N2s=cfg.nightStart2*60; const N2e=cfg.nightEnd2*60+1440;    // 22h-5h(lendemain)
-
-      let nLight=this._overlap(start,end,N1s,N1e)+this._overlap(start,end,N1s-1440,N1e-1440);
-      let nDeep =this._overlap(start,end,N2s,N2e)+this._overlap(start,end,N2s-1440,N2e-1440);
-      nLight=Math.min(nLight,totalMin);
-      nDeep =Math.min(nDeep,totalMin);
-
-      if(nLight>0){ maj.nuit5=nLight/60;  alerts.push({type:'info',msg:`🌙 Nuit 21h-22h : +${cfg.nightRate1*100}% sur ${maj.nuit5.toFixed(2)}h (CCN 2216)`}); }
-      if(nDeep>0){  maj.nuit20=nDeep/60;  alerts.push({type:'info',msg:`🌙 Nuit 22h-5h : +${cfg.nightRate2*100}% sur ${maj.nuit20.toFixed(2)}h (CCN 2216)`}); }
-
-      // ───────────────────────────────────────────────
-      // D. DIMANCHE — CCN 2216 (paramétré surface + type)
-      // ───────────────────────────────────────────────
-      if(dow===0){
-        if(cfg.sundayType==='exceptional'){
-          // Dimanche exceptionnel / JF : +100% EN PLUS du salaire mensuel (versement distinct)
-          maj.dim100=totalH;
-          alerts.push({type:'info',msg:`☀️ Dimanche EXCEPTIONNEL : +100% versé en sus — à tracker (log obligatoire CCN 2216)`});
-        } else {
-          if(surface<=400){
-            // Commerce ≤400m² : +20% SEULEMENT si le salarié n'a pas bénéficié
-            // d'1 jour et demi de repos consécutif dans la semaine (sam+dim ou dim+lun)
-            const samShift=emp?.schedule?.[this._prevDayKey(date)];
-            const lunShift=emp?.schedule?.[this._nextDayKey(date)];
-            const samRest=!samShift||samShift.type!=='work';
-            const lunRest=!lunShift||lunShift.type!=='work';
-            const has15jConsecutif=samRest||lunRest;
-            if(!has15jConsecutif){
-              maj.dim20=totalH;
-              alerts.push({type:'info',msg:`☀️ Dim. régulier ≤400m² : +${cfg.sundayRateLe400*100}% (salarié sans 1,5j repos consécutif sam-dim ou dim-lun)`});
-            } else {
-              alerts.push({type:'info',msg:`☀️ Dim. régulier ≤400m² : pas de majoration (1,5j repos consécutif présent)`});
-            }
-          } else {
-            // Commerce >400m² : +30% pour les heures effectuées jusqu'à 13h00
-            const limite13=cfg.sundayGt400LimitH*60;
-            const dimH30=this._overlap(start,end,0,limite13)/60;
-            const dimHapres=Math.max(0,totalH-dimH30);
-            if(dimH30>0){
-              maj.dim30=dimH30;
-              alerts.push({type:'info',msg:`☀️ Dim. >400m² : +${cfg.sundayRateGt400*100}% sur ${dimH30.toFixed(2)}h (heures jusqu'à ${cfg.sundayGt400LimitH}h00 — CCN 2216)`});
-            }
-            if(dimHapres>0) alerts.push({type:'info',msg:`☀️ Dim. >400m² : ${dimHapres.toFixed(2)}h après ${cfg.sundayGt400LimitH}h → sans majoration dimanche`});
-          }
-        }
-      }
-
-      // ───────────────────────────────────────────────
-      // E. CALCUL COÛT ESTIMÉ
-      // Majoration = additive sur le taux de base (CCN 2216)
-      // ───────────────────────────────────────────────
-      const cost=totalH*rate;
-      const costMaj=(maj.nuit5*rate*cfg.nightRate1)+(maj.nuit20*rate*cfg.nightRate2)
-                   +(maj.dim100*rate*cfg.sundayRateExcept)+(maj.dim20*rate*cfg.sundayRateLe400)
-                   +(maj.dim30*rate*cfg.sundayRateGt400);
-      const costTotal=cost+costMaj;
-
-      return{totalH,cost,costTotal,majorations:maj,alerts,pauses:pausePayeH,pauseOk};
-    },
-
-    /**
-     * validateEmployee — Validation hebdomadaire CCN 2216
-     */
-    validateEmployee(emp){
-      const cfg=this._cfg;
-      const dates=this.getWeekDates();
-      const warnings=[];
-      let totalHours=0,restDays=0,workDays=0;
-      let prevShift=null,prevDate=null;
-
-      dates.forEach(date=>{
-        const key=date.toISOString().slice(0,10);
-        const shift=emp.schedule?.[key];
-        const isWork=shift&&shift.type==='work';
-        if(!isWork){ restDays++; }
-        else {
-          workDays++;
-          const calc=this.calcShift(shift,date,emp);
-          totalHours+=calc.totalH;
-
-          if(calc.totalH>cfg.maxExceptionH){
-            warnings.push({type:'hard',msg:`${date.toLocaleDateString('fr',{weekday:'short'})} : ${calc.totalH.toFixed(1)}h > ${cfg.maxExceptionH}h absolu`,day:key});
-          } else if(calc.totalH>cfg.maxDailyH){
-            warnings.push({type:'hard',msg:`${date.toLocaleDateString('fr',{weekday:'short'})} : ${calc.totalH.toFixed(1)}h > ${cfg.maxDailyH}h — motif requis`,day:key});
-          }
-          if(calc.totalH>0&&calc.totalH<cfg.minShiftH){
-            warnings.push({type:'soft',msg:`${date.toLocaleDateString('fr',{weekday:'short'})} : ${calc.totalH.toFixed(1)}h < ${cfg.minShiftH}h min CCN`,day:key});
-          }
-
-          // Repos quotidien 11h (entre fin du shift précédent et début de celui-ci)
-          if(prevShift&&prevShift.type==='work'&&prevShift.end&&shift.start){
-            const prevEndMin=this._toMin(prevShift.end);
-            const curStartMin=this._toMin(shift.start);
-            let restMin=curStartMin+1440-prevEndMin;
-            if(restMin>=1440) restMin-=1440;
-            if(restMin<cfg.minDailyRestH*60){
-              warnings.push({type:'hard',msg:`Repos quotidien ${(restMin/60).toFixed(1)}h < ${cfg.minDailyRestH}h entre ${prevDate?.toLocaleDateString('fr',{weekday:'short'})} et ${date.toLocaleDateString('fr',{weekday:'short'})} (CCN 2216)`,day:key});
-            }
-          }
-        }
-        prevShift=shift; prevDate=date;
-      });
-
-      if(workDays>cfg.maxWorkDaysPerWeek) warnings.push({type:'hard',msg:`${workDays}j travaillés > ${cfg.maxWorkDaysPerWeek}j max/semaine (CCN 2216)`,day:null});
-      if(restDays<cfg.minRestDaysPerWeek)  warnings.push({type:'hard',msg:`${restDays}j repos < ${cfg.minRestDaysPerWeek}j minimum (CCN 2216)`,day:null});
-      if(totalHours>cfg.maxWeeklyH)        warnings.push({type:'hard',msg:`${totalHours.toFixed(1)}h > ${cfg.maxWeeklyH}h/semaine (légal absolu)`,day:null});
-      if(totalHours>cfg.hs50threshold&&totalHours<=cfg.maxWeeklyH) warnings.push({type:'soft',msg:`${totalHours.toFixed(1)}h > ${cfg.hs50threshold}h — taux HS +50% s'applique (Code trav.)`,day:null});
-
-      return{totalHours,restDays,workDays,warnings};
-    },
-
-    /**
-     * calcHS — Heures supplémentaires CCN 2216
-     * 35h→43h : +25% | >43h : +50%
-     */
-    calcHS(emp){
-      const{totalHours}=this.validateEmployee(emp);
-      const cfg=this._cfg;
-      const base=Math.max(parseFloat((emp.contract||'').match(/(\d+(\.\d+)?)\s*h/i)?.[1]||35),35);
-      const hs1=Math.max(0,Math.min(totalHours,cfg.hs50threshold)-base);
-      const hs2=Math.max(0,totalHours-cfg.hs50threshold);
-      const hs=hs1+hs2;
-      const rate=parseFloat(emp?.hourlyRate)||cfg.hourlyRate;
-      const costHS=hs1*rate*0.25+hs2*rate*0.50;
-      return{hs,hs1,hs2,totalHours,contractH:base,costHS};
-    },
-
-    /**
-     * Repos 48h consécutives incluant le dimanche — toutes les 12 semaines (CCN 2216)
-     */
-    check48h12weeks(emp){
-      const dates=this.getWeekDates();
-      const sunKey=dates[6].toISOString().slice(0,10);
-      const satKey=dates[5].toISOString().slice(0,10);
-      const sunRest=!emp.schedule?.[sunKey]||emp.schedule[sunKey].type!=='work';
-      const satRest=!emp.schedule?.[satKey]||emp.schedule[satKey].type!=='work';
-      return{
-        hasSundayRest:sunRest,
-        hasSatSunRest:satRest&&sunRest,
-        warn:!sunRest?'Dimanche travaillé — vérifier compteur 48h/12 semaines (CCN 2216)':''
-      };
-    },
-
-    /**
-     * Vérification minima salariaux CCN 2216 vs SMIC
-     */
-    checkMinWage(emp){
-      const cfg=this._cfg;
-      const rate=parseFloat(emp?.hourlyRate)||cfg.hourlyRate;
-      if(rate<cfg.smiHoraire) return{ok:false,msg:`Taux ${rate}€/h < SMIC ${cfg.smiHoraire}€/h ⛔`};
-      if(emp.niveauCCN){
-        const n=this._CCN_NIVEAUX.find(x=>x.niveau===emp.niveauCCN);
-        if(n&&rate<n.tauxH) return{ok:false,msg:`Taux ${rate}€/h < minima CCN 2216 niv. ${emp.niveauCCN} (${n.tauxH}€/h) ⛔`};
-      }
-      return{ok:true,msg:''};
-    },
-
-    // ── PERSISTANCE ──
     async _load(){
       try{
-        const{doc,getDoc}=window._fbChat;
-        const snap=await getDoc(doc(window._db,'store_master','PLANNING_RH'));
-        if(snap.exists()){const d=snap.data();this._employees=d.employees||[];if(d.cfg)this._cfg={...this._cfg,...d.cfg};}
+        const{doc,getDoc,setDoc}=window._fbChat;
+        const ref=doc(window._db,'store_master','PLANNING_RH');
+        this._docRef=ref;
+        const snap=await getDoc(ref);
+        if(snap.exists()){this._employees=snap.data().employees||[];}
       }catch(e){
-        try{
-          const s=JSON.parse(localStorage.getItem('planning_employees')||'[]');if(s.length)this._employees=s;
-          const c=JSON.parse(localStorage.getItem('planning_cfg')||'{}');if(c)this._cfg={...this._cfg,...c};
-        }catch(e2){}
+        try{const s=JSON.parse(localStorage.getItem('planning_employees')||'[]');if(s.length)this._employees=s;}catch(e2){}
       }
     },
+
     async _save(){
-      try{localStorage.setItem('planning_employees',JSON.stringify(this._employees));localStorage.setItem('planning_cfg',JSON.stringify(this._cfg));}catch(e){}
-      try{const{doc,setDoc}=window._fbChat;await setDoc(doc(window._db,'store_master','PLANNING_RH'),{employees:this._employees,cfg:this._cfg,updatedAt:Date.now()});}catch(e){}
+      const data=JSON.stringify(this._employees);
+      try{localStorage.setItem('planning_employees',data);}catch(e){}
+      try{
+        const{doc,setDoc}=window._fbChat;
+        const ref=doc(window._db,'store_master','PLANNING_RH');
+        await setDoc(ref,{employees:this._employees,updatedAt:Date.now()});
+      }catch(e){}
     },
 
-    // ── NAVIGATION ──
     getWeekDates(){
       const now=new Date();const day=now.getDay();
-      const monday=new Date(now);monday.setDate(now.getDate()+(day===0?-6:1-day)+this._weekOffset*7);monday.setHours(0,0,0,0);
-      return Array.from({length:7},(_,i)=>{const d=new Date(monday);d.setDate(monday.getDate()+i);return d;});
+      const mondayOffset=day===0?-6:1-day;
+      const monday=new Date(now);monday.setDate(now.getDate()+mondayOffset+this._weekOffset*7);monday.setHours(0,0,0,0);
+      const dates=[];for(let i=0;i<7;i++){const d=new Date(monday);d.setDate(monday.getDate()+i);dates.push(d);}
+      return dates;
     },
+
     prevWeek(){this._weekOffset--;this.render();},
     nextWeek(){this._weekOffset++;this.render();},
 
-    switchView(v){
-      this._view=v;
-      ['week','staff','alerts','settings'].forEach(t=>{
-        document.getElementById('ptab-'+t)?.classList.toggle('active',t===v);
-        const el=document.getElementById('plan-view-'+t);if(el)el.style.display=t===v?'block':'none';
-      });
-      if(v==='week')this.render();
-      if(v==='staff')this.renderStaffView();
-      if(v==='alerts')this.renderAlertsView();
-      if(v==='settings')this.renderSettingsView();
+    getShiftHours(shift){
+      if(!shift||shift.type==='rest'||!shift.start||!shift.end)return 0;
+      const[sh,sm]=shift.start.split(':').map(Number);const[eh,em]=shift.end.split(':').map(Number);
+      let h=(eh*60+em-sh*60-sm)/60;if(h<0)h+=24;return Math.max(0,h);
     },
 
-    // ── RENDU GRILLE SEMAINE ──
+    validateSchedule(emp){
+      const dates=this.getWeekDates();const warnings=[];let totalHours=0;let restDays=0;
+      const profile=emp.hrProfile?this.HR_PROFILES[emp.hrProfile]:null;
+      const maxDay=profile?profile.maxHoursDay:10;
+      const maxWeek=profile?profile.maxHoursWeek:48;
+      const minRest=profile?profile.minRestHours:11;
+      dates.forEach((date,idx)=>{
+        const key=date.toISOString().slice(0,10);const shift=emp.schedule?.[key];
+        if(!shift||shift.type==='rest'){restDays++;return;}
+        const h=this.getShiftHours(shift);
+        if(h>maxDay)warnings.push(`${date.toLocaleDateString('fr',{weekday:'short'})}: >${maxDay}h`);
+        // Check night restriction for minors
+        if(profile?.nightBan&&shift.start&&shift.end){
+          const s=shift.start,e=shift.end;
+          if(s<'06:00'||s>='22:00'||e>'22:00')warnings.push(`${date.toLocaleDateString('fr',{weekday:'short'})}: travail de nuit interdit`);
+        }
+        totalHours+=h;
+      });
+      if(restDays<2)warnings.push(`${restDays} repos (min 2)`);
+      if(totalHours>maxWeek)warnings.push(`Semaine ${totalHours.toFixed(0)}h > ${maxWeek}h`);
+      return{totalHours,restDays,warnings};
+    },
+
     render:async function(){
       if(!this._employees.length&&!this._loaded){this._loaded=true;await this._load();}
       const dates=this.getWeekDates();
       const labelEl=document.getElementById('plan-week-label');
-      if(labelEl){const o={day:'2-digit',month:'2-digit'};labelEl.textContent=`Sem. ${dates[0].toLocaleDateString('fr',o)} – ${dates[6].toLocaleDateString('fr',o)}`;}
-      const wrap=document.getElementById('plan-employees');if(!wrap)return;
-      const DS=['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+      if(labelEl){const opts={day:'2-digit',month:'2-digit'};labelEl.textContent=`${dates[0].toLocaleDateString('fr',opts)} – ${dates[6].toLocaleDateString('fr',opts)}`;}
+
+      const wrap=document.getElementById('plan-employees');
+      if(!wrap)return;
+      const DAY_SHORT=['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
       const today=new Date().toISOString().slice(0,10);
 
-      this._renderWeekSummary(dates);
-
       if(!this._employees.length){
-        wrap.innerHTML='<div class="empty-state"><i class="fas fa-users-slash"></i><br>Aucun salarié. Cliquez sur + pour commencer.</div>';
+        wrap.innerHTML=`<div class="empty-state"><i class="fas fa-users-slash"></i><br>Aucun employé. Cliquez sur "Ajouter" pour commencer.</div>`;
         document.getElementById('plan-summary').style.display='none';return;
       }
 
+      // ── Header ──
       const headerHtml=`<div class="plan-grid-row plan-header-row">
-        <div class="plan-emp-col" style="font-size:10px;font-weight:900;color:#64748b;">SALARIÉ CCN 2216</div>
-        ${dates.map((d,i)=>{const isT=d.toISOString().slice(0,10)===today;const isSun=d.getDay()===0;const isSat=d.getDay()===6;
-          return`<div class="plan-day-header ${isT?'today':''} ${(isSun||isSat)&&!isT?'sunday':''}">
-            <div class="plan-day-name">${DS[i]}</div><div class="plan-day-num">${d.getDate()}</div>
-          </div>`;}).join('')}
-        <div class="plan-total-col" style="font-size:10px;font-weight:900;color:#64748b;">TOT</div>
+        <div class="plan-emp-col"></div>
+        ${dates.map((d,i)=>{const isT=d.toISOString().slice(0,10)===today;return`<div class="plan-day-header ${isT?'today':''}"><div class="plan-day-name">${DAY_SHORT[i]}</div><div class="plan-day-num">${d.getDate()}</div></div>`;}).join('')}
+        <div class="plan-total-col">Total</div>
       </div>`;
 
+      // ── Rows ──
       const rowsHtml=this._employees.map(emp=>{
-        const{totalHours,restDays,warnings}=this.validateEmployee(emp);
+        const{totalHours,restDays,warnings}=this.validateSchedule(emp);
         const colorDot=emp.color||'#003896';
         const initials=(emp.name||'?').split(' ').map(x=>x[0]||'').join('').toUpperCase().slice(0,2);
-        const hardWarns=warnings.filter(w=>w.type==='hard');
-        const{hs}=this.calcHS(emp);
-        const sun48=this.check48h12weeks(emp);
-        const wc=this.checkMinWage(emp);
-        const weekCost=dates.reduce((s,d)=>{const k=d.toISOString().slice(0,10);const sh=emp.schedule?.[k];return s+(sh&&sh.type==='work'?this.calcShift(sh,d,emp).costTotal:0);},0);
+        const profile=emp.hrProfile?this.HR_PROFILES[emp.hrProfile]:null;
 
         const cells=dates.map(date=>{
           const key=date.toISOString().slice(0,10);const isT=key===today;
-          const shift=emp.schedule?.[key];const isSun=date.getDay()===0;
-          if(!shift||shift.type==='rest') return`<div class="plan-cell rest ${isT?'today':''}" onclick="app.planning.editShift('${emp.id}','${key}')"><span class="plan-rest-label">—</span></div>`;
-          if(shift.type==='cp')     return`<div class="plan-cell cp ${isT?'today':''}" onclick="app.planning.editShift('${emp.id}','${key}')"><span style="font-size:11px;font-weight:900;color:#166534;">🌴 CP</span></div>`;
-          if(shift.type==='absent') return`<div class="plan-cell absent ${isT?'today':''}" onclick="app.planning.editShift('${emp.id}','${key}')"><span style="font-size:11px;font-weight:900;color:#be185d;">🤒 ABS</span></div>`;
-          if(shift.type==='ferie')  return`<div class="plan-cell ferie ${isT?'today':''}" onclick="app.planning.editShift('${emp.id}','${key}')"><span style="font-size:11px;font-weight:900;color:#b45309;">🏖 JF</span></div>`;
-          const calc=this.calcShift(shift,date,emp);
+          const shift=emp.schedule?.[key];const isRest=!shift||shift.type==='rest';
+          if(isRest){
+            return`<div class="plan-cell rest ${isT?'today':''}"
+              onclick="app.planning.editShift('${emp.id}','${key}')"
+              ondragover="event.preventDefault();this.classList.add('drag-over')"
+              ondragleave="this.classList.remove('drag-over')"
+              ondrop="app.planning.dropShift(event,'${emp.id}','${key}')">
+              <span class="plan-rest-label">—</span>
+            </div>`;
+          }
+          const h=this.getShiftHours(shift);
           const col=this._postColors[shift.post||'AUTRE']||'#475569';
-          const hasNight=calc.majorations.nuit5>0||calc.majorations.nuit20>0;
-          const hasDim=calc.majorations.dim100>0||calc.majorations.dim20>0||calc.majorations.dim30>0;
-          const isLong=calc.totalH>this._cfg.maxDailyH;
-          return`<div class="plan-cell work ${isT?'today':''} ${isSun?'sunday-work':''} ${hasNight?'night-work':''} ${isLong?'long':''}" style="--shift-color:${col};" onclick="app.planning.editShift('${emp.id}','${key}')">
+          const isSplit=h>10;
+          const breakMin=shift.breakMin||this._autoBreak(h,profile);
+          return`<div class="plan-cell work ${isT?'today':''} ${isSplit?'long':''}" style="--shift-color:${col};"
+            draggable="true"
+            ondragstart="app.planning.dragStart(event,'${emp.id}','${key}')"
+            ondragover="event.preventDefault();this.classList.add('drag-over')"
+            ondragleave="this.classList.remove('drag-over')"
+            ondrop="app.planning.dropShift(event,'${emp.id}','${key}')"
+            onclick="app.planning.editShift('${emp.id}','${key}')">
             <div class="plan-shift-post" style="background:${col}20;color:${col};">${shift.post||'TRAVAIL'}</div>
             <div class="plan-shift-times">${shift.start}–${shift.end}</div>
-            <div class="plan-shift-h">${calc.totalH.toFixed(1)}h</div>
-            ${hasDim?'<div class="plan-shift-majoration">☀️MAJ</div>':''}
-            ${hasNight?'<div class="plan-shift-majoration">🌙NUIT</div>':''}
+            <div class="plan-shift-h">${h.toFixed(1)}h${breakMin?` <span style="color:#f59e0b;">☕${breakMin}'</span>`:''}</div>
           </div>`;
         }).join('');
 
-        return`<div class="plan-grid-row ${hardWarns.length?'has-warn':''}">
+        return`<div class="plan-grid-row ${warnings.length?'has-warn':''}">
           <div class="plan-emp-col">
             <div class="plan-avatar" style="background:${colorDot};">${initials}</div>
             <div class="plan-emp-info">
-              <div class="plan-emp-name">${emp.name}${!wc.ok?' ⚠️':''}</div>
-              <div class="plan-emp-contract">${emp.contract||'—'} · ${weekCost.toFixed(0)}€</div>
+              <div class="plan-emp-name">${emp.name}</div>
+              <div class="plan-emp-contract">${emp.contract||''}</div>
+              ${profile?`<span class="hr-profile-chip" onclick="event.stopPropagation();app.planning.changeHrProfile('${emp.id}')">${profile.icon} ${profile.label}</span>`:'<span class="hr-profile-chip" onclick="event.stopPropagation();app.planning.changeHrProfile(\''+emp.id+'\')"><i class="fas fa-plus" style="font-size:9px;"></i> Profil RH</span>'}
             </div>
             <button class="plan-emp-del" onclick="app.planning.removeEmployee('${emp.id}')"><i class="fas fa-trash"></i></button>
           </div>
           ${cells}
           <div class="plan-total-col">
-            <div class="plan-total-h" style="color:${totalHours>43?'#dc2626':totalHours>35?'#d97706':'#059669'}">${totalHours.toFixed(0)}h</div>
-            <div class="plan-rest-badge ${restDays>=this._cfg.minRestDaysPerWeek?'ok':'warn'}">${restDays}R</div>
-            ${hs>0?`<div style="font-size:8px;font-weight:900;color:#dc2626;">+${hs.toFixed(0)}HS</div>`:''}
-            ${!sun48.hasSundayRest?'<div style="font-size:8px;font-weight:900;color:#f59e0b;" title="Vérifier repos 48h/12sem">⚠️48h</div>':''}
+            <div class="plan-total-h" style="color:${totalHours>40?'#dc2626':totalHours>35?'#d97706':'#059669'}">${totalHours.toFixed(0)}h</div>
+            <div class="plan-rest-badge ${restDays>=2?'ok':'warn'}">${restDays}R</div>
           </div>
         </div>
-        ${hardWarns.length?`<div class="plan-warn-row"><i class="fas fa-ban"></i> ${hardWarns.map(w=>w.msg).join(' · ')}</div>`:''}`;
+        ${warnings.length?`<div class="plan-warn-row"><i class="fas fa-triangle-exclamation"></i> ${warnings.join(' • ')}</div>`:''}`;
       }).join('');
 
-      const totalWeekCost=this._employees.reduce((s,emp)=>s+dates.reduce((ss,d)=>{const k=d.toISOString().slice(0,10);const sh=emp.schedule?.[k];return ss+(sh&&sh.type==='work'?this.calcShift(sh,d,emp).costTotal:0);},0),0);
+      // ── Bottom totals bar ──
       const dayTotals=dates.map(date=>{
-        const key=date.toISOString().slice(0,10);const isSun=date.getDay()===0;const isSat=date.getDay()===6;
-        const tot=this._employees.reduce((s,e)=>{const sh=e.schedule?.[key];return s+(sh&&sh.type==='work'?this.calcShift(sh,date,e).totalH:0);},0);
-        const cnt=this._employees.filter(e=>{const sh=e.schedule?.[key];return sh&&sh.type==='work';}).length;
-        const cst=this._employees.reduce((s,e)=>{const sh=e.schedule?.[key];return s+(sh&&sh.type==='work'?this.calcShift(sh,date,e).costTotal:0);},0);
-        return`<div class="plan-day-footer" style="${isSun||isSat?'background:#fef3c7;':''}">
-          <div class="plan-day-count">${cnt}p</div><div class="plan-day-hours">${tot.toFixed(0)}h</div>
-          <div style="font-size:9px;color:#64748b;font-weight:800;">${cst.toFixed(0)}€</div>
-        </div>`;
+        const key=date.toISOString().slice(0,10);
+        const total=this._employees.reduce((s,e)=>{const sh=e.schedule?.[key];return s+(sh&&sh.type!=='rest'?this.getShiftHours(sh):0);},0);
+        const count=this._employees.filter(e=>{const sh=e.schedule?.[key];return sh&&sh.type!=='rest';}).length;
+        return`<div class="plan-day-footer"><div class="plan-day-count">${count} pers</div><div class="plan-day-hours">${total.toFixed(0)}h</div></div>`;
       }).join('');
-
-      wrap.innerHTML=headerHtml+rowsHtml+`<div class="plan-grid-row plan-footer-row">
-        <div class="plan-emp-col" style="font-size:10px;font-weight:900;color:#64748b;">PAR JOUR</div>
+      const footerHtml=`<div class="plan-grid-row plan-footer-row">
+        <div class="plan-emp-col" style="font-size:11px;font-weight:900;color:#64748b;text-align:center;">PAR JOUR</div>
         ${dayTotals}
-        <div class="plan-total-col" style="font-size:10px;font-weight:950;color:#0891b2;">${totalWeekCost.toFixed(0)}€</div>
+        <div class="plan-total-col"></div>
       </div>`;
 
+      wrap.innerHTML=headerHtml+rowsHtml+footerHtml;
+
+      // Summary
       const se=document.getElementById('plan-summary'),sc=document.getElementById('plan-summary-content');
       if(se&&sc){
         se.style.display='block';
-        const tw=this._employees.reduce((s,e)=>s+this.validateEmployee(e).totalHours,0);
-        const allW=this._employees.flatMap(e=>this.validateEmployee(e).warnings);
-        const hards=allW.filter(w=>w.type==='hard').length;
-        sc.innerHTML=`<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">
-          <div style="background:#eff6ff;border-radius:10px;padding:10px;text-align:center;"><div style="font-size:20px;font-weight:950;color:#0891b2;">${this._employees.length}</div><div style="font-size:10px;color:#64748b;">Salariés</div></div>
-          <div style="background:#f0fdf4;border-radius:10px;padding:10px;text-align:center;"><div style="font-size:20px;font-weight:950;color:#059669;">${tw.toFixed(0)}h</div><div style="font-size:10px;color:#64748b;">Heures</div></div>
-          <div style="background:#fef3c7;border-radius:10px;padding:10px;text-align:center;"><div style="font-size:20px;font-weight:950;color:#d97706;">${totalWeekCost.toFixed(0)}€</div><div style="font-size:10px;color:#64748b;">Coût CCN 2216</div></div>
-          <div style="background:${hards>0?'#fef2f2':'#f0fdf4'};border-radius:10px;padding:10px;text-align:center;"><div style="font-size:20px;font-weight:950;color:${hards>0?'#dc2626':'#059669'};">${hards}</div><div style="font-size:10px;color:#64748b;">Alertes HARD</div></div>
+        const tw=this._employees.reduce((s,e)=>s+this.validateSchedule(e).totalHours,0);
+        const pres=this._employees.flatMap(e=>dates.map(d=>{const k=d.toISOString().slice(0,10);const s=e.schedule?.[k];return s&&s.type!=='rest'?1:0;})).reduce((a,b)=>a+b,0);
+        sc.innerHTML=`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
+          <div style="background:#eff6ff;border-radius:10px;padding:10px;text-align:center;"><div style="font-size:22px;font-weight:950;color:#0891b2;">${this._employees.length}</div><div style="font-size:11px;color:#64748b;">Employés</div></div>
+          <div style="background:#f0fdf4;border-radius:10px;padding:10px;text-align:center;"><div style="font-size:22px;font-weight:950;color:#059669;">${tw.toFixed(0)}h</div><div style="font-size:11px;color:#64748b;">Total semaine</div></div>
+          <div style="background:#fdf4ff;border-radius:10px;padding:10px;text-align:center;"><div style="font-size:22px;font-weight:950;color:#7c3aed;">${pres}</div><div style="font-size:11px;color:#64748b;">Présences</div></div>
         </div>`;
       }
     },
 
-    _renderWeekSummary(dates){
-      const wrap=document.getElementById('plan-week-summary');if(!wrap)return;
-      const tw=this._employees.reduce((s,e)=>s+this.validateEmployee(e).totalHours,0);
-      const tc=this._employees.reduce((s,e)=>s+dates.reduce((ss,d)=>{const k=d.toISOString().slice(0,10);const sh=e.schedule?.[k];return ss+(sh&&sh.type==='work'?this.calcShift(sh,d,e).costTotal:0);},0),0);
-      const ths=this._employees.reduce((s,e)=>s+this.calcHS(e).hs,0);
-      const allW=this._employees.flatMap(e=>this.validateEmployee(e).warnings);
-      const hards=allW.filter(w=>w.type==='hard').length;
-      const softs=allW.filter(w=>w.type==='soft').length;
-      wrap.innerHTML=`
-        <div class="plan-counter-chip"><i class="fas fa-clock" style="color:#0891b2;"></i>${tw.toFixed(0)}h</div>
-        <div class="plan-counter-chip"><i class="fas fa-euro-sign" style="color:#059669;"></i>${tc.toFixed(0)}€</div>
-        ${ths>0?`<div class="plan-counter-chip warn"><i class="fas fa-plus-circle"></i>${ths.toFixed(0)}h HS</div>`:''}
-        ${hards>0?`<div class="plan-counter-chip danger"><i class="fas fa-ban"></i>${hards} HARD</div>`:''}
-        ${softs>0?`<div class="plan-counter-chip warn"><i class="fas fa-exclamation-circle"></i>${softs} SOFT</div>`:''}
-        ${!hards&&!softs?'<div class="plan-counter-chip ok"><i class="fas fa-check-circle"></i>CCN 2216 ✓</div>':''}
-      `;
+    addEmployee:async function(){
+      const name=await dlgPrompt('Prénom + Nom de l\'employé :');if(!name?.trim())return;
+      const contract=await dlgPrompt('Contrat (ex: 30h/sem, CDI…) :','');
+      const colors=['#003896','#0891b2','#059669','#7c3aed','#dc2626','#d97706','#0f766e','#db2777'];
+      const color=colors[this._employees.length%colors.length];
+      this._employees.push({id:Date.now(),name:name.trim().toUpperCase(),contract:contract?.trim()||'',color,schedule:{}});
+      await this._save();this.render();
     },
 
-    // ── VUE SALARIÉ ──
-    renderStaffView(){
-      const sel=document.getElementById('plan-staff-select');
-      if(sel){const cur=sel.value;sel.innerHTML='<option value="">-- Sélectionner un salarié --</option>'+this._employees.map(e=>`<option value="${e.id}">${e.name}</option>`).join('');if(cur)sel.value=cur;}
-      const wrap=document.getElementById('plan-staff-view-content');if(!wrap)return;
-      const empId=document.getElementById('plan-staff-select')?.value;
-      const emp=this._employees.find(e=>String(e.id)===String(empId));
-      if(!emp){wrap.innerHTML='<div class="empty-state">Sélectionnez un salarié.</div>';return;}
-
-      const dates=this.getWeekDates();
-      const{totalHours,restDays,warnings}=this.validateEmployee(emp);
-      const{hs,hs1,hs2,costHS}=this.calcHS(emp);
-      const sun48=this.check48h12weeks(emp);
-      const wc=this.checkMinWage(emp);
-      const weekCost=dates.reduce((s,d)=>{const k=d.toISOString().slice(0,10);const sh=emp.schedule?.[k];return s+(sh&&sh.type==='work'?this.calcShift(sh,d,emp).costTotal:0);},0);
-      const nH5=dates.reduce((s,d)=>{const k=d.toISOString().slice(0,10);const sh=emp.schedule?.[k];return s+(sh&&sh.type==='work'?this.calcShift(sh,d,emp).majorations.nuit5||0:0);},0);
-      const nH20=dates.reduce((s,d)=>{const k=d.toISOString().slice(0,10);const sh=emp.schedule?.[k];return s+(sh&&sh.type==='work'?this.calcShift(sh,d,emp).majorations.nuit20||0:0);},0);
-      const sunH=dates.filter(d=>d.getDay()===0).reduce((s,d)=>{const k=d.toISOString().slice(0,10);const sh=emp.schedule?.[k];return s+(sh&&sh.type==='work'?this.calcShift(sh,d,emp).totalH:0);},0);
-      const pauseH=dates.reduce((s,d)=>{const k=d.toISOString().slice(0,10);const sh=emp.schedule?.[k];return s+(sh&&sh.type==='work'?this.calcShift(sh,d,emp).pauses:0);},0);
-      const cH=parseFloat((emp.contract||'').match(/(\d+(\.\d+)?)\s*h/i)?.[1]||35);
-
-      wrap.innerHTML=`
-        <div style="background:linear-gradient(135deg,#0891b2,#0e7490);border-radius:16px;padding:16px;margin-bottom:12px;color:#fff;">
-          <div style="font-weight:950;font-size:17px;">${emp.name}</div>
-          <div style="font-size:12px;opacity:.8;">${emp.contract||'—'} · Taux: ${parseFloat(emp.hourlyRate||this._cfg.hourlyRate).toFixed(2)}€/h · Niv. CCN: ${emp.niveauCCN||'?'}</div>
-          ${!wc.ok?`<div style="background:#dc2626;border-radius:8px;padding:6px 10px;margin-top:6px;font-size:12px;font-weight:900;">⛔ ${wc.msg}</div>`:''}
-        </div>
-
-        <div class="staff-counters">
-          <div class="staff-counter-card ${totalHours>cH+8?'danger':totalHours>cH?'warn':'ok'}">
-            <div class="scc-val">${totalHours.toFixed(1)}h</div><div class="scc-label">Heures / semaine</div>
-          </div>
-          <div class="staff-counter-card ${hs>0?'warn':'ok'}">
-            <div class="scc-val">${hs.toFixed(1)}h</div><div class="scc-label">HS (contingent 180h/an)</div>
-          </div>
-          <div class="staff-counter-card ${nH5+nH20>0?'warn':'ok'}">
-            <div class="scc-val">${(nH5+nH20).toFixed(1)}h</div><div class="scc-label">Heures nuit (21h-5h)</div>
-          </div>
-          <div class="staff-counter-card ${sunH>0?'warn':'ok'}">
-            <div class="scc-val">${sunH.toFixed(1)}h</div><div class="scc-label">Heures dimanche</div>
-          </div>
-          <div class="staff-counter-card ${restDays>=this._cfg.minRestDaysPerWeek?'ok':'danger'}">
-            <div class="scc-val">${restDays}j</div><div class="scc-label">Jours de repos</div>
-          </div>
-          <div class="staff-counter-card ${sun48.hasSundayRest?'ok':'warn'}">
-            <div class="scc-val">${sun48.hasSundayRest?'✓':'⚠'}</div><div class="scc-label">Repos 48h / 12 sem.</div>
-          </div>
-          <div class="staff-counter-card">
-            <div class="scc-val">${(pauseH*60).toFixed(0)}min</div><div class="scc-label">Pauses payées CCN (5%)</div>
-          </div>
-          <div class="staff-counter-card ok">
-            <div class="scc-val">${weekCost.toFixed(0)}€</div><div class="scc-label">Coût semaine (CCN 2216)</div>
-          </div>
-        </div>
-
-        ${hs>0?`<div class="card" style="border-left:3px solid #f59e0b;margin-bottom:10px;">
-          <div style="font-weight:950;font-size:13px;color:#d97706;margin-bottom:4px;">💼 Heures supplémentaires — CCN 2216</div>
-          <div style="font-size:12px;color:#334155;line-height:1.7;">
-            <b>HS tranche 1</b> (35h→43h, +25%) : ${hs1.toFixed(2)}h<br>
-            <b>HS tranche 2</b> (>43h, +50%) : ${hs2.toFixed(2)}h<br>
-            <b>Surcoût majorations HS</b> : ${costHS.toFixed(2)}€<br>
-            <span style="font-size:10px;color:#f59e0b;">⚠️ Contingent annuel CCN 2216 : 180h — déduire du solde annuel</span>
-          </div>
-        </div>`:''}
-
-        ${warnings.length?`<div style="margin-bottom:10px;">${warnings.map(w=>`<div class="plan-alert-item ${w.type}"><i class="fas fa-${w.type==='hard'?'ban':'exclamation-circle'}"></i>${w.msg}</div>`).join('')}</div>`:'<div class="plan-alert-item info" style="margin-bottom:10px;"><i class="fas fa-check-circle"></i>Semaine conforme — CCN 2216 Commerce alimentaire détail &lt;11 salariés</div>'}
-
-        <div class="card" style="margin-bottom:10px;">
-          <div style="font-weight:950;font-size:13px;color:#0891b2;margin-bottom:6px;">🏖 Jours fériés 2025 — CCN-11 (11 jours légaux)</div>
-          <div style="font-size:10px;color:#64748b;margin-bottom:8px;">Chômés/payés : <b>${(emp.feriesChomes||[]).length}/6</b> · Les 5 autres pouvant être travaillés (repos compensateur OU paiement au taux contractuel, au choix du salarié)</div>
-          <div style="display:flex;flex-wrap:wrap;gap:4px;">
-            ${this._FERIES_FR.map(f=>{const ok=(emp.feriesChomes||[]).includes(f.key);return`<span style="font-size:10px;font-weight:800;border-radius:6px;padding:3px 8px;background:${ok?'#dbeafe':'#f1f5f9'};color:${ok?'#1d4ed8':'#64748b'};border:1px solid ${f.obligChome?'#fbbf24':ok?'#93c5fd':'#e2e8f0'};">${f.label}${f.obligChome?' ✓':''}</span>`;}).join('')}
-          </div>
-        </div>
-
-        <div class="card">
-          <div style="font-weight:950;color:#0891b2;margin-bottom:8px;"><i class="fas fa-calendar-week"></i> Détail jours</div>
-          ${dates.map(d=>{
-            const k=d.toISOString().slice(0,10);const sh=emp.schedule?.[k];
-            const isWork=sh&&sh.type==='work';const calc=isWork?this.calcShift(sh,d,emp):null;
-            const DS=['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];const isSun=d.getDay()===0;
-            return`<div style="display:flex;justify-content:space-between;align-items:flex-start;padding:8px 0;border-bottom:1px solid #f1f5f9;">
-              <span style="font-weight:800;font-size:13px;color:${isSun?'#d97706':'#334155'};">${DS[d.getDay()]} ${d.getDate()}</span>
-              ${isWork?`<div style="text-align:right;">
-                <span style="font-size:12px;font-weight:900;color:#0891b2;">${sh.start}–${sh.end} (${calc.totalH.toFixed(1)}h) · ${sh.post||''}</span><br>
-                <span style="font-size:10px;color:#64748b;">${calc.costTotal.toFixed(2)}€ total · pause payée: ${(calc.pauses*60).toFixed(0)}min</span>
-                ${calc.majorations.nuit5>0||calc.majorations.nuit20>0?'<br><span style="font-size:9px;color:#6d28d9;font-weight:900;">🌙 Nuit majorée CCN 2216</span>':''}
-                ${calc.majorations.dim20>0||calc.majorations.dim30>0||calc.majorations.dim100>0?'<br><span style="font-size:9px;color:#d97706;font-weight:900;">☀️ Dimanche majoré CCN 2216</span>':''}
-                ${calc.totalH>this._cfg.maxDailyH?`<br><span style="font-size:9px;color:#dc2626;font-weight:900;">⚠️ >10h — motif: ${sh.note||'à renseigner'}</span>`:''}
-              </div>`
-              :sh?.type==='cp'?'<span style="color:#166534;font-weight:900;font-size:12px;">🌴 Congés payés</span>'
-              :sh?.type==='absent'?'<span style="color:#be185d;font-weight:900;font-size:12px;">🤒 Absence</span>'
-              :sh?.type==='ferie'?'<span style="color:#b45309;font-weight:900;font-size:12px;">🏖 Jour Férié</span>'
-              :'<span style="color:#94a3b8;font-size:12px;">— Repos</span>'}
-            </div>`;
-          }).join('')}
-        </div>
-      `;
-    },
-
-    // ── VUE ALERTES ──
-    renderAlertsView(){
-      const wrap=document.getElementById('plan-alerts-content');if(!wrap)return;
-      const dates=this.getWeekDates();
-      const all=[];
-      this._employees.forEach(emp=>{
-        this.validateEmployee(emp).warnings.forEach(w=>all.push({...w,empName:emp.name}));
-        const wc=this.checkMinWage(emp);if(!wc.ok)all.push({type:'hard',msg:wc.msg,empName:emp.name,day:null});
-        dates.forEach(d=>{const k=d.toISOString().slice(0,10);const sh=emp.schedule?.[k];if(sh&&sh.type==='work'){this.calcShift(sh,d,emp).alerts.filter(a=>a.type==='hard'||a.type==='soft').forEach(a=>all.push({...a,empName:emp.name,day:k}));}});
-        const s=this.check48h12weeks(emp);if(s.warn)all.push({type:'soft',msg:s.warn,empName:emp.name,day:null});
-        const{hs}=this.calcHS(emp);if(hs>0)all.push({type:'soft',msg:`${hs.toFixed(1)}h HS cette semaine — contingent annuel 180h CCN 2216 (IDCC 2216)`,empName:emp.name,day:null});
-      });
-      if(!all.length){wrap.innerHTML='<div class="plan-alert-item info"><i class="fas fa-check-circle"></i>Aucune alerte — Planning conforme CCN 2216 Commerce alimentaire détail &lt;11 salariés.</div>';return;}
-      const hards=all.filter(a=>a.type==='hard'),softs=all.filter(a=>a.type==='soft');
-      wrap.innerHTML=`
-        <div style="background:#f0fdf4;border-radius:10px;padding:10px 12px;margin-bottom:10px;font-size:11px;font-weight:800;color:#166534;line-height:1.6;">
-          <i class="fas fa-scale-balanced"></i> <b>CCN 2216 — Commerce de détail alimentaire (IDCC 2216)</b><br>
-          Établissement &lt;11 salariés · Contingent HS: 180h/an · Nuit: 21h-22h +5% / 22h-5h +20%<br>
-          Dimanche régulier: ≤400m² +20% (si pas 1,5j repos) · >400m² +30% jusqu'à 13h<br>
-          Jours fériés: 6 chômés/payés (CCN-11) · Repos quotidien: 11h · Hebdo: min 2j repos
-        </div>
-        ${hards.length?`<div style="font-weight:950;color:#dc2626;margin-bottom:6px;font-size:13px;"><i class="fas fa-ban"></i> ${hards.length} Alerte(s) HARD — à corriger avant publication</div>${hards.map(a=>`<div class="plan-alert-item hard"><i class="fas fa-ban"></i><div><div style="font-weight:950;">${a.empName}</div><div>${a.msg}</div></div></div>`).join('')}`:''}
-        ${softs.length?`<div style="font-weight:950;color:#d97706;margin-bottom:6px;margin-top:10px;font-size:13px;"><i class="fas fa-exclamation-circle"></i> ${softs.length} Alerte(s) SOFT — à vérifier</div>${softs.map(a=>`<div class="plan-alert-item soft"><i class="fas fa-exclamation-circle"></i><div><div style="font-weight:950;">${a.empName}</div><div>${a.msg}</div></div></div>`).join('')}`:''}
-      `;
-    },
-
-    // ── VUE CONFIG ──
-    renderSettingsView(){
-      const set=(id,val)=>{const el=document.getElementById(id);if(el)el.value=val==null?'':val;};
-      set('plan-cfg-surface',this._cfg.surface);
-      set('plan-cfg-sunday-type',this._cfg.sundayType);
-      set('plan-cfg-hourly-rate',this._cfg.hourlyRate);
-      set('plan-cfg-notice',this._cfg.noticeDays);
-
-      // Bannière CCN
-      const fc=document.querySelector('#plan-view-settings .card');
-      if(fc&&!fc.querySelector('.ccn-banner')){
-        const b=document.createElement('div');b.className='ccn-banner';
-        b.style.cssText='background:linear-gradient(135deg,#eff6ff,#dbeafe);border:1.5px solid #93c5fd;border-radius:12px;padding:12px;font-size:11px;font-weight:800;color:#1d4ed8;margin-bottom:14px;line-height:1.7;';
-        b.innerHTML=`<i class="fas fa-scale-balanced" style="font-size:16px;"></i> <span style="font-size:13px;">CCN 2216 — Commerce alimentaire détail — IDCC 2216</span><br>
-        Établissement <b>&lt;11 salariés</b> · Accord de branche simplifié (1 validation max)<br>
-        HS: 35h→43h +25% / >43h +50% · Contingent: <b>180h/an</b><br>
-        Nuit: 21h-22h <b>+5%</b> / 22h-5h <b>+20%</b> · Pause payée: <b>5% TTE</b><br>
-        Dimanche ≤400m² <b>+20%</b> (si pas 1,5j repos) · >400m² <b>+30%</b> jusqu'à 13h · Exceptionnel <b>+100%</b>`;
-        fc.insertBefore(b,fc.firstChild);
-      }
-
-      // Feries
-      const wrap=document.getElementById('plan-ferie-config');
-      if(wrap){
-        if(!this._employees.length){wrap.innerHTML='<div class="small">Ajoutez des salariés d\'abord.</div>';return;}
-        wrap.innerHTML=this._employees.map(emp=>`
-          <div style="margin-bottom:14px;padding:12px;background:#f8fafc;border-radius:12px;border:1px solid #e2e8f0;">
-            <div style="font-weight:950;font-size:13px;margin-bottom:4px;">${emp.name}
-              <span style="font-size:11px;color:${(emp.feriesChomes||[]).length===6?'#059669':'#dc2626'};font-weight:800;margin-left:6px;">${(emp.feriesChomes||[]).length}/6 sélectionnés</span>
-            </div>
-            <div style="font-size:10px;color:#64748b;margin-bottom:8px;">Sélectionnez exactement 6 jours chômés/payés (1er Mai toujours inclus · ✓ = obligatoire CCN)</div>
-            <div style="display:flex;flex-wrap:wrap;gap:5px;">
-              ${this._FERIES_FR.map(f=>{
-                const chk=(emp.feriesChomes||[]).includes(f.key);
-                return`<label style="display:flex;align-items:center;gap:4px;font-size:11px;font-weight:700;background:#fff;border:1.5px solid ${chk?'#0891b2':f.obligChome?'#fbbf24':'#e2e8f0'};border-radius:8px;padding:4px 9px;cursor:pointer;">
-                  <input type="checkbox" ${chk?'checked':''} ${f.key==='05-01'?'disabled checked':''} onchange="app.planning.toggleFerie('${emp.id}','${f.key}',this.checked)" style="width:14px;height:14px;">
-                  ${f.label}${f.obligChome?` <span style="color:#f59e0b;font-size:9px;">✓OBLIG</span>`:''}
-                </label>`;
-              }).join('')}
-            </div>
-          </div>`).join('');
-      }
-
-      // Grille minima
-      const gmWrap=document.getElementById('plan-posts-list');
-      if(gmWrap){
-        gmWrap.innerHTML='<div style="font-size:11px;font-weight:800;color:#0891b2;margin-bottom:6px;">Minima CCN 2216 2025 (indicatifs) :</div>'
-          +this._CCN_NIVEAUX.map(n=>`<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #f1f5f9;font-size:11px;"><span style="font-weight:800;">${n.niveau}</span><span style="color:#64748b;">${n.label.slice(0,30)}</span><span style="font-weight:900;color:#0891b2;">${n.tauxH.toFixed(2)}€/h</span></div>`).join('')
-          +'<div style="margin-top:12px;font-weight:800;font-size:11px;color:#0891b2;margin-bottom:6px;">Postes :</div>'
-          +Object.entries(this._postColors).map(([p,c])=>`<span style="display:inline-flex;align-items:center;gap:4px;background:${c}20;color:${c};border:1.5px solid ${c};border-radius:8px;padding:4px 10px;font-size:11px;font-weight:900;margin:3px;">${p}</span>`).join('');
-      }
-    },
-
-    saveCfg(){
-      this._cfg.surface=parseFloat(document.getElementById('plan-cfg-surface')?.value)||300;
-      this._cfg.sundayType=document.getElementById('plan-cfg-sunday-type')?.value||'regular';
-      this._cfg.hourlyRate=parseFloat(document.getElementById('plan-cfg-hourly-rate')?.value)||12.5;
-      this._cfg.noticeDays=parseInt(document.getElementById('plan-cfg-notice')?.value)||7;
-      clearTimeout(this._cfgTimer);this._cfgTimer=setTimeout(()=>this._save(),1200);
-    },
-
-    async toggleFerie(empId,key,checked){
-      const emp=this._employees.find(e=>String(e.id)===String(empId));if(!emp)return;
-      if(key==='05-01')return; // 1er Mai toujours obligatoirement chômé
-      if(!emp.feriesChomes)emp.feriesChomes=['05-01'];
-      if(checked){
-        if((emp.feriesChomes||[]).length>=6){toast('Maximum 6 jours fériés chômés (CCN-11).','warn');this.renderSettingsView();return;}
-        if(!emp.feriesChomes.includes(key))emp.feriesChomes.push(key);
-      } else {
-        emp.feriesChomes=emp.feriesChomes.filter(k=>k!==key);
-      }
-      await this._save();this.renderSettingsView();
-    },
-
-    // ── ÉDITEUR SHIFT ──
-    _setShiftType(t){
-      this._editingShiftType=t;
-      ['work','rest','cp','absent','ferie'].forEach(s=>{
-        const btn=document.getElementById('smt-'+s);
-        if(btn){btn.classList.toggle('selected',s===t);btn.style.background=s===t?'#dbeafe':'';btn.style.borderColor=s===t?'#93c5fd':'#e2e8f0';}
-      });
-      document.getElementById('shift-modal-fields').style.display=t==='work'?'block':'none';
-      const prev=document.getElementById('shift-cost-preview');if(prev)prev.style.display='none';
-      const al=document.getElementById('shift-alerts-preview');if(al)al.innerHTML='';
-      if(t==='work')this.previewShiftCost();
-    },
-
-    previewShiftCost(){
-      const start=document.getElementById('shift-modal-start')?.value;
-      const end=document.getElementById('shift-modal-end')?.value;
-      if(!start||!end)return;
-      const modal=document.getElementById('modal-shift-editor');
-      const empId=modal?._empId;const dateKey=modal?._dateKey;if(!dateKey)return;
-      const emp=this._employees.find(e=>String(e.id)===String(empId));
-      const date=new Date(dateKey+'T12:00:00');
-      const calc=this.calcShift({type:'work',start,end},date,emp);
-      const cfg=this._cfg;const rate=parseFloat(emp?.hourlyRate)||cfg.hourlyRate;
-
-      const prev=document.getElementById('shift-cost-preview');
-      if(prev){
-        const rows=[];
-        rows.push(`<div class="shift-cost-row"><span>⏱ Durée de travail</span><span><b>${calc.totalH.toFixed(2)}h</b></span></div>`);
-        rows.push(`<div class="shift-cost-row"><span>⏸ Pause payée CCN (${cfg.pauseRate*100}% TTE)</span><span><b>${(calc.pauses*60).toFixed(0)} min</b></span></div>`);
-        rows.push(`<div class="shift-cost-row"><span>💶 Salaire base (${calc.totalH.toFixed(2)}h × ${rate}€)</span><span>${calc.cost.toFixed(2)}€</span></div>`);
-        if(calc.majorations.nuit5>0) rows.push(`<div class="shift-cost-row"><span>🌙 Nuit 21h-22h +${cfg.nightRate1*100}% (${calc.majorations.nuit5.toFixed(2)}h)</span><span>+${(calc.majorations.nuit5*rate*cfg.nightRate1).toFixed(2)}€</span></div>`);
-        if(calc.majorations.nuit20>0)rows.push(`<div class="shift-cost-row"><span>🌙 Nuit 22h-5h +${cfg.nightRate2*100}% (${calc.majorations.nuit20.toFixed(2)}h)</span><span>+${(calc.majorations.nuit20*rate*cfg.nightRate2).toFixed(2)}€</span></div>`);
-        if(calc.majorations.dim100>0)rows.push(`<div class="shift-cost-row"><span>☀️ Dimanche exceptionnel +100% (${calc.majorations.dim100.toFixed(2)}h)</span><span>+${(calc.majorations.dim100*rate).toFixed(2)}€</span></div>`);
-        if(calc.majorations.dim20>0) rows.push(`<div class="shift-cost-row"><span>☀️ Dimanche ≤400m² +20% (${calc.majorations.dim20.toFixed(2)}h)</span><span>+${(calc.majorations.dim20*rate*cfg.sundayRateLe400).toFixed(2)}€</span></div>`);
-        if(calc.majorations.dim30>0) rows.push(`<div class="shift-cost-row"><span>☀️ Dimanche >400m² +30% jusqu'à ${cfg.sundayGt400LimitH}h (${calc.majorations.dim30.toFixed(2)}h)</span><span>+${(calc.majorations.dim30*rate*cfg.sundayRateGt400).toFixed(2)}€</span></div>`);
-        prev.style.display='block';
-        prev.innerHTML=rows.join('')+`<div class="shift-cost-total"><span>💰 Coût total estimé (CCN 2216)</span><span>${calc.costTotal.toFixed(2)} €</span></div>`;
-      }
-      const al=document.getElementById('shift-alerts-preview');
-      if(al)al.innerHTML=calc.alerts.filter(a=>a.type==='hard'||a.type==='soft').map(a=>`<div class="plan-alert-item ${a.type}" style="margin-bottom:4px;"><i class="fas fa-${a.type==='hard'?'ban':'exclamation-circle'}"></i>${a.msg}</div>`).join('');
+    removeEmployee:async function(empId){
+      const ok=await dlgConfirm('Supprimer cet employé ?','Planning et horaires supprimés.',true);if(!ok)return;
+      this._employees=this._employees.filter(e=>String(e.id)!==String(empId));
+      await this._save();this.render();
     },
 
     editShift:async function(empId,dateKey){
       const emp=this._employees.find(e=>String(e.id)===String(empId));if(!emp)return;
       if(!emp.schedule)emp.schedule={};
-      const shift=emp.schedule[dateKey];
+      const shift=emp.schedule[dateKey];const isRest=!shift||shift.type==='rest';
       const dateLabel=new Date(dateKey+'T12:00:00').toLocaleDateString('fr',{weekday:'long',day:'numeric',month:'long'});
+
+      // Show shift editor modal
       document.getElementById('shift-modal-emp').textContent=emp.name+' — '+dateLabel;
+      document.getElementById('shift-modal-start').value=shift?.start||'09:00';
+      document.getElementById('shift-modal-end').value=shift?.end||'17:00';
+      document.getElementById('shift-modal-rest').checked=isRest;
+      document.getElementById('shift-modal-fields').style.display=isRest?'none':'block';
+      // Break field
+      const breakEl=document.getElementById('shift-modal-break');
+      if(breakEl){breakEl.value=shift?.breakMin||'';}
+      this._updateBreakHint();
+
+      // Auto-update break hint on time change
+      ['shift-modal-start','shift-modal-end'].forEach(id=>{
+        const el=document.getElementById(id);
+        if(el)el.onchange=()=>this._updateBreakHint();
+      });
+
+      // Build visual post buttons
+      const postColors=this._postColors;const currentPost=shift?.post||'RAYON';
+      const postGrid=document.getElementById('shift-post-grid');
+      const postSel=document.getElementById('shift-modal-post');
+      postSel.value=currentPost;
+      if(postGrid){
+        postGrid.innerHTML=Object.entries(postColors).map(([p,c])=>`
+          <div class="plan-post-btn ${p===currentPost?'selected':''}" style="color:${c};border-color:${p===currentPost?c:'#e2e8f0'};"
+            onclick="this.closest('#shift-post-grid').querySelectorAll('.plan-post-btn').forEach(b=>{b.classList.remove('selected');b.style.borderColor='#e2e8f0';});this.classList.add('selected');this.style.borderColor='${c}';document.getElementById('shift-modal-post').value='${p}';">
+            ${p}
+          </div>`).join('');
+      }
+
       const modal=document.getElementById('modal-shift-editor');
-      modal._empId=empId;modal._dateKey=dateKey;
-      const t=shift?.type||'rest';
-      this._setShiftType(!shift||t==='rest'?'rest':t);
-      if(shift?.type==='work'){document.getElementById('shift-modal-start').value=shift.start||'09:00';document.getElementById('shift-modal-end').value=shift.end||'17:00';document.getElementById('shift-modal-note').value=shift.note||'';}
-      else{document.getElementById('shift-modal-start').value='09:00';document.getElementById('shift-modal-end').value='17:00';if(document.getElementById('shift-modal-note'))document.getElementById('shift-modal-note').value='';}
-      const cur=shift?.post||'RAYON';
-      const ps=document.getElementById('shift-modal-post');if(ps)ps.value=cur;
-      const pg=document.getElementById('shift-post-grid');
-      if(pg)pg.innerHTML=Object.entries(this._postColors).map(([p,c])=>`
-        <div class="plan-post-btn ${p===cur?'selected':''}" style="color:${c};border-color:${p===cur?c:'#e2e8f0'};"
-          onclick="this.closest('#shift-post-grid').querySelectorAll('.plan-post-btn').forEach(b=>{b.classList.remove('selected');b.style.borderColor='#e2e8f0';});this.classList.add('selected');this.style.borderColor='${c}';document.getElementById('shift-modal-post').value='${p}';">
-          ${p}
-        </div>`).join('');
       modal.classList.remove('hidden');
+      modal._empId=empId;modal._dateKey=dateKey;
+    },
+
+    _autoBreak(h,profile){
+      if(!h||h<6)return 0;
+      if(profile){
+        if(h>=profile.breakAfterH)return profile.breakMinutes;
+        return 0;
+      }
+      // French labor code default
+      if(h>=6)return 20;
+      return 0;
+    },
+
+    _updateBreakHint(){
+      const s=document.getElementById('shift-modal-start')?.value;
+      const e=document.getElementById('shift-modal-end')?.value;
+      const hint=document.getElementById('shift-break-hint');
+      if(!hint||!s||!e)return;
+      const[sh,sm]=s.split(':').map(Number);const[eh,em]=e.split(':').map(Number);
+      let h=(eh*60+em-sh*60-sm)/60;if(h<0)h+=24;
+      const auto=this._autoBreak(h,null);
+      hint.textContent=auto?`Légale: ${auto} min (après ${h.toFixed(1)}h)`:'Légale: aucune';
     },
 
     saveShift:async function(){
@@ -4368,137 +3868,228 @@ ${nameLine2?`^CF0,30^FO15,45^FD${nameLine2}^FS`:''}
       const empId=modal._empId;const dateKey=modal._dateKey;
       const emp=this._employees.find(e=>String(e.id)===String(empId));if(!emp)return;
       if(!emp.schedule)emp.schedule={};
-      const t=this._editingShiftType;
-      if(t!=='work'){emp.schedule[dateKey]={type:t};}
+      const isRest=document.getElementById('shift-modal-rest').checked;
+      if(isRest){emp.schedule[dateKey]={type:'rest'};}
       else{
         const start=document.getElementById('shift-modal-start').value;
         const end=document.getElementById('shift-modal-end').value;
         const post=document.getElementById('shift-modal-post').value;
-        const note=document.getElementById('shift-modal-note').value;
-        if(!start||!end)return toast('Heure début et fin requises.','warn');
-        const date=new Date(dateKey+'T12:00:00');
-        const calc=this.calcShift({type:'work',start,end,post,note},date,emp);
-
-        // HARD block: >12h absolu
-        if(calc.totalH>this._cfg.maxExceptionH){toast(`⛔ Shift refusé: ${calc.totalH.toFixed(1)}h dépasse le maximum absolu de ${this._cfg.maxExceptionH}h (CCN 2216 IDCC 2216).`,'err',6000);return;}
-        // HARD alerte: >10h sans motif
-        if(calc.totalH>this._cfg.maxDailyH&&!note){toast('⚠️ Shift >10h — motif obligatoire (inventaire/urgence). Renseignez la note.','warn',5000);}
-
-        emp.schedule[dateKey]={type:'work',start,end,post,note};
-
-        // Log exception
-        if(calc.totalH>this._cfg.maxDailyH){
-          if(!emp.exceptionLog)emp.exceptionLog=[];
-          emp.exceptionLog.push({date:dateKey,h:calc.totalH,note,ts:Date.now()});
-          const yearCount=(emp.exceptionLog||[]).filter(l=>l.date.startsWith(new Date().getFullYear())).length;
-          if(yearCount>this._cfg.maxExceptionPerYear)toast(`⚠️ ${yearCount} exceptions >10h cette année (max ${this._cfg.maxExceptionPerYear}/an — CCN 2216).`,'warn',6000);
-        }
-        this._checkNoticeDelay(emp,dateKey);
+        const breakVal=document.getElementById('shift-modal-break')?.value;
+        const breakMin=breakVal?parseInt(breakVal)||0:0;
+        if(!start||!end)return toast('Heure de début et de fin requises.','warn');
+        emp.schedule[dateKey]={type:'work',start,end,post,breakMin:breakMin||undefined};
       }
       modal.classList.add('hidden');
       await this._save();this.render();
     },
 
-    _checkNoticeDelay(emp,dateKey){
-      const cH=parseFloat((emp.contract||'').match(/(\d+(\.\d+)?)\s*h/i)?.[1]||35);
-      if(cH>=35)return;
-      const diffDays=Math.round((new Date(dateKey+'T12:00:00')-new Date())/(1000*60*60*24));
-      const req=this._cfg.noticeDays||7;
-      if(diffDays>=0&&diffDays<req){
-        toast(`⚠️ Délai prévenance temps partiel: ${diffDays}j < ${req}j requis (art. L.3123-24 + CCN 2216). À tracer.`,'warn',6000);
-        if(!emp.noticeLog)emp.noticeLog=[];
-        emp.noticeLog.push({date:dateKey,delay:diffDays,required:req,ts:Date.now()});
+    duplicateShift:async function(){
+      const modal=document.getElementById('modal-shift-editor');
+      const empId=modal._empId;const dateKey=modal._dateKey;
+      const emp=this._employees.find(e=>String(e.id)===String(empId));if(!emp)return;
+      const shift=emp.schedule?.[dateKey];
+      if(!shift||shift.type==='rest'){modal.classList.add('hidden');return;}
+      // Find next day without a shift
+      const dates=this.getWeekDates();
+      const idx=dates.findIndex(d=>d.toISOString().slice(0,10)===dateKey);
+      let targetKey=null;
+      for(let i=idx+1;i<dates.length;i++){
+        const k=dates[i].toISOString().slice(0,10);
+        if(!emp.schedule?.[k]||emp.schedule[k].type==='rest'){targetKey=k;break;}
       }
+      if(!targetKey){toast('Aucun jour libre trouvé cette semaine.','warn');return;}
+      emp.schedule[targetKey]={...shift};
+      modal.classList.add('hidden');
+      await this._save();this.render();
+      toast(`Shift dupliqué sur le ${new Date(targetKey+'T12:00:00').toLocaleDateString('fr',{weekday:'long'})} ✓`,'ok');
     },
 
     closeShiftModal(){document.getElementById('modal-shift-editor').classList.add('hidden');},
 
-    // ── ACTIONS ──
-    addEmployee:async function(){
-      const name=await dlgPrompt('Prénom + Nom du salarié :');if(!name?.trim())return;
-      const contract=await dlgPrompt('Contrat (ex: 26h/sem CDI, 35h CDI…) :','');
-      const hourlyRate=await dlgPrompt(`Taux horaire brut €/h\n(SMIC: ${this._cfg.smiHoraire}€ · Min CCN Niv.I-1: 12.06€) :`,String(this._cfg.hourlyRate));
-      const rate=parseFloat(hourlyRate)||this._cfg.hourlyRate;
-      if(rate<this._cfg.smiHoraire)toast(`⚠️ Taux ${rate}€/h < SMIC ${this._cfg.smiHoraire}€/h — à corriger impérativement.`,'warn',6000);
-      const colors=['#003896','#0891b2','#059669','#7c3aed','#dc2626','#d97706','#0f766e','#db2777'];
-      this._employees.push({
-        id:Date.now(),name:name.trim().toUpperCase(),contract:contract?.trim()||'',
-        hourlyRate:rate,niveauCCN:'I-1',
-        color:colors[this._employees.length%colors.length],
-        schedule:{},feriesChomes:['05-01'],noticeLog:[],exceptionLog:[]
-      });
+    // ── DRAG & DROP ──
+    _drag:{empId:null,dateKey:null},
+    dragStart(event,empId,dateKey){
+      this._drag={empId,dateKey};
+      event.dataTransfer.effectAllowed='move';
+    },
+    dropShift:async function(event,toEmpId,toDateKey){
+      event.preventDefault();
+      document.querySelectorAll('.plan-cell.drag-over').forEach(el=>el.classList.remove('drag-over'));
+      const{empId,dateKey}=this._drag;
+      if(!empId||!dateKey||empId===toEmpId&&dateKey===toDateKey)return;
+      const fromEmp=this._employees.find(e=>String(e.id)===String(empId));
+      const toEmp=this._employees.find(e=>String(e.id)===String(toEmpId));
+      if(!fromEmp||!toEmp)return;
+      const fromShift=fromEmp.schedule?.[dateKey];
+      if(!fromShift||fromShift.type==='rest')return;
+      const toShift=toEmp.schedule?.[toDateKey];
+      // Swap or move
+      if(!toEmp.schedule)toEmp.schedule={};
+      if(!fromEmp.schedule)fromEmp.schedule={};
+      toEmp.schedule[toDateKey]={...fromShift};
+      if(toShift&&toShift.type!=='rest'){fromEmp.schedule[dateKey]={...toShift};}
+      else{fromEmp.schedule[dateKey]={type:'rest'};}
+      await this._save();this.render();
+      toast('Shift déplacé ✓','ok');
+    },
+
+    // ── IMPORT USERS FROM APP ──
+    importFromUsers:async function(){
+      const users=window.app._users||[];
+      if(!users.length){toast('Aucun utilisateur trouvé. Chargement…','warn');return;}
+      let added=0;
+      for(const u of users){
+        const name=(u.displayName||u.email||'').toUpperCase().trim();
+        if(!name)continue;
+        const exists=this._employees.some(e=>e.name===name);
+        if(exists)continue;
+        const colors=['#003896','#0891b2','#059669','#7c3aed','#dc2626','#d97706','#0f766e','#db2777'];
+        this._employees.push({id:Date.now()+Math.random(),name,contract:'',color:colors[this._employees.length%colors.length],schedule:{}});
+        added++;
+      }
+      if(!added){toast('Tous les utilisateurs sont déjà dans le planning.','info');return;}
+      await this._save();this.render();
+      toast(`${added} employé(s) importé(s) ✓`,'ok');
+    },
+
+    // ── MODÈLES RH ──
+    openHrModels:async function(){
+      const profiles=this.HR_PROFILES;
+      const html=`<div style="font-weight:950;font-size:16px;margin-bottom:14px;color:#7c3aed;"><i class="fas fa-briefcase"></i> Modèles de politique RH</div>
+      ${Object.entries(profiles).map(([key,p])=>`
+        <div style="background:#f8fafc;border-radius:12px;padding:12px;margin-bottom:10px;border:1.5px solid #e2e8f0;">
+          <div style="font-weight:950;font-size:14px;">${p.icon} ${p.label}</div>
+          <div style="font-size:12px;color:#64748b;margin-top:4px;">${p.desc}</div>
+          <button onclick="app.planning._applyProfileToAll('${key}')" style="margin-top:8px;background:${p.color};color:#fff;border:none;border-radius:8px;padding:6px 14px;font-weight:900;font-size:12px;cursor:pointer;">Appliquer à un employé…</button>
+        </div>`).join('')}
+      <button onclick="document.getElementById('modal-hr-models').classList.add('hidden')" style="background:#e2e8f0;border:none;border-radius:10px;padding:10px 20px;font-weight:900;cursor:pointer;width:100%;margin-top:4px;">Fermer</button>`;
+      let m=document.getElementById('modal-hr-models');
+      if(!m){m=document.createElement('div');m.id='modal-hr-models';m.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:90000;display:flex;align-items:flex-end;justify-content:center;padding:16px;';m.innerHTML=`<div class="dlg-card" style="max-width:420px;max-height:85vh;overflow-y:auto;" id="modal-hr-content"></div>`;document.body.appendChild(m);}
+      document.getElementById('modal-hr-content').innerHTML=html;
+      m.classList.remove('hidden');
+    },
+
+    _applyProfileToAll:async function(profileKey){
+      const names=this._employees.map((e,i)=>`${i+1}. ${e.name}`).join('\n');
+      const idx=parseInt(await dlgPrompt(`Sélectionnez l'employé (numéro):\n${names}`))-1;
+      if(isNaN(idx)||idx<0||idx>=this._employees.length)return;
+      this._employees[idx].hrProfile=profileKey;
+      document.getElementById('modal-hr-models')?.classList.add('hidden');
+      await this._save();this.render();
+      toast(`Profil "${profileKey}" appliqué à ${this._employees[idx].name} ✓`,'ok');
+    },
+
+    changeHrProfile:async function(empId){
+      const emp=this._employees.find(e=>String(e.id)===String(empId));if(!emp)return;
+      const profiles=Object.keys(this.HR_PROFILES);
+      const opts=profiles.map((p,i)=>`${i+1}. ${this.HR_PROFILES[p].icon} ${p}`).join('\n');
+      const current=emp.hrProfile?`Actuel: ${emp.hrProfile}\n`:'';
+      const idx=parseInt(await dlgPrompt(`${current}Profil RH pour ${emp.name}:\n${opts}\n0. Aucun profil`))-1;
+      if(isNaN(idx+1))return;
+      if(idx===-1){delete emp.hrProfile;}
+      else if(profiles[idx]){emp.hrProfile=profiles[idx];}
       await this._save();this.render();
     },
 
-    removeEmployee:async function(empId){
-      const ok=await dlgConfirm('Supprimer ce salarié ?','Planning et historique supprimés.',true);if(!ok)return;
-      this._employees=this._employees.filter(e=>String(e.id)!==String(empId));
-      await this._save();this.render();
-    },
+    // ── PRINT ──
+    printWeek(){
+      const dates=this.getWeekDates();
+      const DAY=['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+      const today=new Date().toISOString().slice(0,10);
+      const opts={day:'2-digit',month:'2-digit'};
+      const weekLabel=`${dates[0].toLocaleDateString('fr',opts)} – ${dates[6].toLocaleDateString('fr',opts)}`;
 
-    addPost:async function(){
-      const n=await dlgPrompt('Nom du poste (ex: DRIVE, INVENTAIRE…) :');if(!n?.trim())return;
-      const cs=['#f59e0b','#8b5cf6','#06b6d4','#84cc16','#f97316'];
-      this._postColors[n.trim().toUpperCase()]=cs[Object.keys(this._postColors).length%cs.length];
-      toast('Poste ajouté.','ok');this.renderSettingsView();
+      const headerCols=DAY.map((d,i)=>{
+        const isT=dates[i].toISOString().slice(0,10)===today;
+        return`<th style="${isT?'background:#0891b2;':''}">${d}<br>${dates[i].getDate()}</th>`;
+      }).join('');
+
+      const rows=this._employees.map(emp=>{
+        const{totalHours,restDays,warnings}=this.validateSchedule(emp);
+        const profile=emp.hrProfile?this.HR_PROFILES[emp.hrProfile]:null;
+        const cells=dates.map(d=>{
+          const key=d.toISOString().slice(0,10);const s=emp.schedule?.[key];
+          if(!s||s.type==='rest')return`<td class="p-rest">Repos</td>`;
+          const h=this.getShiftHours(s);
+          const breakMin=s.breakMin||this._autoBreak(h,profile);
+          return`<td class="p-work">${s.start}–${s.end}<br>${s.post||''}<br>${h.toFixed(1)}h${breakMin?` ☕${breakMin}'`:''}`;
+        }).join('');
+        const warnMark=warnings.length?`<span style="color:#dc2626;font-size:9px;">⚠ ${warnings[0]}</span>`:''
+        return`<tr>
+          <td>${emp.name}<br><span style="font-size:9px;color:#64748b;">${emp.contract||''}${profile?' • '+profile.icon+profile.label:''}</span><br>${warnMark}</td>
+          ${cells}
+          <td class="p-total">${totalHours.toFixed(1)}h<br>${restDays}R</td>
+        </tr>`;
+      }).join('');
+
+      const dayTotals=dates.map(d=>{
+        const key=d.toISOString().slice(0,10);
+        const tot=this._employees.reduce((s,e)=>{const sh=e.schedule?.[key];return s+(sh&&sh.type!=='rest'?this.getShiftHours(sh):0);},0);
+        const cnt=this._employees.filter(e=>{const sh=e.schedule?.[key];return sh&&sh.type!=='rest';}).length;
+        return`<td>${cnt}p<br>${tot.toFixed(0)}h</td>`;
+      }).join('');
+
+      const html=`<h2>📅 Planning semaine du ${weekLabel}</h2>
+      <p style="text-align:center;font-size:11px;color:#64748b;margin-bottom:10px;">Express Purpan · Imprimé le ${new Date().toLocaleDateString('fr')}</p>
+      <table>
+        <thead><tr><th>Employé</th>${headerCols}<th>Total</th></tr></thead>
+        <tbody>${rows}</tbody>
+        <tfoot><tr><td>Par jour</td>${dayTotals}<td></td></tr></tfoot>
+      </table>`;
+
+      const wrap=document.getElementById('print-planning-wrap');
+      if(wrap){wrap.innerHTML=html;wrap.style.display='block';}
+      setTimeout(()=>{window.print();if(wrap)wrap.style.display='none';},200);
     },
 
     copyWeek:async function(){
-      const ok=await dlgConfirm('Copier la semaine','Copier ce planning vers la semaine suivante ?',false);if(!ok)return;
+      const choix=await dlgPrompt('Copier le planning :\n1. Cette semaine → semaine suivante\n2. Semaine précédente → cette semaine\n\nEntrez 1 ou 2 :');
+      if(!choix)return;const dir=parseInt(choix);
       const dates=this.getWeekDates();
-      this._employees.forEach(emp=>{
-        if(!emp.schedule)emp.schedule={};
-        dates.forEach(d=>{const k=d.toISOString().slice(0,10);const nd=new Date(d);nd.setDate(d.getDate()+7);const nk=nd.toISOString().slice(0,10);
-          if(emp.schedule[k])emp.schedule[nk]={...emp.schedule[k]};else delete emp.schedule[nk];});
-      });
-      await this._save();toast('Semaine copiée vers la semaine suivante.','ok');
-    },
-
-    publishWeek:async function(){
-      const dates=this.getWeekDates();
-      const label=`${dates[0].toLocaleDateString('fr')} – ${dates[6].toLocaleDateString('fr')}`;
-      const ok=await dlgConfirm('Publier le planning','Publier le planning du '+label+' ?',false);if(!ok)return;
-      try{const{doc,setDoc}=window._fbChat;await setDoc(doc(window._db,'store_master','PLANNING_PUB'),{publishedAt:Date.now(),publishedBy:window.app.me?.name||'Admin',weekStart:dates[0].toISOString().slice(0,10),weekEnd:dates[6].toISOString().slice(0,10)});toast('✓ Planning publié.','ok');}
-      catch(e){toast('Planning publié (local uniquement).','ok');}
+      if(dir===1){
+        const ok=await dlgConfirm('Copier la semaine','Copier ce planning sur la semaine suivante ?',false);if(!ok)return;
+        this._employees.forEach(emp=>{
+          if(!emp.schedule)emp.schedule={};
+          dates.forEach(date=>{
+            const key=date.toISOString().slice(0,10);
+            const nextDate=new Date(date);nextDate.setDate(date.getDate()+7);
+            const nextKey=nextDate.toISOString().slice(0,10);
+            if(emp.schedule[key])emp.schedule[nextKey]={...emp.schedule[key]};else delete emp.schedule[nextKey];
+          });
+        });
+        await this._save();toast('Semaine copiée vers la semaine prochaine ✓','ok');
+      } else if(dir===2){
+        const ok=await dlgConfirm('Importer semaine précédente','Remplacer cette semaine par la semaine précédente ?',true);if(!ok)return;
+        this._employees.forEach(emp=>{
+          if(!emp.schedule)emp.schedule={};
+          dates.forEach(date=>{
+            const prevDate=new Date(date);prevDate.setDate(date.getDate()-7);
+            const prevKey=prevDate.toISOString().slice(0,10);
+            const key=date.toISOString().slice(0,10);
+            if(emp.schedule[prevKey])emp.schedule[key]={...emp.schedule[prevKey]};else delete emp.schedule[key];
+          });
+        });
+        await this._save();this.render();toast('Semaine précédente importée ✓','ok');
+      }
     },
 
     exportCSV(){
-      const dates=this.getWeekDates();const dn=['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
-      const hdr=['Salarié','Contrat','Taux€/h','Niv.CCN 2216',
-        ...dates.map((d,i)=>`${dn[i]} ${d.toLocaleDateString('fr')}`),
-        'H.travail','HS tot.','HS+25%(h)','HS+50%(h)','Coût HS€',
-        'H.Nuit21-22(+5%)','H.Nuit22-5(+20%)','H.Dimanche','Pauses payées CCN(h)',
-        'Coût total sem.€','Majorations€','Alertes HARD'
-      ];
-      const rows=[hdr];
+      const dates=this.getWeekDates();const dayNames=['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+      const header=['Employé','Contrat',...dates.map((d,i)=>`${dayNames[i]} ${d.toLocaleDateString('fr')}`),'Total heures'];
+      const rows=[header];
       this._employees.forEach(emp=>{
-        const{totalHours,warnings}=this.validateEmployee(emp);
-        const{hs,hs1,hs2,costHS}=this.calcHS(emp);
-        const n5=dates.reduce((s,d)=>{const k=d.toISOString().slice(0,10);const sh=emp.schedule?.[k];return s+(sh&&sh.type==='work'?this.calcShift(sh,d,emp).majorations.nuit5||0:0);},0);
-        const n20=dates.reduce((s,d)=>{const k=d.toISOString().slice(0,10);const sh=emp.schedule?.[k];return s+(sh&&sh.type==='work'?this.calcShift(sh,d,emp).majorations.nuit20||0:0);},0);
-        const sunH=dates.filter(d=>d.getDay()===0).reduce((s,d)=>{const k=d.toISOString().slice(0,10);const sh=emp.schedule?.[k];return s+(sh&&sh.type==='work'?this.calcShift(sh,d,emp).totalH:0);},0);
-        const pausH=dates.reduce((s,d)=>{const k=d.toISOString().slice(0,10);const sh=emp.schedule?.[k];return s+(sh&&sh.type==='work'?this.calcShift(sh,d,emp).pauses:0);},0);
-        const cost=dates.reduce((s,d)=>{const k=d.toISOString().slice(0,10);const sh=emp.schedule?.[k];return s+(sh&&sh.type==='work'?this.calcShift(sh,d,emp).costTotal:0);},0);
-        const baseCost=dates.reduce((s,d)=>{const k=d.toISOString().slice(0,10);const sh=emp.schedule?.[k];return s+(sh&&sh.type==='work'?this.calcShift(sh,d,emp).cost:0);},0);
-        const hards=warnings.filter(w=>w.type==='hard').map(w=>w.msg).join(' | ');
-        rows.push([emp.name,emp.contract||'',emp.hourlyRate||this._cfg.hourlyRate,emp.niveauCCN||'',
-          ...dates.map(d=>{const k=d.toISOString().slice(0,10);const s=emp.schedule?.[k]||{type:'rest'};
-            if(s.type==='rest')return'Repos';if(s.type==='cp')return'CP';if(s.type==='absent')return'Absent';if(s.type==='ferie')return'Jour Férié';
-            const c=this.calcShift(s,d,emp);return`${s.start}-${s.end} ${s.post||''} ${c.totalH.toFixed(2)}h ${c.costTotal.toFixed(2)}€`;
-          }),
-          totalHours.toFixed(2),hs.toFixed(2),hs1.toFixed(2),hs2.toFixed(2),costHS.toFixed(2),
-          n5.toFixed(2),n20.toFixed(2),sunH.toFixed(2),pausH.toFixed(2),
-          cost.toFixed(2),(cost-baseCost).toFixed(2),hards
-        ]);
+        const{totalHours}=this.validateSchedule(emp);
+        const row=[emp.name,emp.contract||'',...dates.map(d=>{
+          const key=d.toISOString().slice(0,10);const s=emp.schedule?.[key]||{type:'rest'};
+          return s.type==='rest'?'Repos':`${s.start||'?'}-${s.end||'?'} (${s.post||''})`;
+        }),totalHours.toFixed(1)+'h'];
+        rows.push(row);
       });
       const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(';')).join('\n');
       const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
-      const url=URL.createObjectURL(blob);const a=document.createElement('a');
-      a.href=url;a.download=`paie_CCN2216_IDCC2216_${new Date().toISOString().slice(0,10)}.csv`;
-      a.click();URL.revokeObjectURL(url);toast('Export paie CCN 2216 (IDCC 2216) généré.','ok');
-    },
-
-    exportPDF(){window.print();toast('Ctrl+P → Enregistrer en PDF.','info',4000);}
+      const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`planning_${new Date().toISOString().slice(0,10)}.csv`;a.click();URL.revokeObjectURL(url);
+      toast('Planning exporté.','ok');
+    }
   },
 
   // ══════════════════════════════════════════════════
