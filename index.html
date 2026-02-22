@@ -486,7 +486,56 @@ textarea{min-height:80px;resize:none;}
 #float-settings-btn:hover i{transform:rotate(60deg);}
 #float-settings-btn span{font-size:9px;font-weight:900;letter-spacing:.5px;writing-mode:vertical-rl;text-orientation:mixed;transform:rotate(180deg);opacity:.8;}
 
-/* ── ALERT NET OVERLAY ── */
+/* ── PLANNING STYLE COMBOHR ── */
+.plan-grid-row{display:grid;grid-template-columns:150px repeat(7,1fr) 60px;gap:3px;margin-bottom:3px;align-items:stretch;}
+.plan-header-row{margin-bottom:6px;}
+.plan-footer-row{margin-top:4px;}
+.plan-day-header{background:#f1f5f9;border-radius:8px;padding:6px 4px;text-align:center;transition:all .15s;}
+.plan-day-header.today{background:#003896;color:#fff;}
+.plan-day-name{font-size:10px;font-weight:950;text-transform:uppercase;opacity:.7;}
+.plan-day-header.today .plan-day-name{opacity:.8;color:#fff;}
+.plan-day-num{font-size:16px;font-weight:950;}
+.plan-emp-col{display:flex;align-items:center;gap:8px;padding:4px 6px;background:#f8fafc;border-radius:10px;}
+.plan-avatar{width:32px;height:32px;border-radius:50%;color:#fff;font-weight:950;font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.plan-emp-info{flex:1;min-width:0;}
+.plan-emp-name{font-size:12px;font-weight:950;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.plan-emp-contract{font-size:10px;color:#64748b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.plan-emp-del{background:none;border:none;color:#cbd5e1;font-size:12px;cursor:pointer;padding:2px;flex-shrink:0;transition:color .15s;}
+.plan-emp-del:hover{color:#ef4444;}
+.plan-cell{border-radius:8px;min-height:52px;cursor:pointer;transition:all .15s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;}
+.plan-cell:active{transform:scale(.97);}
+.plan-cell.rest{background:#f8fafc;border:1.5px dashed #e2e8f0;}
+.plan-cell.rest.today{background:#eff6ff;border-color:#bfdbfe;}
+.plan-rest-label{color:#cbd5e1;font-size:18px;font-weight:900;}
+.plan-cell.work{border:1.5px solid transparent;border-color:color-mix(in srgb, var(--shift-color) 30%, transparent);}
+.plan-shift-post{font-size:9px;font-weight:950;padding:1px 5px;border-radius:4px;text-align:center;letter-spacing:.3px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.plan-shift-times{font-size:10px;font-weight:900;color:#374151;}
+.plan-shift-h{font-size:9px;color:#6b7280;font-weight:800;}
+.plan-total-col{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:#f8fafc;border-radius:8px;padding:4px 2px;}
+.plan-total-h{font-size:13px;font-weight:950;}
+.plan-rest-badge{font-size:10px;font-weight:900;border-radius:4px;padding:1px 4px;}
+.plan-rest-badge.ok{background:#d1fae5;color:#065f46;}
+.plan-rest-badge.warn{background:#fee2e2;color:#991b1b;}
+.plan-warn-row{background:#fffbeb;border-left:3px solid #f59e0b;border-radius:6px;padding:4px 10px;font-size:11px;color:#92400e;margin-bottom:4px;grid-column:1/-1;}
+.has-warn{border-left:3px solid #fbbf24;}
+.plan-day-footer{background:#f1f5f9;border-radius:6px;padding:4px;text-align:center;}
+.plan-day-count{font-size:10px;font-weight:900;color:#003896;}
+.plan-day-hours{font-size:10px;color:#64748b;font-weight:800;}
+/* Post color pills legend */
+.post-legend{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;}
+.post-chip{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:12px;font-size:11px;font-weight:900;}
+
+/* ── NOTIFICATION BTN IN HEADER ── */
+#notif-toggle-btn{position:absolute;right:55px;top:18px;border:none;background:#f1f5f9;border-radius:12px;padding:10px 12px;cursor:pointer;font-size:18px;display:none;align-items:center;justify-content:center;}
+
+/* ── SHIFT EDITOR MODAL ── */
+#modal-shift-editor .shift-type-toggle{display:flex;align-items:center;gap:10px;margin-bottom:14px;background:#f8fafc;border-radius:10px;padding:12px;}
+#modal-shift-editor .shift-type-toggle label{font-weight:800;font-size:14px;flex:1;}
+.plan-post-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px;}
+.plan-post-btn{border:2px solid #e2e8f0;border-radius:8px;padding:8px 4px;text-align:center;font-size:11px;font-weight:900;cursor:pointer;transition:all .15s;}
+.plan-post-btn.selected{border-color:currentColor;background:color-mix(in srgb,currentColor 15%,#fff);}
+
+/* ── ALERTNET OVERLAY (kept CSS but overlay removed) ── */
 #alertnet-overlay{position:fixed;inset:0;z-index:9000;background:#fff;display:none;flex-direction:column;}
 #alertnet-bar{background:#dc2626;padding:12px 16px;display:flex;align-items:center;gap:12px;padding-top:calc(12px + env(safe-area-inset-top));}
 #alertnet-iframe{flex:1;border:none;width:100%;background:#f8fafc;}
@@ -745,6 +794,7 @@ textarea{min-height:80px;resize:none;}
 <header id="app-header" class="hidden">
   <button class="logout-btn" onclick="app.auth.logout()"><i class="fas fa-right-from-bracket"></i></button>
   <img src="https://raw.githubusercontent.com/araujoexploitation/Magasin/main/LOGO.png" class="logo-header">
+  <button id="notif-toggle-btn" onclick="app.notif.requestPermission()" title="Notifications"></button>
   <div id="user-badge" class="user-badge">...</div>
 </header>
 
@@ -796,7 +846,7 @@ textarea{min-height:80px;resize:none;}
       <!-- GESTION MAGASIN (parent) - inclut aussi Module Carrefour -->
       <div class="home-btn wide" onclick="app.nav('gestion-magasin')" style="background:linear-gradient(135deg,#0f766e,#134e4a);">
         <i class="fas fa-building"></i><br>GESTION MAGASIN
-        <div class="small" style="color:rgba(255,255,255,.8);margin-top:6px;">Planning • Inspection • Outils Carrefour</div>
+        <div class="small" style="color:rgba(255,255,255,.8);margin-top:6px;">Planning • Inspection</div>
       </div>
     </div>
     <div class="card hidden" id="btn-team" onclick="app.nav('team')" style="text-align:center;cursor:pointer;margin-bottom:10px;display:none!important;"><i class="fas fa-gear"></i> Paramètres & Équipe</div>
@@ -827,7 +877,7 @@ textarea{min-height:80px;resize:none;}
         <div class="sub-title" style="color:var(--salad);">SALAD BAR</div>
         <div class="sub-sub">DLC + Traçabilité</div>
       </div>
-      <div class="dlc-sub-card wide" onclick="app.tgtgPortal.open()" style="border-color:#006B3C;background:linear-gradient(135deg,#f0fdf4,#fff);">
+      <div class="dlc-sub-card wide" onclick="window.open('https://store.toogoodtogo.com/stores','_blank','noopener')" style="border-color:#006B3C;background:linear-gradient(135deg,#f0fdf4,#fff);">
         <i class="fas fa-leaf" style="color:#006B3C;font-size:28px;"></i>
         <div class="sub-title" style="color:#006B3C;">TOO GOOD TO GO — PORTAIL</div>
         <div class="sub-sub">Gérer vos paniers sur store.toogoodtogo.com</div>
@@ -1055,7 +1105,7 @@ textarea{min-height:80px;resize:none;}
           <div style="font-weight:900;font-size:14px;">ID : <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="b4dedbdad5c0dcd5daebd5c6d5c1dedbeb80f4d2c6d5dad7dcddc7d19ad7d5c6c6d1d2dbc1c69ad7dbd9">[email&#160;protected]</a></div>
           <div style="font-weight:900;font-size:14px;color:#64748b;">MDP : KzD?VB&amp;6bNnS5.3</div>
         </div>
-        <button class="btn" style="background:#0369a1;" onclick="app.mytravis.open()"><i class="fas fa-external-link-alt"></i> Ouvrir MyTravis</button>
+        <button class="btn" style="background:#0369a1;" onclick="window.open('https://mytravis.fr.carrefour.com/mytravis','_blank','noopener')"><i class="fas fa-external-link-alt"></i> Ouvrir MyTravis</button>
       </div>
     </div>
   </div>
@@ -1116,87 +1166,63 @@ textarea{min-height:80px;resize:none;}
         <div class="sub-title" style="color:#475569;">INSPECTION</div>
         <div class="sub-sub">Rapports & export</div>
       </div>
-      <div class="dlc-sub-card wide" onclick="app.nav('carrefour-tools')" style="border-color:#003896;background:linear-gradient(135deg,#eff6ff,#fff);">
-        <i class="fas fa-store" style="color:#003896;font-size:30px;"></i>
-        <div class="sub-title" style="color:#003896;">OUTILS CARREFOUR</div>
-        <div class="sub-sub">Dynacad • METI • Alert Net • My Travis</div>
-      </div>
     </div>
   </div>
 
-  <!-- OUTILS CARREFOUR (standalone) -->
-  <div id="view-carrefour-tools" class="hidden">
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
-      <button class="qty-btn" onclick="app.goBack()"><i class="fas fa-arrow-left"></i></button>
-      <div>
-        <div style="font-weight:950;font-size:20px;color:#003896;"><i class="fas fa-store"></i> OUTILS CARREFOUR</div>
-        <div class="small" style="margin-top:2px;">Outils et accès franchise Carrefour Express</div>
-      </div>
-    </div>
-    <div class="dlc-module-grid">
-      <div class="dlc-sub-card" onclick="app.dynacad.open()" style="border-color:#0f172a;background:linear-gradient(135deg,#f8fafc,#fff);">
-        <i class="fas fa-store" style="color:#0f172a;font-size:30px;"></i>
-        <div class="sub-title" style="color:#0f172a;">DYNACAD</div>
-        <div class="sub-sub">Planogrammes</div>
-      </div>
-      <div class="dlc-sub-card" onclick="app.metiPortal.open()" style="border-color:var(--carrefour-red);background:linear-gradient(135deg,#fff5f5,#fff);">
-        <i class="fas fa-laptop" style="color:var(--carrefour-red);font-size:30px;"></i>
-        <div class="sub-title" style="color:var(--carrefour-red);">METI</div>
-        <div class="sub-sub">Portail VPN</div>
-      </div>
-      <div class="dlc-sub-card" onclick="app.alertNet.open()" style="border-color:#dc2626;background:linear-gradient(135deg,#fff5f5,#fff);">
-        <i class="fas fa-bell" style="color:#dc2626;font-size:30px;"></i>
-        <div class="sub-title" style="color:#dc2626;">ALERT NET</div>
-        <div class="sub-sub">Alertes Carrefour</div>
-      </div>
-      <div class="dlc-sub-card" onclick="app.mytravis.open()" style="border-color:#0891b2;background:linear-gradient(135deg,#f0f9ff,#fff);">
-        <i class="fas fa-truck" style="color:#0891b2;font-size:30px;"></i>
-        <div class="sub-title" style="color:#0891b2;">MY TRAVIS</div>
-        <div class="sub-sub">Suivi camions</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- PLANNING MODULE -->
+  <!-- PLANNING MODULE — Style ComboHR -->
   <div id="view-planning" class="hidden">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-      <h2 style="margin:0;font-size:18px;color:#0891b2;"><i class="fas fa-calendar-days"></i> Planning RH</h2>
-    </div>
-    <!-- Règles RH France info card -->
-    <div class="card" style="border-left:5px solid #0891b2;margin-bottom:12px;">
-      <div style="font-weight:950;color:#0891b2;margin-bottom:8px;"><i class="fas fa-scale-balanced"></i> Règles droit du travail France</div>
-      <div style="font-size:13px;line-height:1.8;color:#334155;">
-        <b>⏱ Durée max quotidienne :</b> 10h/jour (dérogation 12h possible)<br>
-        <b>📅 Durée max hebdomadaire :</b> 48h/semaine (44h en moyenne sur 12 semaines)<br>
-        <b>😴 Repos quotidien :</b> 11h consécutives minimum<br>
-        <b>📆 Repos hebdomadaire :</b> 35h consécutives (2 jours dont dimanche)<br>
-        <b>🔴 Jours de repos :</b> 2 jours/semaine minimum<br>
-        <b>🌙 Travail de nuit :</b> 21h–6h → majoration 25%<br>
-        <b>🏖 Congés payés :</b> 2.5 jours ouvrables/mois
+    <!-- Navigation semaine -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;background:#fff;border-radius:14px;padding:12px 14px;box-shadow:0 2px 8px rgba(0,0,0,.05);">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <button class="qty-btn" onclick="app.planning.prevWeek()"><i class="fas fa-chevron-left"></i></button>
+        <div style="font-weight:950;font-size:15px;color:#0891b2;"><span id="plan-week-label"></span></div>
+        <button class="qty-btn" onclick="app.planning.nextWeek()"><i class="fas fa-chevron-right"></i></button>
+      </div>
+      <div style="display:flex;gap:6px;">
+        <button class="qty-btn" title="Copier semaine →" onclick="app.planning.copyWeek()"><i class="fas fa-copy"></i></button>
+        <button class="qty-btn" title="Export CSV" onclick="app.planning.exportCSV()"><i class="fas fa-file-csv"></i></button>
+        <button class="qty-btn" style="background:#0891b2;color:#fff;" onclick="app.planning.addEmployee()"><i class="fas fa-user-plus"></i></button>
       </div>
     </div>
 
-    <!-- Planning builder -->
-    <div class="card">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-        <div style="font-weight:950;color:#0891b2;">Semaine <span id="plan-week-label"></span></div>
-        <div style="display:flex;gap:8px;">
-          <button class="qty-btn" onclick="app.planning.prevWeek()"><i class="fas fa-chevron-left"></i></button>
-          <button class="qty-btn" onclick="app.planning.nextWeek()"><i class="fas fa-chevron-right"></i></button>
-        </div>
-      </div>
-      <div id="plan-employees" style="margin-bottom:12px;"></div>
-      <div style="display:flex;gap:8px;">
-        <button class="btn" style="background:#0891b2;margin-top:0;flex:1;" onclick="app.planning.addEmployee()"><i class="fas fa-user-plus"></i> Ajouter employé</button>
-        <button class="btn secondary" style="margin-top:0;" onclick="app.planning.exportCSV()"><i class="fas fa-file-csv"></i></button>
-      </div>
+    <!-- Légende des postes -->
+    <div class="post-legend" id="plan-legend">
+      <span class="post-chip" style="background:#dbeafe;color:#1d4ed8;">🏪 CAISSE</span>
+      <span class="post-chip" style="background:#d1fae5;color:#065f46;">📦 RAYON</span>
+      <span class="post-chip" style="background:#fef3c7;color:#92400e;">🚚 RÉCEPTION</span>
+      <span class="post-chip" style="background:#ede9fe;color:#5b21b6;">👔 MANAGE</span>
+      <span class="post-chip" style="background:#fee2e2;color:#991b1b;">🔒 FERMETURE</span>
+      <span class="post-chip" style="background:#e0f2fe;color:#0369a1;">🔑 OUVERTURE</span>
     </div>
 
-    <!-- Weekly summary -->
-    <div class="card" id="plan-summary" style="display:none;">
-      <div style="font-weight:950;color:#0891b2;margin-bottom:8px;"><i class="fas fa-chart-bar"></i> Récapitulatif</div>
+    <!-- Grille planning -->
+    <div style="background:#fff;border-radius:16px;padding:12px;box-shadow:0 2px 10px rgba(0,0,0,.05);overflow-x:auto;">
+      <div id="plan-employees"></div>
+    </div>
+
+    <!-- Récapitulatif -->
+    <div class="card" id="plan-summary" style="display:none;margin-top:12px;">
+      <div style="font-weight:950;color:#0891b2;margin-bottom:8px;"><i class="fas fa-chart-bar"></i> Récapitulatif de la semaine</div>
       <div id="plan-summary-content"></div>
     </div>
+
+    <!-- Règles RH -->
+    <details style="margin-top:12px;">
+      <summary style="background:#f0f9ff;border-radius:12px;padding:12px 14px;font-weight:900;color:#0891b2;cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;">
+        <i class="fas fa-scale-balanced"></i> Règles Droit du Travail France
+        <i class="fas fa-chevron-down" style="margin-left:auto;font-size:12px;"></i>
+      </summary>
+      <div style="background:#f8fafc;border-radius:12px;padding:14px;margin-top:4px;font-size:13px;line-height:1.8;color:#334155;">
+        <b>⏱ Max quotidien :</b> 10h/jour<br>
+        <b>📅 Max hebdo :</b> 48h/semaine<br>
+        <b>😴 Repos quotidien :</b> 11h consécutives<br>
+        <b>📆 Repos hebdo :</b> 35h consécutives<br>
+        <b>🔴 Repos :</b> 2 jours minimum/semaine<br>
+        <b>🌙 Nuit (21h–6h) :</b> majoration 25%<br>
+        <b>🏖 CP :</b> 2.5 jours/mois
+      </div>
+    </details>
+  </div>
   </div>
 
   <!-- TEAM -->
@@ -1255,72 +1281,33 @@ textarea{min-height:80px;resize:none;}
   </div>
 </main>
 
-<!-- DYNACAD OVERLAY (fullscreen iframe) -->
-<div id="dynacad-overlay" style="display:none;">
-  <div id="dynacad-bar">
-    <button onclick="app.dynacad.close()" style="background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:8px;padding:8px 12px;font-weight:900;cursor:pointer;font-size:13px;"><i class="fas fa-arrow-left"></i> RETOUR</button>
-    <span style="font-weight:950;font-size:15px;"><i class="fas fa-store"></i> DYNACAD Carrefour</span>
-    <button onclick="app.dynacad.openExternal()" style="margin-left:auto;background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:8px;padding:8px 12px;font-weight:900;cursor:pointer;font-size:12px;"><i class="fas fa-external-link-alt"></i> Ouvrir</button>
-  </div>
-  <div style="flex:1;display:flex;flex-direction:column;background:#f0f4f8;">
-    <!-- Login helper shown when iframe is blocked -->
-    <div id="dynacad-login-helper" style="padding:20px;text-align:center;">
-      <div style="background:#fff;border-radius:16px;padding:24px;max-width:340px;margin:0 auto;box-shadow:0 8px 30px rgba(0,0,0,.1);">
-        <div style="font-size:36px;margin-bottom:12px;">🔐</div>
-        <div style="font-weight:950;font-size:17px;color:#003896;margin-bottom:8px;">Connexion Dynacad</div>
-        <div class="small" style="margin-bottom:16px;">Cliquez sur le bouton ci-dessous pour ouvrir Dynacad avec vos identifiants pré-remplis.</div>
-        <div style="background:#f8fafc;border-radius:10px;padding:12px;margin-bottom:16px;text-align:left;">
-          <div class="small" style="font-weight:800;color:#64748b;margin-bottom:4px;">IDENTIFIANTS</div>
-          <div style="font-weight:900;font-size:14px;">ID : jonathan_araujo_4</div>
-          <div style="font-weight:900;font-size:14px;color:#64748b;">MDP : PurpanCHU32?</div>
-        </div>
-        <button onclick="app.dynacad.openExternal()" class="btn" style="background:#003896;"><i class="fas fa-external-link-alt"></i> Ouvrir Dynacad</button>
-        <div class="small" style="margin-top:10px;color:#94a3b8;">Les identifiants sont copiés dans le presse-papier</div>
-      </div>
+<!-- ── SHIFT EDITOR MODAL ── -->
+<div id="modal-shift-editor" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:80000;display:flex;align-items:flex-end;justify-content:center;padding:16px;">
+  <div class="dlg-card" style="max-width:420px;">
+    <div style="font-weight:950;font-size:16px;margin-bottom:14px;color:#0891b2;" id="shift-modal-emp"></div>
+    <div class="shift-type-toggle">
+      <label for="shift-modal-rest">Jour de repos</label>
+      <input type="checkbox" id="shift-modal-rest" style="width:22px;height:22px;cursor:pointer;accent-color:#0891b2;" onchange="document.getElementById('shift-modal-fields').style.display=this.checked?'none':'block'">
     </div>
-    <iframe id="dynacad-iframe" src="about:blank" style="flex:1;border:none;width:100%;display:none;"></iframe>
-  </div>
-</div>
-
-<!-- METI OVERLAY (fullscreen iframe) -->
-<div id="meti-overlay" style="display:none;position:fixed;inset:0;z-index:9500;background:#000;flex-direction:column;">
-  <div style="background:var(--carrefour-red);color:#fff;padding:10px 14px;display:flex;align-items:center;gap:12px;flex-shrink:0;height:50px;">
-    <button onclick="app.metiPortal.close()" style="background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:8px;padding:8px 12px;font-weight:900;cursor:pointer;font-size:13px;"><i class="fas fa-arrow-left"></i> RETOUR</button>
-    <span style="font-weight:950;font-size:15px;"><i class="fas fa-laptop"></i> METI — VPN Carrefour</span>
-    <button onclick="app.metiPortal.openExternal()" style="margin-left:auto;background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:8px;padding:8px 12px;font-weight:900;cursor:pointer;font-size:12px;"><i class="fas fa-external-link-alt"></i> Ouvrir</button>
-  </div>
-  <div style="flex:1;display:flex;flex-direction:column;background:#f0f4f8;overflow-y:auto;">
-    <div style="padding:20px;text-align:center;">
-      <div style="background:#fff;border-radius:16px;padding:24px;max-width:400px;margin:0 auto;box-shadow:0 8px 30px rgba(0,0,0,.1);">
-        <div style="font-size:36px;margin-bottom:12px;">🔐</div>
-        <div style="font-weight:950;font-size:17px;color:var(--carrefour-red);margin-bottom:8px;">Connexion METI</div>
-        <div class="small" style="margin-bottom:16px;line-height:1.6;">Le portail METI nécessite une connexion VPN Pulse Secure. Assurez-vous d'être connecté au VPN avant d'accéder à ce module.</div>
-        <div style="background:#fff5f5;border:1.5px solid #fca5a5;border-radius:10px;padding:12px;margin-bottom:16px;text-align:left;">
-          <div class="small" style="font-weight:900;color:var(--carrefour-red);margin-bottom:6px;"><i class="fas fa-triangle-exclamation"></i> PRÉREQUIS VPN</div>
-          <div style="font-size:13px;line-height:1.7;">
-            1. Aller sur <b>vpnportal.carrefour.com/franchise</b><br>
-            2. Cliquer sur <b>Démarrer</b> (application Pulse)<br>
-            3. Cliquer sur <b>Ouvrir Pulse Secure</b><br>
-            4. Cliquer sur <b>Oui / Toujours</b><br>
-            5. Vérifier la connexion dans la barre système
-          </div>
-        </div>
-        <button onclick="app.metiPortal.openExternal()" class="btn" style="background:var(--carrefour-red);"><i class="fas fa-external-link-alt"></i> Accéder à METI</button>
-        <button onclick="window.open('https://vpnportal.carrefour.com/franchise','_blank','noopener')" class="btn secondary" style="margin-top:8px;"><i class="fas fa-shield"></i> Ouvrir VPN Portal</button>
+    <div id="shift-modal-fields">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+        <div><label style="font-size:12px;font-weight:800;color:#64748b;display:block;margin-bottom:4px;">Début</label><input type="time" id="shift-modal-start" style="margin:0;padding:12px;font-size:16px;"></div>
+        <div><label style="font-size:12px;font-weight:800;color:#64748b;display:block;margin-bottom:4px;">Fin</label><input type="time" id="shift-modal-end" style="margin:0;padding:12px;font-size:16px;"></div>
       </div>
+      <label style="font-size:12px;font-weight:800;color:#64748b;display:block;margin-bottom:6px;">Poste</label>
+      <div class="plan-post-grid" id="shift-post-grid">
+        <!-- Built by JS but also available via select -->
+      </div>
+      <select id="shift-modal-post" style="display:none;">
+        <option>CAISSE</option><option>RAYON</option><option>RÉCEPTION</option>
+        <option>MANAGE</option><option>MÉNAGE</option><option>FERMETURE</option>
+        <option>OUVERTURE</option><option>AUTRE</option>
+      </select>
     </div>
-  </div>
-</div>
-
-<!-- MYTRAVIS OVERLAY -->
-<div id="mytravis-overlay" style="display:none;position:fixed;inset:0;z-index:9500;background:#000;flex-direction:column;">
-  <div style="background:#0369a1;color:#fff;padding:10px 14px;display:flex;align-items:center;gap:12px;flex-shrink:0;height:50px;">
-    <button onclick="app.mytravis.close()" style="background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:8px;padding:8px 12px;font-weight:900;cursor:pointer;font-size:13px;"><i class="fas fa-arrow-left"></i> RETOUR</button>
-    <span style="font-weight:950;font-size:15px;">🚚 MyTravis — Suivi camion</span>
-    <button onclick="app.mytravis.openExternal()" style="margin-left:auto;background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:8px;padding:8px 12px;font-weight:900;cursor:pointer;font-size:12px;"><i class="fas fa-external-link-alt"></i> Ouvrir</button>
-  </div>
-  <div style="flex:1;display:flex;flex-direction:column;">
-    <iframe id="mytravis-iframe" src="about:blank" style="flex:1;border:none;width:100%;"></iframe>
+    <div class="dlg-btns">
+      <button class="btn" style="background:#0891b2;margin:0;" onclick="app.planning.saveShift()"><i class="fas fa-check"></i> Enregistrer</button>
+      <button class="btn secondary" style="margin:0;" onclick="app.planning.closeShiftModal()">Annuler</button>
+    </div>
   </div>
 </div>
 
@@ -1622,6 +1609,10 @@ window.app={
       if(saladCreateBtn)saladCreateBtn.style.display=this.canDo('saladLib')?'':'none';
 
       this.updateUI();
+      // Init notifications
+      await this.notif.init();
+      // Check DLC alerts via notification (after 3s)
+      setTimeout(()=>this.notif.checkDlcAlerts(),3000);
     }finally{spin(false);}
   },
 
@@ -3259,43 +3250,6 @@ window.app={
   },
 
   // ══════════════════════════════════════════════════
-  // ── DYNACAD MODULE ──
-  // ══════════════════════════════════════════════════
-  dynacad:{
-    _url:'https://dynacad.fr.carrefour.com/',
-    _loginUrl:'https://dynacad.fr.carrefour.com/',
-    _id:'jonathan_araujo_4',
-    _pwd:'PurpanCHU32?',
-
-    open(){
-      const overlay=document.getElementById('dynacad-overlay');
-      if(overlay)overlay.style.display='flex';
-      // Try to put credentials in clipboard for convenience
-      try{navigator.clipboard.writeText(this._id+'\n'+this._pwd);}catch(e){}
-      toast('Identifiants copiés dans le presse-papier','info',3000);
-    },
-
-    close(){
-      const overlay=document.getElementById('dynacad-overlay');
-      if(overlay)overlay.style.display='none';
-      // Clear iframe
-      const frame=document.getElementById('dynacad-iframe');
-      if(frame)frame.src='about:blank';
-    },
-
-    openExternal(){
-      // Copy credentials to clipboard then open URL
-      try{
-        const text=`Identifiant: ${this._id}\nMot de passe: ${this._pwd}`;
-        navigator.clipboard.writeText(text).then(()=>{
-          toast('Identifiants copiés ! Collez-les sur la page de connexion.','ok',4000);
-        }).catch(()=>{});
-      }catch(e){}
-      window.open(this._url,'_blank','noopener');
-    }
-  },
-
-  // ══════════════════════════════════════════════════
   // ── ÉTIQUETTES MODULE (Brother TD-2120N) ──
   // ══════════════════════════════════════════════════
   etiquettes:{
@@ -3447,289 +3401,332 @@ ${nameLine2?`^CF0,30^FO15,45^FD${nameLine2}^FS`:''}
   },
 
   // ══════════════════════════════════════════════════
-  // ── METI PORTAL MODULE ──
-  // ══════════════════════════════════════════════════
-  metiPortal:{
-    _url:'https://vpnportal.carrefour.com/dana/user/#',
-    open(){
-      const el=document.getElementById('meti-overlay');
-      if(el)el.style.display='flex';
-    },
-    close(){
-      const el=document.getElementById('meti-overlay');
-      if(el)el.style.display='none';
-    },
-    openExternal(){
-      window.open(this._url,'_blank','noopener');
-    }
-  },
-
-  // ══════════════════════════════════════════════════
-  // ── MYTRAVIS MODULE ──
-  // ══════════════════════════════════════════════════
-  mytravis:{
-    _url:'https://mytravis.fr.carrefour.com/mytravis',
-    _id:'jonathan_araujo_4@franchise.carrefour.com',
-    _pwd:'KzD?VB&6bNnS5.3',
-    open(){
-      const el=document.getElementById('mytravis-overlay');
-      if(el){el.style.display='flex';}
-      // Try to load in iframe
-      const frame=document.getElementById('mytravis-iframe');
-      if(frame&&frame.src==='about:blank'){
-        try{navigator.clipboard.writeText(this._id+'\n'+this._pwd);}catch(e){}
-        frame.src=this._url;
-        toast('Identifiants copiés dans le presse-papier','info',3000);
-      }
-    },
-    close(){
-      const el=document.getElementById('mytravis-overlay');
-      if(el)el.style.display='none';
-      const frame=document.getElementById('mytravis-iframe');
-      if(frame)frame.src='about:blank';
-    },
-    openExternal(){
-      try{navigator.clipboard.writeText(this._id+'\n'+this._pwd);}catch(e){}
-      window.open(this._url,'_blank','noopener');
-      toast('Identifiants copiés ! Collez-les sur la page de connexion.','ok',4000);
-    }
-  },
-
-  // ══════════════════════════════════════════════════
-  // ── TOO GOOD TO GO PORTAL ──
-  // ══════════════════════════════════════════════════
-  tgtgPortal:{
-    _url:'https://store.toogoodtogo.com/stores',
-    _id:'jonathan_araujo_4@franchise.carrefour.com',
-    _pwd:'KzD?VB&6bNnS5.3',
-    open(){
-      try{navigator.clipboard.writeText(this._id+'\n'+this._pwd);}catch(e){}
-      window.open(this._url,'_blank','noopener');
-      toast('Identifiants copiés ! Utilisez-les sur la page Too Good To Go.','ok',4000);
-    }
-  },
-
-  // ══════════════════════════════════════════════════
-  // ── PLANNING RH MODULE ──
+  // ── PLANNING RH MODULE — Style ComboHR ──
   // ══════════════════════════════════════════════════
   planning:{
     _weekOffset:0,
     _employees:[],
+    _postColors:{
+      CAISSE:'#3b82f6',RAYON:'#10b981',RÉCEPTION:'#f59e0b',MANAGE:'#8b5cf6',
+      MÉNAGE:'#64748b',FERMETURE:'#ef4444',OUVERTURE:'#0891b2',AUTRE:'#475569'
+    },
 
-    init(){
-      if(!this._employees.length){
-        // Load from localStorage if available
-        try{const s=JSON.parse(localStorage.getItem('planning_employees')||'[]');if(s.length)this._employees=s;}catch(e){}
+    _docRef:null,
+
+    async _load(){
+      try{
+        const{doc,getDoc,setDoc}=window._fbChat;
+        const ref=doc(window._db,'store_master','PLANNING_RH');
+        this._docRef=ref;
+        const snap=await getDoc(ref);
+        if(snap.exists()){this._employees=snap.data().employees||[];}
+      }catch(e){
+        try{const s=JSON.parse(localStorage.getItem('planning_employees')||'[]');if(s.length)this._employees=s;}catch(e2){}
       }
     },
 
-    save(){try{localStorage.setItem('planning_employees',JSON.stringify(this._employees));}catch(e){}},
+    async _save(){
+      const data=JSON.stringify(this._employees);
+      try{localStorage.setItem('planning_employees',data);}catch(e){}
+      try{
+        const{doc,setDoc}=window._fbChat;
+        const ref=doc(window._db,'store_master','PLANNING_RH');
+        await setDoc(ref,{employees:this._employees,updatedAt:Date.now()});
+      }catch(e){}
+    },
 
     getWeekDates(){
-      const now=new Date();
-      const day=now.getDay();
+      const now=new Date();const day=now.getDay();
       const mondayOffset=day===0?-6:1-day;
-      const monday=new Date(now);
-      monday.setDate(now.getDate()+mondayOffset+this._weekOffset*7);
-      monday.setHours(0,0,0,0);
-      const dates=[];
-      for(let i=0;i<7;i++){const d=new Date(monday);d.setDate(monday.getDate()+i);dates.push(d);}
+      const monday=new Date(now);monday.setDate(now.getDate()+mondayOffset+this._weekOffset*7);monday.setHours(0,0,0,0);
+      const dates=[];for(let i=0;i<7;i++){const d=new Date(monday);d.setDate(monday.getDate()+i);dates.push(d);}
       return dates;
     },
 
     prevWeek(){this._weekOffset--;this.render();},
     nextWeek(){this._weekOffset++;this.render();},
 
-    addEmployee:async function(){
-      const name=await dlgPrompt('Nom de l\'employé :');
-      if(!name||!name.trim())return;
-      const id=Date.now();
-      const days={L:null,M:null,MM:null,J:null,V:null,S:null,D:null};
-      this._employees.push({id,name:name.trim().toUpperCase(),schedule:{}});
-      this.save();
-      this.render();
+    getShiftHours(shift){
+      if(!shift||shift.type==='rest'||!shift.start||!shift.end)return 0;
+      const[sh,sm]=shift.start.split(':').map(Number);const[eh,em]=shift.end.split(':').map(Number);
+      let h=(eh*60+em-sh*60-sm)/60;if(h<0)h+=24;return Math.max(0,h);
     },
 
-    // Validate RH rules for an employee
     validateSchedule(emp){
-      const days=this.getWeekDates();
-      const dayLabels=['L','M','MM','J','V','S','D'];
-      const warnings=[];
-      let totalHours=0;
-      let restDays=0;
-
-      days.forEach((date,i)=>{
-        const key=date.toISOString().slice(0,10);
-        const shift=emp.schedule[key];
+      const dates=this.getWeekDates();const warnings=[];let totalHours=0;let restDays=0;
+      dates.forEach(date=>{
+        const key=date.toISOString().slice(0,10);const shift=emp.schedule?.[key];
         if(!shift||shift.type==='rest'){restDays++;return;}
-        if(shift.start&&shift.end){
-          const [sh,sm]=shift.start.split(':').map(Number);
-          const [eh,em]=shift.end.split(':').map(Number);
-          let h=(eh*60+em-sh*60-sm)/60;
-          if(h<0)h+=24;
-          if(h>10)warnings.push(`${dayLabels[i]}: journée > 10h (${h.toFixed(1)}h)`);
-          totalHours+=h;
-        }
+        const h=this.getShiftHours(shift);
+        if(h>10)warnings.push(`${date.toLocaleDateString('fr',{weekday:'short'})}: >10h`);
+        totalHours+=h;
       });
-
-      if(restDays<2)warnings.push(`Repos insuffisants: ${restDays} jour(s) (min. 2)`);
-      if(totalHours>48)warnings.push(`Semaine > 48h (${totalHours.toFixed(1)}h)`);
-
+      if(restDays<2)warnings.push(`${restDays} repos (min 2)`);
+      if(totalHours>48)warnings.push(`Semaine ${totalHours.toFixed(0)}h > 48h`);
       return{totalHours,restDays,warnings};
     },
 
-    render(){
-      this.init();
+    render:async function(){
+      if(!this._employees.length&&!this._loaded){this._loaded=true;await this._load();}
       const dates=this.getWeekDates();
       const labelEl=document.getElementById('plan-week-label');
-      if(labelEl){
-        const opts={day:'2-digit',month:'2-digit'};
-        labelEl.textContent=`${dates[0].toLocaleDateString('fr',opts)} – ${dates[6].toLocaleDateString('fr',opts)}`;
-      }
+      if(labelEl){const opts={day:'2-digit',month:'2-digit'};labelEl.textContent=`${dates[0].toLocaleDateString('fr',opts)} – ${dates[6].toLocaleDateString('fr',opts)}`;}
 
       const wrap=document.getElementById('plan-employees');
       if(!wrap)return;
-      const DAY_NAMES=['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+      const DAY_SHORT=['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
       const today=new Date().toISOString().slice(0,10);
 
       if(!this._employees.length){
-        wrap.innerHTML=`<div class="empty-state"><i class="fas fa-users"></i><br>Aucun employé. Ajoutez-en un pour commencer.</div>`;
-        document.getElementById('plan-summary').style.display='none';
-        return;
+        wrap.innerHTML=`<div class="empty-state"><i class="fas fa-users-slash"></i><br>Aucun employé. Cliquez sur "Ajouter" pour commencer.</div>`;
+        document.getElementById('plan-summary').style.display='none';return;
       }
 
-      // Header row with day names (Skello style)
-      const headerHtml=`<div style="display:grid;grid-template-columns:120px repeat(7,1fr);gap:4px;margin-bottom:6px;padding:0 2px;">
-        <div></div>
-        ${dates.map((d,i)=>{
-          const isToday=d.toISOString().slice(0,10)===today;
-          return`<div style="text-align:center;padding:6px 2px;border-radius:8px;background:${isToday?'#003896':'#f1f5f9'};color:${isToday?'#fff':'#64748b'};">
-            <div style="font-size:11px;font-weight:950;">${DAY_NAMES[i]}</div>
-            <div style="font-size:13px;font-weight:950;">${d.getDate()}</div>
-          </div>`;
-        }).join('')}
+      // ── Header ──
+      const headerHtml=`<div class="plan-grid-row plan-header-row">
+        <div class="plan-emp-col"></div>
+        ${dates.map((d,i)=>{const isT=d.toISOString().slice(0,10)===today;return`<div class="plan-day-header ${isT?'today':''}"><div class="plan-day-name">${DAY_SHORT[i]}</div><div class="plan-day-num">${d.getDate()}</div></div>`;}).join('')}
+        <div class="plan-total-col">Total</div>
       </div>`;
 
+      // ── Rows ──
       const rowsHtml=this._employees.map(emp=>{
-        const {totalHours,restDays,warnings}=this.validateSchedule(emp);
-        const hasWarn=warnings.length>0;
-        const cellsHtml=dates.map(date=>{
-          const key=date.toISOString().slice(0,10);
-          const shift=emp.schedule[key]||{type:'rest'};
-          const isRest=!shift||shift.type==='rest';
-          const isToday=key===today;
+        const{totalHours,restDays,warnings}=this.validateSchedule(emp);
+        const colorDot=emp.color||'#003896';
+        const initials=(emp.name||'?').split(' ').map(x=>x[0]||'').join('').toUpperCase().slice(0,2);
+
+        const cells=dates.map(date=>{
+          const key=date.toISOString().slice(0,10);const isT=key===today;
+          const shift=emp.schedule?.[key];const isRest=!shift||shift.type==='rest';
           if(isRest){
-            return`<div onclick="app.planning.editShift('${emp.id}','${key}','${date.toLocaleDateString('fr')}')"
-              style="text-align:center;cursor:pointer;min-height:50px;border-radius:10px;display:flex;align-items:center;justify-content:center;border:1.5px dashed ${isToday?'#bfdbfe':'#e2e8f0'};background:${isToday?'#eff6ff':'#f8fafc'};">
-              <i class="fas fa-moon" style="color:#cbd5e1;font-size:14px;"></i>
+            return`<div class="plan-cell rest ${isT?'today':''}" onclick="app.planning.editShift('${emp.id}','${key}')">
+              <span class="plan-rest-label">—</span>
             </div>`;
           }
-          const h=(()=>{const[sh,sm]=shift.start.split(':').map(Number);const[eh,em]=shift.end.split(':').map(Number);let v=(eh*60+em-sh*60-sm)/60;if(v<0)v+=24;return v;})();
-          const col=h>9?'#fee2e2':h>7?'#dbeafe':'#d1fae5';
-          const tc=h>9?'#991b1b':h>7?'#1e40af':'#065f46';
-          return`<div onclick="app.planning.editShift('${emp.id}','${key}','${date.toLocaleDateString('fr')}')"
-            style="text-align:center;cursor:pointer;min-height:50px;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:${col};border:1.5px solid ${tc}20;">
-            <div style="font-size:10px;font-weight:950;color:${tc};">${shift.start||'?'}</div>
-            <div style="font-size:9px;color:${tc};opacity:.7;">${h.toFixed(1)}h</div>
-            <div style="font-size:10px;font-weight:950;color:${tc};">${shift.end||'?'}</div>
+          const h=this.getShiftHours(shift);
+          const col=this._postColors[shift.post||'AUTRE']||'#475569';
+          const isSplit=h>10;
+          return`<div class="plan-cell work ${isT?'today':''} ${isSplit?'long':''}" style="--shift-color:${col};" onclick="app.planning.editShift('${emp.id}','${key}')">
+            <div class="plan-shift-post" style="background:${col}20;color:${col};">${shift.post||'TRAVAIL'}</div>
+            <div class="plan-shift-times">${shift.start}–${shift.end}</div>
+            <div class="plan-shift-h">${h.toFixed(1)}h</div>
           </div>`;
         }).join('');
-        return`<div style="display:grid;grid-template-columns:120px repeat(7,1fr);gap:4px;margin-bottom:6px;padding:0 2px;">
-          <div style="display:flex;align-items:center;gap:8px;padding:0 4px;">
-            <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#003896,#1a50c8);color:#fff;font-weight:950;font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${(emp.name||'?').split(' ').map(x=>x[0]||'').join('').toUpperCase().slice(0,2)}</div>
-            <div style="min-width:0;">
-              <div style="font-weight:950;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${emp.name||'?'}</div>
-              <div style="display:flex;gap:4px;">
-                <span style="font-size:10px;font-weight:900;color:#0891b2;">${totalHours.toFixed(0)}h</span>
-                <span style="font-size:10px;font-weight:900;background:${restDays>=2?'#d1fae5':'#fee2e2'};color:${restDays>=2?'#065f46':'#991b1b'};border-radius:4px;padding:0 4px;">${restDays}R</span>
-                ${hasWarn?'<i class="fas fa-triangle-exclamation" style="color:#f59e0b;font-size:10px;margin-top:1px;"></i>':''}
-              </div>
+
+        return`<div class="plan-grid-row ${warnings.length?'has-warn':''}">
+          <div class="plan-emp-col">
+            <div class="plan-avatar" style="background:${colorDot};">${initials}</div>
+            <div class="plan-emp-info">
+              <div class="plan-emp-name">${emp.name}</div>
+              <div class="plan-emp-contract">${emp.contract||''}</div>
             </div>
+            <button class="plan-emp-del" onclick="app.planning.removeEmployee('${emp.id}')"><i class="fas fa-trash"></i></button>
           </div>
-          ${cellsHtml}
+          ${cells}
+          <div class="plan-total-col">
+            <div class="plan-total-h" style="color:${totalHours>40?'#dc2626':totalHours>35?'#d97706':'#059669'}">${totalHours.toFixed(0)}h</div>
+            <div class="plan-rest-badge ${restDays>=2?'ok':'warn'}">${restDays}R</div>
+          </div>
         </div>
-        ${hasWarn?`<div style="background:#fef3c7;border-left:4px solid #f59e0b;border-radius:8px;padding:6px 10px;margin:-2px 2px 6px 2px;font-size:11px;color:#92400e;"><i class="fas fa-triangle-exclamation"></i> ${warnings.join(' • ')}</div>`:''}`;
+        ${warnings.length?`<div class="plan-warn-row"><i class="fas fa-triangle-exclamation"></i> ${warnings.join(' • ')}</div>`:''}`;
       }).join('');
 
-      wrap.innerHTML=headerHtml+rowsHtml;
+      // ── Bottom totals bar ──
+      const dayTotals=dates.map(date=>{
+        const key=date.toISOString().slice(0,10);
+        const total=this._employees.reduce((s,e)=>{const sh=e.schedule?.[key];return s+(sh&&sh.type!=='rest'?this.getShiftHours(sh):0);},0);
+        const count=this._employees.filter(e=>{const sh=e.schedule?.[key];return sh&&sh.type!=='rest';}).length;
+        return`<div class="plan-day-footer"><div class="plan-day-count">${count} pers</div><div class="plan-day-hours">${total.toFixed(0)}h</div></div>`;
+      }).join('');
+      const footerHtml=`<div class="plan-grid-row plan-footer-row">
+        <div class="plan-emp-col" style="font-size:11px;font-weight:900;color:#64748b;text-align:center;">PAR JOUR</div>
+        ${dayTotals}
+        <div class="plan-total-col"></div>
+      </div>`;
+
+      wrap.innerHTML=headerHtml+rowsHtml+footerHtml;
 
       // Summary
-      const summaryEl=document.getElementById('plan-summary');
-      const summaryContent=document.getElementById('plan-summary-content');
-      if(summaryEl&&summaryContent&&this._employees.length){
-        summaryEl.style.display='block';
-        const totalWeekHours=this._employees.reduce((s,e)=>s+this.validateSchedule(e).totalHours,0);
-        const workersDays=this._employees.flatMap(e=>dates.map(d=>{const k=d.toISOString().slice(0,10);const s=e.schedule[k];return s&&s.type!=='rest'?1:0;})).reduce((a,b)=>a+b,0);
-        summaryContent.innerHTML=`
-          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
-            <div style="background:#eff6ff;border-radius:10px;padding:10px;text-align:center;">
-              <div style="font-size:20px;font-weight:950;color:#0891b2;">${this._employees.length}</div>
-              <div style="font-size:11px;color:#64748b;">Employés</div>
-            </div>
-            <div style="background:#f0fdf4;border-radius:10px;padding:10px;text-align:center;">
-              <div style="font-size:20px;font-weight:950;color:#059669;">${totalWeekHours.toFixed(0)}h</div>
-              <div style="font-size:11px;color:#64748b;">Total semaine</div>
-            </div>
-            <div style="background:#fdf4ff;border-radius:10px;padding:10px;text-align:center;">
-              <div style="font-size:20px;font-weight:950;color:#7c3aed;">${workersDays}</div>
-              <div style="font-size:11px;color:#64748b;">Présences</div>
-            </div>
-          </div>`;
+      const se=document.getElementById('plan-summary'),sc=document.getElementById('plan-summary-content');
+      if(se&&sc){
+        se.style.display='block';
+        const tw=this._employees.reduce((s,e)=>s+this.validateSchedule(e).totalHours,0);
+        const pres=this._employees.flatMap(e=>dates.map(d=>{const k=d.toISOString().slice(0,10);const s=e.schedule?.[k];return s&&s.type!=='rest'?1:0;})).reduce((a,b)=>a+b,0);
+        sc.innerHTML=`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
+          <div style="background:#eff6ff;border-radius:10px;padding:10px;text-align:center;"><div style="font-size:22px;font-weight:950;color:#0891b2;">${this._employees.length}</div><div style="font-size:11px;color:#64748b;">Employés</div></div>
+          <div style="background:#f0fdf4;border-radius:10px;padding:10px;text-align:center;"><div style="font-size:22px;font-weight:950;color:#059669;">${tw.toFixed(0)}h</div><div style="font-size:11px;color:#64748b;">Total semaine</div></div>
+          <div style="background:#fdf4ff;border-radius:10px;padding:10px;text-align:center;"><div style="font-size:22px;font-weight:950;color:#7c3aed;">${pres}</div><div style="font-size:11px;color:#64748b;">Présences</div></div>
+        </div>`;
       }
     },
 
-    editShift:async function(empId,dateKey,dateLabel){
-      const emp=this._employees.find(e=>String(e.id)===String(empId));if(!emp)return;
-      const shift=emp.schedule[dateKey]||{type:'rest'};
-      const isRest=!shift||shift.type==='rest';
-
-      const choice=await dlgConfirm(
-        `${emp.name} — ${dateLabel}`,
-        isRest?'Ce jour est un repos. Définir un horaire ?':'Supprimer ce créneau (→ repos) ?',
-        false
-      );
-      if(!choice)return;
-
-      if(isRest){
-        // Set a shift
-        const start=await dlgPrompt('Heure de début (HH:MM):','09:00');
-        if(!start)return;
-        const end=await dlgPrompt('Heure de fin (HH:MM):','17:00');
-        if(!end)return;
-        emp.schedule[dateKey]={type:'work',start:start.trim(),end:end.trim()};
-      }else{
-        emp.schedule[dateKey]={type:'rest'};
-      }
-      this.save();
-      this.render();
+    addEmployee:async function(){
+      const name=await dlgPrompt('Prénom + Nom de l\'employé :');if(!name?.trim())return;
+      const contract=await dlgPrompt('Contrat (ex: 30h/sem, CDI…) :','');
+      const colors=['#003896','#0891b2','#059669','#7c3aed','#dc2626','#d97706','#0f766e','#db2777'];
+      const color=colors[this._employees.length%colors.length];
+      this._employees.push({id:Date.now(),name:name.trim().toUpperCase(),contract:contract?.trim()||'',color,schedule:{}});
+      await this._save();this.render();
     },
 
     removeEmployee:async function(empId){
-      const ok=await dlgConfirm('Supprimer cet employé ?','Cette action supprime l\'employé et son planning.',true);
-      if(!ok)return;
+      const ok=await dlgConfirm('Supprimer cet employé ?','Planning et horaires supprimés.',true);if(!ok)return;
       this._employees=this._employees.filter(e=>String(e.id)!==String(empId));
-      this.save();
-      this.render();
+      await this._save();this.render();
+    },
+
+    editShift:async function(empId,dateKey){
+      const emp=this._employees.find(e=>String(e.id)===String(empId));if(!emp)return;
+      if(!emp.schedule)emp.schedule={};
+      const shift=emp.schedule[dateKey];const isRest=!shift||shift.type==='rest';
+      const dateLabel=new Date(dateKey+'T12:00:00').toLocaleDateString('fr',{weekday:'long',day:'numeric',month:'long'});
+
+      // Show shift editor modal
+      document.getElementById('shift-modal-emp').textContent=emp.name+' — '+dateLabel;
+      document.getElementById('shift-modal-start').value=shift?.start||'09:00';
+      document.getElementById('shift-modal-end').value=shift?.end||'17:00';
+      document.getElementById('shift-modal-rest').checked=isRest;
+      document.getElementById('shift-modal-fields').style.display=isRest?'none':'block';
+
+      // Build visual post buttons
+      const postColors=this._postColors;const currentPost=shift?.post||'RAYON';
+      const postGrid=document.getElementById('shift-post-grid');
+      const postSel=document.getElementById('shift-modal-post');
+      postSel.value=currentPost;
+      if(postGrid){
+        postGrid.innerHTML=Object.entries(postColors).map(([p,c])=>`
+          <div class="plan-post-btn ${p===currentPost?'selected':''}" style="color:${c};border-color:${p===currentPost?c:'#e2e8f0'};"
+            onclick="this.closest('#shift-post-grid').querySelectorAll('.plan-post-btn').forEach(b=>{b.classList.remove('selected');b.style.borderColor='#e2e8f0';});this.classList.add('selected');this.style.borderColor='${c}';document.getElementById('shift-modal-post').value='${p}';">
+            ${p}
+          </div>`).join('');
+      }
+
+      const modal=document.getElementById('modal-shift-editor');
+      modal.classList.remove('hidden');
+      modal._empId=empId;modal._dateKey=dateKey;
+    },
+
+    saveShift:async function(){
+      const modal=document.getElementById('modal-shift-editor');
+      const empId=modal._empId;const dateKey=modal._dateKey;
+      const emp=this._employees.find(e=>String(e.id)===String(empId));if(!emp)return;
+      if(!emp.schedule)emp.schedule={};
+      const isRest=document.getElementById('shift-modal-rest').checked;
+      if(isRest){emp.schedule[dateKey]={type:'rest'};}
+      else{
+        const start=document.getElementById('shift-modal-start').value;
+        const end=document.getElementById('shift-modal-end').value;
+        const post=document.getElementById('shift-modal-post').value;
+        if(!start||!end)return toast('Heure de début et de fin requises.','warn');
+        emp.schedule[dateKey]={type:'work',start,end,post};
+      }
+      modal.classList.add('hidden');
+      await this._save();this.render();
+    },
+
+    closeShiftModal(){document.getElementById('modal-shift-editor').classList.add('hidden');},
+
+    copyWeek:async function(){
+      // Copy current week to next week
+      const ok=await dlgConfirm('Copier la semaine','Copier ce planning sur la semaine suivante ?',false);if(!ok)return;
+      const dates=this.getWeekDates();
+      this._employees.forEach(emp=>{
+        if(!emp.schedule)emp.schedule={};
+        dates.forEach(date=>{
+          const key=date.toISOString().slice(0,10);
+          const nextDate=new Date(date);nextDate.setDate(date.getDate()+7);
+          const nextKey=nextDate.toISOString().slice(0,10);
+          if(emp.schedule[key])emp.schedule[nextKey]={...emp.schedule[key]};
+          else delete emp.schedule[nextKey];
+        });
+      });
+      await this._save();toast('Semaine copiée vers la semaine prochaine.','ok');
     },
 
     exportCSV(){
-      const dates=this.getWeekDates();
-      const dayNames=['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
-      const header=['Employé',...dates.map((d,i)=>`${dayNames[i]} ${d.toLocaleDateString('fr')}`), 'Total heures'];
+      const dates=this.getWeekDates();const dayNames=['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+      const header=['Employé','Contrat',...dates.map((d,i)=>`${dayNames[i]} ${d.toLocaleDateString('fr')}`),'Total heures'];
       const rows=[header];
       this._employees.forEach(emp=>{
-        const {totalHours}=this.validateSchedule(emp);
-        const row=[emp.name,...dates.map(d=>{
-          const key=d.toISOString().slice(0,10);
-          const s=emp.schedule[key]||{type:'rest'};
-          return s.type==='rest'?'Repos':`${s.start||'?'}-${s.end||'?'}`;
+        const{totalHours}=this.validateSchedule(emp);
+        const row=[emp.name,emp.contract||'',...dates.map(d=>{
+          const key=d.toISOString().slice(0,10);const s=emp.schedule?.[key]||{type:'rest'};
+          return s.type==='rest'?'Repos':`${s.start||'?'}-${s.end||'?'} (${s.post||''})`;
         }),totalHours.toFixed(1)+'h'];
         rows.push(row);
       });
       const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(';')).join('\n');
       const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
-      const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='planning.csv';a.click();URL.revokeObjectURL(url);
-      toast('Planning exporté en CSV','ok');
+      const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`planning_${new Date().toISOString().slice(0,10)}.csv`;a.click();URL.revokeObjectURL(url);
+      toast('Planning exporté.','ok');
+    }
+  },
+
+  // ══════════════════════════════════════════════════
+  // ── NOTIFICATIONS MODULE ──
+  // ══════════════════════════════════════════════════
+  notif:{
+    _permission:'default',
+    _sw:null,
+
+    async init(){
+      if(!('Notification' in window))return;
+      this._permission=Notification.permission;
+      // Register service worker for push (fallback to local)
+      if('serviceWorker' in navigator){
+        try{
+          this._sw=await navigator.serviceWorker.register('/sw-notif.js').catch(()=>null);
+        }catch(e){}
+      }
+      this._updateBtnState();
+    },
+
+    _updateBtnState(){
+      const btn=document.getElementById('notif-toggle-btn');
+      if(!btn)return;
+      if(!('Notification' in window)){btn.style.display='none';return;}
+      btn.style.display='flex';
+      if(this._permission==='granted'){
+        btn.innerHTML='<i class="fas fa-bell" style="color:#10b981;"></i>';
+        btn.title='Notifications activées';
+      }else if(this._permission==='denied'){
+        btn.innerHTML='<i class="fas fa-bell-slash" style="color:#ef4444;"></i>';
+        btn.title='Notifications bloquées dans les paramètres navigateur';
+      }else{
+        btn.innerHTML='<i class="fas fa-bell" style="color:#f59e0b;"></i>';
+        btn.title='Activer les notifications';
+      }
+    },
+
+    async requestPermission(){
+      if(!('Notification' in window))return toast('Notifications non disponibles sur cet appareil.','warn');
+      if(this._permission==='denied'){
+        toast('Notifications bloquées. Autorisez-les dans les paramètres de votre navigateur.','warn',6000);return;
+      }
+      try{
+        this._permission=await Notification.requestPermission();
+        this._updateBtnState();
+        if(this._permission==='granted'){
+          toast('✓ Notifications activées !','ok');
+          this.sendLocal('Express Purpan','Notifications activées 🔔 Vous serez alerté des DLC urgentes.');
+        }else{toast('Notifications refusées.','warn');}
+      }catch(e){toast('Erreur activation notifications.','err');}
+    },
+
+    sendLocal(title,body,icon=''){
+      if(this._permission!=='granted')return;
+      try{new Notification(title,{body,icon:icon||'https://raw.githubusercontent.com/araujoexploitation/Magasin/main/LOGO.png',badge:'https://raw.githubusercontent.com/araujoexploitation/Magasin/main/LOGO.png',vibrate:[200,100,200]});}
+      catch(e){}
+    },
+
+    checkDlcAlerts(){
+      if(this._permission!=='granted')return;
+      const today=new Date();today.setHours(23,59,59,999);
+      const urgent=window.app.data.frais.filter(i=>{const d=new Date(i.date);return!isNaN(d.getTime())&&d<=today;});
+      if(urgent.length){
+        const names=urgent.slice(0,3).map(i=>i.name).join(', ');
+        this.sendLocal('⚠️ DLC Urgentes — '+urgent.length+' produit(s)',names+(urgent.length>3?' et '+(urgent.length-3)+' autres…':''));
+      }
     }
   },
 
@@ -3860,34 +3857,6 @@ ${nameLine2?`^CF0,30^FO15,45^FD${nameLine2}^FS`:''}
       el.classList.remove('dragging');
       clone.remove();
       this._drag=null;
-    }
-  },
-
-  // ══════════════════════════════════════════════════
-  // ── ALERT NET MODULE ──
-  // ══════════════════════════════════════════════════
-  alertNet:{
-    _url:'https://alertnet.carrefour.com/carrefour/users/login',
-    _id:'m31555BF',
-    _pwd:'P16P2!',
-    open(){
-      // Copy credentials to clipboard
-      try{navigator.clipboard.writeText(this._id+':'+this._pwd);}catch(e){}
-      // Open overlay with login helper
-      const ov=document.getElementById('alertnet-overlay');
-      if(ov){ov.style.display='flex';}
-      toast('Identifiants copiés — '+this._id,'info',3000);
-    },
-    close(){
-      const ov=document.getElementById('alertnet-overlay');
-      if(ov)ov.style.display='none';
-      const fr=document.getElementById('alertnet-iframe');
-      if(fr)fr.src='about:blank';
-    },
-    openExternal(){
-      try{navigator.clipboard.writeText(this._id+'\n'+this._pwd);}catch(e){}
-      window.open(this._url,'_blank','noopener');
-      toast('Identifiants copiés ! Collez-les sur Alert Net.','ok',4000);
     }
   },
 
