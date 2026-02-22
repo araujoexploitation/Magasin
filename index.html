@@ -420,6 +420,41 @@ textarea{min-height:80px;resize:none;}
 .dlc-sub-card .sub-sub{font-size:11px;color:var(--muted);}
 .dlc-sub-card.wide{grid-column:1/-1;}
 
+/* ── POINTEUSE ── */
+#view-pointeuse{animation:fadeIn .2s ease;}
+.pointeuse-overlay{position:fixed;inset:0;background:#0f172a;z-index:9100;display:flex;flex-direction:column;overflow:hidden;}
+.pointeuse-bar{background:rgba(255,255,255,.05);padding:12px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid rgba(255,255,255,.1);}
+.pointeuse-bar button{background:rgba(255,255,255,.1);border:none;color:#fff;border-radius:10px;padding:10px 14px;font-weight:900;cursor:pointer;font-size:15px;}
+.pointeuse-body{flex:1;overflow-y:auto;padding:20px 16px;}
+.pointeuse-clock{text-align:center;padding:30px 0 24px;}
+.pointeuse-timer{font-size:56px;font-weight:950;color:#fff;letter-spacing:2px;font-variant-numeric:tabular-nums;text-shadow:0 0 40px rgba(99,102,241,.6);}
+.pointeuse-status-chip{display:inline-flex;align-items:center;gap:8px;padding:8px 20px;border-radius:999px;font-weight:900;font-size:14px;margin-top:12px;}
+.pointeuse-status-chip.off{background:rgba(255,255,255,.1);color:rgba(255,255,255,.6);}
+.pointeuse-status-chip.on{background:rgba(34,197,94,.2);color:#4ade80;border:1.5px solid rgba(74,222,128,.3);}
+.pointeuse-status-chip .dot{width:10px;height:10px;border-radius:50%;background:currentColor;animation:pulseGreen 1.2s ease infinite;}
+@keyframes pulseGreen{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+.pointeuse-btn-wrap{display:flex;justify-content:center;margin:16px 0 28px;}
+.pointeuse-main-btn{width:160px;height:160px;border-radius:50%;border:none;cursor:pointer;font-size:18px;font-weight:950;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;transition:all .2s;box-shadow:0 0 50px rgba(99,102,241,.4);}
+.pointeuse-main-btn.btn-in{background:linear-gradient(135deg,#6366f1,#4f46e5);}
+.pointeuse-main-btn.btn-out{background:linear-gradient(135deg,#ef4444,#dc2626);box-shadow:0 0 50px rgba(239,68,68,.4);}
+.pointeuse-main-btn:active{transform:scale(.94);}
+.pointeuse-main-btn i{font-size:36px;}
+.pointeuse-pause-btn{display:block;margin:0 auto 28px;background:rgba(255,255,255,.1);border:none;color:#fff;border-radius:14px;padding:13px 28px;font-size:15px;font-weight:900;cursor:pointer;transition:background .15s;}
+.pointeuse-pause-btn:active{background:rgba(255,255,255,.2);}
+.pointeuse-section{background:rgba(255,255,255,.05);border-radius:18px;padding:16px;margin-bottom:14px;}
+.pointeuse-section-title{font-size:12px;font-weight:950;color:rgba(255,255,255,.4);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;}
+.punch-log{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.04);margin-bottom:6px;}
+.punch-log:last-child{margin-bottom:0;}
+.punch-log .punch-time{font-size:16px;font-weight:950;color:#fff;}
+.punch-log .punch-label{font-size:12px;font-weight:800;}
+.punch-label.in{color:#4ade80;}
+.punch-label.out{color:#f87171;}
+.punch-label.pause{color:#fbbf24;}
+.punch-log .punch-dur{font-size:12px;color:rgba(255,255,255,.4);font-weight:700;}
+.timesheet-row{display:flex;align-items:center;justify-content:space-between;padding:12px;background:rgba(255,255,255,.04);border-radius:12px;margin-bottom:6px;}
+.timesheet-row .ts-name{font-weight:900;color:#fff;font-size:14px;}
+.timesheet-row .ts-total{font-size:20px;font-weight:950;color:#a5b4fc;}
+
 /* ── DYNACAD ── */
 #dynacad-overlay{position:fixed;inset:0;z-index:9500;background:#000;display:flex;flex-direction:column;}
 #dynacad-bar{background:var(--primary);color:#fff;padding:10px 14px;display:flex;align-items:center;gap:12px;flex-shrink:0;height:50px;}
@@ -843,6 +878,13 @@ textarea{min-height:80px;resize:none;}
 
 
 
+      <!-- POINTEUSE -->
+      <div class="home-btn wide" onclick="app.pointeuse.open()" style="background:linear-gradient(135deg,#0f172a,#1e3a5f);position:relative;">
+        <div id="badge-pointeuse" class="home-badge hidden" style="background:rgba(255,255,255,.92);color:#0f172a;">EN POSTE</div>
+        <i class="fas fa-clock"></i><br>POINTEUSE
+        <div class="small" style="color:rgba(255,255,255,.8);margin-top:6px;">Pointage • Feuille de temps</div>
+      </div>
+
       <!-- GESTION MAGASIN (parent) - inclut aussi Module Carrefour -->
       <div class="home-btn wide" onclick="app.nav('gestion-magasin')" style="background:linear-gradient(135deg,#0f766e,#134e4a);">
         <i class="fas fa-building"></i><br>GESTION MAGASIN
@@ -1259,6 +1301,67 @@ textarea{min-height:80px;resize:none;}
       <div id="user-list"></div>
     </div>
   </div>
+  <!-- ── POINTEUSE ── -->
+  <div id="pointeuse-overlay" class="pointeuse-overlay hidden">
+    <div class="pointeuse-bar">
+      <button onclick="app.pointeuse.close()"><i class="fas fa-arrow-left"></i></button>
+      <div style="flex:1;color:#fff;">
+        <div style="font-weight:950;font-size:16px;"><i class="fas fa-clock" style="color:#6366f1;"></i> Pointeuse</div>
+        <div style="font-size:11px;opacity:.6;" id="ptse-date-label"></div>
+      </div>
+      <button onclick="app.pointeuse.showTab('timesheet')" id="ptse-tab-ts-btn" style="font-size:12px;">📋 Feuille</button>
+      <button onclick="app.pointeuse.showTab('logs')" id="ptse-tab-log-btn" style="font-size:12px;">📋 Aujourd'hui</button>
+    </div>
+
+    <!-- TAB: HORLOGE -->
+    <div id="ptse-tab-clock" class="pointeuse-body">
+      <div class="pointeuse-clock">
+        <div class="pointeuse-timer" id="ptse-timer">00:00:00</div>
+        <div id="ptse-status-chip" class="pointeuse-status-chip off">
+          <span class="dot"></span>
+          <span id="ptse-status-text">Non pointé</span>
+        </div>
+        <div style="font-size:12px;color:rgba(255,255,255,.4);margin-top:8px;" id="ptse-total-label"></div>
+      </div>
+
+      <div class="pointeuse-btn-wrap">
+        <button class="pointeuse-main-btn btn-in" id="ptse-main-btn" onclick="app.pointeuse.toggle()">
+          <i class="fas fa-play" id="ptse-main-icon"></i>
+          <span id="ptse-main-label">POINTER L'ARRIVÉE</span>
+        </button>
+      </div>
+
+      <button class="pointeuse-pause-btn" id="ptse-pause-btn" onclick="app.pointeuse.togglePause()" style="display:none;">
+        <i class="fas fa-mug-hot" id="ptse-pause-icon"></i>
+        <span id="ptse-pause-label">Commencer la pause</span>
+      </button>
+
+      <!-- Récap du jour -->
+      <div class="pointeuse-section" id="ptse-today-section" style="display:none;">
+        <div class="pointeuse-section-title">Récapitulatif du jour</div>
+        <div id="ptse-today-punches"></div>
+      </div>
+    </div>
+
+    <!-- TAB: LOGS AUJOURD'HUI (équipe) -->
+    <div id="ptse-tab-logs" class="pointeuse-body hidden">
+      <div class="pointeuse-section">
+        <div class="pointeuse-section-title">Pointages d'aujourd'hui</div>
+        <div id="ptse-logs-list"></div>
+      </div>
+    </div>
+
+    <!-- TAB: FEUILLE DE TEMPS -->
+    <div id="ptse-tab-timesheet" class="pointeuse-body hidden">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <button onclick="app.pointeuse.prevWeek()" style="background:rgba(255,255,255,.1);border:none;color:#fff;border-radius:10px;padding:8px 14px;font-weight:900;cursor:pointer;font-size:16px;"><i class="fas fa-chevron-left"></i></button>
+        <div style="color:#fff;font-weight:950;font-size:14px;" id="ptse-week-label">Semaine en cours</div>
+        <button onclick="app.pointeuse.nextWeek()" style="background:rgba(255,255,255,.1);border:none;color:#fff;border-radius:10px;padding:8px 14px;font-weight:900;cursor:pointer;font-size:16px;"><i class="fas fa-chevron-right"></i></button>
+      </div>
+      <div id="ptse-timesheet-content"></div>
+    </div>
+  </div>
+
   <!-- CHAT MODULE -->
   <div id="view-chat" class="hidden">
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
@@ -1676,7 +1779,7 @@ window.app={
     if(v==='planning'){this.planning.render();}
     if(v==='chat'){this.chat.render();}
     if(v==='team'){this.team.renderConseilleurs();this.team.renderChannelsConfig();}
-    if(v==='home'){this._maybeShowInstallPrompt();}
+    if(v==='home'){this._maybeShowInstallPrompt();this.pointeuse&&this.pointeuse._renderClock&&this.pointeuse._renderClock();}
   },
   goBack(){if(this.viewHistory.length)this.nav(this.viewHistory.pop(),false);else this.nav('home',false);},
   toggleFam(id){if(this.closed.has(id))this.closed.delete(id);else this.closed.add(id);this.updateUI();},
@@ -3857,6 +3960,357 @@ ${nameLine2?`^CF0,30^FO15,45^FD${nameLine2}^FS`:''}
       el.classList.remove('dragging');
       clone.remove();
       this._drag=null;
+    }
+  },
+
+  // ══════════════════════════════════════════════════
+  // ── POINTEUSE ──
+  // ══════════════════════════════════════════════════
+  pointeuse:{
+    _tab:'clock',
+    _timer:null,
+    _clockTimer:null,
+    _weekOffset:0,
+    _unsub:null,
+    _state:null, // {clockIn, pauseStart, totalPauseMs, active}
+
+    colRef(){return collection(window._db,'pointeuse_logs');},
+
+    _fmtDur(ms){
+      if(!ms||ms<0)return'0h00';
+      const tot=Math.floor(ms/1000);
+      const h=Math.floor(tot/3600);const m=Math.floor((tot%3600)/60);
+      return`${h}h${String(m).padStart(2,'0')}`;
+    },
+    _fmtTime(ts){
+      if(!ts)return'--:--';
+      const d=new Date(ts);
+      return`${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+    },
+    _todayStr(){const d=new Date();return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;},
+    _weekStart(offset=0){
+      const d=new Date();
+      const day=d.getDay();
+      const diff=day===0?-6:1-day;
+      d.setDate(d.getDate()+diff+offset*7);
+      d.setHours(0,0,0,0);
+      return d;
+    },
+
+    open(){
+      document.getElementById('pointeuse-overlay').classList.remove('hidden');
+      document.getElementById('ptse-date-label').textContent=new Date().toLocaleDateString('fr',{weekday:'long',day:'numeric',month:'long'});
+      this.showTab('clock');
+      this._loadState();
+      this._listenLogs();
+    },
+
+    close(){
+      document.getElementById('pointeuse-overlay').classList.add('hidden');
+      if(this._clockTimer)clearInterval(this._clockTimer);
+      if(this._unsub){try{this._unsub();}catch(e){}}
+    },
+
+    showTab(tab){
+      this._tab=tab;
+      document.getElementById('ptse-tab-clock').classList.toggle('hidden',tab!=='clock');
+      document.getElementById('ptse-tab-logs').classList.toggle('hidden',tab!=='logs');
+      document.getElementById('ptse-tab-timesheet').classList.toggle('hidden',tab!=='timesheet');
+      if(tab==='timesheet')this._renderTimesheet();
+      if(tab==='logs')this._renderLogs();
+    },
+
+    async _loadState(){
+      const me=window.app.me;
+      if(!me)return;
+      if(this._clockTimer)clearInterval(this._clockTimer);
+      try{
+        const today=this._todayStr();
+        const{query,where,orderBy,getDocs}=window._fbChat;
+        const q=query(this.colRef(),where('userId','==',me.uid),where('date','==',today),orderBy('ts','asc'));
+        const snap=await getDocs(q);
+        const logs=[];snap.forEach(d=>logs.push({_id:d.id,...d.data()}));
+        this._processState(logs);
+      }catch(e){this._processState([]);}
+    },
+
+    _processState(logs){
+      const ins=logs.filter(l=>l.type==='in').sort((a,b)=>a.ts-b.ts);
+      const outs=logs.filter(l=>l.type==='out').sort((a,b)=>a.ts-b.ts);
+      const pauseStarts=logs.filter(l=>l.type==='pause_start').sort((a,b)=>a.ts-b.ts);
+      const pauseEnds=logs.filter(l=>l.type==='pause_end').sort((a,b)=>a.ts-b.ts);
+
+      const lastIn=ins.length?ins[ins.length-1]:null;
+      const lastOut=outs.length?outs[outs.length-1]:null;
+      const lastPauseStart=pauseStarts.length?pauseStarts[pauseStarts.length-1]:null;
+      const lastPauseEnd=pauseEnds.length?pauseEnds[pauseEnds.length-1]:null;
+
+      // Active if last 'in' is after last 'out' (or no out)
+      const isActive=lastIn&&(!lastOut||lastIn.ts>lastOut.ts);
+      const isPaused=isActive&&lastPauseStart&&(!lastPauseEnd||lastPauseStart.ts>lastPauseEnd.ts);
+
+      // Compute total pause ms
+      let totalPauseMs=0;
+      for(let i=0;i<pauseStarts.length;i++){
+        const ps=pauseStarts[i].ts;
+        const pe=pauseEnds[i]?pauseEnds[i].ts:null;
+        if(pe)totalPauseMs+=(pe-ps);
+      }
+      if(isPaused&&lastPauseStart)totalPauseMs+=(Date.now()-lastPauseStart.ts);
+
+      // Compute total worked ms today
+      let totalWorkedMs=0;
+      for(let i=0;i<ins.length;i++){
+        const inTs=ins[i].ts;
+        const outTs=outs[i]?outs[i].ts:isActive&&i===ins.length-1?Date.now():null;
+        if(outTs)totalWorkedMs+=(outTs-inTs);
+      }
+      // Subtract pauses already computed
+      const pausedMs=logs.filter(l=>l.type==='pause_end').reduce((acc,pe,idx)=>{
+        const ps=pauseStarts[idx];return ps?acc+(pe.ts-ps.ts):acc;
+      },0);
+
+      this._state={isActive,isPaused,clockIn:lastIn?lastIn.ts:null,pauseStart:lastPauseStart&&isPaused?lastPauseStart.ts:null,totalPauseMs,logs};
+      this._renderClock();
+      this._startClockTimer();
+      this._renderTodayPunches(logs);
+    },
+
+    _startClockTimer(){
+      if(this._clockTimer)clearInterval(this._clockTimer);
+      this._clockTimer=setInterval(()=>this._tickClock(),1000);
+      this._tickClock();
+    },
+
+    _tickClock(){
+      const s=this._state;
+      if(!s){document.getElementById('ptse-timer').textContent='00:00:00';return;}
+      let elapsed=0;
+      if(s.isActive&&s.clockIn){
+        elapsed=Date.now()-s.clockIn-s.totalPauseMs;
+        if(s.isPaused&&s.pauseStart){elapsed-=(Date.now()-s.pauseStart);}
+      }
+      if(elapsed<0)elapsed=0;
+      const tot=Math.floor(elapsed/1000);
+      const h=Math.floor(tot/3600);const m=Math.floor((tot%3600)/60);const sec=tot%60;
+      document.getElementById('ptse-timer').textContent=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+      // Update total label
+      const lbl=document.getElementById('ptse-total-label');
+      if(lbl&&elapsed>0)lbl.textContent=`Temps travaillé : ${this._fmtDur(elapsed)}`;
+    },
+
+    _renderClock(){
+      const s=this._state||{};
+      const chip=document.getElementById('ptse-status-chip');
+      const statusTxt=document.getElementById('ptse-status-text');
+      const btn=document.getElementById('ptse-main-btn');
+      const icon=document.getElementById('ptse-main-icon');
+      const lbl=document.getElementById('ptse-main-label');
+      const pauseBtn=document.getElementById('ptse-pause-btn');
+      const pauseIcon=document.getElementById('ptse-pause-icon');
+      const pauseLbl=document.getElementById('ptse-pause-label');
+
+      if(s.isActive){
+        chip.className='pointeuse-status-chip on';
+        if(s.isPaused){
+          statusTxt.textContent='En pause';
+          chip.className='pointeuse-status-chip'+('; background:rgba(251,191,36,.2);color:#fbbf24;border:1.5px solid rgba(251,191,36,.3);');
+          chip.style.cssText='background:rgba(251,191,36,.15);color:#fbbf24;border:1.5px solid rgba(251,191,36,.3);';
+        }else{
+          statusTxt.textContent='En service depuis '+this._fmtTime(s.clockIn);
+          chip.style.cssText='';
+        }
+        btn.className='pointeuse-main-btn btn-out';
+        icon.className='fas fa-stop';
+        lbl.textContent='POINTER LA SORTIE';
+        pauseBtn.style.display='block';
+        if(s.isPaused){pauseIcon.className='fas fa-play';pauseLbl.textContent='Fin de pause';}
+        else{pauseIcon.className='fas fa-mug-hot';pauseLbl.textContent='Commencer la pause';}
+      }else{
+        chip.className='pointeuse-status-chip off';
+        chip.style.cssText='';
+        statusTxt.textContent='Non pointé';
+        btn.className='pointeuse-main-btn btn-in';
+        icon.className='fas fa-play';
+        lbl.textContent="POINTER L'ARRIVÉE";
+        pauseBtn.style.display='none';
+      }
+
+      // Home badge
+      const hb=document.getElementById('badge-pointeuse');
+      if(hb){
+        if(s.isActive&&!s.isPaused){hb.textContent='EN POSTE';hb.classList.remove('hidden');}
+        else{hb.classList.add('hidden');}
+      }
+    },
+
+    _renderTodayPunches(logs){
+      const sec=document.getElementById('ptse-today-section');
+      const wrap=document.getElementById('ptse-today-punches');
+      if(!wrap)return;
+      if(!logs||!logs.length){sec.style.display='none';return;}
+      sec.style.display='block';
+      const sorted=[...logs].sort((a,b)=>a.ts-b.ts);
+      const labels={in:'Arrivée',out:'Départ',pause_start:'Début pause',pause_end:'Fin pause'};
+      wrap.innerHTML=sorted.map(l=>`
+        <div class="punch-log">
+          <div>
+            <div class="punch-time">${this._fmtTime(l.ts)}</div>
+            <div class="punch-label ${l.type==='in'?'in':l.type==='out'?'out':'pause'}">${labels[l.type]||l.type}</div>
+          </div>
+          <div class="punch-dur">${new Date(l.ts).toLocaleDateString('fr')}</div>
+        </div>`).join('');
+    },
+
+    _listenLogs(){
+      if(this._unsub){try{this._unsub();}catch(e){}}
+      const me=window.app.me;
+      if(!me)return;
+      try{
+        const today=this._todayStr();
+        const{query,where,orderBy,onSnapshot}=window._fbChat;
+        const q=query(this.colRef(),where('userId','==',me.uid),where('date','==',today),orderBy('ts','asc'));
+        this._unsub=onSnapshot(q,snap=>{
+          const logs=[];snap.forEach(d=>logs.push({_id:d.id,...d.data()}));
+          this._processState(logs);
+        },()=>{});
+      }catch(e){}
+    },
+
+    async _punch(type){
+      const me=window.app.me;
+      if(!me)return toast('Connexion requise','err');
+      const now=Date.now();
+      const{addDoc,serverTimestamp}=window._fbChat;
+      try{
+        await addDoc(this.colRef(),{
+          type,userId:me.uid,userName:me.name||me.email||'USER',
+          ts:now,date:this._todayStr(),serverTs:serverTimestamp()
+        });
+      }catch(e){toast('Erreur de pointage','err');}
+    },
+
+    async toggle(){
+      const s=this._state||{};
+      if(s.isActive){
+        const ok=await dlgConfirm('Pointer la sortie ?','Confirmer la fin de service.',false);
+        if(!ok)return;
+        await this._punch('out');
+        toast('Bonne journée ! Sortie enregistrée.','ok');
+      }else{
+        await this._punch('in');
+        toast('Bienvenue ! Arrivée enregistrée.','ok');
+      }
+    },
+
+    async togglePause(){
+      const s=this._state||{};
+      if(s.isPaused){
+        await this._punch('pause_end');
+        toast('Fin de pause.','ok');
+      }else{
+        await this._punch('pause_start');
+        toast('Pause enregistrée.','info');
+      }
+    },
+
+    async _renderLogs(){
+      const wrap=document.getElementById('ptse-logs-list');
+      if(!wrap)return;
+      wrap.innerHTML='<div style="color:rgba(255,255,255,.4);text-align:center;padding:20px;"><i class="fas fa-spinner fa-spin"></i></div>';
+      try{
+        const today=this._todayStr();
+        const{query,where,orderBy,getDocs}=window._fbChat;
+        const q=query(this.colRef(),where('date','==',today),orderBy('ts','asc'));
+        const snap=await getDocs(q);
+        const logs=[];snap.forEach(d=>logs.push({_id:d.id,...d.data()}));
+        if(!logs.length){wrap.innerHTML='<div style="color:rgba(255,255,255,.3);text-align:center;padding:20px;">Aucun pointage aujourd\'hui</div>';return;}
+        const byUser={};
+        logs.forEach(l=>{
+          if(!byUser[l.userId])byUser[l.userId]={name:l.userName,logs:[]};
+          byUser[l.userId].logs.push(l);
+        });
+        const labels={in:'Arrivée',out:'Départ',pause_start:'Début pause',pause_end:'Fin pause'};
+        wrap.innerHTML=Object.values(byUser).map(u=>`
+          <div style="margin-bottom:16px;">
+            <div style="font-weight:950;color:rgba(255,255,255,.7);font-size:12px;text-transform:uppercase;margin-bottom:6px;">${u.name}</div>
+            ${u.logs.sort((a,b)=>a.ts-b.ts).map(l=>`
+              <div class="punch-log">
+                <div><div class="punch-time">${this._fmtTime(l.ts)}</div>
+                <div class="punch-label ${l.type==='in'?'in':l.type==='out'?'out':'pause'}">${labels[l.type]||l.type}</div></div>
+              </div>`).join('')}
+          </div>`).join('');
+      }catch(e){wrap.innerHTML='<div style="color:#f87171;text-align:center;padding:20px;">Erreur de chargement</div>';}
+    },
+
+    prevWeek(){this._weekOffset--;this._renderTimesheet();},
+    nextWeek(){this._weekOffset++;this._renderTimesheet();},
+
+    async _renderTimesheet(){
+      const wrap=document.getElementById('ptse-timesheet-content');
+      const wlbl=document.getElementById('ptse-week-label');
+      if(!wrap)return;
+      const ws=this._weekStart(this._weekOffset);
+      const we=new Date(ws);we.setDate(we.getDate()+6);we.setHours(23,59,59,999);
+      const fmtDay=d=>d.toLocaleDateString('fr',{day:'numeric',month:'short'});
+      if(wlbl)wlbl.textContent=`${fmtDay(ws)} – ${fmtDay(we)}`;
+      wrap.innerHTML='<div style="color:rgba(255,255,255,.4);text-align:center;padding:20px;"><i class="fas fa-spinner fa-spin"></i></div>';
+      try{
+        const{query,where,orderBy,getDocs}=window._fbChat;
+        const q=query(this.colRef(),where('ts','>=',ws.getTime()),where('ts','<=',we.getTime()),orderBy('ts','asc'));
+        const snap=await getDocs(q);
+        const logs=[];snap.forEach(d=>logs.push({_id:d.id,...d.data()}));
+        if(!logs.length){wrap.innerHTML='<div style="color:rgba(255,255,255,.3);text-align:center;padding:20px;">Aucune donnée pour cette semaine</div>';return;}
+
+        // Group by user then by date
+        const byUser={};
+        logs.forEach(l=>{
+          if(!byUser[l.userId])byUser[l.userId]={name:l.userName,byDate:{}};
+          const d=l.date||(new Date(l.ts).toISOString().slice(0,10));
+          if(!byUser[l.userId].byDate[d])byUser[l.userId].byDate[d]=[];
+          byUser[l.userId].byDate[d].push(l);
+        });
+
+        const computeWorked=(dayLogs)=>{
+          const ins=dayLogs.filter(l=>l.type==='in').sort((a,b)=>a.ts-b.ts);
+          const outs=dayLogs.filter(l=>l.type==='out').sort((a,b)=>a.ts-b.ts);
+          let ms=0;
+          ins.forEach((inL,i)=>{const outL=outs[i];if(outL)ms+=(outL.ts-inL.ts);});
+          // Subtract pauses
+          const ps=dayLogs.filter(l=>l.type==='pause_start').sort((a,b)=>a.ts-b.ts);
+          const pe=dayLogs.filter(l=>l.type==='pause_end').sort((a,b)=>a.ts-b.ts);
+          ps.forEach((p,i)=>{if(pe[i])ms-=(pe[i].ts-p.ts);});
+          return Math.max(0,ms);
+        };
+
+        wrap.innerHTML=Object.values(byUser).map(u=>{
+          let totalMs=0;
+          const days=[];
+          for(let i=0;i<7;i++){
+            const d=new Date(ws);d.setDate(ws.getDate()+i);
+            const dstr=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+            const dayLogs=u.byDate[dstr]||[];
+            const ms=computeWorked(dayLogs);totalMs+=ms;
+            const ins=dayLogs.filter(l=>l.type==='in').sort((a,b)=>a.ts-b.ts);
+            const outs=dayLogs.filter(l=>l.type==='out').sort((a,b)=>a.ts-b.ts);
+            const inStr=ins.length?this._fmtTime(ins[0].ts):'—';
+            const outStr=outs.length?this._fmtTime(outs[outs.length-1].ts):'—';
+            const dayNames=['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+            days.push(`<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:rgba(255,255,255,.03);border-radius:10px;margin-bottom:4px;">
+              <div style="color:rgba(255,255,255,.5);font-size:12px;width:32px;font-weight:900;">${dayNames[i]}</div>
+              <div style="color:#fff;font-size:13px;font-weight:800;">${ins.length?inStr+' → '+outStr:'Repos'}</div>
+              <div style="color:#a5b4fc;font-weight:900;font-size:13px;">${ms?this._fmtDur(ms):''}</div>
+            </div>`);
+          }
+          return`<div class="pointeuse-section">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+              <div style="font-weight:950;color:#fff;font-size:15px;">${u.name}</div>
+              <div style="font-size:20px;font-weight:950;color:#a5b4fc;">${this._fmtDur(totalMs)}</div>
+            </div>
+            ${days.join('')}
+          </div>`;
+        }).join('');
+      }catch(e){wrap.innerHTML='<div style="color:#f87171;text-align:center;padding:20px;">Erreur de chargement</div>';}
     }
   },
 
