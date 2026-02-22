@@ -541,6 +541,8 @@ textarea{min-height:80px;resize:none;}
 .plan-cell:active{transform:scale(.97);}
 .plan-cell.rest{background:#f8fafc;border:1.5px dashed #e2e8f0;}
 .plan-cell.rest.today{background:#eff6ff;border-color:#bfdbfe;}
+.plan-cell.leave{background:#fdf2f8;border:1.5px solid #f9a8d4;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;}
+.plan-cell.leave.today{background:#fce7f3;}
 .plan-rest-label{color:#cbd5e1;font-size:18px;font-weight:900;}
 .plan-cell.work{border:1.5px solid transparent;border-color:color-mix(in srgb, var(--shift-color) 30%, transparent);}
 /* ── DRAG & DROP PLANNING ── */
@@ -1236,62 +1238,68 @@ textarea{min-height:80px;resize:none;}
     </div>
   </div>
 
-  <!-- PLANNING MODULE — Style ComboHR -->
+  <!-- PLANNING MODULE — Tabs: Planning | Résumé | Politique RH -->
   <div id="view-planning" class="hidden">
-    <!-- Navigation semaine -->
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;background:#fff;border-radius:14px;padding:12px 14px;box-shadow:0 2px 8px rgba(0,0,0,.05);">
-      <div style="display:flex;align-items:center;gap:10px;">
-        <button class="qty-btn" onclick="app.planning.prevWeek()"><i class="fas fa-chevron-left"></i></button>
-        <div style="font-weight:950;font-size:15px;color:#0891b2;"><span id="plan-week-label"></span></div>
-        <button class="qty-btn" onclick="app.planning.nextWeek()"><i class="fas fa-chevron-right"></i></button>
+
+    <!-- ── ONGLETS ── -->
+    <div style="display:flex;gap:6px;margin-bottom:12px;background:#fff;border-radius:14px;padding:6px;box-shadow:0 2px 8px rgba(0,0,0,.05);">
+      <div id="plan-tab-grid"  class="tab active" onclick="app.planning.switchTab('grid')" ><i class="fas fa-calendar-days"></i> Planning</div>
+      <div id="plan-tab-recap" class="tab"        onclick="app.planning.switchTab('recap')"><i class="fas fa-chart-bar"></i> Résumé</div>
+      <div id="plan-tab-rh"    class="tab"        onclick="app.planning.switchTab('rh')"  ><i class="fas fa-scale-balanced"></i> Politique RH</div>
+    </div>
+
+    <!-- ══ TAB: GRILLE PLANNING ══ -->
+    <div id="plan-panel-grid">
+      <!-- Nav semaine -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;background:#fff;border-radius:14px;padding:12px 14px;box-shadow:0 2px 8px rgba(0,0,0,.05);">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <button class="qty-btn" onclick="app.planning.prevWeek()"><i class="fas fa-chevron-left"></i></button>
+          <div style="font-weight:950;font-size:14px;color:#0891b2;"><span id="plan-week-label"></span></div>
+          <button class="qty-btn" onclick="app.planning.nextWeek()"><i class="fas fa-chevron-right"></i></button>
+        </div>
+        <div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end;">
+          <button class="qty-btn" title="Copier semaine" onclick="app.planning.copyWeek()"><i class="fas fa-copy"></i></button>
+          <button class="qty-btn" title="Imprimer" onclick="app.planning.printWeek()"><i class="fas fa-print"></i></button>
+          <button class="qty-btn" title="Export CSV" onclick="app.planning.exportCSV()"><i class="fas fa-file-csv"></i></button>
+          <button class="qty-btn" title="Importer utilisateurs appli" style="background:#059669;color:#fff;" onclick="app.planning.importFromUsers()"><i class="fas fa-users-gear"></i></button>
+          <button class="qty-btn" style="background:#0891b2;color:#fff;" onclick="app.planning.addEmployee()"><i class="fas fa-user-plus"></i></button>
+        </div>
       </div>
-      <div style="display:flex;gap:6px;">
-        <button class="qty-btn" title="Copier semaine →" onclick="app.planning.copyWeek()"><i class="fas fa-copy"></i></button>
-        <button class="qty-btn" title="Imprimer le planning" onclick="app.planning.printWeek()"><i class="fas fa-print"></i></button>
-        <button class="qty-btn" title="Export CSV" onclick="app.planning.exportCSV()"><i class="fas fa-file-csv"></i></button>
-        <button class="qty-btn" title="Modèles RH" style="background:#7c3aed;color:#fff;" onclick="app.planning.openHrModels()"><i class="fas fa-briefcase"></i></button>
-        <button class="qty-btn" title="Importer utilisateurs" style="background:#059669;color:#fff;" onclick="app.planning.importFromUsers()"><i class="fas fa-users-gear"></i></button>
-        <button class="qty-btn" style="background:#0891b2;color:#fff;" onclick="app.planning.addEmployee()"><i class="fas fa-user-plus"></i></button>
+      <!-- Légende -->
+      <div class="post-legend" id="plan-legend">
+        <span class="post-chip" style="background:#dbeafe;color:#1d4ed8;">🏪 CAISSE</span>
+        <span class="post-chip" style="background:#d1fae5;color:#065f46;">📦 RAYON</span>
+        <span class="post-chip" style="background:#fef3c7;color:#92400e;">🚚 RÉCEPTION</span>
+        <span class="post-chip" style="background:#ede9fe;color:#5b21b6;">👔 MANAGE</span>
+        <span class="post-chip" style="background:#fee2e2;color:#991b1b;">🔒 FERMETURE</span>
+        <span class="post-chip" style="background:#e0f2fe;color:#0369a1;">🔑 OUVERTURE</span>
+        <span class="post-chip" style="background:#fce7f3;color:#9d174d;">🌴 CONGÉS</span>
+      </div>
+      <!-- Grille -->
+      <div style="background:#fff;border-radius:16px;padding:10px;box-shadow:0 2px 10px rgba(0,0,0,.05);overflow-x:auto;">
+        <div id="plan-employees"></div>
+      </div>
+      <!-- Footer total semaine -->
+      <div class="card" id="plan-summary" style="display:none;margin-top:10px;padding:12px;">
+        <div id="plan-summary-content"></div>
       </div>
     </div>
 
-    <!-- Légende des postes -->
-    <div class="post-legend" id="plan-legend">
-      <span class="post-chip" style="background:#dbeafe;color:#1d4ed8;">🏪 CAISSE</span>
-      <span class="post-chip" style="background:#d1fae5;color:#065f46;">📦 RAYON</span>
-      <span class="post-chip" style="background:#fef3c7;color:#92400e;">🚚 RÉCEPTION</span>
-      <span class="post-chip" style="background:#ede9fe;color:#5b21b6;">👔 MANAGE</span>
-      <span class="post-chip" style="background:#fee2e2;color:#991b1b;">🔒 FERMETURE</span>
-      <span class="post-chip" style="background:#e0f2fe;color:#0369a1;">🔑 OUVERTURE</span>
-    </div>
-
-    <!-- Grille planning -->
-    <div style="background:#fff;border-radius:16px;padding:12px;box-shadow:0 2px 10px rgba(0,0,0,.05);overflow-x:auto;">
-      <div id="plan-employees"></div>
-    </div>
-
-    <!-- Récapitulatif -->
-    <div class="card" id="plan-summary" style="display:none;margin-top:12px;">
-      <div style="font-weight:950;color:#0891b2;margin-bottom:8px;"><i class="fas fa-chart-bar"></i> Récapitulatif de la semaine</div>
-      <div id="plan-summary-content"></div>
-    </div>
-
-    <!-- Règles RH -->
-    <details style="margin-top:12px;">
-      <summary style="background:#f0f9ff;border-radius:12px;padding:12px 14px;font-weight:900;color:#0891b2;cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;">
-        <i class="fas fa-scale-balanced"></i> Règles Droit du Travail France
-        <i class="fas fa-chevron-down" style="margin-left:auto;font-size:12px;"></i>
-      </summary>
-      <div style="background:#f8fafc;border-radius:12px;padding:14px;margin-top:4px;font-size:13px;line-height:1.8;color:#334155;">
-        <b>⏱ Max quotidien :</b> 10h/jour<br>
-        <b>📅 Max hebdo :</b> 48h/semaine<br>
-        <b>😴 Repos quotidien :</b> 11h consécutives<br>
-        <b>📆 Repos hebdo :</b> 35h consécutives<br>
-        <b>🔴 Repos :</b> 2 jours minimum/semaine<br>
-        <b>🌙 Nuit (21h–6h) :</b> majoration 25%<br>
-        <b>🏖 CP :</b> 2.5 jours/mois
+    <!-- ══ TAB: RÉSUMÉ ══ -->
+    <div id="plan-panel-recap" class="hidden">
+      <div style="display:flex;gap:6px;margin-bottom:12px;">
+        <button id="recap-btn-day"   onclick="app.planning.renderRecap('day')"   style="flex:1;padding:10px;border-radius:10px;border:2px solid #e2e8f0;font-weight:900;font-size:12px;background:#0891b2;color:#fff;cursor:pointer;">Jour</button>
+        <button id="recap-btn-week"  onclick="app.planning.renderRecap('week')"  style="flex:1;padding:10px;border-radius:10px;border:2px solid #e2e8f0;font-weight:900;font-size:12px;background:#fff;color:#334155;cursor:pointer;">Semaine</button>
+        <button id="recap-btn-month" onclick="app.planning.renderRecap('month')" style="flex:1;padding:10px;border-radius:10px;border:2px solid #e2e8f0;font-weight:900;font-size:12px;background:#fff;color:#334155;cursor:pointer;">Mois</button>
       </div>
-    </details>
+      <div id="plan-recap-content"></div>
+    </div>
+
+    <!-- ══ TAB: POLITIQUE RH ══ -->
+    <div id="plan-panel-rh" class="hidden">
+      <div id="plan-rh-content"></div>
+    </div>
+
   </div>
   </div>
 
@@ -1414,40 +1422,89 @@ textarea{min-height:80px;resize:none;}
 
 <!-- ── SHIFT EDITOR MODAL ── -->
 <div id="modal-shift-editor" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:80000;display:flex;align-items:flex-end;justify-content:center;padding:16px;">
-  <div class="dlg-card" style="max-width:420px;max-height:90vh;overflow-y:auto;">
-    <div style="font-weight:950;font-size:16px;margin-bottom:14px;color:#0891b2;" id="shift-modal-emp"></div>
-    <div class="shift-type-toggle">
-      <label for="shift-modal-rest">Jour de repos</label>
-      <input type="checkbox" id="shift-modal-rest" style="width:22px;height:22px;cursor:pointer;accent-color:#0891b2;" onchange="document.getElementById('shift-modal-fields').style.display=this.checked?'none':'block'">
+  <div class="dlg-card" style="max-width:420px;max-height:92vh;overflow-y:auto;">
+    <div style="font-weight:950;font-size:15px;margin-bottom:14px;color:#0891b2;" id="shift-modal-emp"></div>
+    <!-- Repos -->
+    <div style="display:flex;align-items:center;gap:10px;background:#f8fafc;border-radius:10px;padding:12px;margin-bottom:10px;">
+      <label for="shift-modal-rest" style="font-weight:800;font-size:14px;flex:1;">🌙 Jour de repos</label>
+      <input type="checkbox" id="shift-modal-rest" style="width:22px;height:22px;cursor:pointer;accent-color:#0891b2;" onchange="app.planning.onRestToggle(this.checked)">
     </div>
+    <!-- Congé -->
+    <div style="display:flex;align-items:center;gap:10px;background:#fdf2f8;border-radius:10px;padding:12px;margin-bottom:10px;">
+      <label for="shift-modal-leave" style="font-weight:800;font-size:14px;flex:1;">🌴 Congé / Absence</label>
+      <input type="checkbox" id="shift-modal-leave" style="width:22px;height:22px;cursor:pointer;accent-color:#db2777;" onchange="app.planning.onLeaveToggle(this.checked)">
+    </div>
+    <div id="shift-leave-type" class="hidden" style="margin-bottom:12px;">
+      <select id="shift-modal-leave-type" style="margin:0;padding:10px;font-size:14px;">
+        <option value="CP">🌴 Congés payés</option>
+        <option value="RTT">📅 RTT</option>
+        <option value="MALADIE">🏥 Arrêt maladie</option>
+        <option value="SANS_SOLDE">💸 Sans solde</option>
+        <option value="FORMATION">📚 Formation</option>
+      </select>
+    </div>
+    <!-- Champs shift -->
     <div id="shift-modal-fields">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
-        <div><label style="font-size:12px;font-weight:800;color:#64748b;display:block;margin-bottom:4px;">Début</label><input type="time" id="shift-modal-start" style="margin:0;padding:12px;font-size:16px;"></div>
-        <div><label style="font-size:12px;font-weight:800;color:#64748b;display:block;margin-bottom:4px;">Fin</label><input type="time" id="shift-modal-end" style="margin:0;padding:12px;font-size:16px;"></div>
+        <div><label style="font-size:12px;font-weight:800;color:#64748b;display:block;margin-bottom:4px;">Début</label><input type="time" id="shift-modal-start" style="margin:0;padding:12px;font-size:16px;" oninput="app.planning.updateBreakHint()"></div>
+        <div><label style="font-size:12px;font-weight:800;color:#64748b;display:block;margin-bottom:4px;">Fin</label><input type="time" id="shift-modal-end" style="margin:0;padding:12px;font-size:16px;" oninput="app.planning.updateBreakHint()"></div>
       </div>
-      <!-- Pause personnalisée -->
-      <div style="margin-bottom:12px;">
-        <label style="font-size:12px;font-weight:800;color:#64748b;display:block;margin-bottom:4px;"><i class="fas fa-mug-hot" style="color:#f59e0b;"></i> Pause (min)</label>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <input type="number" id="shift-modal-break" min="0" max="120" step="5" placeholder="Auto" style="margin:0;padding:10px;font-size:15px;flex:1;">
-          <div style="font-size:11px;color:#94a3b8;" id="shift-break-hint">Légale: auto</div>
+      <!-- Pause -->
+      <div style="background:#fffbeb;border-radius:10px;padding:12px;margin-bottom:12px;">
+        <label style="font-size:12px;font-weight:800;color:#92400e;display:block;margin-bottom:6px;">☕ Temps de pause</label>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <input type="number" id="shift-modal-break" min="0" max="120" step="5" placeholder="0" style="margin:0;padding:10px;font-size:16px;width:90px;">
+          <span style="font-size:14px;font-weight:800;color:#64748b;">minutes</span>
         </div>
+        <div style="font-size:11px;color:#d97706;margin-top:6px;font-weight:700;" id="shift-break-hint"></div>
       </div>
+      <!-- Poste -->
       <label style="font-size:12px;font-weight:800;color:#64748b;display:block;margin-bottom:6px;">Poste</label>
-      <div class="plan-post-grid" id="shift-post-grid">
-        <!-- Built by JS but also available via select -->
-      </div>
+      <div class="plan-post-grid" id="shift-post-grid"></div>
       <select id="shift-modal-post" style="display:none;">
         <option>CAISSE</option><option>RAYON</option><option>RÉCEPTION</option>
         <option>MANAGE</option><option>MÉNAGE</option><option>FERMETURE</option>
         <option>OUVERTURE</option><option>AUTRE</option>
       </select>
     </div>
-    <div class="dlg-btns" style="flex-wrap:wrap;gap:6px;">
-      <button class="btn" style="background:#0891b2;margin:0;" onclick="app.planning.saveShift()"><i class="fas fa-check"></i> Enregistrer</button>
-      <button class="btn" style="background:#059669;margin:0;" onclick="app.planning.duplicateShift()"><i class="fas fa-clone"></i> Dupliquer</button>
-      <button class="btn secondary" style="margin:0;" onclick="app.planning.closeShiftModal()">Annuler</button>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px;">
+      <button class="btn" style="background:#0891b2;margin:0;font-size:13px;" onclick="app.planning.saveShift()"><i class="fas fa-check"></i> Enregistrer</button>
+      <button class="btn" style="background:#059669;margin:0;font-size:13px;" onclick="app.planning.duplicateShift()"><i class="fas fa-clone"></i> Dupliquer</button>
+      <button class="btn" style="background:#ef4444;margin:0;font-size:13px;" onclick="app.planning.deleteShift()"><i class="fas fa-trash"></i> Supprimer</button>
+      <button class="btn secondary" style="margin:0;font-size:13px;" onclick="app.planning.closeShiftModal()">Annuler</button>
     </div>
+  </div>
+</div>
+
+<!-- ── EMPLOYEE SETTINGS MODAL ── -->
+<div id="modal-emp-settings" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:80000;display:flex;align-items:flex-end;justify-content:center;padding:16px;">
+  <div class="dlg-card" style="max-width:420px;max-height:92vh;overflow-y:auto;">
+    <div style="font-weight:950;font-size:16px;margin-bottom:16px;color:#7c3aed;"><i class="fas fa-user-gear"></i> Paramètres employé</div>
+    <label style="font-size:12px;font-weight:800;color:#64748b;display:block;margin-bottom:4px;">Nom complet</label>
+    <input id="emp-set-name" style="margin-bottom:10px;" placeholder="Prénom NOM">
+    <label style="font-size:12px;font-weight:800;color:#64748b;display:block;margin-bottom:4px;">Contrat</label>
+    <input id="emp-set-contract" style="margin-bottom:10px;" placeholder="ex: CDI 35h, Apprenti…">
+    <label style="font-size:12px;font-weight:800;color:#64748b;display:block;margin-bottom:4px;">Taux horaire brut (€/h)</label>
+    <input id="emp-set-rate" type="number" min="0" step="0.01" style="margin-bottom:10px;" placeholder="ex: 11.88">
+    <label style="font-size:12px;font-weight:800;color:#64748b;display:block;margin-bottom:4px;">Plage horaire autorisée</label>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+      <div><label style="font-size:11px;color:#94a3b8;">Pas avant</label><input type="time" id="emp-set-from" style="margin:0;padding:10px;" value="06:00"></div>
+      <div><label style="font-size:11px;color:#94a3b8;">Pas après</label><input type="time" id="emp-set-to" style="margin:0;padding:10px;" value="22:00"></div>
+    </div>
+    <label style="font-size:12px;font-weight:800;color:#64748b;display:block;margin-bottom:4px;">Profil RH</label>
+    <select id="emp-set-profile" style="margin-bottom:14px;">
+      <option value="">— Aucun profil —</option>
+    </select>
+    <div style="background:#fdf2f8;border-radius:12px;padding:12px;margin-bottom:14px;">
+      <div style="font-size:12px;font-weight:800;color:#9d174d;margin-bottom:8px;">🌴 Congés / Vacances (dates bloquantes)</div>
+      <div id="emp-vacances-list" style="margin-bottom:8px;"></div>
+      <button onclick="app.planning.addVacance()" style="background:#db2777;color:#fff;border:none;border-radius:10px;padding:8px 14px;font-weight:900;font-size:12px;cursor:pointer;"><i class="fas fa-plus"></i> Ajouter période</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+      <button class="btn" style="background:#7c3aed;margin:0;" onclick="app.planning.saveEmpSettings()"><i class="fas fa-check"></i> Enregistrer</button>
+      <button class="btn secondary" style="margin:0;" onclick="document.getElementById('modal-emp-settings').classList.add('hidden')">Annuler</button>
+    </div>
+    <button onclick="app.planning.deleteEmployee()" style="width:100%;background:#fee2e2;color:#dc2626;border:none;border-radius:10px;padding:10px;font-weight:900;font-size:13px;cursor:pointer;margin-top:10px;"><i class="fas fa-trash"></i> Supprimer cet employé</button>
   </div>
 </div>
 
@@ -1641,6 +1698,22 @@ window.app={
 
   _todoUnsubscribe:null,
 
+  // ── PVP BESOINS: auto-reset à minuit ──
+  _startPvpMidnightReset(){
+    if(this._pvpResetTimer)clearTimeout(this._pvpResetTimer);
+    const now=new Date();
+    const msToMidnight=(new Date(now.getFullYear(),now.getMonth(),now.getDate()+1,0,0,5)-now);
+    this._pvpResetTimer=setTimeout(async ()=>{
+      if(this.data.checkedNeeds?.length){
+        this.data.checkedNeeds=[];
+        try{await this.save('pvp');}catch(e){}
+        const el=document.getElementById('pvp-calc');if(el&&!el.classList.contains('hidden'))this.pvp.render?.();
+        toast('✅ Besoins PVP réinitialisés (minuit)','info',4000);
+      }
+      this._startPvpMidnightReset();
+    },msToMidnight);
+  },
+
   _startTodoSync(){
     if(this._todoUnsubscribe){try{this._todoUnsubscribe();}catch(e){}}
     const today=todayStr();
@@ -1726,6 +1799,7 @@ window.app={
 
       // Start real-time sync for today's todo logs
       this._startTodoSync();
+      this._startPvpMidnightReset();
 
       document.getElementById('login-overlay').classList.add('hidden');
       document.getElementById('app-header').classList.remove('hidden');
@@ -1816,7 +1890,7 @@ window.app={
     if(v==='reception'){this.reception.init();this.reception.tab('new');}
     if(v==='inspection'){this.inspection.render();}
     if(v==='etiquettes'){this.etiquettes.loadProducts();}
-    if(v==='planning'){this.planning.render();}
+    if(v==='planning'){this.planning.switchTab(this.planning._currentTab||'grid');}
     if(v==='chat'){this.chat.render();}
     if(v==='team'){this.team.renderConseilleurs();this.team.renderChannelsConfig();}
     if(v==='home'){this._maybeShowInstallPrompt();this.pointeuse&&this.pointeuse._renderClock&&this.pointeuse._renderClock();}
@@ -3573,179 +3647,206 @@ ${nameLine2?`^CF0,30^FO15,45^FD${nameLine2}^FS`:''}
   },
 
   // ══════════════════════════════════════════════════
-  // ── PLANNING RH MODULE — Style ComboHR ──
+  // ── PLANNING RH MODULE — V10 ──
   // ══════════════════════════════════════════════════
   planning:{
     _weekOffset:0,
     _employees:[],
+    _currentTab:'grid',
     _postColors:{
       CAISSE:'#3b82f6',RAYON:'#10b981',RÉCEPTION:'#f59e0b',MANAGE:'#8b5cf6',
       MÉNAGE:'#64748b',FERMETURE:'#ef4444',OUVERTURE:'#0891b2',AUTRE:'#475569'
     },
 
-    // ── MODÈLES RH (Code du travail France) ──
-    HR_PROFILES:{
+    // ── MODÈLES RH LÉGAUX (inviolables, basés Code du travail) ──
+    HR_LEGAL:{
       'Apprenti Mineur':{
         label:'Apprenti Mineur',icon:'👶',color:'#7c3aed',
         maxHoursDay:8,maxHoursWeek:35,minRestHours:12,minRestWeekHours:48,
-        breakAfterH:4.5,breakMinutes:30,
+        breakAfterH:4.5,breakMinutes:30,maxRestDaysWeek:2,
         nightBan:{start:'22:00',end:'06:00'},
-        desc:'Max 8h/j · 35h/sem · Repos 12h · Interdit la nuit 22h–6h (Code trav. L3163)'
+        desc:'Code trav. L3163 — Max 8h/j · 35h/sem · Repos 12h · Interdit 22h–6h'
       },
       'Apprenti Majeur':{
         label:'Apprenti Majeur',icon:'🎓',color:'#0891b2',
         maxHoursDay:10,maxHoursWeek:48,minRestHours:11,minRestWeekHours:35,
-        breakAfterH:6,breakMinutes:20,
-        desc:'Max 10h/j · 48h/sem · Repos 11h · Pause 20min après 6h (Code trav. L3121-16)'
+        breakAfterH:6,breakMinutes:20,maxRestDaysWeek:2,
+        desc:'Code trav. L3121-16 — Max 10h/j · 48h/sem · Pause 20min après 6h'
       },
       'CDI Temps Partiel':{
         label:'CDI Temps Partiel',icon:'🕐',color:'#d97706',
         maxHoursDay:10,maxHoursWeek:44,minRestHours:11,minRestWeekHours:35,
-        breakAfterH:6,breakMinutes:20,
-        minContractH:24,
-        desc:'Min 24h/sem · Max 10h/j · Pause 20min après 6h · Heures compl. +10%/+25%'
+        breakAfterH:6,breakMinutes:20,minContractH:24,maxRestDaysWeek:2,
+        desc:'Code trav. L3123 — Min 24h/sem · Heures compl. +10% (>10%) +25% (>1/10)'
       },
       'CDI Temps Complet':{
         label:'CDI Temps Complet',icon:'⭐',color:'#059669',
         maxHoursDay:10,maxHoursWeek:48,minRestHours:11,minRestWeekHours:35,
-        breakAfterH:6,breakMinutes:20,
-        refH:35,overtimeThreshold:35,
-        desc:'Réf. 35h · Heures sup >35h (+25% jusqu\'à 8h, +50% au-delà) · Max 48h/sem'
+        breakAfterH:6,breakMinutes:20,refH:35,overtimeThreshold:35,maxRestDaysWeek:2,
+        desc:'Code trav. L3121 — Réf. 35h · H.sup: +25% (≤43h) · +50% (>43h)'
       }
     },
 
+    _hrProfiles:{},
     _docRef:null,
+    _rhSaveTimer:null,
 
+    // ── LOAD / SAVE ──
     async _load(){
       try{
-        const{doc,getDoc,setDoc}=window._fbChat;
+        const{doc,getDoc}=window._fbChat;
         const ref=doc(window._db,'store_master','PLANNING_RH');
         this._docRef=ref;
         const snap=await getDoc(ref);
-        if(snap.exists()){this._employees=snap.data().employees||[];}
+        if(snap.exists()){
+          const d=snap.data();
+          this._employees=d.employees||[];
+          this._hrProfiles=d.hrProfiles||JSON.parse(JSON.stringify(this.HR_LEGAL));
+        } else {
+          this._hrProfiles=JSON.parse(JSON.stringify(this.HR_LEGAL));
+        }
       }catch(e){
         try{const s=JSON.parse(localStorage.getItem('planning_employees')||'[]');if(s.length)this._employees=s;}catch(e2){}
+        try{this._hrProfiles=JSON.parse(localStorage.getItem('planning_hrprofiles')||'null')||JSON.parse(JSON.stringify(this.HR_LEGAL));}catch(e2){this._hrProfiles=JSON.parse(JSON.stringify(this.HR_LEGAL));}
       }
     },
-
     async _save(){
-      const data=JSON.stringify(this._employees);
-      try{localStorage.setItem('planning_employees',data);}catch(e){}
-      try{
-        const{doc,setDoc}=window._fbChat;
-        const ref=doc(window._db,'store_master','PLANNING_RH');
-        await setDoc(ref,{employees:this._employees,updatedAt:Date.now()});
-      }catch(e){}
+      const data={employees:this._employees,hrProfiles:this._hrProfiles,updatedAt:Date.now()};
+      try{localStorage.setItem('planning_employees',JSON.stringify(this._employees));localStorage.setItem('planning_hrprofiles',JSON.stringify(this._hrProfiles));}catch(e){}
+      try{const{doc,setDoc}=window._fbChat;const ref=doc(window._db,'store_master','PLANNING_RH');await setDoc(ref,data);}catch(e){}
     },
 
-    getWeekDates(){
+    // ── DATES ──
+    getWeekDates(offset){
+      const o=offset!==undefined?offset:this._weekOffset;
       const now=new Date();const day=now.getDay();
       const mondayOffset=day===0?-6:1-day;
-      const monday=new Date(now);monday.setDate(now.getDate()+mondayOffset+this._weekOffset*7);monday.setHours(0,0,0,0);
+      const monday=new Date(now);monday.setDate(now.getDate()+mondayOffset+o*7);monday.setHours(0,0,0,0);
       const dates=[];for(let i=0;i<7;i++){const d=new Date(monday);d.setDate(monday.getDate()+i);dates.push(d);}
       return dates;
     },
-
     prevWeek(){this._weekOffset--;this.render();},
     nextWeek(){this._weekOffset++;this.render();},
 
+    // ── HOURS ──
     getShiftHours(shift){
-      if(!shift||shift.type==='rest'||!shift.start||!shift.end)return 0;
+      if(!shift||shift.type==='rest'||shift.type==='leave'||!shift.start||!shift.end)return 0;
       const[sh,sm]=shift.start.split(':').map(Number);const[eh,em]=shift.end.split(':').map(Number);
       let h=(eh*60+em-sh*60-sm)/60;if(h<0)h+=24;return Math.max(0,h);
     },
+    _autoBreak(h,profile){
+      if(h<=0)return 0;
+      if(profile&&profile.breakAfterH&&h>=profile.breakAfterH)return profile.breakMinutes||20;
+      if(h>=6)return 20;
+      return 0;
+    },
 
+    // ── VALIDATE ──
     validateSchedule(emp){
       const dates=this.getWeekDates();const warnings=[];let totalHours=0;let restDays=0;
-      const profile=emp.hrProfile?this.HR_PROFILES[emp.hrProfile]:null;
+      const profile=emp.hrProfile?this._hrProfiles[emp.hrProfile]:null;
       const maxDay=profile?profile.maxHoursDay:10;
       const maxWeek=profile?profile.maxHoursWeek:48;
-      const minRest=profile?profile.minRestHours:11;
-      dates.forEach((date,idx)=>{
+      dates.forEach(date=>{
         const key=date.toISOString().slice(0,10);const shift=emp.schedule?.[key];
-        if(!shift||shift.type==='rest'){restDays++;return;}
+        if(!shift||shift.type==='rest'||shift.type==='leave'){restDays++;return;}
         const h=this.getShiftHours(shift);
         if(h>maxDay)warnings.push(`${date.toLocaleDateString('fr',{weekday:'short'})}: >${maxDay}h`);
-        // Check night restriction for minors
         if(profile?.nightBan&&shift.start&&shift.end){
-          const s=shift.start,e=shift.end;
-          if(s<'06:00'||s>='22:00'||e>'22:00')warnings.push(`${date.toLocaleDateString('fr',{weekday:'short'})}: travail de nuit interdit`);
+          if(shift.start<'06:00'||shift.start>='22:00'||shift.end>'22:00')warnings.push(`Nuit interdit ${date.toLocaleDateString('fr',{weekday:'short'})}`);
         }
+        if(emp.workFrom&&shift.start&&shift.start<emp.workFrom)warnings.push(`${date.toLocaleDateString('fr',{weekday:'short'})}: avant ${emp.workFrom}`);
+        if(emp.workTo&&shift.end&&shift.end>emp.workTo)warnings.push(`${date.toLocaleDateString('fr',{weekday:'short'})}: après ${emp.workTo}`);
         totalHours+=h;
       });
       if(restDays<2)warnings.push(`${restDays} repos (min 2)`);
-      if(totalHours>maxWeek)warnings.push(`Semaine ${totalHours.toFixed(0)}h > ${maxWeek}h`);
+      if(totalHours>maxWeek)warnings.push(`${totalHours.toFixed(0)}h > ${maxWeek}h max`);
       return{totalHours,restDays,warnings};
     },
 
+    // ── TABS ──
+    switchTab(t){
+      this._currentTab=t;
+      ['grid','recap','rh'].forEach(tab=>{
+        document.getElementById('plan-panel-'+tab)?.classList.toggle('hidden',tab!==t);
+        const btn=document.getElementById('plan-tab-'+tab);
+        if(btn){btn.classList.toggle('active',tab===t);}
+      });
+      if(t==='grid')this.render();
+      else if(t==='recap')this.renderRecap('week');
+      else if(t==='rh')this.renderRH();
+    },
+
+    // ══ RENDER GRILLE ══
     render:async function(){
       if(!this._employees.length&&!this._loaded){this._loaded=true;await this._load();}
       const dates=this.getWeekDates();
       const labelEl=document.getElementById('plan-week-label');
       if(labelEl){const opts={day:'2-digit',month:'2-digit'};labelEl.textContent=`${dates[0].toLocaleDateString('fr',opts)} – ${dates[6].toLocaleDateString('fr',opts)}`;}
-
-      const wrap=document.getElementById('plan-employees');
-      if(!wrap)return;
+      const wrap=document.getElementById('plan-employees');if(!wrap)return;
       const DAY_SHORT=['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
       const today=new Date().toISOString().slice(0,10);
 
       if(!this._employees.length){
-        wrap.innerHTML=`<div class="empty-state"><i class="fas fa-users-slash"></i><br>Aucun employé. Cliquez sur "Ajouter" pour commencer.</div>`;
+        wrap.innerHTML=`<div class="empty-state"><i class="fas fa-users-slash"></i><br>Aucun employé.<br>Cliquez <b>+</b> pour ajouter.</div>`;
         document.getElementById('plan-summary').style.display='none';return;
       }
 
-      // ── Header ──
       const headerHtml=`<div class="plan-grid-row plan-header-row">
         <div class="plan-emp-col"></div>
         ${dates.map((d,i)=>{const isT=d.toISOString().slice(0,10)===today;return`<div class="plan-day-header ${isT?'today':''}"><div class="plan-day-name">${DAY_SHORT[i]}</div><div class="plan-day-num">${d.getDate()}</div></div>`;}).join('')}
         <div class="plan-total-col">Total</div>
       </div>`;
 
-      // ── Rows ──
       const rowsHtml=this._employees.map(emp=>{
         const{totalHours,restDays,warnings}=this.validateSchedule(emp);
-        const colorDot=emp.color||'#003896';
+        const col=emp.color||'#003896';
         const initials=(emp.name||'?').split(' ').map(x=>x[0]||'').join('').toUpperCase().slice(0,2);
-        const profile=emp.hrProfile?this.HR_PROFILES[emp.hrProfile]:null;
+        const profile=emp.hrProfile?this._hrProfiles[emp.hrProfile]:null;
 
         const cells=dates.map(date=>{
           const key=date.toISOString().slice(0,10);const isT=key===today;
-          const shift=emp.schedule?.[key];const isRest=!shift||shift.type==='rest';
-          if(isRest){
-            return`<div class="plan-cell rest ${isT?'today':''}"
-              onclick="app.planning.editShift('${emp.id}','${key}')"
-              ondragover="event.preventDefault();this.classList.add('drag-over')"
-              ondragleave="this.classList.remove('drag-over')"
-              ondrop="app.planning.dropShift(event,'${emp.id}','${key}')">
+          const shift=emp.schedule?.[key];
+          const isVac=this._isVacation(emp,key);
+          if(isVac&&(!shift||shift.type==='rest')){
+            return`<div class="plan-cell leave ${isT?'today':''}" data-emp="${emp.id}" data-key="${key}">
+              <span style="font-size:14px;">🌴</span><span style="font-size:8px;color:#9d174d;font-weight:900;">CONGÉ</span>
+            </div>`;
+          }
+          if(!shift||shift.type==='rest'){
+            return`<div class="plan-cell rest ${isT?'today':''}" data-emp="${emp.id}" data-key="${key}">
               <span class="plan-rest-label">—</span>
             </div>`;
           }
+          if(shift.type==='leave'){
+            const ll={CP:'🌴CP',RTT:'📅RTT',MALADIE:'🏥',SANS_SOLDE:'💸',FORMATION:'📚'};
+            return`<div class="plan-cell leave ${isT?'today':''}" data-emp="${emp.id}" data-key="${key}">
+              <span style="font-size:12px;">${ll[shift.leaveType]||'🌴'}</span>
+              <span style="font-size:8px;color:#9d174d;font-weight:900;">${shift.leaveType||'CONGÉ'}</span>
+            </div>`;
+          }
           const h=this.getShiftHours(shift);
-          const col=this._postColors[shift.post||'AUTRE']||'#475569';
-          const isSplit=h>10;
-          const breakMin=shift.breakMin||this._autoBreak(h,profile);
-          return`<div class="plan-cell work ${isT?'today':''} ${isSplit?'long':''}" style="--shift-color:${col};"
-            draggable="true"
-            ondragstart="app.planning.dragStart(event,'${emp.id}','${key}')"
-            ondragover="event.preventDefault();this.classList.add('drag-over')"
-            ondragleave="this.classList.remove('drag-over')"
-            ondrop="app.planning.dropShift(event,'${emp.id}','${key}')"
-            onclick="app.planning.editShift('${emp.id}','${key}')">
-            <div class="plan-shift-post" style="background:${col}20;color:${col};">${shift.post||'TRAVAIL'}</div>
+          const c=this._postColors[shift.post||'AUTRE']||'#475569';
+          const brk=shift.breakMin!==undefined?shift.breakMin:this._autoBreak(h,profile);
+          return`<div class="plan-cell work ${isT?'today':''}" style="--shift-color:${c};" data-emp="${emp.id}" data-key="${key}" data-movable="1">
+            <div class="plan-shift-post" style="background:${c}20;color:${c};">${shift.post||'TRAVAIL'}</div>
             <div class="plan-shift-times">${shift.start}–${shift.end}</div>
-            <div class="plan-shift-h">${h.toFixed(1)}h${breakMin?` <span style="color:#f59e0b;">☕${breakMin}'</span>`:''}</div>
+            <div class="plan-shift-h">${h.toFixed(1)}h${brk?` ☕${brk}'`:''}</div>
           </div>`;
         }).join('');
 
+        const profileChip=profile
+          ?`<span class="hr-profile-chip" onclick="event.stopPropagation();app.planning.openEmpSettings('${emp.id}')">${profile.icon} ${profile.label}</span>`
+          :`<span class="hr-profile-chip" onclick="event.stopPropagation();app.planning.openEmpSettings('${emp.id}')"><i class='fas fa-gear' style='font-size:9px;'></i> Paramètres</span>`;
+
         return`<div class="plan-grid-row ${warnings.length?'has-warn':''}">
-          <div class="plan-emp-col">
-            <div class="plan-avatar" style="background:${colorDot};">${initials}</div>
+          <div class="plan-emp-col" style="cursor:pointer;" onclick="app.planning.openEmpSettings('${emp.id}')">
+            <div class="plan-avatar" style="background:${col};">${initials}</div>
             <div class="plan-emp-info">
               <div class="plan-emp-name">${emp.name}</div>
-              <div class="plan-emp-contract">${emp.contract||''}</div>
-              ${profile?`<span class="hr-profile-chip" onclick="event.stopPropagation();app.planning.changeHrProfile('${emp.id}')">${profile.icon} ${profile.label}</span>`:'<span class="hr-profile-chip" onclick="event.stopPropagation();app.planning.changeHrProfile(\''+emp.id+'\')"><i class="fas fa-plus" style="font-size:9px;"></i> Profil RH</span>'}
+              <div class="plan-emp-contract" style="font-size:10px;">${emp.rate?emp.rate+'€/h · ':''}${emp.contract||''}</div>
+              ${profileChip}
             </div>
-            <button class="plan-emp-del" onclick="app.planning.removeEmployee('${emp.id}')"><i class="fas fa-trash"></i></button>
           </div>
           ${cells}
           <div class="plan-total-col">
@@ -3753,114 +3854,202 @@ ${nameLine2?`^CF0,30^FO15,45^FD${nameLine2}^FS`:''}
             <div class="plan-rest-badge ${restDays>=2?'ok':'warn'}">${restDays}R</div>
           </div>
         </div>
-        ${warnings.length?`<div class="plan-warn-row"><i class="fas fa-triangle-exclamation"></i> ${warnings.join(' • ')}</div>`:''}`;
+        ${warnings.length?`<div class="plan-warn-row"><i class="fas fa-triangle-exclamation"></i> ${warnings.join(' · ')}</div>`:''}`;
       }).join('');
 
-      // ── Bottom totals bar ──
       const dayTotals=dates.map(date=>{
         const key=date.toISOString().slice(0,10);
-        const total=this._employees.reduce((s,e)=>{const sh=e.schedule?.[key];return s+(sh&&sh.type!=='rest'?this.getShiftHours(sh):0);},0);
-        const count=this._employees.filter(e=>{const sh=e.schedule?.[key];return sh&&sh.type!=='rest';}).length;
-        return`<div class="plan-day-footer"><div class="plan-day-count">${count} pers</div><div class="plan-day-hours">${total.toFixed(0)}h</div></div>`;
+        const tot=this._employees.reduce((s,e)=>{const sh=e.schedule?.[key];return s+(sh?.type==='work'?this.getShiftHours(sh):0);},0);
+        const cnt=this._employees.filter(e=>e.schedule?.[key]?.type==='work').length;
+        return`<div class="plan-day-footer"><div class="plan-day-count">${cnt}p</div><div class="plan-day-hours">${tot.toFixed(0)}h</div></div>`;
       }).join('');
       const footerHtml=`<div class="plan-grid-row plan-footer-row">
-        <div class="plan-emp-col" style="font-size:11px;font-weight:900;color:#64748b;text-align:center;">PAR JOUR</div>
+        <div class="plan-emp-col" style="font-size:10px;font-weight:900;color:#64748b;text-align:center;">PAR JOUR</div>
         ${dayTotals}
         <div class="plan-total-col"></div>
       </div>`;
 
       wrap.innerHTML=headerHtml+rowsHtml+footerHtml;
+      this._bindCells(wrap);
 
-      // Summary
+      const tw=this._employees.reduce((s,e)=>s+this.validateSchedule(e).totalHours,0);
       const se=document.getElementById('plan-summary'),sc=document.getElementById('plan-summary-content');
-      if(se&&sc){
-        se.style.display='block';
-        const tw=this._employees.reduce((s,e)=>s+this.validateSchedule(e).totalHours,0);
-        const pres=this._employees.flatMap(e=>dates.map(d=>{const k=d.toISOString().slice(0,10);const s=e.schedule?.[k];return s&&s.type!=='rest'?1:0;})).reduce((a,b)=>a+b,0);
+      if(se&&sc){se.style.display='block';
+        const costTotal=this._employees.reduce((s,e)=>s+this.validateSchedule(e).totalHours*(e.rate||0),0);
         sc.innerHTML=`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
           <div style="background:#eff6ff;border-radius:10px;padding:10px;text-align:center;"><div style="font-size:22px;font-weight:950;color:#0891b2;">${this._employees.length}</div><div style="font-size:11px;color:#64748b;">Employés</div></div>
-          <div style="background:#f0fdf4;border-radius:10px;padding:10px;text-align:center;"><div style="font-size:22px;font-weight:950;color:#059669;">${tw.toFixed(0)}h</div><div style="font-size:11px;color:#64748b;">Total semaine</div></div>
-          <div style="background:#fdf4ff;border-radius:10px;padding:10px;text-align:center;"><div style="font-size:22px;font-weight:950;color:#7c3aed;">${pres}</div><div style="font-size:11px;color:#64748b;">Présences</div></div>
+          <div style="background:#f0fdf4;border-radius:10px;padding:10px;text-align:center;"><div style="font-size:22px;font-weight:950;color:#059669;">${tw.toFixed(0)}h</div><div style="font-size:11px;color:#64748b;">Total sem.</div></div>
+          <div style="background:#fdf4ff;border-radius:10px;padding:10px;text-align:center;"><div style="font-size:20px;font-weight:950;color:#7c3aed;">${costTotal.toFixed(0)}€</div><div style="font-size:11px;color:#64748b;">Coût brut</div></div>
         </div>`;
       }
     },
 
-    addEmployee:async function(){
-      const name=await dlgPrompt('Prénom + Nom de l\'employé :');if(!name?.trim())return;
-      const contract=await dlgPrompt('Contrat (ex: 30h/sem, CDI…) :','');
-      const colors=['#003896','#0891b2','#059669','#7c3aed','#dc2626','#d97706','#0f766e','#db2777'];
-      const color=colors[this._employees.length%colors.length];
-      this._employees.push({id:Date.now(),name:name.trim().toUpperCase(),contract:contract?.trim()||'',color,schedule:{}});
-      await this._save();this.render();
+    // ── BIND CELLS: tap + touch drag + context menu ──
+    _bindCells(wrap){
+      let dragEl=null,dragEmpId=null,dragKey=null,ghost=null,overEl=null;
+
+      // Context menu div
+      let ctxMenu=document.getElementById('plan-ctx-menu');
+      if(!ctxMenu){
+        ctxMenu=document.createElement('div');ctxMenu.id='plan-ctx-menu';
+        ctxMenu.style.cssText='position:fixed;z-index:99999;background:#fff;border-radius:14px;box-shadow:0 8px 30px rgba(0,0,0,.2);padding:8px;min-width:180px;display:none;';
+        document.body.appendChild(ctxMenu);
+        document.addEventListener('click',()=>{ctxMenu.style.display='none';},{passive:true});
+      }
+
+      wrap.querySelectorAll('.plan-cell').forEach(el=>{
+        // Tap to edit
+        el.addEventListener('click',()=>{
+          if(el._dragged){el._dragged=false;return;}
+          const empId=el.dataset.emp;const key=el.dataset.key;
+          if(empId&&key)this.editShift(empId,key);
+        });
+
+        // Right-click context menu
+        el.addEventListener('contextmenu',(e)=>{
+          e.preventDefault();
+          const empId=el.dataset.emp;const key=el.dataset.key;
+          if(!empId||!key)return;
+          const shift=this._employees.find(emp=>String(emp.id)===String(empId))?.schedule?.[key];
+          const isWork=shift?.type==='work';
+          ctxMenu.innerHTML=`
+            <div style="font-size:11px;font-weight:900;color:#94a3b8;padding:4px 10px 8px;">Actions rapides</div>
+            <div class="ctx-item" onclick="app.planning.editShift('${empId}','${key}');document.getElementById('plan-ctx-menu').style.display='none'" style="display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;cursor:pointer;font-weight:800;font-size:13px;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='transparent'">
+              <i class="fas fa-pen" style="color:#0891b2;width:16px;"></i> Modifier
+            </div>
+            ${isWork?`<div class="ctx-item" onclick="app.planning._duplicateShiftDirect('${empId}','${key}');document.getElementById('plan-ctx-menu').style.display='none'" style="display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;cursor:pointer;font-weight:800;font-size:13px;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='transparent'">
+              <i class="fas fa-clone" style="color:#059669;width:16px;"></i> Dupliquer
+            </div>`:'' }
+            <div class="ctx-item" onclick="app.planning._deleteShiftDirect('${empId}','${key}');document.getElementById('plan-ctx-menu').style.display='none'" style="display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;cursor:pointer;font-weight:800;font-size:13px;" onmouseover="this.style.background='#fff1f2'" onmouseout="this.style.background='transparent'">
+              <i class="fas fa-trash" style="color:#ef4444;width:16px;"></i> Supprimer
+            </div>`;
+          const x=Math.min(e.clientX,window.innerWidth-200);
+          const y=Math.min(e.clientY,window.innerHeight-200);
+          ctxMenu.style.left=x+'px';ctxMenu.style.top=y+'px';ctxMenu.style.display='block';
+          e.stopPropagation();
+        });
+
+        // Touch drag for movable cells
+        if(!el.dataset.movable)return;
+        let longPress=null;
+        el.addEventListener('touchstart',(e)=>{
+          longPress=setTimeout(()=>{
+            dragEl=el;dragEmpId=el.dataset.emp;dragKey=el.dataset.key;
+            const t=e.touches[0];
+            ghost=el.cloneNode(true);
+            ghost.style.cssText=`position:fixed;opacity:.85;pointer-events:none;z-index:99999;border-radius:8px;box-shadow:0 10px 30px rgba(0,0,0,.35);width:${el.offsetWidth}px;transform:scale(1.05);`;
+            document.body.appendChild(ghost);
+            ghost.style.left=(t.clientX-el.offsetWidth/2)+'px';ghost.style.top=(t.clientY-50)+'px';
+            el.classList.add('dragging');
+            navigator.vibrate?.(40);
+          },400);
+        },{passive:true});
+
+        el.addEventListener('touchmove',(e)=>{
+          clearTimeout(longPress);longPress=null;
+          if(!ghost||!dragEl)return;
+          e.preventDefault();
+          const t=e.touches[0];
+          ghost.style.left=(t.clientX-ghost.offsetWidth/2)+'px';
+          ghost.style.top=(t.clientY-60)+'px';
+          if(overEl)overEl.classList.remove('drag-over');
+          const hit=document.elementFromPoint(t.clientX,t.clientY);
+          overEl=hit?.closest?.('.plan-cell');
+          if(overEl&&overEl!==dragEl)overEl.classList.add('drag-over');
+        },{passive:false});
+
+        el.addEventListener('touchend',()=>{
+          clearTimeout(longPress);longPress=null;
+          if(ghost){ghost.remove();ghost=null;}
+          if(dragEl){dragEl.classList.remove('dragging');dragEl._dragged=!!overEl&&overEl!==dragEl;}
+          if(overEl)overEl.classList.remove('drag-over');
+          if(dragEl&&overEl&&overEl!==dragEl){
+            const toEmpId=overEl.dataset.emp;const toKey=overEl.dataset.key;
+            if(toEmpId&&toKey)this._swapShifts(dragEmpId,dragKey,toEmpId,toKey);
+          }
+          dragEl=null;dragEmpId=null;dragKey=null;overEl=null;
+        },{passive:true});
+      });
     },
 
-    removeEmployee:async function(empId){
-      const ok=await dlgConfirm('Supprimer cet employé ?','Planning et horaires supprimés.',true);if(!ok)return;
-      this._employees=this._employees.filter(e=>String(e.id)!==String(empId));
+    async _swapShifts(fromEmpId,fromKey,toEmpId,toKey){
+      const fromEmp=this._employees.find(e=>String(e.id)===String(fromEmpId));
+      const toEmp=this._employees.find(e=>String(e.id)===String(toEmpId));
+      if(!fromEmp||!toEmp)return;
+      const fromShift=fromEmp.schedule?.[fromKey];if(!fromShift||fromShift.type!=='work')return;
+      const toShift=toEmp.schedule?.[toKey];
+      if(!fromEmp.schedule)fromEmp.schedule={};if(!toEmp.schedule)toEmp.schedule={};
+      toEmp.schedule[toKey]={...fromShift};
+      if(toShift&&toShift.type==='work'){fromEmp.schedule[fromKey]={...toShift};}
+      else{fromEmp.schedule[fromKey]={type:'rest'};}
       await this._save();this.render();
+      toast('Shift déplacé ✓','ok',2000);
     },
 
-    editShift:async function(empId,dateKey){
+    _isVacation(emp,key){
+      if(!emp.vacances?.length)return false;
+      return emp.vacances.some(v=>v.from&&v.to&&key>=v.from&&key<=v.to);
+    },
+
+    // ── EDIT SHIFT ──
+    editShift(empId,dateKey){
       const emp=this._employees.find(e=>String(e.id)===String(empId));if(!emp)return;
       if(!emp.schedule)emp.schedule={};
-      const shift=emp.schedule[dateKey];const isRest=!shift||shift.type==='rest';
+      const shift=emp.schedule[dateKey];
+      const isVac=this._isVacation(emp,dateKey);
+      if(isVac&&(!shift||shift.type==='rest')){
+        toast('🌴 Date bloquée par congés. Modifiez les paramètres employé pour changer.','warn',3500);return;
+      }
+      const isRest=!shift||shift.type==='rest';
+      const isLeave=shift?.type==='leave';
       const dateLabel=new Date(dateKey+'T12:00:00').toLocaleDateString('fr',{weekday:'long',day:'numeric',month:'long'});
+      const profile=emp.hrProfile?this._hrProfiles[emp.hrProfile]:null;
 
-      // Show shift editor modal
       document.getElementById('shift-modal-emp').textContent=emp.name+' — '+dateLabel;
-      document.getElementById('shift-modal-start').value=shift?.start||'09:00';
-      document.getElementById('shift-modal-end').value=shift?.end||'17:00';
-      document.getElementById('shift-modal-rest').checked=isRest;
-      document.getElementById('shift-modal-fields').style.display=isRest?'none':'block';
-      // Break field
-      const breakEl=document.getElementById('shift-modal-break');
-      if(breakEl){breakEl.value=shift?.breakMin||'';}
-      this._updateBreakHint();
+      document.getElementById('shift-modal-rest').checked=isRest&&!isLeave;
+      document.getElementById('shift-modal-leave').checked=isLeave;
+      document.getElementById('shift-leave-type').classList.toggle('hidden',!isLeave);
+      if(isLeave)document.getElementById('shift-modal-leave-type').value=shift.leaveType||'CP';
+      document.getElementById('shift-modal-fields').style.display=(isRest||isLeave)?'none':'block';
+      document.getElementById('shift-modal-start').value=shift?.start||emp.workFrom||'09:00';
+      document.getElementById('shift-modal-end').value=shift?.end||emp.workTo||'17:00';
+      const h=this.getShiftHours(shift);
+      const brk=shift?.breakMin!==undefined?shift.breakMin:this._autoBreak(h,profile);
+      document.getElementById('shift-modal-break').value=brk>0?brk:'';
+      this.updateBreakHint();
 
-      // Auto-update break hint on time change
-      ['shift-modal-start','shift-modal-end'].forEach(id=>{
-        const el=document.getElementById(id);
-        if(el)el.onchange=()=>this._updateBreakHint();
-      });
-
-      // Build visual post buttons
-      const postColors=this._postColors;const currentPost=shift?.post||'RAYON';
+      const currentPost=shift?.post||'RAYON';
+      document.getElementById('shift-modal-post').value=currentPost;
       const postGrid=document.getElementById('shift-post-grid');
-      const postSel=document.getElementById('shift-modal-post');
-      postSel.value=currentPost;
       if(postGrid){
-        postGrid.innerHTML=Object.entries(postColors).map(([p,c])=>`
+        postGrid.innerHTML=Object.entries(this._postColors).map(([p,c])=>`
           <div class="plan-post-btn ${p===currentPost?'selected':''}" style="color:${c};border-color:${p===currentPost?c:'#e2e8f0'};"
             onclick="this.closest('#shift-post-grid').querySelectorAll('.plan-post-btn').forEach(b=>{b.classList.remove('selected');b.style.borderColor='#e2e8f0';});this.classList.add('selected');this.style.borderColor='${c}';document.getElementById('shift-modal-post').value='${p}';">
             ${p}
           </div>`).join('');
       }
-
       const modal=document.getElementById('modal-shift-editor');
-      modal.classList.remove('hidden');
-      modal._empId=empId;modal._dateKey=dateKey;
+      modal.classList.remove('hidden');modal._empId=empId;modal._dateKey=dateKey;
     },
 
-    _autoBreak(h,profile){
-      if(!h||h<6)return 0;
-      if(profile){
-        if(h>=profile.breakAfterH)return profile.breakMinutes;
-        return 0;
-      }
-      // French labor code default
-      if(h>=6)return 20;
-      return 0;
+    onRestToggle(checked){
+      document.getElementById('shift-modal-fields').style.display=checked?'none':'block';
+      if(checked){document.getElementById('shift-modal-leave').checked=false;document.getElementById('shift-leave-type').classList.add('hidden');}
     },
-
-    _updateBreakHint(){
+    onLeaveToggle(checked){
+      document.getElementById('shift-leave-type').classList.toggle('hidden',!checked);
+      document.getElementById('shift-modal-fields').style.display=checked?'none':'block';
+      if(checked)document.getElementById('shift-modal-rest').checked=false;
+    },
+    updateBreakHint(){
       const s=document.getElementById('shift-modal-start')?.value;
       const e=document.getElementById('shift-modal-end')?.value;
-      const hint=document.getElementById('shift-break-hint');
-      if(!hint||!s||!e)return;
+      const hint=document.getElementById('shift-break-hint');if(!hint||!s||!e)return;
       const[sh,sm]=s.split(':').map(Number);const[eh,em]=e.split(':').map(Number);
       let h=(eh*60+em-sh*60-sm)/60;if(h<0)h+=24;
-      const auto=this._autoBreak(h,null);
-      hint.textContent=auto?`Légale: ${auto} min (après ${h.toFixed(1)}h)`:'Légale: aucune';
+      const auto=h>=6?20:0;
+      hint.textContent=auto?`⚠️ Minimum légal: ${auto} min pour ${h.toFixed(1)}h de travail`:'Aucune pause légale obligatoire (moins de 6h)';
+      hint.style.color=auto?'#d97706':'#94a3b8';
     },
 
     saveShift:async function(){
@@ -3869,203 +4058,427 @@ ${nameLine2?`^CF0,30^FO15,45^FD${nameLine2}^FS`:''}
       const emp=this._employees.find(e=>String(e.id)===String(empId));if(!emp)return;
       if(!emp.schedule)emp.schedule={};
       const isRest=document.getElementById('shift-modal-rest').checked;
-      if(isRest){emp.schedule[dateKey]={type:'rest'};}
-      else{
+      const isLeave=document.getElementById('shift-modal-leave').checked;
+      if(isLeave){
+        emp.schedule[dateKey]={type:'leave',leaveType:document.getElementById('shift-modal-leave-type').value};
+      } else if(isRest){
+        emp.schedule[dateKey]={type:'rest'};
+      } else {
         const start=document.getElementById('shift-modal-start').value;
         const end=document.getElementById('shift-modal-end').value;
         const post=document.getElementById('shift-modal-post').value;
-        const breakVal=document.getElementById('shift-modal-break')?.value;
-        const breakMin=breakVal?parseInt(breakVal)||0:0;
+        const breakMin=parseInt(document.getElementById('shift-modal-break').value)||0;
         if(!start||!end)return toast('Heure de début et de fin requises.','warn');
+        const profile=emp.hrProfile?this._hrProfiles[emp.hrProfile]:null;
+        if(profile?.nightBan&&(start<'06:00'||start>='22:00'||end>'22:00')){
+          const ok=await dlgConfirm('Nuit interdite','Ce profil interdit le travail de nuit (22h–6h). Forcer quand même ?',true);if(!ok)return;
+        }
+        if(emp.workFrom&&start<emp.workFrom||emp.workTo&&end>emp.workTo){
+          const ok=await dlgConfirm('Hors plage autorisée','Ce shift dépasse la plage horaire configurée pour cet employé. Continuer ?',false);if(!ok)return;
+        }
         emp.schedule[dateKey]={type:'work',start,end,post,breakMin:breakMin||undefined};
       }
-      modal.classList.add('hidden');
-      await this._save();this.render();
+      modal.classList.add('hidden');await this._save();this.render();
+    },
+
+    deleteShift:async function(){
+      const modal=document.getElementById('modal-shift-editor');
+      const empId=modal._empId;const dateKey=modal._dateKey;
+      const emp=this._employees.find(e=>String(e.id)===String(empId));if(!emp)return;
+      if(emp.schedule?.[dateKey])delete emp.schedule[dateKey];
+      modal.classList.add('hidden');await this._save();this.render();
+      toast('Shift supprimé','ok',2000);
     },
 
     duplicateShift:async function(){
       const modal=document.getElementById('modal-shift-editor');
       const empId=modal._empId;const dateKey=modal._dateKey;
       const emp=this._employees.find(e=>String(e.id)===String(empId));if(!emp)return;
-      const shift=emp.schedule?.[dateKey];
-      if(!shift||shift.type==='rest'){modal.classList.add('hidden');return;}
-      // Find next day without a shift
+      const shift=emp.schedule?.[dateKey];if(!shift||shift.type!=='work')return toast('Aucun shift à dupliquer.','warn');
       const dates=this.getWeekDates();
       const idx=dates.findIndex(d=>d.toISOString().slice(0,10)===dateKey);
       let targetKey=null;
       for(let i=idx+1;i<dates.length;i++){
         const k=dates[i].toISOString().slice(0,10);
-        if(!emp.schedule?.[k]||emp.schedule[k].type==='rest'){targetKey=k;break;}
+        if(!this._isVacation(emp,k)&&(!emp.schedule?.[k]||emp.schedule[k].type==='rest')){targetKey=k;break;}
       }
-      if(!targetKey){toast('Aucun jour libre trouvé cette semaine.','warn');return;}
+      if(!targetKey)return toast('Aucun jour libre cette semaine.','warn');
       emp.schedule[targetKey]={...shift};
-      modal.classList.add('hidden');
-      await this._save();this.render();
-      toast(`Shift dupliqué sur le ${new Date(targetKey+'T12:00:00').toLocaleDateString('fr',{weekday:'long'})} ✓`,'ok');
+      modal.classList.add('hidden');await this._save();this.render();
+      toast(`Shift dupliqué ✓`,'ok',2000);
     },
 
     closeShiftModal(){document.getElementById('modal-shift-editor').classList.add('hidden');},
 
-    // ── DRAG & DROP ──
-    _drag:{empId:null,dateKey:null},
-    dragStart(event,empId,dateKey){
-      this._drag={empId,dateKey};
-      event.dataTransfer.effectAllowed='move';
-    },
-    dropShift:async function(event,toEmpId,toDateKey){
-      event.preventDefault();
-      document.querySelectorAll('.plan-cell.drag-over').forEach(el=>el.classList.remove('drag-over'));
-      const{empId,dateKey}=this._drag;
-      if(!empId||!dateKey||empId===toEmpId&&dateKey===toDateKey)return;
-      const fromEmp=this._employees.find(e=>String(e.id)===String(empId));
-      const toEmp=this._employees.find(e=>String(e.id)===String(toEmpId));
-      if(!fromEmp||!toEmp)return;
-      const fromShift=fromEmp.schedule?.[dateKey];
-      if(!fromShift||fromShift.type==='rest')return;
-      const toShift=toEmp.schedule?.[toDateKey];
-      // Swap or move
-      if(!toEmp.schedule)toEmp.schedule={};
-      if(!fromEmp.schedule)fromEmp.schedule={};
-      toEmp.schedule[toDateKey]={...fromShift};
-      if(toShift&&toShift.type!=='rest'){fromEmp.schedule[dateKey]={...toShift};}
-      else{fromEmp.schedule[dateKey]={type:'rest'};}
-      await this._save();this.render();
-      toast('Shift déplacé ✓','ok');
-    },
-
-    // ── IMPORT USERS FROM APP ──
-    importFromUsers:async function(){
-      const users=window.app._users||[];
-      if(!users.length){toast('Aucun utilisateur trouvé. Chargement…','warn');return;}
-      let added=0;
-      for(const u of users){
-        const name=(u.displayName||u.email||'').toUpperCase().trim();
-        if(!name)continue;
-        const exists=this._employees.some(e=>e.name===name);
-        if(exists)continue;
-        const colors=['#003896','#0891b2','#059669','#7c3aed','#dc2626','#d97706','#0f766e','#db2777'];
-        this._employees.push({id:Date.now()+Math.random(),name,contract:'',color:colors[this._employees.length%colors.length],schedule:{}});
-        added++;
-      }
-      if(!added){toast('Tous les utilisateurs sont déjà dans le planning.','info');return;}
-      await this._save();this.render();
-      toast(`${added} employé(s) importé(s) ✓`,'ok');
-    },
-
-    // ── MODÈLES RH ──
-    openHrModels:async function(){
-      const profiles=this.HR_PROFILES;
-      const html=`<div style="font-weight:950;font-size:16px;margin-bottom:14px;color:#7c3aed;"><i class="fas fa-briefcase"></i> Modèles de politique RH</div>
-      ${Object.entries(profiles).map(([key,p])=>`
-        <div style="background:#f8fafc;border-radius:12px;padding:12px;margin-bottom:10px;border:1.5px solid #e2e8f0;">
-          <div style="font-weight:950;font-size:14px;">${p.icon} ${p.label}</div>
-          <div style="font-size:12px;color:#64748b;margin-top:4px;">${p.desc}</div>
-          <button onclick="app.planning._applyProfileToAll('${key}')" style="margin-top:8px;background:${p.color};color:#fff;border:none;border-radius:8px;padding:6px 14px;font-weight:900;font-size:12px;cursor:pointer;">Appliquer à un employé…</button>
-        </div>`).join('')}
-      <button onclick="document.getElementById('modal-hr-models').classList.add('hidden')" style="background:#e2e8f0;border:none;border-radius:10px;padding:10px 20px;font-weight:900;cursor:pointer;width:100%;margin-top:4px;">Fermer</button>`;
-      let m=document.getElementById('modal-hr-models');
-      if(!m){m=document.createElement('div');m.id='modal-hr-models';m.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:90000;display:flex;align-items:flex-end;justify-content:center;padding:16px;';m.innerHTML=`<div class="dlg-card" style="max-width:420px;max-height:85vh;overflow-y:auto;" id="modal-hr-content"></div>`;document.body.appendChild(m);}
-      document.getElementById('modal-hr-content').innerHTML=html;
-      m.classList.remove('hidden');
-    },
-
-    _applyProfileToAll:async function(profileKey){
-      const names=this._employees.map((e,i)=>`${i+1}. ${e.name}`).join('\n');
-      const idx=parseInt(await dlgPrompt(`Sélectionnez l'employé (numéro):\n${names}`))-1;
-      if(isNaN(idx)||idx<0||idx>=this._employees.length)return;
-      this._employees[idx].hrProfile=profileKey;
-      document.getElementById('modal-hr-models')?.classList.add('hidden');
-      await this._save();this.render();
-      toast(`Profil "${profileKey}" appliqué à ${this._employees[idx].name} ✓`,'ok');
-    },
-
-    changeHrProfile:async function(empId){
+    _deleteShiftDirect:async function(empId,dateKey){
       const emp=this._employees.find(e=>String(e.id)===String(empId));if(!emp)return;
-      const profiles=Object.keys(this.HR_PROFILES);
-      const opts=profiles.map((p,i)=>`${i+1}. ${this.HR_PROFILES[p].icon} ${p}`).join('\n');
-      const current=emp.hrProfile?`Actuel: ${emp.hrProfile}\n`:'';
-      const idx=parseInt(await dlgPrompt(`${current}Profil RH pour ${emp.name}:\n${opts}\n0. Aucun profil`))-1;
-      if(isNaN(idx+1))return;
-      if(idx===-1){delete emp.hrProfile;}
-      else if(profiles[idx]){emp.hrProfile=profiles[idx];}
+      if(!emp.schedule)emp.schedule={};
+      emp.schedule[dateKey]={type:'rest'};
       await this._save();this.render();
+      toast('Shift supprimé','ok',1500);
     },
 
-    // ── PRINT ──
-    printWeek(){
+    _duplicateShiftDirect:async function(empId,dateKey){
+      const emp=this._employees.find(e=>String(e.id)===String(empId));if(!emp)return;
+      const shift=emp.schedule?.[dateKey];if(!shift||shift.type!=='work')return;
       const dates=this.getWeekDates();
-      const DAY=['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
-      const today=new Date().toISOString().slice(0,10);
-      const opts={day:'2-digit',month:'2-digit'};
-      const weekLabel=`${dates[0].toLocaleDateString('fr',opts)} – ${dates[6].toLocaleDateString('fr',opts)}`;
+      const idx=dates.findIndex(d=>d.toISOString().slice(0,10)===dateKey);
+      let targetKey=null;
+      for(let i=idx+1;i<dates.length;i++){
+        const k=dates[i].toISOString().slice(0,10);
+        if(!this._isVacation(emp,k)&&(!emp.schedule?.[k]||emp.schedule[k].type==='rest')){targetKey=k;break;}
+      }
+      if(!targetKey)return toast('Aucun jour libre cette semaine.','warn');
+      emp.schedule[targetKey]={...shift};
+      await this._save();this.render();
+      toast('Shift dupliqué ✓','ok',1500);
+    },
 
-      const headerCols=DAY.map((d,i)=>{
-        const isT=dates[i].toISOString().slice(0,10)===today;
-        return`<th style="${isT?'background:#0891b2;':''}">${d}<br>${dates[i].getDate()}</th>`;
-      }).join('');
+    // ══ PARAMÈTRES EMPLOYÉ ══
+    openEmpSettings(empId){
+      const emp=this._employees.find(e=>String(e.id)===String(empId));if(!emp)return;
+      const modal=document.getElementById('modal-emp-settings');
+      modal._empId=empId;
+      document.getElementById('emp-set-name').value=emp.name||'';
+      document.getElementById('emp-set-contract').value=emp.contract||'';
+      document.getElementById('emp-set-rate').value=emp.rate||'';
+      document.getElementById('emp-set-from').value=emp.workFrom||'06:00';
+      document.getElementById('emp-set-to').value=emp.workTo||'22:00';
+      const sel=document.getElementById('emp-set-profile');
+      sel.innerHTML='<option value="">— Aucun profil —</option>'+
+        Object.keys(this._hrProfiles).map(k=>`<option value="${k}" ${emp.hrProfile===k?'selected':''}>${this._hrProfiles[k].icon} ${k}</option>`).join('');
+      this._renderVacancesList(emp.vacances||[]);
+      modal.classList.remove('hidden');
+    },
 
+    _renderVacancesList(vacances){
+      const wrap=document.getElementById('emp-vacances-list');if(!wrap)return;
+      if(!vacances.length){wrap.innerHTML=`<div style="font-size:12px;color:#94a3b8;font-style:italic;">Aucune période définie</div>`;return;}
+      wrap.innerHTML=vacances.map((v,i)=>`
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;background:#fce7f3;border-radius:8px;padding:8px;">
+          <span style="font-size:12px;font-weight:800;flex:1;">🌴 ${v.from} → ${v.to}${v.label?' ('+v.label+')':''}</span>
+          <button onclick="app.planning.removeVacance(${i})" style="background:#dc2626;color:#fff;border:none;border-radius:6px;padding:4px 8px;font-weight:900;font-size:11px;cursor:pointer;">✕</button>
+        </div>`).join('');
+    },
+
+    addVacance(){
+      const modal=document.getElementById('modal-emp-settings');
+      const empId=modal?._empId;
+      const emp=this._employees.find(e=>String(e.id)===String(empId));if(!emp)return;
+      if(!emp.vacances)emp.vacances=[];
+      const fromStr=prompt('Date de début (AAAA-MM-JJ) :');if(!fromStr?.match(/^\d{4}-\d{2}-\d{2}$/))return toast('Format invalide (ex: 2025-08-01)','warn');
+      const toStr=prompt('Date de fin (AAAA-MM-JJ) :');if(!toStr?.match(/^\d{4}-\d{2}-\d{2}$/))return toast('Format invalide','warn');
+      const label=prompt('Libellé (optionnel, ex: Été 2025) :')||'';
+      emp.vacances.push({from:fromStr,to:toStr,label});
+      this._renderVacancesList(emp.vacances);
+    },
+
+    removeVacance(idx){
+      const modal=document.getElementById('modal-emp-settings');
+      const empId=modal?._empId;
+      const emp=this._employees.find(e=>String(e.id)===String(empId));if(!emp||!emp.vacances)return;
+      emp.vacances.splice(idx,1);
+      this._renderVacancesList(emp.vacances);
+    },
+
+    saveEmpSettings:async function(){
+      const modal=document.getElementById('modal-emp-settings');
+      const empId=modal._empId;
+      const emp=this._employees.find(e=>String(e.id)===String(empId));if(!emp)return;
+      emp.name=(document.getElementById('emp-set-name').value||emp.name).toUpperCase().trim()||emp.name;
+      emp.contract=document.getElementById('emp-set-contract').value.trim();
+      emp.rate=parseFloat(document.getElementById('emp-set-rate').value)||undefined;
+      emp.workFrom=document.getElementById('emp-set-from').value||'06:00';
+      emp.workTo=document.getElementById('emp-set-to').value||'22:00';
+      emp.hrProfile=document.getElementById('emp-set-profile').value||undefined;
+      modal.classList.add('hidden');
+      await this._save();this.render();
+      toast(`${emp.name} mis à jour ✓`,'ok',2000);
+    },
+
+    deleteEmployee:async function(){
+      const modal=document.getElementById('modal-emp-settings');
+      const empId=modal._empId;
+      const emp=this._employees.find(e=>String(e.id)===String(empId));if(!emp)return;
+      const ok=await dlgConfirm('Supprimer '+emp.name,'Toutes les données de planification seront perdues.',true);if(!ok)return;
+      this._employees=this._employees.filter(e=>String(e.id)!==String(empId));
+      modal.classList.add('hidden');await this._save();this.render();
+    },
+
+    // ══ RÉSUMÉ HEURES ══
+    renderRecap(period='week'){
+      ['day','week','month'].forEach(p=>{
+        const btn=document.getElementById('recap-btn-'+p);if(!btn)return;
+        btn.style.background=p===period?'#0891b2':'#fff';
+        btn.style.color=p===period?'#fff':'#334155';
+      });
+      const wrap=document.getElementById('plan-recap-content');if(!wrap)return;
+      const today=new Date();
+      let dates=[];
+      if(period==='day'){dates=[new Date(today)];}
+      else if(period==='week'){dates=this.getWeekDates();}
+      else if(period==='month'){
+        const y=today.getFullYear(),m=today.getMonth();
+        for(let d=new Date(y,m,1);d<=new Date(y,m+1,0);d.setDate(d.getDate()+1))dates.push(new Date(d));
+      }
+      const ptseData=window.app.pointeuse?._logs||{};
       const rows=this._employees.map(emp=>{
-        const{totalHours,restDays,warnings}=this.validateSchedule(emp);
-        const profile=emp.hrProfile?this.HR_PROFILES[emp.hrProfile]:null;
-        const cells=dates.map(d=>{
-          const key=d.toISOString().slice(0,10);const s=emp.schedule?.[key];
-          if(!s||s.type==='rest')return`<td class="p-rest">Repos</td>`;
-          const h=this.getShiftHours(s);
-          const breakMin=s.breakMin||this._autoBreak(h,profile);
-          return`<td class="p-work">${s.start}–${s.end}<br>${s.post||''}<br>${h.toFixed(1)}h${breakMin?` ☕${breakMin}'`:''}`;
-        }).join('');
-        const warnMark=warnings.length?`<span style="color:#dc2626;font-size:9px;">⚠ ${warnings[0]}</span>`:''
-        return`<tr>
-          <td>${emp.name}<br><span style="font-size:9px;color:#64748b;">${emp.contract||''}${profile?' • '+profile.icon+profile.label:''}</span><br>${warnMark}</td>
-          ${cells}
-          <td class="p-total">${totalHours.toFixed(1)}h<br>${restDays}R</td>
-        </tr>`;
+        let plannedH=0,workedH=0,leaveDays=0;
+        dates.forEach(date=>{
+          const key=date.toISOString().slice(0,10);
+          const shift=emp.schedule?.[key];
+          if(shift?.type==='work'){plannedH+=this.getShiftHours(shift);}
+          if(shift?.type==='leave'){leaveDays++;}
+          const ptDay=ptseData[key];
+          if(ptDay){const pt=ptDay[emp.name]||ptDay[emp.id];if(pt?.total)workedH+=pt.total/3600;}
+        });
+        const profile=emp.hrProfile?this._hrProfiles[emp.hrProfile]:null;
+        const refH=profile?.refH||(period==='week'?35:period==='day'?7:151.67);
+        const overtimeH=Math.max(0,(workedH||plannedH)-refH);
+        const diff=workedH-plannedH;
+        const diffColor=diff>0.25?'#059669':diff<-0.25?'#dc2626':'#64748b';
+        const col=emp.color||'#003896';
+        const init=(emp.name||'?').split(' ').map(x=>x[0]||'').join('').toUpperCase().slice(0,2);
+        return`<div style="background:#fff;border-radius:14px;padding:14px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.05);">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+            <div style="width:36px;height:36px;border-radius:50%;background:${col};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:950;font-size:13px;">${init}</div>
+            <div style="flex:1;">
+              <div style="font-weight:950;font-size:14px;">${emp.name}</div>
+              <div style="font-size:11px;color:#64748b;">${emp.contract||''}${emp.rate?' · '+emp.rate+'€/h':''}</div>
+            </div>
+            <button onclick="app.planning.openEmpSettings('${emp.id}')" style="background:#f1f5f9;border:none;border-radius:8px;padding:6px 10px;cursor:pointer;font-size:12px;font-weight:900;color:#334155;"><i class="fas fa-gear"></i></button>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:8px;">
+            <div style="background:#eff6ff;border-radius:8px;padding:8px;text-align:center;">
+              <div style="font-size:18px;font-weight:950;color:#0891b2;">${plannedH.toFixed(1)}</div>
+              <div style="font-size:10px;color:#64748b;">h planif.</div>
+            </div>
+            <div style="background:#f0fdf4;border-radius:8px;padding:8px;text-align:center;">
+              <div style="font-size:18px;font-weight:950;color:#059669;">${workedH>0?workedH.toFixed(1):'—'}</div>
+              <div style="font-size:10px;color:#64748b;">h réelles</div>
+            </div>
+            <div style="background:${Math.abs(diff)>0.25?'#fffbeb':'#f8fafc'};border-radius:8px;padding:8px;text-align:center;">
+              <div style="font-size:18px;font-weight:950;color:${diffColor};">${workedH>0?(diff>=0?'+':'')+diff.toFixed(1):'—'}</div>
+              <div style="font-size:10px;color:#64748b;">écart</div>
+            </div>
+            <div style="background:${leaveDays?'#fdf2f8':'#f8fafc'};border-radius:8px;padding:8px;text-align:center;">
+              <div style="font-size:18px;font-weight:950;color:#db2777;">${leaveDays||'—'}</div>
+              <div style="font-size:10px;color:#64748b;">j congés</div>
+            </div>
+          </div>
+          ${emp.rate&&plannedH>0?`<div style="background:#f1f5f9;border-radius:8px;padding:8px;font-size:12px;font-weight:800;color:#334155;">
+            💰 Planifié: <span style="color:#059669;">${(plannedH*emp.rate).toFixed(2)}€</span>
+            ${overtimeH>0?` · H.sup: <span style="color:#d97706;">+${overtimeH.toFixed(1)}h</span>`:''}
+            ${workedH>0?` · Réel: <span style="color:#0891b2;">${(workedH*emp.rate).toFixed(2)}€</span>`:''}
+          </div>`:''}
+        </div>`;
       }).join('');
 
-      const dayTotals=dates.map(d=>{
-        const key=d.toISOString().slice(0,10);
-        const tot=this._employees.reduce((s,e)=>{const sh=e.schedule?.[key];return s+(sh&&sh.type!=='rest'?this.getShiftHours(sh):0);},0);
-        const cnt=this._employees.filter(e=>{const sh=e.schedule?.[key];return sh&&sh.type!=='rest';}).length;
-        return`<td>${cnt}p<br>${tot.toFixed(0)}h</td>`;
+      const lblPeriod=period==='day'?`Aujourd'hui — ${today.toLocaleDateString('fr',{weekday:'long',day:'numeric',month:'long'})}`:
+        period==='week'?`Semaine du ${dates[0].toLocaleDateString('fr',{day:'2-digit',month:'2-digit'})} au ${dates[6].toLocaleDateString('fr',{day:'2-digit',month:'2-digit'})}`:
+        `${today.toLocaleDateString('fr',{month:'long',year:'numeric'})}`;
+
+      wrap.innerHTML=`<div style="background:linear-gradient(135deg,#0891b2,#0369a1);border-radius:14px;padding:14px;margin-bottom:14px;color:#fff;">
+        <div style="font-weight:950;font-size:15px;"><i class="fas fa-chart-bar"></i> ${lblPeriod}</div>
+        <div style="font-size:12px;opacity:.8;margin-top:2px;">Heures planifiées vs réelles (pointeuse)</div>
+      </div>${rows||'<div class="empty-state"><i class="fas fa-users-slash"></i><br>Aucun employé.</div>'}`;
+    },
+
+    // ══ POLITIQUE RH ══
+    renderRH(){
+      const wrap=document.getElementById('plan-rh-content');if(!wrap)return;
+      wrap.innerHTML=`
+        <div style="background:linear-gradient(135deg,#7c3aed,#6d28d9);border-radius:14px;padding:14px;margin-bottom:14px;color:#fff;">
+          <div style="font-weight:950;font-size:15px;"><i class="fas fa-scale-balanced"></i> Politique RH & Profils</div>
+          <div style="font-size:12px;opacity:.8;margin-top:4px;">Modifiez les règles · Chaque profil peut être personnalisé</div>
+        </div>
+        <div id="rh-profiles-list"></div>
+        <button onclick="app.planning.resetRHToLegal()" style="width:100%;background:#fef2f2;color:#dc2626;border:2px solid #fca5a5;border-radius:12px;padding:12px;font-weight:900;font-size:13px;cursor:pointer;margin-top:10px;">
+          <i class="fas fa-rotate-left"></i> Remettre les valeurs légales (Code du travail)
+        </button>`;
+      this._renderRHProfiles();
+    },
+
+    _renderRHProfiles(){
+      const wrap=document.getElementById('rh-profiles-list');if(!wrap)return;
+      wrap.innerHTML=Object.entries(this._hrProfiles).map(([key,p])=>{
+        const legal=this.HR_LEGAL[key];
+        return`<div style="background:#fff;border-radius:14px;padding:14px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,.06);border-left:4px solid ${p.color||'#7c3aed'};">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+            <div style="font-weight:950;font-size:14px;">${p.icon} ${p.label}</div>
+            <span style="font-size:10px;background:#f0f9ff;color:#0369a1;border-radius:6px;padding:3px 8px;font-weight:800;cursor:pointer;" onclick="app.planning.assignProfileToEmp('${key}')"><i class="fas fa-user-plus"></i> Attribuer</span>
+          </div>
+          <div style="font-size:11px;color:#64748b;margin-bottom:10px;line-height:1.6;">📜 ${legal?.desc||p.desc||''}</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+            <div><label style="font-size:11px;color:#64748b;display:block;margin-bottom:2px;">Max h/jour</label>
+              <input type="number" value="${p.maxHoursDay}" style="margin:0;padding:8px;font-size:14px;" oninput="app.planning._updateProfile('${key}','maxHoursDay',parseFloat(this.value))"></div>
+            <div><label style="font-size:11px;color:#64748b;display:block;margin-bottom:2px;">Max h/semaine</label>
+              <input type="number" value="${p.maxHoursWeek}" style="margin:0;padding:8px;font-size:14px;" oninput="app.planning._updateProfile('${key}','maxHoursWeek',parseFloat(this.value))"></div>
+            <div><label style="font-size:11px;color:#64748b;display:block;margin-bottom:2px;">Repos min entre shifts (h)</label>
+              <input type="number" value="${p.minRestHours}" style="margin:0;padding:8px;font-size:14px;" oninput="app.planning._updateProfile('${key}','minRestHours',parseFloat(this.value))"></div>
+            <div><label style="font-size:11px;color:#64748b;display:block;margin-bottom:2px;">Pause après (h)</label>
+              <input type="number" value="${p.breakAfterH}" style="margin:0;padding:8px;font-size:14px;" oninput="app.planning._updateProfile('${key}','breakAfterH',parseFloat(this.value))"></div>
+            <div><label style="font-size:11px;color:#64748b;display:block;margin-bottom:2px;">Durée pause (min)</label>
+              <input type="number" value="${p.breakMinutes}" style="margin:0;padding:8px;font-size:14px;" oninput="app.planning._updateProfile('${key}','breakMinutes',parseInt(this.value))"></div>
+            <div><label style="font-size:11px;color:#64748b;display:block;margin-bottom:2px;">Interdit la nuit</label>
+              <select style="margin:0;padding:8px;font-size:12px;" onchange="app.planning._updateProfile('${key}','nightBan',this.value?{start:'22:00',end:'06:00'}:null)">
+                <option value="" ${!p.nightBan?'selected':''}>Non</option>
+                <option value="1" ${p.nightBan?'selected':''}>Oui (22h–6h)</option>
+              </select>
+            </div>
+          </div>
+          ${legal?`<div style="font-size:10px;color:#94a3b8;background:#f8fafc;border-radius:6px;padding:5px 8px;"><i class="fas fa-shield-halved"></i> Référence légale — ${legal.desc}</div>`:''}
+          <div style="font-size:11px;color:#94a3b8;margin-top:6px;">Employés avec ce profil: ${this._employees.filter(e=>e.hrProfile===key).map(e=>e.name).join(', ')||'aucun'}</div>
+        </div>`;
       }).join('');
+    },
 
-      const html=`<h2>📅 Planning semaine du ${weekLabel}</h2>
-      <p style="text-align:center;font-size:11px;color:#64748b;margin-bottom:10px;">Express Purpan · Imprimé le ${new Date().toLocaleDateString('fr')}</p>
-      <table>
-        <thead><tr><th>Employé</th>${headerCols}<th>Total</th></tr></thead>
-        <tbody>${rows}</tbody>
-        <tfoot><tr><td>Par jour</td>${dayTotals}<td></td></tr></tfoot>
-      </table>`;
+    _updateProfile(key,field,val){
+      if(!this._hrProfiles[key])return;
+      this._hrProfiles[key][field]=val;
+      clearTimeout(this._rhSaveTimer);
+      this._rhSaveTimer=setTimeout(()=>this._save(),1500);
+    },
 
-      const wrap=document.getElementById('print-planning-wrap');
-      if(wrap){wrap.innerHTML=html;wrap.style.display='block';}
-      setTimeout(()=>{window.print();if(wrap)wrap.style.display='none';},200);
+    assignProfileToEmp:async function(profileKey){
+      if(!this._employees.length)return toast('Aucun employé dans le planning.','warn');
+      // Clickable modal
+      let m=document.getElementById('modal-assign-profile');
+      if(!m){
+        m=document.createElement('div');m.id='modal-assign-profile';
+        m.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:90001;display:flex;align-items:flex-end;justify-content:center;padding:16px;';
+        document.body.appendChild(m);
+      }
+      const p=this._hrProfiles[profileKey];
+      const empHtml=this._employees.map(e=>{
+        const hasP=e.hrProfile===profileKey;
+        return`<div style="display:flex;align-items:center;gap:12px;padding:12px;border-radius:10px;margin-bottom:6px;background:${hasP?'#ede9fe':'#f8fafc'};border:2px solid ${hasP?'#a78bfa':'#e2e8f0'};cursor:pointer;"
+          onclick="app.planning._setProfileDirectly('${e.id}','${profileKey}')">
+          <div style="width:34px;height:34px;border-radius:50%;background:${e.color||'#003896'};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:950;font-size:12px;">${(e.name||'?').slice(0,2)}</div>
+          <div style="flex:1;">
+            <div style="font-weight:950;font-size:13px;">${e.name}</div>
+            <div style="font-size:11px;color:#64748b;">${e.contract||'Pas de contrat défini'}</div>
+          </div>
+          ${hasP?`<span style="color:#7c3aed;font-weight:900;font-size:11px;">✓ Actif</span>`:'<span style="font-size:11px;color:#94a3b8;">Cliquer</span>'}
+        </div>`;
+      }).join('');
+      m.innerHTML=`<div style="background:#fff;border-radius:20px;padding:20px;max-width:420px;width:100%;max-height:80vh;display:flex;flex-direction:column;">
+        <div style="font-weight:950;font-size:16px;margin-bottom:4px;">${p?.icon||'👤'} Attribuer profil "${profileKey}"</div>
+        <div style="font-size:12px;color:#64748b;margin-bottom:14px;">Cliquez sur un employé pour lui attribuer ce profil.</div>
+        <div style="overflow-y:auto;flex:1;margin-bottom:14px;">${empHtml}</div>
+        <button onclick="document.getElementById('modal-assign-profile').style.display='none'" style="background:#f1f5f9;color:#475569;border:none;border-radius:12px;padding:12px;font-weight:950;cursor:pointer;width:100%;">Fermer</button>
+      </div>`;
+      m.style.display='flex';
+    },
+
+    _setProfileDirectly:async function(empId,profileKey){
+      const emp=this._employees.find(e=>String(e.id)===String(empId));if(!emp)return;
+      emp.hrProfile=emp.hrProfile===profileKey?undefined:profileKey;
+      await this._save();
+      document.getElementById('modal-assign-profile')?.remove();
+      this.render();this.renderRH();
+      toast(`Profil ${emp.hrProfile?'attribué':'retiré'} ✓`,'ok',2000);
+    },
+
+    resetRHToLegal:async function(){
+      const ok=await dlgConfirm('Réinitialiser','Remettre tous les profils aux valeurs légales du Code du travail ?',true);if(!ok)return;
+      this._hrProfiles=JSON.parse(JSON.stringify(this.HR_LEGAL));
+      await this._save();this._renderRHProfiles();
+      toast('Profils RH réinitialisés ✓','ok',3000);
+    },
+
+    // ══ AUTRES ACTIONS ══
+    addEmployee:async function(){
+      const name=await dlgPrompt('Prénom + Nom :');if(!name?.trim())return;
+      const colors=['#003896','#0891b2','#059669','#7c3aed','#dc2626','#d97706','#0f766e','#db2777'];
+      const id=Date.now()+Math.random();
+      this._employees.push({id,name:name.trim().toUpperCase(),contract:'',color:colors[this._employees.length%colors.length],schedule:{},vacances:[]});
+      await this._save();this.render();
+      setTimeout(()=>this.openEmpSettings(id),300);
+    },
+
+    importFromUsers:async function(){
+      const users=window.app.data?.users||[];
+      if(!users.length)return toast('Aucun utilisateur trouvé dans l\'appli.','warn');
+      // Show clickable selection modal
+      let m=document.getElementById('modal-import-users');
+      if(!m){
+        m=document.createElement('div');m.id='modal-import-users';
+        m.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:90000;display:flex;align-items:flex-end;justify-content:center;padding:16px;';
+        document.body.appendChild(m);
+      }
+      const toImport=new Set();
+      const alreadyIn=new Set(this._employees.map(e=>e.name));
+      const userHtml=users.map(u=>{
+        const name=(u.name||u.displayName||u.email||'').toUpperCase().trim();
+        if(!name)return'';
+        const isIn=alreadyIn.has(name);
+        return`<div id="imp-user-${u.uid}" style="display:flex;align-items:center;gap:12px;padding:12px;border-radius:10px;margin-bottom:6px;background:${isIn?'#f0fdf4':'#f8fafc'};border:2px solid ${isIn?'#86efac':'#e2e8f0'};cursor:${isIn?'default':'pointer'};"
+          ${!isIn?`onclick="this.classList.toggle('selected-imp');this.style.background=this.classList.contains('selected-imp')?'#dbeafe':'#f8fafc';this.style.borderColor=this.classList.contains('selected-imp')?'#93c5fd':'#e2e8f0';"`:''}
+          >
+          <div style="width:36px;height:36px;border-radius:50%;background:${u.role==='admin'?'#003896':u.role==='conseiller'?'#7c3aed':'#0891b2'};display:flex;align-items:center;justify-content:center;color:#fff;font-weight:950;font-size:13px;">${name.slice(0,2)}</div>
+          <div style="flex:1;">
+            <div style="font-weight:950;font-size:13px;">${name}</div>
+            <div style="font-size:11px;color:#64748b;">${u.role||'staff'} • ${u.email||''}</div>
+          </div>
+          ${isIn?`<span style="font-size:11px;color:#059669;font-weight:900;">✓ Déjà dans le planning</span>`:'<span style="font-size:10px;color:#64748b;">Cliquer pour sélectionner</span>'}
+        </div>`;
+      }).filter(Boolean).join('');
+      m.innerHTML=`<div style="background:#fff;border-radius:20px;padding:20px;max-width:420px;width:100%;max-height:80vh;display:flex;flex-direction:column;">
+        <div style="font-weight:950;font-size:16px;margin-bottom:4px;color:#059669;"><i class="fas fa-users-gear"></i> Importer des utilisateurs</div>
+        <div style="font-size:12px;color:#64748b;margin-bottom:14px;">Sélectionnez les utilisateurs à ajouter au planning</div>
+        <div style="overflow-y:auto;flex:1;margin-bottom:14px;">${userHtml}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <button onclick="app.planning._doImportSelected()" style="background:#059669;color:#fff;border:none;border-radius:12px;padding:12px;font-weight:950;cursor:pointer;"><i class="fas fa-check"></i> Importer</button>
+          <button onclick="document.getElementById('modal-import-users').style.display='none'" style="background:#f1f5f9;color:#475569;border:none;border-radius:12px;padding:12px;font-weight:950;cursor:pointer;">Annuler</button>
+        </div>
+      </div>`;
+      m.style.display='flex';
+    },
+
+    _doImportSelected:async function(){
+      const m=document.getElementById('modal-import-users');
+      if(!m)return;
+      const selected=m.querySelectorAll('.selected-imp');
+      if(!selected.length){toast('Aucun utilisateur sélectionné.','warn');return;}
+      let added=0;
+      const colors=['#003896','#0891b2','#059669','#7c3aed','#dc2626','#d97706','#0f766e','#db2777'];
+      selected.forEach(el=>{
+        const name=el.querySelector('div > div')?.textContent?.trim();
+        if(!name)return;
+        if(this._employees.some(e=>e.name===name))return;
+        this._employees.push({id:Date.now()+Math.random(),name,contract:'',color:colors[this._employees.length%colors.length],schedule:{},vacances:[]});
+        added++;
+      });
+      m.style.display='none';
+      if(!added){toast('Tous les utilisateurs sont déjà dans le planning.','info');return;}
+      await this._save();this.render();toast(`${added} employé(s) importé(s) ✓`,'ok');
     },
 
     copyWeek:async function(){
-      const choix=await dlgPrompt('Copier le planning :\n1. Cette semaine → semaine suivante\n2. Semaine précédente → cette semaine\n\nEntrez 1 ou 2 :');
-      if(!choix)return;const dir=parseInt(choix);
       const dates=this.getWeekDates();
+      const choix=await dlgPrompt('Copier:\n1. Cette semaine → semaine suivante\n2. Semaine précédente → cette semaine\n\nEntrez 1 ou 2 :');
+      if(!choix)return;const dir=parseInt(choix);
       if(dir===1){
-        const ok=await dlgConfirm('Copier la semaine','Copier ce planning sur la semaine suivante ?',false);if(!ok)return;
+        const ok=await dlgConfirm('Copier','Copier ce planning sur la semaine suivante ?',false);if(!ok)return;
         this._employees.forEach(emp=>{
           if(!emp.schedule)emp.schedule={};
           dates.forEach(date=>{
             const key=date.toISOString().slice(0,10);
-            const nextDate=new Date(date);nextDate.setDate(date.getDate()+7);
-            const nextKey=nextDate.toISOString().slice(0,10);
+            const nk=new Date(date);nk.setDate(date.getDate()+7);
+            const nextKey=nk.toISOString().slice(0,10);
             if(emp.schedule[key])emp.schedule[nextKey]={...emp.schedule[key]};else delete emp.schedule[nextKey];
           });
         });
-        await this._save();toast('Semaine copiée vers la semaine prochaine ✓','ok');
+        await this._save();toast('Semaine copiée ✓','ok');
       } else if(dir===2){
-        const ok=await dlgConfirm('Importer semaine précédente','Remplacer cette semaine par la semaine précédente ?',true);if(!ok)return;
+        const ok=await dlgConfirm('Importer','Remplacer cette semaine par la semaine précédente ?',true);if(!ok)return;
         this._employees.forEach(emp=>{
           if(!emp.schedule)emp.schedule={};
           dates.forEach(date=>{
-            const prevDate=new Date(date);prevDate.setDate(date.getDate()-7);
-            const prevKey=prevDate.toISOString().slice(0,10);
+            const pk=new Date(date);pk.setDate(date.getDate()-7);
             const key=date.toISOString().slice(0,10);
+            const prevKey=pk.toISOString().slice(0,10);
             if(emp.schedule[prevKey])emp.schedule[key]={...emp.schedule[prevKey]};else delete emp.schedule[key];
           });
         });
@@ -4074,21 +4487,68 @@ ${nameLine2?`^CF0,30^FO15,45^FD${nameLine2}^FS`:''}
     },
 
     exportCSV(){
-      const dates=this.getWeekDates();const dayNames=['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
-      const header=['Employé','Contrat',...dates.map((d,i)=>`${dayNames[i]} ${d.toLocaleDateString('fr')}`),'Total heures'];
+      const dates=this.getWeekDates();const dN=['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+      const header=['Employé','Contrat','Profil RH','€/h',...dates.map((d,i)=>`${dN[i]} ${d.toLocaleDateString('fr')}`),'Total h','Coût brut'];
       const rows=[header];
       this._employees.forEach(emp=>{
         const{totalHours}=this.validateSchedule(emp);
-        const row=[emp.name,emp.contract||'',...dates.map(d=>{
+        const row=[emp.name,emp.contract||'',emp.hrProfile||'',emp.rate||'',...dates.map(d=>{
           const key=d.toISOString().slice(0,10);const s=emp.schedule?.[key]||{type:'rest'};
-          return s.type==='rest'?'Repos':`${s.start||'?'}-${s.end||'?'} (${s.post||''})`;
-        }),totalHours.toFixed(1)+'h'];
+          if(s.type==='leave')return`CONGÉ-${s.leaveType||''}`;
+          return s.type==='rest'?'Repos':`${s.start}-${s.end} ${s.post||''}${s.breakMin?` pause:${s.breakMin}min`:''}`;
+        }),totalHours.toFixed(1)+'h',emp.rate?(totalHours*emp.rate).toFixed(2)+'€':''];
         rows.push(row);
       });
       const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(';')).join('\n');
       const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
       const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`planning_${new Date().toISOString().slice(0,10)}.csv`;a.click();URL.revokeObjectURL(url);
       toast('Planning exporté.','ok');
+    },
+
+    printWeek(){
+      const dates=this.getWeekDates();
+      const DAY=['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+      const today=new Date().toISOString().slice(0,10);
+      const opts={day:'2-digit',month:'2-digit'};
+      const lbl=`${dates[0].toLocaleDateString('fr',opts)} – ${dates[6].toLocaleDateString('fr',opts)}`;
+      const headers=DAY.map((d,i)=>{const isT=dates[i].toISOString().slice(0,10)===today;return`<th style="${isT?'background:#0891b2;':''}">${d} ${dates[i].getDate()}</th>`;}).join('');
+      const rows=this._employees.map(emp=>{
+        const{totalHours,restDays,warnings}=this.validateSchedule(emp);
+        const profile=emp.hrProfile?this._hrProfiles[emp.hrProfile]:null;
+        const cells=dates.map(d=>{
+          const key=d.toISOString().slice(0,10);const s=emp.schedule?.[key];
+          const isVac=this._isVacation(emp,key);
+          if(isVac&&(!s||s.type==='rest'))return`<td style="background:#fce7f3;color:#9d174d;font-size:9px;font-weight:900;">🌴 CONGÉ</td>`;
+          if(!s||s.type==='rest')return`<td class="p-rest">Repos</td>`;
+          if(s.type==='leave')return`<td class="p-rest">🌴 ${s.leaveType||'CP'}</td>`;
+          const h=this.getShiftHours(s);
+          const brk=s.breakMin!==undefined?s.breakMin:this._autoBreak(h,profile);
+          return`<td class="p-work">${s.start}–${s.end}<br><span style="font-size:8px;">${s.post||''} · ${h.toFixed(1)}h${brk?` ☕${brk}'`:''}</span>`;
+        }).join('');
+        const cost=emp.rate&&totalHours?` · ${(totalHours*emp.rate).toFixed(0)}€`:'';
+        return`<tr>
+          <td><strong>${emp.name}</strong><br><small>${emp.contract||''}${profile?' · '+profile.icon+profile.label:''}</small>${warnings.length?`<br><span style="color:#dc2626;font-size:9px;">⚠ ${warnings[0]}</span>`:''}</td>
+          ${cells}
+          <td class="p-total">${totalHours.toFixed(1)}h${cost}<br>${restDays}R</td>
+        </tr>`;
+      }).join('');
+      const dayTot=dates.map(d=>{
+        const key=d.toISOString().slice(0,10);
+        const tot=this._employees.reduce((s,e)=>{const sh=e.schedule?.[key];return s+(sh?.type==='work'?this.getShiftHours(sh):0);},0);
+        const cnt=this._employees.filter(e=>e.schedule?.[key]?.type==='work').length;
+        return`<td style="font-size:9px;">${cnt}p · ${tot.toFixed(0)}h</td>`;
+      }).join('');
+      const totBrut=this._employees.reduce((s,e)=>s+this.validateSchedule(e).totalHours*(e.rate||0),0);
+      const html=`<h2>📅 Planning — ${lbl}</h2>
+      <p style="text-align:center;font-size:11px;color:#64748b;">Express Purpan · Édité le ${new Date().toLocaleDateString('fr')} · Coût brut total: ${totBrut.toFixed(0)}€</p>
+      <table>
+        <thead><tr><th>Employé</th>${headers}<th>Total</th></tr></thead>
+        <tbody>${rows}</tbody>
+        <tfoot><tr><td><strong>Par jour</strong></td>${dayTot}<td></td></tr></tfoot>
+      </table>`;
+      const wrap=document.getElementById('print-planning-wrap');
+      if(wrap){wrap.innerHTML=html;wrap.style.display='block';}
+      setTimeout(()=>{window.print();if(wrap)wrap.style.display='none';},200);
     }
   },
 
@@ -4534,10 +4994,24 @@ ${nameLine2?`^CF0,30^FO15,45^FD${nameLine2}^FS`:''}
       const s=this._state||{};
       if(s.isPaused){
         await this._punch('pause_end');
-        toast('Fin de pause.','ok');
+        toast('Fin de pause ✓','ok');
       }else{
+        if(!s.isActive)return toast('Vous n\'êtes pas en service.','warn');
+        // Check: how long worked without break?
+        const elapsed=(Date.now()-s.clockIn-s.totalPauseMs)/3600000;// hours
+        // Get employee HR profile break rule
+        const me=window.app.me;
+        const planEmp=window.app.planning?._employees?.find(e=>
+          e.name===me?.name||(me?.name&&e.name.includes(me.name.split(' ')[0]))
+        );
+        const profile=planEmp?.hrProfile?window.app.planning._hrProfiles?.[planEmp.hrProfile]:null;
+        const maxWithoutBreak=profile?.breakAfterH||6;
+        const minBreak=profile?.breakMinutes||20;
+        if(elapsed>=maxWithoutBreak){
+          toast(`⚠️ Pause obligatoire ! Vous avez travaillé ${elapsed.toFixed(1)}h sans pause (max ${maxWithoutBreak}h).`,'warn',5000);
+        }
         await this._punch('pause_start');
-        toast('Pause enregistrée.','info');
+        toast('Pause enregistrée ☕','info');
       }
     },
 
