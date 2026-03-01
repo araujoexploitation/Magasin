@@ -39,7 +39,15 @@ window._fbChat={collection,query,orderBy,limit,onSnapshot,addDoc,serverTimestamp
 const colReception=collection(db,"reception_logs");
 const TRACE_PREFIX={salad:"salad_traca",pvp:"pvp_traca"};
 const colTraceFor=(mod,pid)=>collection(db,TRACE_PREFIX[mod],String(pid),"items");
-
+// ── APP VERSION & CHANGELOG ──
+const APP_VERSION="2.1.0";
+const APP_LAST_UPDATE="01/06/2025 à 14h30";
+const APP_CHANGELOG=[
+  {v:"2.1.0",date:"01/06/2025",items:["Reset besoins PVP à 23h automatique","Fix erreur sauvegarde Salad Bar","DLC du jour en rouge en tête de liste","Badge nombre de DLC sur DLC Frais","Étiquette DLC dans DLC Frais","Too Good To Go regroupé dans DLC Frais","Écran connexion : version + date MAJ + changelog","Tri amélioré par famille + date DLC"]},
+  {v:"2.0.0",date:"15/05/2025",items:["Module Salad Bar complet","Module Planning avec gestion des équipes","Portail Too Good To Go","Compteur de températures frigo","Export CSV inspection + traçabilités"]},
+  {v:"1.5.0",date:"20/04/2025",items:["Gestion des DLC frais avec scan code-barres","Besoins PVP avec objectifs par jour","Module chat interne par canal","Gestion des rôles et permissions"]},
+  {v:"1.0.0",date:"01/03/2025",items:["Lancement de l'app Araujo Exploitation","Connexion Firebase sécurisée","Navigation multi-modules","Gestion équipe basique"]}
+];
 const codeReader=new ZXing.BrowserMultiFormatReader();
 
 // ── ZONE COLOR PALETTE ──
@@ -183,7 +191,9 @@ window.app={
   _startPvpMidnightReset(){
     if(this._pvpResetTimer)clearTimeout(this._pvpResetTimer);
     const now=new Date();
-    const msToMidnight=(new Date(now.getFullYear(),now.getMonth(),now.getDate()+1,0,0,5)-now);
+    const reset23h=new Date(now.getFullYear(),now.getMonth(),now.getDate(),23,0,5);
+if(reset23h<=now) reset23h.setDate(reset23h.getDate()+1);
+const msToReset=(reset23h-now);
     this._pvpResetTimer=setTimeout(async ()=>{
       if(this.data.checkedNeeds?.length){
         this.data.checkedNeeds=[];
