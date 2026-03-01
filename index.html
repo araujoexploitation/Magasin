@@ -1,0 +1,950 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"/>
+<meta name="theme-color" content="#003896"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Express Purpan"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="application-name" content="Express Purpan"/>
+<link rel="apple-touch-icon" href="https://raw.githubusercontent.com/araujoexploitation/Magasin/main/LOGO.png"/>
+<link rel="manifest" id="pwa-manifest"/>
+<title>Express Purpan V9.0</title>
+<script>
+// Inject PWA manifest dynamically
+const manifest={name:"Express Purpan",short_name:"Purpan",display:"fullscreen",background_color:"#003896",theme_color:"#003896",start_url:window.location.href,icons:[{src:"https://raw.githubusercontent.com/araujoexploitation/Magasin/main/LOGO.png",sizes:"192x192",type:"image/png"}]};
+const blob=new Blob([JSON.stringify(manifest)],{type:"application/json"});
+document.getElementById('pwa-manifest').href=URL.createObjectURL(blob);
+</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+<script src="https://unpkg.com/@zxing/library@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+<link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<div id="offline-banner"><i class="fas fa-wifi-slash"></i> Hors ligne – reconnexion en cours…</div>
+
+<!-- PWA INSTALL BANNER -->
+<div id="pwa-install-banner">
+  <i class="fas fa-mobile-screen-button" style="font-size:24px;flex-shrink:0;"></i>
+  <div class="pwa-text">
+    <div class="pwa-title">Installer Express Purpan</div>
+    <div class="pwa-sub">Accès rapide depuis l'écran d'accueil</div>
+  </div>
+  <button class="pwa-btn" onclick="app.installPWA()"><i class="fas fa-download"></i> Installer</button>
+  <button class="pwa-close" onclick="document.getElementById('pwa-install-banner').style.display='none'">✕</button>
+</div>
+
+<!-- CONSEILLER READ-ONLY BANNER -->
+<div id="conseiller-banner">
+  <div><i class="fas fa-eye"></i> Accès Conseiller — <span style="font-weight:700;opacity:.85;">Lecture seule</span></div>
+  <div style="font-size:11px;opacity:.75;">Les modifications sont désactivées</div>
+</div>
+
+
+<div id="toast-container"></div>
+<div id="spinner-overlay" class="hidden"><div class="spinner"></div></div>
+
+<!-- ── CONFIRM ── -->
+<div id="modal-confirm" class="hidden">
+  <div class="dlg-card">
+    <p class="dlg-title" id="dlg-title">Confirmation</p>
+    <p class="dlg-msg"   id="dlg-msg"></p>
+    <div class="dlg-btns">
+      <button class="btn secondary" style="margin:0" id="dlg-cancel">Annuler</button>
+      <button class="btn danger"    style="margin:0" id="dlg-ok">Confirmer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── PROMPT ── -->
+<div id="modal-prompt" class="hidden">
+  <div class="dlg-card">
+    <p class="dlg-title" id="pmt-title">Saisie</p>
+    <input id="pmt-input" type="text" style="margin-bottom:12px;">
+    <div class="dlg-btns">
+      <button class="btn secondary" style="margin:0" id="pmt-cancel">Annuler</button>
+      <button class="btn"           style="margin:0" id="pmt-ok">OK</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── LOGIN ── -->
+<div id="login-overlay">
+  <div class="login-card">
+    <div style="text-align:center;"><img src="https://raw.githubusercontent.com/araujoexploitation/Magasin/main/LOGO.png" style="width:200px;margin-bottom:20px;"></div>
+    <input type="email" id="login-email" placeholder="Email" autocomplete="username" inputmode="email">
+    <input type="password" id="login-pass" placeholder="Mot de passe" autocomplete="current-password">
+    <button class="btn success" id="login-btn" onclick="app.auth.login()"><i class="fas fa-right-to-bracket"></i> CONNEXION</button>
+    <div class="login-help" onclick="app.auth.forgot()"><i class="fas fa-unlock-keyhole"></i> Mot de passe oublié ?</div>
+    <div id="login-error" class="login-error"></div>
+    <div class="small" style="text-align:center;margin-top:14px;">Astuce : après création d'un compte staff, "Mot de passe oublié" permet de définir le mot de passe.</div>
+  </div>
+</div>
+
+<!-- ── BARCODE MODAL ── -->
+<div id="modal-barcode" class="modal-bc hidden">
+  <div class="modal-card" style="text-align:center;">
+    <h3 id="bc-name" style="margin-top:0;"></h3>
+    <img id="bc-img-display" style="width:100%;height:220px;object-fit:contain;margin-bottom:15px;display:none;background:#f8fafc;border-radius:10px;">
+    <svg id="barcode"></svg><br>
+    <button class="btn secondary" style="margin-top:20px;" onclick="document.getElementById('modal-barcode').classList.add('hidden')">Fermer</button>
+  </div>
+</div>
+
+<!-- ── TRACE MODAL ── -->
+<div id="modal-trace" class="modal-bc hidden">
+  <div class="modal-card">
+    <h3 id="trace-h3" style="margin-top:0;display:flex;align-items:center;gap:10px;"><i class="fas fa-camera"></i> Tracabilité</h3>
+    <div class="small" id="trace-title" style="margin-bottom:10px;"></div>
+    <button class="btn" id="trace-btn-pick" onclick="document.getElementById('trace-file').click()"><i class="fas fa-image"></i> Prendre / choisir une photo</button>
+    <input type="file" id="trace-file" accept="image/*" capture="environment" class="hidden">
+    <img id="trace-preview" style="width:100%;height:200px;object-fit:contain;background:#f8fafc;border-radius:12px;display:none;margin-top:12px;">
+    <div class="row" style="margin-top:12px;">
+      <button class="btn" id="trace-btn-save" style="margin-top:0;" onclick="app.trace.save()"><i class="fas fa-floppy-disk"></i> Enregistrer</button>
+      <button class="btn secondary" style="margin-top:0;" onclick="app.trace.close()">Fermer</button>
+    </div>
+    <hr class="divider">
+    <h4 style="margin:0 0 10px 0;">Historique (6 mois)</h4>
+    <div id="trace-history" class="small">Chargement…</div>
+  </div>
+</div>
+
+<!-- ── EDIT FRAIS ── -->
+<div id="modal-edit-frais" class="modal-bc hidden">
+  <div class="modal-card">
+    <h3 style="margin-top:0;">Modifier Frais</h3>
+    <input type="hidden" id="edit-id">
+    <label>EAN</label><input type="text" id="edit-ean" inputmode="numeric">
+    <label>Nom Produit</label><input type="text" id="edit-name">
+    <label>Famille</label>
+    <select id="edit-famille"><option>SNACKING</option><option>TRAITEUR</option><option>ULTRA FRAIS</option><option>CHARCUTERIE</option><option>VOLAILLE</option><option>BOUCHERIE</option><option>FROMAGE</option><option>SAURISSERIE</option><option>DIVERS</option></select>
+    <label>Qté</label><input type="number" id="edit-qty">
+    <label>DLC</label><input type="date" id="edit-date">
+    <button class="btn success" onclick="app.frais.saveEdit()">Enregistrer</button>
+    <button class="btn danger"  onclick="app.frais.del()">Supprimer</button>
+    <button class="btn secondary" onclick="document.getElementById('modal-edit-frais').classList.add('hidden')">Annuler</button>
+  </div>
+</div>
+
+<!-- ── PVP LIB ── -->
+<div id="modal-pvp-lib" class="modal-bc hidden">
+  <div class="modal-card">
+    <h3 style="color:var(--pvp);margin-top:0;">Produit PVP</h3>
+    <input type="hidden" id="lib-id"><input type="hidden" id="lib-img-data">
+    <label>Famille</label><select id="lib-fam-select" onchange="app.pvp.toggleFamInput()"></select>
+    <input type="text" id="lib-fam-new" placeholder="Nouvelle famille..." class="hidden">
+    <label>Nom</label><input type="text" id="lib-name">
+    <label>EAN</label><input type="text" id="lib-ean" inputmode="numeric" maxlength="13">
+    <button class="btn secondary" onclick="document.getElementById('cam-input').click()" style="margin-bottom:10px;">Photo</button>
+    <input type="file" id="cam-input" accept="image/*" capture="environment" class="hidden">
+    <img id="img-preview" style="width:110px;height:110px;object-fit:cover;border-radius:12px;display:none;margin:0 auto 10px auto;">
+    <label>Conservation</label><select id="lib-days"><option value="0">JOURNÉE</option><option value="48">48H</option><option value="72">72H</option></select>
+    <label>Objectifs (L→D)</label>
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;">
+      <input type="number" id="t-1" placeholder="L" style="text-align:center;padding:6px;">
+      <input type="number" id="t-2" placeholder="M" style="text-align:center;padding:6px;">
+      <input type="number" id="t-3" placeholder="M" style="text-align:center;padding:6px;">
+      <input type="number" id="t-4" placeholder="J" style="text-align:center;padding:6px;">
+      <input type="number" id="t-5" placeholder="V" style="text-align:center;padding:6px;">
+      <input type="number" id="t-6" placeholder="S" style="text-align:center;padding:6px;">
+      <input type="number" id="t-0" placeholder="D" style="text-align:center;padding:6px;">
+    </div>
+    <button class="btn pvp"      onclick="app.pvp.saveLib()">Enregistrer</button>
+    <button class="btn danger"   onclick="app.pvp.delLib()">Supprimer</button>
+    <button class="btn secondary" onclick="document.getElementById('modal-pvp-lib').classList.add('hidden')">Fermer</button>
+  </div>
+</div>
+
+<!-- ── PVP STOCK ── -->
+<div id="modal-pvp-stock" class="modal-bc hidden">
+  <div class="modal-card">
+    <h3 style="color:var(--pvp);margin-top:0;">Correction Rayon</h3>
+    <input type="hidden" id="stock-id"><h4 id="stock-name" style="text-align:center;margin:0 0 10px 0;"></h4>
+    <label>Quantité</label><input type="number" id="stock-qty">
+    <label>Sortie</label><input type="datetime-local" id="stock-start">
+    <label>Fin</label><input type="datetime-local" id="stock-end">
+    <button class="btn pvp"    onclick="app.pvp.saveStock()">Valider</button>
+    <button class="btn danger" onclick="app.pvp.delStock()">Retirer</button>
+    <button class="btn secondary" onclick="document.getElementById('modal-pvp-stock').classList.add('hidden')">Annuler</button>
+  </div>
+</div>
+
+<!-- ── SALAD LIB ── -->
+<div id="modal-salad-lib" class="modal-bc hidden">
+  <div class="modal-card">
+    <h3 style="color:var(--salad);margin-top:0;">Produit Salad Bar</h3>
+    <input type="hidden" id="sal-lib-id">
+    <label>Groupe</label>
+    <select id="sal-lib-fam"><option>SALADE</option><option>BASE</option><option>LEGUMES ET FRUITS</option><option>PROTEINE</option><option>FROMAGES</option><option>FECULENTS</option><option>TOPPING</option><option>DIVERS</option></select>
+    <label>Nom</label><input type="text" id="sal-lib-name">
+    <label>Durée</label>
+    <select id="sal-lib-hours"><option value="24">24H</option><option value="48">48H</option><option value="72">72H</option><option value="168">7J</option><option value="1920">80J</option></select>
+    <button class="btn salad"  onclick="app.salad.saveLib()">Enregistrer</button>
+    <button class="btn danger" onclick="app.salad.delLib()">Supprimer</button>
+    <button class="btn secondary" onclick="document.getElementById('modal-salad-lib').classList.add('hidden')">Fermer</button>
+  </div>
+</div>
+
+<!-- ── FRIGO LOG ── -->
+<div id="modal-frigo-log" class="modal-bc hidden">
+  <div class="modal-card">
+    <h3 style="margin-top:0;color:var(--frigo);"><i class="fas fa-temperature-half"></i> Température frigo</h3>
+    <label>Frigo</label><select id="frigo-log-fridge"></select>
+    <label>Température (°C)</label><input type="number" id="frigo-log-temp" inputmode="decimal" step="0.1" placeholder="Ex: 3.6">
+    <label>Date / heure</label><input type="datetime-local" id="frigo-log-time">
+    <div class="row" style="margin-top:12px;">
+      <button class="btn frigo" style="margin-top:0;" onclick="app.frigo.saveLog()"><i class="fas fa-check"></i> Valider</button>
+      <button class="btn secondary" style="margin-top:0;" onclick="document.getElementById('modal-frigo-log').classList.add('hidden')">Annuler</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── TODO ZONE MODAL ── -->
+<div id="modal-todo-zone" class="modal-bc hidden">
+  <div class="modal-card">
+    <h3 style="color:var(--todo);margin-top:0;" id="todo-zone-modal-title"><i class="fas fa-map-marker-alt"></i> Zone</h3>
+    <input type="hidden" id="tz-id">
+    <label>Nom de la zone</label>
+    <input type="text" id="tz-name" placeholder="Ex: RÉSERVE, RAYON, CAISSE...">
+    <div class="field-err" id="err-tz-name">Nom requis</div>
+    <label>Couleur</label>
+    <div class="color-grid" id="tz-color-grid"></div>
+    <input type="hidden" id="tz-color" value="#7c3aed">
+    <div class="row" style="margin-top:8px;">
+      <button class="btn todo"   style="margin-top:0;" onclick="app.todo.saveZone()">Enregistrer</button>
+      <button class="btn danger" style="margin-top:0;" id="tz-del-btn" onclick="app.todo.delZone()">Supprimer</button>
+    </div>
+    <button class="btn secondary" onclick="document.getElementById('modal-todo-zone').classList.add('hidden')">Annuler</button>
+  </div>
+</div>
+
+<!-- ── TODO TASK MODAL ── -->
+<div id="modal-todo-task" class="modal-bc hidden">
+  <div class="modal-card">
+    <h3 style="color:var(--todo);margin-top:0;" id="todo-task-modal-title"><i class="fas fa-list-check"></i> Tâche</h3>
+    <input type="hidden" id="tt-id">
+    <label>Zone</label>
+    <select id="tt-zone"></select>
+    <label>Nom de la tâche</label>
+    <input type="text" id="tt-name" placeholder="Ex: Nettoyer le sol, Faire l'inventaire...">
+    <div class="field-err" id="err-tt-name">Nom requis</div>
+    <label>Heure cible</label>
+    <input type="time" id="tt-time" placeholder="Ex: 08:00">
+    <label>Fréquence</label>
+    <div class="freq-type-tabs">
+      <div class="freq-tab active" id="freq-daily-tab"   onclick="app.todo._setFreq('daily')">Journalier</div>
+      <div class="freq-tab"        id="freq-weekly-tab"  onclick="app.todo._setFreq('weekly')">Hebdo</div>
+      <div class="freq-tab"        id="freq-monthly-tab" onclick="app.todo._setFreq('monthly')">Mensuel</div>
+      <div class="freq-tab"        id="freq-yearly-tab"  onclick="app.todo._setFreq('yearly')">Annuel</div>
+    </div>
+    <!-- Journalier : tous les jours -->
+    <div class="freq-panel active" id="freq-panel-daily">
+      <div class="small" style="color:var(--muted);text-align:center;padding:8px;">Tâche active tous les jours</div>
+    </div>
+    <!-- Hebdomadaire : jours de la semaine -->
+    <div class="freq-panel" id="freq-panel-weekly">
+      <label>Jours d'application</label>
+      <div class="days-row" id="tt-days-row"></div>
+      <div class="field-err" id="err-tt-days">Sélectionner au moins un jour</div>
+    </div>
+    <!-- Mensuel : jour du mois -->
+    <div class="freq-panel" id="freq-panel-monthly">
+      <label>Jours du mois</label>
+      <div class="month-days-grid" id="tt-month-days-grid"></div>
+      <div class="field-err" id="err-tt-days-m">Sélectionner au moins un jour</div>
+    </div>
+    <!-- Annuel : date exacte -->
+    <div class="freq-panel" id="freq-panel-yearly">
+      <label>Date (chaque année)</label>
+      <input type="text" id="tt-yearly-date" placeholder="JJ/MM (ex: 01/01)" inputmode="numeric" maxlength="5">
+    </div>
+    <label>Notes (optionnel)</label>
+    <textarea id="tt-notes" placeholder="Instructions, détails…"></textarea>
+    <div class="row" style="margin-top:8px;">
+      <button class="btn todo"   style="margin-top:0;" onclick="app.todo.saveTask()">Enregistrer</button>
+      <button class="btn danger" style="margin-top:0;" id="tt-del-btn" onclick="app.todo.delTask()">Supprimer</button>
+    </div>
+    <button class="btn secondary" onclick="document.getElementById('modal-todo-task').classList.add('hidden')">Annuler</button>
+  </div>
+</div>
+
+<!-- ── HEADER ── -->
+<header id="app-header" class="hidden">
+  <button class="logout-btn" onclick="app.auth.logout()"><i class="fas fa-right-from-bracket"></i></button>
+  <img src="https://raw.githubusercontent.com/araujoexploitation/Magasin/main/LOGO.png" class="logo-header">
+  <button id="notif-toggle-btn" onclick="app.notif.requestPermission()" title="Notifications"></button>
+  <div id="user-badge" class="user-badge">...</div>
+</header>
+
+<main>
+  <!-- HOME -->
+  <div id="view-home">
+
+
+    <div id="home-edit-bar" style="display:none;background:linear-gradient(135deg,#7c3aed,#5b21b6);border-radius:16px;padding:14px 16px;margin-bottom:12px;color:#fff;">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+        <div>
+          <div style="font-weight:950;font-size:15px;"><i class="fas fa-hand-pointer"></i> Maintenez et glissez pour réorganiser</div>
+          <div style="font-size:12px;opacity:.8;margin-top:3px;">Les modules se déplacent au toucher • Sauvegarde automatique</div>
+        </div>
+        <button onclick="app.homeOrder.stopEdit()" style="background:rgba(255,255,255,.25);border:none;color:#fff;border-radius:12px;padding:10px 16px;font-weight:950;cursor:pointer;white-space:nowrap;flex-shrink:0;"><i class="fas fa-check"></i> Terminé</button>
+      </div>
+    </div>
+    <div class="home-grid" id="home-grid">
+      <div class="home-btn wide" onclick="app.nav('dlc')" style="background:linear-gradient(135deg,#003896,#1e40af);position:relative;">
+        <div id="badge-frais" class="home-badge red hidden">0</div>
+        <i class="fas fa-barcode"></i><br>GESTION DLC
+        <div class="small" style="color:rgba(255,255,255,.8);margin-top:6px;">Frais • PVP • Salad Bar • Too Good To Go</div>
+      </div>
+      <div class="home-btn" onclick="app.nav('frigo')" style="background:linear-gradient(135deg,#0ea5e9,#0369a1);">
+        <div id="badge-frigo" class="home-badge blue hidden">0</div>
+        <i class="fas fa-temperature-half"></i><br>TEMPÉRATURES
+        <div class="small" style="color:rgba(255,255,255,.8);margin-top:6px;">Relevés restants</div>
+      </div>
+      <div class="home-btn" onclick="app.nav('todo')" style="background:linear-gradient(135deg,#7c3aed,#5b21b6);">
+        <div id="badge-todo" class="home-badge purple hidden">0</div>
+        <i class="fas fa-list-check"></i><br>CHECK-LIST
+        <div class="small" style="color:rgba(255,255,255,.8);margin-top:6px;">Tâches du jour</div>
+      </div>
+      <div class="home-btn" onclick="app.nav('reception')" style="background:linear-gradient(135deg,#059669,#047857);">
+        <div id="badge-reception" class="home-badge hidden" style="background:rgba(255,255,255,.92);color:#065f46;">0</div>
+        <i class="fas fa-truck-ramp-box"></i><br>RÉCEPTION
+        <div class="small" style="color:rgba(255,255,255,.8);margin-top:6px;">Contrôle livraison</div>
+      </div>
+      <div class="home-btn" onclick="app.nav('chat')" style="background:linear-gradient(135deg,#0891b2,#0369a1);">
+        <div id="badge-chat" class="home-badge hidden" style="background:rgba(255,255,255,.92);color:#0369a1;">0</div>
+        <i class="fas fa-comments"></i><br>MESSAGERIE
+        <div class="small" style="color:rgba(255,255,255,.8);margin-top:6px;">Canaux de discussion</div>
+      </div>
+
+
+
+
+
+      <!-- POINTEUSE -->
+      <div class="home-btn wide" onclick="app.pointeuse.open()" style="background:linear-gradient(135deg,#0f172a,#1e3a5f);position:relative;">
+        <div id="badge-pointeuse" class="home-badge hidden" style="background:rgba(255,255,255,.92);color:#0f172a;">EN POSTE</div>
+        <i class="fas fa-clock"></i><br>POINTEUSE
+        <div class="small" style="color:rgba(255,255,255,.8);margin-top:6px;">Pointage • Feuille de temps</div>
+      </div>
+
+      <!-- GESTION MAGASIN (parent) - inclut aussi Module Carrefour -->
+      <div class="home-btn wide" onclick="app.nav('gestion-magasin')" style="background:linear-gradient(135deg,#0f766e,#134e4a);">
+        <i class="fas fa-building"></i><br>GESTION MAGASIN
+        <div class="small" style="color:rgba(255,255,255,.8);margin-top:6px;">Planning • Inspection</div>
+      </div>
+    </div>
+    <div class="card hidden" id="btn-team" onclick="app.nav('team')" style="text-align:center;cursor:pointer;margin-bottom:10px;display:none!important;"><i class="fas fa-gear"></i> Paramètres & Équipe</div>
+  </div>
+
+  <!-- GESTION DLC - Module parent -->
+  <div id="view-dlc" class="hidden">
+    <div style="text-align:center;margin-bottom:16px;">
+      <div style="font-weight:950;font-size:20px;color:var(--primary);"><i class="fas fa-barcode"></i> GESTION DLC</div>
+      <div class="small" style="margin-top:4px;">Sélectionnez un module</div>
+    </div>
+    <div id="alert-box" style="display:none;background:linear-gradient(135deg,#dc2626,#ef4444);color:white;padding:14px;border-radius:14px;margin-bottom:14px;text-align:center;font-weight:950;font-size:16px;box-shadow:0 4px 20px rgba(239,68,68,.35);"><i class="fas fa-triangle-exclamation"></i> ⚠️ Produits à DATES COURTES — Action requise !</div>
+    <div class="dlc-module-grid">
+      <div class="dlc-sub-card wide" onclick="app.nav('frais')" style="border-color:#003896;background:linear-gradient(135deg,#eff6ff,#fff);">
+        <div id="badge-frais-dlc" style="display:none;background:#ef4444;color:#fff;border-radius:20px;padding:2px 10px;font-size:12px;font-weight:950;margin-bottom:4px;">0 à DLC</div>
+        <i class="fas fa-barcode" style="color:#003896;"></i>
+        <div class="sub-title" style="color:#003896;">DLC FRAIS</div>
+        <div class="sub-sub">Scanner, lister, Too Good To Go</div>
+      </div>
+      <div class="dlc-sub-card" onclick="app.nav('pvp')" style="border-color:var(--pvp);background:linear-gradient(135deg,#fffbeb,#fff);">
+        <div id="badge-pvp-dlc" style="display:none;background:#ef4444;color:#fff;border-radius:20px;padding:2px 8px;font-size:11px;font-weight:950;margin-bottom:4px;">0 à jeter</div>
+        <i class="fas fa-bread-slice" style="color:var(--pvp);"></i>
+        <div class="sub-title" style="color:var(--pvp);">GESTION PVP</div>
+        <div class="sub-sub">Dates courtes rayon</div>
+      </div>
+      <div class="dlc-sub-card" onclick="app.nav('salad')" style="border-color:var(--salad);background:linear-gradient(135deg,#f0fdf4,#fff);">
+        <i class="fas fa-bowl-food" style="color:var(--salad);"></i>
+        <div class="sub-title" style="color:var(--salad);">SALAD BAR</div>
+        <div class="sub-sub">DLC + Traçabilité</div>
+      </div>
+      <div class="dlc-sub-card wide" onclick="window.open('https://store.toogoodtogo.com/stores','_blank','noopener')" style="border-color:#006B3C;background:linear-gradient(135deg,#f0fdf4,#fff);">
+        <i class="fas fa-leaf" style="color:#006B3C;font-size:28px;"></i>
+        <div class="sub-title" style="color:#006B3C;">TOO GOOD TO GO — PORTAIL</div>
+        <div class="sub-sub">Gérer vos paniers sur store.toogoodtogo.com</div>
+      </div>
+      <div class="dlc-sub-card wide" onclick="app.nav('etiquettes')" style="border-color:#9333ea;background:linear-gradient(135deg,#faf5ff,#fff);">
+        <i class="fas fa-tag" style="color:#9333ea;font-size:28px;"></i>
+        <div class="sub-title" style="color:#9333ea;">ÉTIQUETTES -50%</div>
+        <div class="sub-sub">Impression Brother TD-2120N • Démarque</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FRAIS -->
+  <div id="view-frais" class="hidden">
+    <div class="tabs">
+      <div class="tab active" id="tf-1" onclick="app.frais.tab('scan')">SCAN</div>
+      <div class="tab"        id="tf-3" onclick="app.frais.tab('tgtg')" style="color:#006B3C;">TOO GOOD TO GO</div>
+      <div class="tab"        id="tf-2" onclick="app.frais.tab('list')">LISTE</div>
+    </div>
+    <div class="card" id="frais-today-card" style="border-left:6px solid var(--primary);">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+        <div style="font-weight:950;">DLC aujourd'hui</div>
+        <div class="chip warn" id="frais-today-chip"><i class="fas fa-calendar-day"></i> 0</div>
+      </div>
+    </div>
+    <div id="frais-scan">
+      <div id="scanner-box" style="height:200px;background:black;margin-bottom:10px;display:none;border-radius:12px;overflow:hidden;">
+        <video id="video" style="width:100%;height:100%;object-fit:cover;"></video>
+      </div>
+      <button class="btn" onclick="app.frais.toggleScan()"><i class="fas fa-camera"></i> SCANNER</button>
+      <div class="card">
+        <input id="frais-ean" type="text" inputmode="numeric" placeholder="EAN" oninput="app.frais.handleInput(this.value)">
+        <select id="frais-fam"><option>SNACKING</option><option>TRAITEUR</option><option>ULTRA FRAIS</option><option>CHARCUTERIE</option><option>BOUCHERIE</option><option>VOLAILLE</option><option>FROMAGE</option><option>SAURISSERIE</option><option>DIVERS</option></select>
+        <input id="frais-name" placeholder="Nom">
+        <div class="row"><input type="date" id="frais-date"><input type="number" id="frais-qty" placeholder="Qté"></div>
+        <button class="btn" onclick="app.frais.add()">AJOUTER</button>
+      </div>
+    </div>
+    <!-- TOO GOOD TO GO -->
+    <div id="frais-tgtg" class="hidden">
+      <div class="card" style="border-left:5px solid #006B3C;background:linear-gradient(135deg,#f0fdf4,#fff);">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+          <div style="font-size:32px;">🍃</div>
+          <div>
+            <div style="font-weight:950;font-size:16px;color:#006B3C;">Too Good To Go</div>
+            <div class="small">Scannez ou cherchez un produit à déduire du stock</div>
+          </div>
+        </div>
+        <div id="tgtg-scanner-box" style="height:200px;background:black;margin-bottom:10px;display:none;border-radius:12px;overflow:hidden;">
+          <video id="tgtg-video" style="width:100%;height:100%;object-fit:cover;"></video>
+        </div>
+        <button class="btn" style="background:#006B3C;" onclick="app.frais.tgtgToggleScan()"><i class="fas fa-camera"></i> SCANNER</button>
+        <div class="search-wrap" style="margin-top:10px;">
+          <i class="fas fa-magnifying-glass"></i>
+          <input class="search-input" type="search" id="tgtg-search" placeholder="Rechercher un produit…" oninput="app.frais.renderTgtg()" autocomplete="off">
+        </div>
+        <div id="tgtg-result-list" style="margin-top:8px;"></div>
+      </div>
+    </div>
+    <div id="frais-list" class="hidden">
+      <div class="search-wrap">
+        <i class="fas fa-magnifying-glass"></i>
+        <input class="search-input" type="search" id="frais-search" placeholder="Rechercher un produit frais…" oninput="app.frais.render()" autocomplete="off">
+      </div>
+      <div id="frais-list-items"></div>
+    </div>
+  </div>
+
+  <!-- PVP -->
+  <div id="view-pvp" class="hidden">
+    <div class="tabs">
+      <div class="tab active-pvp" id="tp-1" onclick="app.pvp.tab('stock')">RAYON</div>
+      <div class="tab"            id="tp-2" onclick="app.pvp.tab('bib')">BIBLIOTHÈQUE</div>
+      <div class="tab"            id="tp-3" onclick="app.pvp.tab('calc')">BESOINS</div>
+    </div>
+    <div id="pvp-stock"></div>
+    <div id="pvp-bib" class="hidden">
+      <div class="search-wrap">
+        <i class="fas fa-magnifying-glass"></i>
+        <input class="search-input" type="search" id="pvp-search" placeholder="Rechercher un produit PVP…" oninput="app.pvp.render()" autocomplete="off">
+      </div>
+      <button class="btn secondary" id="pvp-create-btn" onclick="app.pvp.openLib()" style="margin-bottom:12px;">+ Créer Produit</button>
+      <div id="lib-list"></div>
+    </div>
+    <div id="pvp-calc" class="hidden"></div>
+  </div>
+
+  <!-- SALAD BAR -->
+  <div id="view-salad" class="hidden">
+    <div class="tabs">
+      <div class="tab active-salad" id="ts-1" onclick="app.salad.tab('stock')">RAYON</div>
+      <div class="tab"              id="ts-2" onclick="app.salad.tab('bib')">BIBLIOTHÈQUE</div>
+    </div>
+    <div id="salad-stock"></div>
+    <div id="salad-bib" class="hidden">
+      <div class="search-wrap">
+        <i class="fas fa-magnifying-glass"></i>
+        <input class="search-input" type="search" id="salad-search" placeholder="Rechercher un produit Salad Bar…" oninput="app.salad.render()" autocomplete="off">
+      </div>
+      <button class="btn secondary" id="salad-create-btn" onclick="app.salad.openLib()" style="margin-bottom:12px;">+ Créer Produit</button>
+      <div id="salad-lib-list"></div>
+    </div>
+  </div>
+
+  <!-- FRIGO -->
+  <div id="view-frigo" class="hidden">
+    <div class="tabs">
+      <div class="tab active-frigo" id="tfr-1" onclick="app.frigo.tab('take')">À FAIRE</div>
+      <div class="tab"              id="tfr-2" onclick="app.frigo.tab('fridges')">FRIGOS</div>
+      <div class="tab"              id="tfr-3" onclick="app.frigo.tab('history')">HISTO</div>
+    </div>
+    <div class="card" style="border-left:6px solid var(--frigo);">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div style="font-weight:950;">Relevés du jour restants</div>
+        <div class="chip frigo" id="frigo-remaining-chip"><i class="fas fa-list-check"></i> 0</div>
+      </div>
+      <div class="small" style="margin-top:6px;">Fréquence : <b id="frigo-perday-label">2</b> relevé(s) / frigo / jour</div>
+    </div>
+    <div id="frigo-take"></div>
+    <div id="frigo-fridges" class="hidden">
+      <div class="card">
+        <h3 style="margin:0 0 10px 0;color:var(--frigo);">Paramètres</h3>
+        <label>Fréquence (relevés / frigo / jour)</label>
+        <select id="frigo-perday" onchange="app.frigo.setPerDay(this.value)">
+          <option value="1">1 / jour</option><option value="2">2 / jour</option>
+          <option value="3">3 / jour</option><option value="4">4 / jour</option>
+        </select>
+      </div>
+      <button class="btn frigo" onclick="app.frigo.addFridge()"><i class="fas fa-plus"></i> Ajouter un frigo</button>
+      <div id="frigo-list" style="margin-top:12px;"></div>
+    </div>
+    <div id="frigo-history" class="hidden"></div>
+  </div>
+
+  <!-- TODO / CHECK-LIST -->
+  <div id="view-todo" class="hidden">
+    <div class="tabs">
+      <div class="tab active-todo" id="tt-1" onclick="app.todo.tab('today')">AUJOURD'HUI</div>
+      <div class="tab"             id="tt-4" onclick="app.todo.tab('tomorrow')">À VENIR</div>
+      <div class="tab"             id="tt-2" onclick="app.todo.tab('config')">CONFIGURER</div>
+      <div class="tab"             id="tt-3" onclick="app.todo.tab('history')">HISTORIQUE</div>
+    </div>
+    <div id="todo-today"></div>
+    <div id="todo-tomorrow" class="hidden"></div>
+    <div id="todo-config" class="hidden"></div>
+    <div id="todo-history" class="hidden"></div>
+  </div>
+
+  <!-- RÉCEPTION -->
+  <div id="view-reception" class="hidden">
+    <div class="tabs">
+      <div class="tab active" style="color:var(--reception);" id="trec-1" onclick="app.reception.tab('new')">NOUVEAU</div>
+      <div class="tab"        id="trec-3" onclick="app.reception.tab('planning')">PLANNING</div>
+      <div class="tab"        id="trec-4" onclick="app.reception.tab('tracking')" style="color:#0369a1;">🚚 CAMION</div>
+      <div class="tab"        id="trec-2" onclick="app.reception.tab('history')">HISTORIQUE</div>
+    </div>
+    <div id="reception-new">
+      <div class="card" style="border-left:5px solid var(--reception);">
+        <h3 style="margin-top:0;color:var(--reception);"><i class="fas fa-truck-ramp-box"></i> Contrôle à la réception</h3>
+        <label>Fournisseur</label>
+        <!-- Étape 1 : choisir le fournisseur -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;" id="rec-supplier-grid">
+          <div class="supplier-select-btn" id="sup-btn-011" onclick="app.reception.selectSupplier('011')">
+            <div style="font-weight:950;font-size:13px;">COLOMIERS</div><div style="font-size:10px;opacity:.8;">011</div>
+          </div>
+          <div class="supplier-select-btn" id="sup-btn-392" onclick="app.reception.selectSupplier('392')">
+            <div style="font-weight:950;font-size:13px;">PLAISANCE</div><div style="font-size:10px;opacity:.8;">392</div>
+          </div>
+          <div class="supplier-select-btn" id="sup-btn-032" onclick="app.reception.selectSupplier('032')">
+            <div style="font-weight:950;font-size:13px;">ST GILES</div><div style="font-size:10px;opacity:.8;">032</div>
+          </div>
+        </div>
+        <!-- Étape 2 : choisir le type (dynamique) -->
+        <div id="rec-type-section" style="display:none;margin-bottom:12px;">
+          <label>Type de livraison</label>
+          <div class="sup-type-grid" id="rec-type-grid"></div>
+        </div>
+        <!-- Étape 3 : résumé sélection + temp -->
+        <div id="rec-selected-supplier" style="display:none;margin-bottom:12px;">
+          <div style="background:#f0fdf4;border:2px solid var(--reception);border-radius:12px;padding:12px;display:flex;align-items:center;justify-content:space-between;">
+            <div>
+              <div style="font-weight:950;" id="rec-sup-label">—</div>
+              <div class="small" id="rec-sup-type-label">—</div>
+            </div>
+            <button onclick="app.reception.clearSupplier()" style="border:none;background:#fee2e2;color:#991b1b;border-radius:8px;padding:6px 10px;font-weight:900;cursor:pointer;">Changer</button>
+          </div>
+        </div>
+        <div id="rec-temp-section" style="display:none;">
+          <label>Température à réception (°C)</label>
+          <div style="background:#f8fafc;border-radius:12px;padding:10px;margin-bottom:10px;">
+            <div class="small" id="rec-temp-range-label" style="font-weight:800;color:#475569;margin-bottom:6px;"></div>
+            <input type="number" id="rec-temp" inputmode="decimal" step="0.1" placeholder="Ex: 3.5" oninput="app.reception._updateTempStatus()">
+            <div id="rec-temp-status"></div>
+          </div>
+        </div>
+        <label>Produit / Nature de la livraison</label>
+        <input type="text" id="rec-product" placeholder="Ex: Viande fraîche, Légumes, Poisson…">
+        <label>Date et heure de contrôle</label>
+        <input type="datetime-local" id="rec-datetime">
+        <label>Observations / Non-conformités</label>
+        <textarea id="rec-notes" placeholder="État emballage, odeur, couleur, quantité…"></textarea>
+        <label>Photo (optionnel)</label>
+        <button class="btn secondary" style="margin-bottom:8px;" onclick="document.getElementById('rec-photo-input').click()"><i class="fas fa-camera"></i> Prendre une photo</button>
+        <input type="file" id="rec-photo-input" accept="image/*" capture="environment" class="hidden">
+        <img id="rec-photo-preview" style="width:100%;max-height:180px;object-fit:contain;border-radius:12px;display:none;margin-bottom:10px;background:#f8fafc;">
+        <div style="display:flex;gap:8px;margin-top:4px;">
+          <button class="btn success" style="margin-top:0;" onclick="app.reception.save(true)"><i class="fas fa-check"></i> CONFORME</button>
+          <button class="btn danger"  style="margin-top:0;" onclick="app.reception.save(false)"><i class="fas fa-xmark"></i> NON CONFORME</button>
+        </div>
+      </div>
+    </div>
+    <div id="reception-history" class="hidden"></div>
+    <div id="reception-planning" class="hidden"></div>
+    <div id="reception-tracking" class="hidden">
+      <div class="card" style="border-left:5px solid #0369a1;background:linear-gradient(135deg,#eff6ff,#fff);">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+          <div style="font-size:32px;">🚚</div>
+          <div>
+            <div style="font-weight:950;font-size:16px;color:#0369a1;">Suivi des Camions</div>
+            <div class="small">MyTravis — Carrefour logistique</div>
+          </div>
+        </div>
+        <div style="background:#f0f7ff;border-radius:10px;padding:12px;margin-bottom:16px;">
+          <div class="small" style="font-weight:800;color:#0369a1;margin-bottom:4px;">IDENTIFIANTS</div>
+          <div style="font-weight:900;font-size:14px;">ID : <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="b4dedbdad5c0dcd5daebd5c6d5c1dedbeb80f4d2c6d5dad7dcddc7d19ad7d5c6c6d1d2dbc1c69ad7dbd9">[email&#160;protected]</a></div>
+          <div style="font-weight:900;font-size:14px;color:#64748b;">MDP : KzD?VB&amp;6bNnS5.3</div>
+        </div>
+        <button class="btn" style="background:#0369a1;" onclick="window.open('https://mytravis.fr.carrefour.com/mytravis','_blank','noopener')"><i class="fas fa-external-link-alt"></i> Ouvrir MyTravis</button>
+      </div>
+    </div>
+  </div>
+  <div id="view-inspection" class="hidden">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <h2 style="margin:0;font-size:18px;color:var(--primary);"><i class="fas fa-chart-bar"></i> Inspection & Rapports</h2>
+      <button class="gear-btn" id="inspection-settings-btn" onclick="app.nav('team')" title="Paramètres équipe"><i class="fas fa-gear"></i></button>
+    </div>
+    <div id="inspection-content"></div>
+  </div>
+
+  <!-- ÉTIQUETTES -50% -->
+  <div id="view-etiquettes" class="hidden">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+      <div style="font-size:28px;">🏷️</div>
+      <div>
+        <div style="font-weight:950;font-size:18px;color:#9333ea;">Étiquettes -50%</div>
+        <div class="small">Imprimante Brother TD-2120N</div>
+      </div>
+    </div>
+    <div class="card" style="border-left:5px solid #9333ea;">
+      <div style="font-weight:950;margin-bottom:10px;color:#9333ea;"><i class="fas fa-triangle-exclamation"></i> Produits à date du jour</div>
+      <div id="etiq-product-list"></div>
+      <button class="btn" style="background:#9333ea;margin-top:8px;" onclick="app.etiquettes.loadProducts()"><i class="fas fa-rotate"></i> Actualiser la liste</button>
+    </div>
+    <div class="card" id="etiq-config-card" style="display:none;">
+      <h3 style="margin-top:0;color:#9333ea;"><i class="fas fa-sliders"></i> Configuration impression</h3>
+      <div id="etiq-items-config"></div>
+      <div style="display:flex;gap:8px;margin-top:12px;">
+        <button class="btn" style="background:#9333ea;" onclick="app.etiquettes.printAll()"><i class="fas fa-print"></i> IMPRIMER TOUT</button>
+      </div>
+    </div>
+    <div class="card" style="background:#f8f4ff;border:1px dashed #9333ea;">
+      <h4 style="margin-top:0;color:#9333ea;"><i class="fas fa-network-wired"></i> Connexion imprimante</h4>
+      <input id="etiq-printer-ip" placeholder="IP imprimante (ex: 192.168.1.50)" style="margin-bottom:8px;">
+      <input id="etiq-printer-port" placeholder="Port (défaut: 9100)" value="9100" style="margin-bottom:8px;">
+      <div id="etiq-printer-status" class="small" style="color:var(--muted);margin-bottom:8px;">Non connecté</div>
+      <button class="btn secondary" onclick="app.etiquettes.testPrinter()"><i class="fas fa-plug"></i> Tester la connexion</button>
+    </div>
+  </div>
+
+
+
+  <!-- GESTION MAGASIN (parent) -->
+  <div id="view-gestion-magasin" class="hidden">
+    <div style="text-align:center;margin-bottom:16px;">
+      <div style="font-weight:950;font-size:20px;color:#0891b2;"><i class="fas fa-building"></i> GESTION MAGASIN</div>
+      <div class="small" style="margin-top:4px;">Outils de gestion • Franchise Carrefour Express</div>
+    </div>
+    <div class="dlc-module-grid">
+      <div class="dlc-sub-card" onclick="app.nav('planning')" style="border-color:#0891b2;background:linear-gradient(135deg,#ecfeff,#fff);">
+        <i class="fas fa-calendar-days" style="color:#0891b2;font-size:30px;"></i>
+        <div class="sub-title" style="color:#0891b2;">PLANNING RH</div>
+        <div class="sub-sub">Planification équipe</div>
+      </div>
+      <div class="dlc-sub-card" onclick="app.inspection.render();app.nav('inspection')" style="border-color:#475569;background:linear-gradient(135deg,#f8fafc,#fff);">
+        <i class="fas fa-chart-bar" style="color:#475569;font-size:30px;"></i>
+        <div class="sub-title" style="color:#475569;">INSPECTION</div>
+        <div class="sub-sub">Rapports & export</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PLANNING MODULE — Tabs: Planning | Résumé | Politique RH -->
+  <div id="view-planning" class="hidden">
+
+    <!-- ── ONGLETS ── -->
+    <div style="display:flex;gap:6px;margin-bottom:12px;background:#fff;border-radius:14px;padding:6px;box-shadow:0 2px 8px rgba(0,0,0,.05);">
+      <div id="plan-tab-grid"  class="tab active" onclick="app.planning.switchTab('grid')" ><i class="fas fa-calendar-days"></i> Planning</div>
+      <div id="plan-tab-recap" class="tab"        onclick="app.planning.switchTab('recap')"><i class="fas fa-chart-bar"></i> Résumé</div>
+      <div id="plan-tab-rh"    class="tab"        onclick="app.planning.switchTab('rh')"  ><i class="fas fa-scale-balanced"></i> Politique RH</div>
+    </div>
+
+    <!-- ══ TAB: GRILLE PLANNING ══ -->
+    <div id="plan-panel-grid">
+      <!-- Nav semaine -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;background:#fff;border-radius:14px;padding:12px 14px;box-shadow:0 2px 8px rgba(0,0,0,.05);">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <button class="qty-btn" onclick="app.planning.prevWeek()"><i class="fas fa-chevron-left"></i></button>
+          <div style="font-weight:950;font-size:14px;color:#0891b2;"><span id="plan-week-label"></span></div>
+          <button class="qty-btn" onclick="app.planning.nextWeek()"><i class="fas fa-chevron-right"></i></button>
+        </div>
+        <div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end;">
+          <button class="qty-btn" title="Copier semaine" onclick="app.planning.copyWeek()"><i class="fas fa-copy"></i></button>
+          <button class="qty-btn" title="Imprimer" onclick="app.planning.printWeek()"><i class="fas fa-print"></i></button>
+          <button class="qty-btn" title="Export CSV" onclick="app.planning.exportCSV()"><i class="fas fa-file-csv"></i></button>
+          <button class="qty-btn" title="Importer utilisateurs appli" style="background:#059669;color:#fff;" onclick="app.planning.importFromUsers()"><i class="fas fa-users-gear"></i></button>
+          <button class="qty-btn" style="background:#0891b2;color:#fff;" onclick="app.planning.addEmployee()"><i class="fas fa-user-plus"></i></button>
+        </div>
+      </div>
+      <!-- Légende -->
+      <div class="post-legend" id="plan-legend">
+        <span class="post-chip" style="background:#dbeafe;color:#1d4ed8;">🏪 CAISSE</span>
+        <span class="post-chip" style="background:#d1fae5;color:#065f46;">📦 RAYON</span>
+        <span class="post-chip" style="background:#fef3c7;color:#92400e;">🚚 RÉCEPTION</span>
+        <span class="post-chip" style="background:#ede9fe;color:#5b21b6;">👔 MANAGE</span>
+        <span class="post-chip" style="background:#fee2e2;color:#991b1b;">🔒 FERMETURE</span>
+        <span class="post-chip" style="background:#e0f2fe;color:#0369a1;">🔑 OUVERTURE</span>
+        <span class="post-chip" style="background:#fce7f3;color:#9d174d;">🌴 CONGÉS</span>
+      </div>
+      <!-- Grille -->
+      <div style="background:#fff;border-radius:16px;padding:10px;box-shadow:0 2px 10px rgba(0,0,0,.05);overflow-x:auto;">
+        <div id="plan-employees"></div>
+      </div>
+      <!-- Footer total semaine -->
+      <div class="card" id="plan-summary" style="display:none;margin-top:10px;padding:12px;">
+        <div id="plan-summary-content"></div>
+      </div>
+    </div>
+
+    <!-- ══ TAB: RÉSUMÉ ══ -->
+    <div id="plan-panel-recap" class="hidden">
+      <div style="display:flex;gap:6px;margin-bottom:12px;">
+        <button id="recap-btn-day"   onclick="app.planning.renderRecap('day')"   style="flex:1;padding:10px;border-radius:10px;border:2px solid #e2e8f0;font-weight:900;font-size:12px;background:#0891b2;color:#fff;cursor:pointer;">Jour</button>
+        <button id="recap-btn-week"  onclick="app.planning.renderRecap('week')"  style="flex:1;padding:10px;border-radius:10px;border:2px solid #e2e8f0;font-weight:900;font-size:12px;background:#fff;color:#334155;cursor:pointer;">Semaine</button>
+        <button id="recap-btn-month" onclick="app.planning.renderRecap('month')" style="flex:1;padding:10px;border-radius:10px;border:2px solid #e2e8f0;font-weight:900;font-size:12px;background:#fff;color:#334155;cursor:pointer;">Mois</button>
+      </div>
+      <div id="plan-recap-content"></div>
+    </div>
+
+    <!-- ══ TAB: POLITIQUE RH ══ -->
+    <div id="plan-panel-rh" class="hidden">
+      <div id="plan-rh-content"></div>
+    </div>
+
+  </div>
+  </div>
+
+  <!-- TEAM -->
+  <div id="view-team" class="hidden">
+    <div class="card" style="border-left:5px solid #003896;background:linear-gradient(135deg,#eff6ff,#fff);">
+      <h3 style="margin-top:0;color:#003896;"><i class="fas fa-grip-vertical"></i> Réorganiser l'écran d'accueil</h3>
+      <p class="small" style="color:#64748b;margin-bottom:12px;">Déplacez les modules à votre convenance. Les modifications sont instantanées.</p>
+      <button class="btn" onclick="app.nav('home');setTimeout(()=>app.homeOrder.startEdit(),100)"><i class="fas fa-arrows-up-down-left-right"></i> Réorganiser les modules</button>
+    </div>
+    <div class="card" style="border-left:5px solid #0891b2;background:linear-gradient(135deg,#f0f9ff,#fff);">
+      <h3 style="margin-top:0;color:#0891b2;"><i class="fas fa-eye"></i> Rôle Conseiller Franchise</h3>
+      <p class="small" style="color:#64748b;margin-bottom:10px;">Le rôle <b>Conseiller</b> donne un accès en <b>lecture seule</b> à toute l'application. Vous pouvez lui attribuer une <b>date d'expiration</b> — après cette date, l'accès est automatiquement révoqué.</p>
+      <div style="background:#e0f2fe;border-radius:10px;padding:10px 12px;font-size:13px;color:#0369a1;font-weight:800;margin-bottom:10px;">
+        <i class="fas fa-info-circle"></i> Créez un compte avec le rôle <b>conseiller</b> puis définissez une expiration dans la liste des utilisateurs.
+      </div>
+      <div id="conseiller-list" style="margin-top:4px;"></div>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0;">Créer un compte staff</h3>
+      <input id="new-u-name"  placeholder="Nom (ex: LUCAS)" autocomplete="off">
+      <input id="new-u-email" placeholder="Email (ex: lucas@...)" inputmode="email" autocomplete="off">
+      <select id="new-u-role"><option value="staff">staff</option><option value="conseiller">conseiller (lecture seule)</option><option value="admin">admin</option></select>
+      <button class="btn" onclick="app.team.createStaff()">Créer + envoyer lien mot de passe</button>
+      <div class="small">Le staff clique "Mot de passe oublié" sur l'écran de login.</div>
+    </div>
+    <!-- GESTION DES CANAUX -->
+    <div class="card" style="border-left:5px solid #0891b2;">
+      <h3 style="margin-top:0;color:#0891b2;"><i class="fas fa-comments"></i> Canaux de messagerie</h3>
+      <p class="small" style="color:#64748b;margin-bottom:12px;">Renommez les canaux et définissez qui peut y accéder.</p>
+      <div id="channels-config-list"></div>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0;">Utilisateurs</h3>
+      <div id="user-list"></div>
+    </div>
+  </div>
+  <!-- ── POINTEUSE ── -->
+  <div id="pointeuse-overlay" class="pointeuse-overlay hidden">
+    <div class="pointeuse-bar">
+      <button onclick="app.pointeuse.close()"><i class="fas fa-arrow-left"></i></button>
+      <div style="flex:1;color:#fff;">
+        <div style="font-weight:950;font-size:16px;"><i class="fas fa-clock" style="color:#6366f1;"></i> Pointeuse</div>
+        <div style="font-size:11px;opacity:.6;" id="ptse-date-label"></div>
+      </div>
+      <button onclick="app.pointeuse.showTab('timesheet')" id="ptse-tab-ts-btn" style="font-size:12px;">📋 Feuille</button>
+      <button onclick="app.pointeuse.showTab('logs')" id="ptse-tab-log-btn" style="font-size:12px;">📋 Aujourd'hui</button>
+    </div>
+
+    <!-- TAB: HORLOGE -->
+    <div id="ptse-tab-clock" class="pointeuse-body">
+      <div class="pointeuse-clock">
+        <div class="pointeuse-timer" id="ptse-timer">00:00:00</div>
+        <div id="ptse-status-chip" class="pointeuse-status-chip off">
+          <span class="dot"></span>
+          <span id="ptse-status-text">Non pointé</span>
+        </div>
+        <div style="font-size:12px;color:rgba(255,255,255,.4);margin-top:8px;" id="ptse-total-label"></div>
+      </div>
+
+      <div class="pointeuse-btn-wrap">
+        <button class="pointeuse-main-btn btn-in" id="ptse-main-btn" onclick="app.pointeuse.toggle()">
+          <i class="fas fa-play" id="ptse-main-icon"></i>
+          <span id="ptse-main-label">POINTER L'ARRIVÉE</span>
+        </button>
+      </div>
+
+      <button class="pointeuse-pause-btn" id="ptse-pause-btn" onclick="app.pointeuse.togglePause()" style="display:none;">
+        <i class="fas fa-mug-hot" id="ptse-pause-icon"></i>
+        <span id="ptse-pause-label">Commencer la pause</span>
+      </button>
+
+      <!-- Récap du jour -->
+      <div class="pointeuse-section" id="ptse-today-section" style="display:none;">
+        <div class="pointeuse-section-title">Récapitulatif du jour</div>
+        <div id="ptse-today-punches"></div>
+      </div>
+    </div>
+
+    <!-- TAB: LOGS AUJOURD'HUI (équipe) -->
+    <div id="ptse-tab-logs" class="pointeuse-body hidden">
+      <div class="pointeuse-section">
+        <div class="pointeuse-section-title">Pointages d'aujourd'hui</div>
+        <div id="ptse-logs-list"></div>
+      </div>
+    </div>
+
+    <!-- TAB: FEUILLE DE TEMPS -->
+    <div id="ptse-tab-timesheet" class="pointeuse-body hidden">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <button onclick="app.pointeuse.prevWeek()" style="background:rgba(255,255,255,.1);border:none;color:#fff;border-radius:10px;padding:8px 14px;font-weight:900;cursor:pointer;font-size:16px;"><i class="fas fa-chevron-left"></i></button>
+        <div style="color:#fff;font-weight:950;font-size:14px;" id="ptse-week-label">Semaine en cours</div>
+        <button onclick="app.pointeuse.nextWeek()" style="background:rgba(255,255,255,.1);border:none;color:#fff;border-radius:10px;padding:8px 14px;font-weight:900;cursor:pointer;font-size:16px;"><i class="fas fa-chevron-right"></i></button>
+      </div>
+      <div id="ptse-timesheet-content"></div>
+    </div>
+  </div>
+
+  <!-- CHAT MODULE -->
+  <div id="view-chat" class="hidden">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+      <button class="qty-btn" onclick="app.goBack()"><i class="fas fa-arrow-left"></i></button>
+      <div>
+        <div style="font-weight:950;font-size:18px;color:var(--primary);"><i class="fas fa-comments"></i> Messagerie</div>
+        <div class="small" style="margin-top:2px;">Communication équipe Express Purpan</div>
+      </div>
+    </div>
+    <div class="chat-layout">
+      <div class="chat-channels" id="chat-channel-list"></div>
+      <div class="chat-messages-wrap" id="chat-messages">
+        <div style="text-align:center;padding:20px;color:#94a3b8;">Sélectionnez un canal</div>
+      </div>
+      <div class="chat-input-row">
+        <textarea id="chat-input" placeholder="Écrivez un message…" rows="1" onkeydown="app.chat.sendOnEnter(event)"></textarea>
+        <button class="chat-send-btn" onclick="app.chat.send()"><i class="fas fa-paper-plane"></i></button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- ── SHIFT EDITOR MODAL ── -->
+<div id="modal-shift-editor" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:80000;display:flex;align-items:flex-end;justify-content:center;padding:16px;">
+  <div class="dlg-card" style="max-width:420px;max-height:92vh;overflow-y:auto;">
+    <div style="font-weight:950;font-size:15px;margin-bottom:14px;color:#0891b2;" id="shift-modal-emp"></div>
+    <!-- Repos -->
+    <div style="display:flex;align-items:center;gap:10px;background:#f8fafc;border-radius:10px;padding:12px;margin-bottom:10px;">
+      <label for="shift-modal-rest" style="font-weight:800;font-size:14px;flex:1;">🌙 Jour de repos</label>
+      <input type="checkbox" id="shift-modal-rest" style="width:22px;height:22px;cursor:pointer;accent-color:#0891b2;" onchange="app.planning.onRestToggle(this.checked)">
+    </div>
+    <!-- Congé -->
+    <div style="display:flex;align-items:center;gap:10px;background:#fdf2f8;border-radius:10px;padding:12px;margin-bottom:10px;">
+      <label for="shift-modal-leave" style="font-weight:800;font-size:14px;flex:1;">🌴 Congé / Absence</label>
+      <input type="checkbox" id="shift-modal-leave" style="width:22px;height:22px;cursor:pointer;accent-color:#db2777;" onchange="app.planning.onLeaveToggle(this.checked)">
+    </div>
+    <div id="shift-leave-type" class="hidden" style="margin-bottom:12px;">
+      <select id="shift-modal-leave-type" style="margin:0;padding:10px;font-size:14px;">
+        <option value="CP">🌴 Congés payés</option>
+        <option value="RTT">📅 RTT</option>
+        <option value="MALADIE">🏥 Arrêt maladie</option>
+        <option value="SANS_SOLDE">💸 Sans solde</option>
+        <option value="FORMATION">📚 Formation</option>
+      </select>
+    </div>
+    <!-- Champs shift -->
+    <div id="shift-modal-fields">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+        <div><label style="font-size:12px;font-weight:800;color:#64748b;display:block;margin-bottom:4px;">Début</label><input type="time" id="shift-modal-start" style="margin:0;padding:12px;font-size:16px;" oninput="app.planning.updateBreakHint()"></div>
+        <div><label style="font-size:12px;font-weight:800;color:#64748b;display:block;margin-bottom:4px;">Fin</label><input type="time" id="shift-modal-end" style="margin:0;padding:12px;font-size:16px;" oninput="app.planning.updateBreakHint()"></div>
+      </div>
+      <!-- Pause -->
+      <div style="background:#fffbeb;border-radius:10px;padding:12px;margin-bottom:12px;">
+        <label style="font-size:12px;font-weight:800;color:#92400e;display:block;margin-bottom:6px;">☕ Temps de pause</label>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <input type="number" id="shift-modal-break" min="0" max="120" step="5" placeholder="0" style="margin:0;padding:10px;font-size:16px;width:90px;">
+          <span style="font-size:14px;font-weight:800;color:#64748b;">minutes</span>
+        </div>
+        <div style="font-size:11px;color:#d97706;margin-top:6px;font-weight:700;" id="shift-break-hint"></div>
+      </div>
+      <!-- Poste -->
+      <label style="font-size:12px;font-weight:800;color:#64748b;display:block;margin-bottom:6px;">Poste</label>
+      <div class="plan-post-grid" id="shift-post-grid"></div>
+      <select id="shift-modal-post" style="display:none;">
+        <option>CAISSE</option><option>RAYON</option><option>RÉCEPTION</option>
+        <option>MANAGE</option><option>MÉNAGE</option><option>FERMETURE</option>
+        <option>OUVERTURE</option><option>AUTRE</option>
+      </select>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px;">
+      <button class="btn" style="background:#0891b2;margin:0;font-size:13px;" onclick="app.planning.saveShift()"><i class="fas fa-check"></i> Enregistrer</button>
+      <button class="btn" style="background:#059669;margin:0;font-size:13px;" onclick="app.planning.duplicateShift()"><i class="fas fa-clone"></i> Dupliquer</button>
+      <button class="btn" style="background:#ef4444;margin:0;font-size:13px;" onclick="app.planning.deleteShift()"><i class="fas fa-trash"></i> Supprimer</button>
+      <button class="btn secondary" style="margin:0;font-size:13px;" onclick="app.planning.closeShiftModal()">Annuler</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── EMPLOYEE SETTINGS MODAL ── -->
+<div id="modal-emp-settings" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:80000;display:flex;align-items:flex-end;justify-content:center;padding:16px;">
+  <div class="dlg-card" style="max-width:420px;max-height:92vh;overflow-y:auto;">
+    <div style="font-weight:950;font-size:16px;margin-bottom:16px;color:#7c3aed;"><i class="fas fa-user-gear"></i> Paramètres employé</div>
+    <label style="font-size:12px;font-weight:800;color:#64748b;display:block;margin-bottom:4px;">Nom complet</label>
+    <input id="emp-set-name" style="margin-bottom:10px;" placeholder="Prénom NOM">
+    <label style="font-size:12px;font-weight:800;color:#64748b;display:block;margin-bottom:4px;">Contrat</label>
+    <input id="emp-set-contract" style="margin-bottom:10px;" placeholder="ex: CDI 35h, Apprenti…">
+    <label style="font-size:12px;font-weight:800;color:#64748b;display:block;margin-bottom:4px;">Taux horaire brut (€/h)</label>
+    <input id="emp-set-rate" type="number" min="0" step="0.01" style="margin-bottom:10px;" placeholder="ex: 11.88">
+    <label style="font-size:12px;font-weight:800;color:#64748b;display:block;margin-bottom:4px;">Plage horaire autorisée</label>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+      <div><label style="font-size:11px;color:#94a3b8;">Pas avant</label><input type="time" id="emp-set-from" style="margin:0;padding:10px;" value="06:00"></div>
+      <div><label style="font-size:11px;color:#94a3b8;">Pas après</label><input type="time" id="emp-set-to" style="margin:0;padding:10px;" value="22:00"></div>
+    </div>
+    <label style="font-size:12px;font-weight:800;color:#64748b;display:block;margin-bottom:4px;">Profil RH</label>
+    <select id="emp-set-profile" style="margin-bottom:14px;">
+      <option value="">— Aucun profil —</option>
+    </select>
+    <div style="background:#fdf2f8;border-radius:12px;padding:12px;margin-bottom:14px;">
+      <div style="font-size:12px;font-weight:800;color:#9d174d;margin-bottom:8px;">🌴 Congés / Vacances (dates bloquantes)</div>
+      <div id="emp-vacances-list" style="margin-bottom:8px;"></div>
+      <button onclick="app.planning.addVacance()" style="background:#db2777;color:#fff;border:none;border-radius:10px;padding:8px 14px;font-weight:900;font-size:12px;cursor:pointer;"><i class="fas fa-plus"></i> Ajouter période</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+      <button class="btn" style="background:#7c3aed;margin:0;" onclick="app.planning.saveEmpSettings()"><i class="fas fa-check"></i> Enregistrer</button>
+      <button class="btn secondary" style="margin:0;" onclick="document.getElementById('modal-emp-settings').classList.add('hidden')">Annuler</button>
+    </div>
+    <button onclick="app.planning.deleteEmployee()" style="width:100%;background:#fee2e2;color:#dc2626;border:none;border-radius:10px;padding:10px;font-weight:900;font-size:13px;cursor:pointer;margin-top:10px;"><i class="fas fa-trash"></i> Supprimer cet employé</button>
+  </div>
+</div>
+
+<!-- ── PRINT PLANNING WRAP ── -->
+<div id="print-planning-wrap"></div>
+
+<nav id="app-nav" class="hidden">
+  <div class="nav-btn" onclick="app.goBack()"><i class="fas fa-arrow-left"></i><br>RETOUR</div>
+  <div class="nav-btn" onclick="app.nav('home')"><i class="fas fa-th-large"></i><br>MENU</div>
+</nav>
+
+<script type="module" src="app.js"></script>
+<!-- BOUTON FLOTTANT PARAMÈTRES (admin seulement) -->
+<button id="float-settings-btn" title="Paramètres & Équipe" onclick="app.nav('team')">
+  <i class="fas fa-gear"></i>
+  <span>PARAM</span>
+</button>
+<!-- BOUTON FLOTTANT RÉORGANISER (admin seulement) -->
+<button id="home-reorder-btn" title="Réorganiser les modules" onclick="app.homeOrder.startEdit()">
+  <i class="fas fa-grip-vertical"></i>
+</button>
+</body>
+</html>
